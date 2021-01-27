@@ -15,13 +15,15 @@ sugar to make it more pleasant to query the CDA.
 ```
 from cdapython import Q
 
-q1 = Q('demographic.age_at_index >= 50')
-q2 = Q('project.project_id = "TCGA-OV"')
-q3 = Q('diagnoses.figo_stage = "Stage IIIC"')
+q1 = Q('Diagnosis.age_at_diagnosis >= 50')
+q2 = Q('Specimen.associated_project = "TCGA-OV"')
+q3 = Q('Diagnosis.tumor_stage = "Stage IIIC"')
 
 q = q1.And(q2).And(q3)
-print(q.sql())
-rows = q.run()
+response = q.run()
+
+response.query_sql # Gives the SQL executed
+response.result[0] # Gives first row of result as a Python dict
 ```
 
 Any given part of a query is expressed as a string of three parts separated by spaces:
@@ -43,13 +45,15 @@ parts of a query are explicity split apart.
 
 ```
 from cdapython import Q, Col, Quoted
-q3 = Q(Col('diagnoses.figo_stage), "=", Quoted('Stage IIIC'))
+
+q1 = Q(Col('Diagnosis.age_at_diagnosis'), '>=', 50)
+q3 = Q(Col('Diagnosis.tumor_stage), "=", Quoted('Stage IIIC'))
 ```
 
 
 # Pointing to a custom CDA instance
 
-`.run()` will execute the query on the public CDA API on the 
+`.run()` will execute the query on the public CDA API (`https://cda.cda-dev.broadinstitute.org/api/cda/v1/`).
 
 `.run("http://localhost:8080")` will execute the query on a CDA server running at
 `http://localhost:8080`.  
