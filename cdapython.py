@@ -3,9 +3,9 @@ from typing import Union, List
 import cda_client
 from cda_client.rest import ApiException
 
-__version__ = "2021.1.26"
+__version__ = "2021.1.27"
 
-CDA_API_URL = "https://cda.cda-dev.broadinstitute.org/api/cda/v1/"
+CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
 
 
 def Col(col_name) -> cda_client.Query:

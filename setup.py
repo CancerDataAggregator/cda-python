@@ -2,7 +2,7 @@ import pathlib
 from datetime import datetime
 from setuptools import setup, find_packages
 
-__version__ = "2021.1.26"
+__version__ = "2021.1.27"
 current_path = pathlib.Path(__file__).parent
 
 name = "cdapython"
