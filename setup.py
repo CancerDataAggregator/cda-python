@@ -14,7 +14,7 @@ long_description = desc_path.open("r").read()
 setup(
     name=name,
     version=version,
-    packages=find_packages(),
+    py_modules=['cdapython'],
     platforms=['POSIX', 'MacOS', 'Windows'],
     python_requires='>=3.6',
     install_requires=[
