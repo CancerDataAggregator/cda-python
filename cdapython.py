@@ -1,9 +1,10 @@
 from typing import Union, List
+import sys
 
 import cda_client
 from cda_client.rest import ApiException
 
-__version__ = "2021.1.27"
+__version__ = "2021.2.19"
 
 CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
 
@@ -53,12 +54,11 @@ class Q:
         self.query.l = _l
         self.query.r = _r
 
-    def run(self, offset=0, limit=None, version="v0", host=CDA_API_URL):
+    def run(self, offset=0, limit=None, version="v1", host=CDA_API_URL):
         with cda_client.ApiClient(
             configuration=cda_client.Configuration(host=host)
         ) as api_client:
             api_instance = cda_client.QueryApi(api_client)
-            version = version  # str | Dataset version
             query = self.query  # Query | The boolean query
             offset = offset  # int | The number of entries to skip (optional)
             limit = limit  # int | The numbers of entries to return (optional)
@@ -74,3 +74,40 @@ class Q:
 
     def Or(self, right: "Q"):
         return Q(self.query, "OR", right.query)
+
+
+def unique_terms(col_name, version="v1", host=CDA_API_URL):
+    with cda_client.ApiClient(
+        configuration=cda_client.Configuration(host=host)
+    ) as api_client:
+        api_instance = cda_client.QueryApi(api_client)
+        _new_col, _unnest = _get_unnest_clause(col_name=col_name)
+
+        query = f"SELECT DISTINCT({_new_col}) FROM `gdc-bq-sample.cda_mvp.{version}`, {','.join(_unnest)}"
+        sys.stderr.write(f"{query}\n")
+
+        # Execute boolean query
+        api_response = api_instance.sql_query(
+            version, query, offset=0, limit=10000
+        )
+        return api_response
+
+
+# column ->
+# SELECT DISTINCT(column)
+
+# D.column ->
+# SELECT DISTINCT(_D.column) FROM TABLE, UNNEST(D) AS _D
+
+# A.B.C.D.column ->
+# SELECT DISTINCT(_D.column) FROM TABLE, UNNEST(A) AS _A, UNNEST(_A.B) AS _B, UNNEST(_B.C) AS _C, UNNEST(_C.D) AS _D
+def _get_unnest_clause(col_name):
+    _new_col, _unnest = col_name, []
+    c = col_name.split(".")
+    if len(c) > 1:
+        _new_col = f"_{c[-2]}.{c[-1]}"
+        _unnest = [f"UNNEST({c[0]}) AS _{c[0]}"]
+        for n in range(1, len(c) - 1):
+            _unnest += [f"UNNEST(_{c[n-1]}.{c[n]}) AS _{c[n]}"]
+        
+    return (_new_col, _unnest)
