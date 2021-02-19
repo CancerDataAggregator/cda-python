@@ -7,6 +7,114 @@ sugar to make it more pleasant to query the CDA.
 
 `pip install git+https://github.com/CancerDataAggregator/cda-python.git`
 
+# Basics
+
+```
+from cdapython import Q, unique_terms
+
+
+unique_terms("ResearchSubject.primary_disease_type")
+
+# Results in a list of unique terms for this column eg:
+# [None,
+#  'Acinar Cell Neoplasms',
+#  'Adenomas and Adenocarcinomas',
+#  'Adnexal and Skin Appendage Neoplasms',
+#  'Basal Cell Neoplasms',
+#  'Blood Vessel Tumors',
+#  'Breast Invasive Carcinoma',
+#  'Chromophobe Renal Cell Carcinoma',
+#  'Chronic Myeloproliferative Disorders',
+#  'Clear Cell Renal Cell Carcinoma',
+#  'Colon Adenocarcinoma',
+# ...
+
+q1 = Q('ResearchSubject.primary_disease_type = "Adenomas and Adenocarcinomas"')
+r = q1.run()                                 # Executes this query on the public CDA server
+# r = q1.run(host="http://localhost:8080")   # Executes on local instance of CDA server
+# r = q1.run(limit=2)                        # Limit to two results per page
+
+
+r.sql   # Return SQL string used to generate the query e.g.
+# "SELECT * FROM gdc-bq-sample.cda_mvp.v1, UNNEST(ResearchSubject) AS _ResearchSubject WHERE (_ResearchSubject.primary_disease_type = 'Adenomas and Adenocarcinomas')"
+
+print(r)
+
+# Prints some brief information about the result page eg:
+#
+# Query: SELECT * FROM gdc-bq-sample.cda_mvp.v1, UNNEST(ResearchSubject) AS _ResearchSubject WHERE (_ResearchSubject.# primary_disease_type = 'Adenomas and Adenocarcinomas')
+# Offset: 0
+# Limit: 2
+# Count: 2
+# More pages: Yes
+
+
+r[0]  
+
+# Returns nth result of this page as a Python dict e.g.
+#
+# {'days_to_birth': None,
+#  'race': None,
+#  'sex': None,
+#  'ethnicity': None,
+#  'id': '4d54f72c-e8ac-44a7-8ab9-9f20001750b3',
+#  'ResearchSubject': [{'Diagnosis': [],
+#    'Specimen': [],
+#    'associated_project': 'CGCI-HTMCP-CC',
+#    'id': '4d54f72c-e8ac-44a7-8ab9-9f20001750b3',
+#    'primary_disease_type': 'Adenomas and Adenocarcinomas',
+#    'identifier': [{'system': 'GDC',
+#      'value': '4d54f72c-e8ac-44a7-8ab9-9f20001750b3'}],
+#    'primary_disease_site': 'Cervix uteri'}],
+#  'Diagnosis': [],
+#  'Specimen': [],
+#  'associated_project': 'CGCI-HTMCP-CC',
+#  'primary_disease_type': 'Adenomas and Adenocarcinomas',
+#  'identifier': [{'system': 'GDC',
+#    'value': '4d54f72c-e8ac-44a7-8ab9-9f20001750b3'}],
+#  'primary_disease_site': 'Cervix uteri'}
+
+
+r.pretty_print(0)
+
+# Prints the nth result nicely
+#
+# { 'Diagnosis': [],
+#   'ResearchSubject': [ { 'Diagnosis': [],
+#                          'Specimen': [],
+#                          'associated_project': 'CGCI-HTMCP-CC',
+#                          'id': '4d54f72c-e8ac-44a7-8ab9-9f20001750b3',
+#                          'identifier': [ { 'system': 'GDC',
+#                                            'value': '4d54f72c-e8ac-44a7-8ab9-9f20001750b3'}],
+#                          'primary_disease_site': 'Cervix uteri',
+#                          'primary_disease_type': 'Adenomas and '
+#                                                  'Adenocarcinomas'}],
+#   'Specimen': [],
+#   'associated_project': 'CGCI-HTMCP-CC',
+#   'days_to_birth': None,
+#   'ethnicity': None,
+#   'id': '4d54f72c-e8ac-44a7-8ab9-9f20001750b3',
+#   'identifier': [ { 'system': 'GDC',
+#                     'value': '4d54f72c-e8ac-44a7-8ab9-9f20001750b3'}],
+#   'primary_disease_site': 'Cervix uteri',
+#   'primary_disease_type': 'Adenomas and Adenocarcinomas',
+#   'race': None,
+#   'sex': None}
+
+
+r2 = r.next_page()  # Fetches the next page of results 
+
+print(r2)
+
+# Query: SELECT * FROM gdc-bq-sample.cda_mvp.v1, UNNEST(ResearchSubject) AS _ResearchSubject WHERE (_ResearchSubject.# primary_disease_type = 'Adenomas and Adenocarcinomas')
+# Offset: 2
+# Limit: 2
+# Count: 2
+# More pages: Yes
+```
+
+
+
 # A simple query
 
 > Select data from TCGA-OV project, with donors over age 50 with Stage IIIC cancer
