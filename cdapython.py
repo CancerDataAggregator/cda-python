@@ -83,14 +83,14 @@ def unique_terms(col_name, version="v1", host=CDA_API_URL):
         api_instance = cda_client.QueryApi(api_client)
         _new_col, _unnest = _get_unnest_clause(col_name=col_name)
 
-        query = f"SELECT DISTINCT({_new_col}) FROM `gdc-bq-sample.cda_mvp.{version}`, {','.join(_unnest)}"
+        query = f"SELECT DISTINCT({_new_col}) FROM `gdc-bq-sample.cda_mvp.{version}`, {','.join(_unnest)} ORDER BY {_new_col}"
         sys.stderr.write(f"{query}\n")
 
         # Execute boolean query
         api_response = api_instance.sql_query(
             version, query, offset=0, limit=10000
         )
-        return api_response
+        return [list(t.values())[0] for t in api_response.result]
 
 
 # column ->
