@@ -13,9 +13,23 @@ sugar to make it more pleasant to query the CDA.
 from cdapython import Q, unique_terms
 
 
-unique_terms("ResearchSubject.primary_disease_type")
+columns() # List column names eg:
+# ['days_to_birth',
+#  'race',
+#  'sex',
+#  'ethnicity',
+#  'id',
+#  'ResearchSubject',
+#  'ResearchSubject.Diagnosis',
+#  'ResearchSubject.Diagnosis.morphology',
+#  'ResearchSubject.Diagnosis.tumor_stage',
+#  'ResearchSubject.Diagnosis.tumor_grade',
+#  'ResearchSubject.Diagnosis.Treatment',
+#  'ResearchSubject.Diagnosis.Treatment.type',
+#  'ResearchSubject.Diagnosis.Treatment.outcome',
 
-# Results in a list of unique terms for this column eg:
+
+unique_terms("ResearchSubject.primary_disease_type") # List unique terms for this column eg:
 # [None,
 #  'Acinar Cell Neoplasms',
 #  'Adenomas and Adenocarcinomas',
@@ -31,6 +45,7 @@ unique_terms("ResearchSubject.primary_disease_type")
 
 q1 = Q('ResearchSubject.primary_disease_type = "Adenomas and Adenocarcinomas"')
 r = q1.run()                                 # Executes this query on the public CDA server
+
 # r = q1.run(host="http://localhost:8080")   # Executes on local instance of CDA server
 # r = q1.run(limit=2)                        # Limit to two results per page
 
@@ -38,9 +53,7 @@ r = q1.run()                                 # Executes this query on the public
 r.sql   # Return SQL string used to generate the query e.g.
 # "SELECT * FROM gdc-bq-sample.cda_mvp.v1, UNNEST(ResearchSubject) AS _ResearchSubject WHERE (_ResearchSubject.primary_disease_type = 'Adenomas and Adenocarcinomas')"
 
-print(r)
-
-# Prints some brief information about the result page eg:
+print(r) # Prints some brief information about the result page eg:
 #
 # Query: SELECT * FROM gdc-bq-sample.cda_mvp.v1, UNNEST(ResearchSubject) AS _ResearchSubject WHERE (_ResearchSubject.# primary_disease_type = 'Adenomas and Adenocarcinomas')
 # Offset: 0
@@ -49,9 +62,7 @@ print(r)
 # More pages: Yes
 
 
-r[0]  
-
-# Returns nth result of this page as a Python dict e.g.
+r[0] # Returns nth result of this page as a Python dict e.g.
 #
 # {'days_to_birth': None,
 #  'race': None,
@@ -75,9 +86,7 @@ r[0]
 #  'primary_disease_site': 'Cervix uteri'}
 
 
-r.pretty_print(0)
-
-# Prints the nth result nicely
+r.pretty_print(0) # Prints the nth result nicely
 #
 # { 'Diagnosis': [],
 #   'ResearchSubject': [ { 'Diagnosis': [],
@@ -117,32 +126,64 @@ print(r2)
 
 # A simple query
 
-> Select data from TCGA-OV project, with donors over age 50 with Stage IIIC cancer
+> Select data from TCGA-OV project, with donors over age 50
 
 ## Quick form
 ```
 from cdapython import Q
 
-q1 = Q('Diagnosis.age_at_diagnosis >= 50')
-q2 = Q('Specimen.associated_project = "TCGA-OV"')
-q3 = Q('Diagnosis.tumor_stage = "Stage IIIC"')
+q1 = Q('ResearchSubject.Diagnosis.age_at_diagnosis > 50*365')
+q2 = Q('ResearchSubject.associated_project = "TCGA-OV"')
 
-q = q1.And(q2).And(q3)
-response = q.run()
+q = q1.And(q2)
+r = q.run()
 
-response.query_sql # Gives the SQL executed
-response.result[0] # Gives first row of result as a Python dict
+print(r)
+
+# Query: SELECT * FROM gdc-bq-sample.cda_mvp.v1, UNNEST(ResearchSubject) AS _ResearchSubject, UNNEST(_ResearchSubject.Diagnosis) AS # _Diagnosis WHERE ((_Diagnosis.age_at_diagnosis > 50*365) AND (_ResearchSubject.associated_project = 'TCGA-OV'))
+# Offset: 0
+# Limit: 1000
+# Count: 461
+# More pages: No
+
+r.pretty_print(2)
+# { 'Diagnosis': [ { 'Treatment': [ { 'outcome': None,
+#                                     'type': 'Radiation Therapy, NOS'},
+#                                   { 'outcome': None,
+#                                     'type': 'Pharmaceutical Therapy, NOS'}],
+#                    'age_at_diagnosis': 28779,
+#                    'id': 'dc8af98b-03cb-5817-84fa-d86a7f2df8c6',
+#                    'morphology': '8441/3',
+#                    'primary_diagnosis': 'Serous cystadenocarcinoma, NOS',
+#                    'tumor_grade': 'not reported',
+#                    'tumor_stage': 'not reported'}],
+#   'ResearchSubject': [ { 'Diagnosis': [ { 'Treatment': [ { 'outcome': None,
+#                                                            'type': 'Radiation '
+#                                                                    'Therapy, '
+#                                                                    'NOS'},
+#                                                          { 'outcome': None,
+#                                                            'type': 'Pharmaceutical '
+#                                                                    'Therapy, '
+#                                                                    'NOS'}],
+#                                           'age_at_diagnosis': 28779,
+#                                           'id': 'dc8af98b-03cb-5817-84fa-d86a7f2df8c6',
+#                                           'morphology': '8441/3',
+#                                           'primary_diagnosis': 'Serous '
+#                                                                'cystadenocarcinoma, '
+#                                                                'NOS',
+#                                           'tumor_grade': 'not reported',
+#                                           'tumor_stage': 'not reported'}],
+# ...
+
 ```
 
 Any given part of a query is expressed as a string of three parts separated by spaces:
 ```
-Q('project.project_id = "TCGA-OV"')
+Q('esearchSubject.associated_project = "TCGA-OV"')
 ```
 The first part is interpreted as a column name, the second as a comparator and
 the third part as a value. If the value is a string, it needs to be put in
 quotes.
-
-A query can be executed (`.run()`) or the generated SQL inspected (`.sql()`)
 
 
 ## Detailed form
@@ -154,8 +195,8 @@ parts of a query are explicity split apart.
 ```
 from cdapython import Q, Col, Quoted
 
-q1 = Q(Col('Diagnosis.age_at_diagnosis'), '>=', 50)
-q3 = Q(Col('Diagnosis.tumor_stage), "=", Quoted('Stage IIIC'))
+q1 = Q(Col('ResearchSubject.Diagnosis.age_at_diagnosis'), '>=', 50 * 365)
+q2 = Q(Col('ResearchSubject.associated_project), '=' Quoted('TCGA-OV'))
 ```
 
 
