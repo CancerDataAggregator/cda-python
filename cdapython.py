@@ -8,6 +8,7 @@ from cda_client.rest import ApiException
 __version__ = "2021.2.19"
 
 CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
+table_version = "v2"
 
 pp = pprint.PrettyPrinter(indent=2)
 
@@ -57,7 +58,7 @@ class Q:
         self.query.l = _l
         self.query.r = _r
 
-    def run(self, offset=0, limit=1000, version="v1", host=CDA_API_URL):
+    def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL):
         with cda_client.ApiClient(
             configuration=cda_client.Configuration(host=host)
         ) as api_client:
@@ -137,7 +138,7 @@ More pages: {"No" if self.count < self._limit else "Yes"}
             return Result(api_response, _offset, _limit, version=self._version, host=self._host)
 
 
-def columns(version="v1", host=CDA_API_URL):
+def columns(version=table_version, host=CDA_API_URL):
     """Get columns names from the database."""
     query = f"SELECT field_path FROM `gdc-bq-sample.cda_mvp.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS` WHERE table_name = '{version}'"
     sys.stderr.write(f"{query}\n")
@@ -152,7 +153,7 @@ def columns(version="v1", host=CDA_API_URL):
         return [list(t.values())[0] for t in api_response.result]
 
 
-def unique_terms(col_name, version="v1", host=CDA_API_URL):
+def unique_terms(col_name, version=table_version, host=CDA_API_URL):
     with cda_client.ApiClient(
         configuration=cda_client.Configuration(host=host)
     ) as api_client:
