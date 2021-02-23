@@ -10,7 +10,7 @@ sugar to make it more pleasant to query the CDA.
 # Basics
 
 ```
-from cdapython import Q, unique_terms
+from cdapython import Q, columns, unique_terms
 
 
 columns() # List column names eg:
