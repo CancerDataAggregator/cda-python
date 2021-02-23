@@ -9,6 +9,8 @@ sugar to make it more pleasant to query the CDA.
 
 # Basics
 
+(Also see example [IPython notebook](example.ipynb))
+
 ```
 from cdapython import Q, columns, unique_terms
 

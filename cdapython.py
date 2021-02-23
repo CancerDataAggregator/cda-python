@@ -5,7 +5,7 @@ import pprint
 import cda_client
 from cda_client.rest import ApiException
 
-__version__ = "2021.2.19"
+__version__ = "2021.2.23"
 
 CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
 table_version = "v2"
