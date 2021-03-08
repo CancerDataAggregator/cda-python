@@ -1,9 +1,8 @@
-from typing import Union, List
-import sys
 import pprint
+import sys
+from typing import Union
 
 import cda_client
-from cda_client.rest import ApiException
 
 __version__ = "2021.2.23"
 
@@ -58,7 +57,7 @@ class Q:
         self.query.l = _l
         self.query.r = _r
 
-    def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL):
+    def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False):
         with cda_client.ApiClient(
             configuration=cda_client.Configuration(host=host)
         ) as api_client:
@@ -69,7 +68,7 @@ class Q:
 
             # Execute boolean query
             api_response = api_instance.boolean_query(
-                version, query, offset=offset, limit=limit
+                version, query, offset=offset, limit=limit, dry_run=dry_run
             )
             return Result(api_response, offset, limit, version, host)
 
@@ -78,6 +77,9 @@ class Q:
 
     def Or(self, right: "Q"):
         return Q(self.query, "OR", right.query)
+
+    def From(self, right: "Q"):
+        return Q(self.query, "SUBQUERY", right.query)
 
 
 class Result:
