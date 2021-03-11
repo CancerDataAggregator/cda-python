@@ -208,7 +208,7 @@ parts of a query are explicity split apart.
 from cdapython import Q, Col, Quoted
 
 q1 = Q(Col('ResearchSubject.Diagnosis.age_at_diagnosis'), '>=', 50 * 365)
-q2 = Q(Col('ResearchSubject.associated_project), '=' Quoted('TCGA-OV'))
+q2 = Q(Col('ResearchSubject.associated_project'), '=', Quoted('TCGA-OV'))
 ```
 
 
