@@ -3,6 +3,8 @@ This library sits on top of the machine generated
 [CDA Python Client](https://github.com/CancerDataAggregator/cda-service-python-client) and offers some syntactic 
 sugar to make it more pleasant to query the CDA.
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/CancerDataAggregator/cda-python/HEAD?filepath=example.ipynb)
+
 # Install
 
 `pip install git+https://github.com/CancerDataAggregator/cda-python.git`
