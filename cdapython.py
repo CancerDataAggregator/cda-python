@@ -4,10 +4,10 @@ from typing import Union
 
 import cda_client
 
-__version__ = "2021.2.23"
+__version__ = "2021.3.11"
 
 CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
-table_version = "v2"
+table_version = "v3"
 
 pp = pprint.PrettyPrinter(indent=2)
 
