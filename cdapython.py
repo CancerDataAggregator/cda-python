@@ -81,6 +81,9 @@ class Q:
     def From(self, right: "Q"):
         return Q(self.query, "SUBQUERY", right.query)
 
+    def Not(self):
+        return Q(self.query, "NOT", None)
+
 
 class Result:
     """A convenient wrapper around the response object from the CDA service."""
