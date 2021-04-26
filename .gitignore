@@ -1,0 +1,15 @@
+# Intellij IDEA
+.idea
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# pip install -e generated
+cdapython.egg-info
+
+# Python
+*.pyc
+**/__pycache__
+
+# pytest
+.pytest_cache
