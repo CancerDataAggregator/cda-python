@@ -36,11 +36,11 @@ def infer_quote(val: Union[int, float, str, "Q", Query]) -> Query:
         return Unquoted(val)
 
 
-def get_query_result(api_instance, query_id, offset, page_size):
+def get_query_result(api_instance, query_id, offset, limit):
     while True:
-        response = api_instance.query(id=query_id, offset=offset, page_size=page_size)
+        response = api_instance.query(id=query_id, offset=offset, limit=limit)
         if response.total_row_count is not None:
-            return Result(response, query_id, offset, page_size, api_instance)
+            return Result(response, query_id, offset, limit, api_instance)
 
 
 class Q:
@@ -64,21 +64,16 @@ class Q:
         self.query.l = _l
         self.query.r = _r
 
-    def run(self, offset=0, limit=1000000, page_size=1000, version=table_version, host=CDA_API_URL, dry_run=False):
+    def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False):
         with cda_client.ApiClient(
                 configuration=cda_client.Configuration(host=host)
         ) as api_client:
             api_instance = QueryApi(api_client)
-            # The boolean query
-            query = self.query
-            # If present, the maximum of size of the query's results
-            limit = limit
-
             # Execute boolean query
-            api_response = api_instance.boolean_query(query, version=version, limit=limit, dry_run=dry_run)
+            api_response = api_instance.boolean_query(self.query, version=version, dry_run=dry_run)
             if dry_run is True:
                 return api_response
-            return get_query_result(api_instance, api_response.query_id, offset, page_size)
+            return get_query_result(api_instance, api_response.query_id, offset, limit)
 
     def And(self, right: "Q"):
         return Q(self.query, "AND", right.query)
@@ -96,11 +91,11 @@ class Q:
 class Result:
     """A convenient wrapper around the response object from the CDA service."""
 
-    def __init__(self, api_response, query_id, offset, page_size, api_instance) -> None:
+    def __init__(self, api_response, query_id, offset, limit, api_instance) -> None:
         self._api_response = api_response
         self._query_id = query_id
         self._offset = offset
-        self._page_size = page_size
+        self._limit = limit
         self._api_instance = api_instance
 
     def __str__(self) -> str:
@@ -125,7 +120,7 @@ More pages: {self.has_next_page}
 
     @property
     def has_next_page(self):
-        return (self._offset + self._page_size) <= self.total_row_count
+        return (self._offset + self._limit) <= self.total_row_count
 
     def __getitem__(self, idx):
         return self._api_response.result[idx]
@@ -133,22 +128,22 @@ More pages: {self.has_next_page}
     def pretty_print(self, idx):
         pp.pprint(self[idx])
 
-    def next_page(self, page_size=None):
+    def next_page(self, limit=None):
         if not self.has_next_page:
             raise StopIteration
 
-        _offset = self._offset + self._page_size
-        _page_size = page_size or self._page_size
-        return self._get_result(_offset, _page_size)
+        _offset = self._offset + self._limit
+        _limit = limit or self._limit
+        return self._get_result(_offset, _limit)
 
-    def prev_page(self, page_size=None):
-        _offset = self._offset - self._page_size
+    def prev_page(self, limit=None):
+        _offset = self._offset - self._limit
         _offset = max(0, _offset)
-        _page_size = page_size or self._page_size
-        return self._get_result(_offset, _page_size)
+        _limit = limit or self._limit
+        return self._get_result(_offset, _limit)
 
-    def _get_result(self, _offset, _page_size):
-        return get_query_result(self._api_instance, self._query_id, _offset, _page_size)
+    def _get_result(self, _offset, _limit):
+        return get_query_result(self._api_instance, self._query_id, _offset, _limit)
 
 
 def columns(version=table_version, host=CDA_API_URL):
@@ -160,9 +155,8 @@ def columns(version=table_version, host=CDA_API_URL):
             configuration=cda_client.Configuration(host=host)
     ) as api_client:
         api_instance = QueryApi(api_client)
-        limit = 1000
-        api_response = api_instance.sql_query(query, version=version, limit=limit)
-        query_result = get_query_result(api_instance, api_response.query_id, 0, limit)
+        api_response = api_instance.sql_query(query, version=version)
+        query_result = get_query_result(api_instance, api_response.query_id, 0, 1000)
         return [list(t.values())[0] for t in query_result]
 
 
@@ -191,9 +185,8 @@ def unique_terms(col_name, system=None, version=table_version, host=CDA_API_URL)
         sys.stderr.write(f"{query}\n")
 
         # Execute query
-        limit = 1000
-        api_response = api_instance.sql_query(query, version=version, limit=limit)
-        query_result = get_query_result(api_instance, api_response.query_id, 0, limit)
+        api_response = api_instance.sql_query(query, version=version)
+        query_result = get_query_result(api_instance, api_response.query_id, 0, 1000)
         return [list(t.values())[0] for t in query_result]
 
 
