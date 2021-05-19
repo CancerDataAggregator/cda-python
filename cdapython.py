@@ -101,7 +101,6 @@ class Result:
     def __str__(self) -> str:
         return f"""
 Query: {self.sql}
-Offset: {self._offset}
 Count: {self.count}
 Total Row Count: {self.total_row_count}
 More pages: {self.has_next_page}
