@@ -43,11 +43,15 @@ def get_query_result(api_instance, query_id, offset, limit):
             return Result(response, query_id, offset, limit, api_instance)
 
 
+
+
 class Q:
     def __init__(self, *args) -> None:
         self.query = Query()
+        keySQLTerms=["AND","OR","SUBQUERY","NOT"]
 
         if len(args) == 1:
+            args[0].find()
             _l, _op, _r = args[0].split(" ", 2)
             _l = Col(_l)
             _r = infer_quote(_r)
@@ -69,6 +73,7 @@ class Q:
                 configuration=cda_client.Configuration(host=host)
         ) as api_client:
             api_instance = QueryApi(api_client)
+            print(api_instance)
             # Execute boolean query
             api_response = api_instance.boolean_query(self.query, version=version, dry_run=dry_run)
             if dry_run is True:
@@ -146,19 +151,22 @@ More pages: {self.has_next_page}
     def _get_result(self, _offset, _limit):
         return get_query_result(self._api_instance, self._query_id, _offset, _limit)
 
-
 def columns(version=table_version, host=CDA_API_URL):
     """Get columns names from the database."""
     query = f"SELECT field_path FROM `gdc-bq-sample.cda_mvp.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS` WHERE table_name = '{version}'"
     sys.stderr.write(f"{query}\n")
     # Execute query
-    with cda_client.ApiClient(
-            configuration=cda_client.Configuration(host=host)
-    ) as api_client:
+    with cda_client.ApiClient(configuration=cda_client.Configuration(host=host)) as api_client:
         api_instance = QueryApi(api_client)
         api_response = api_instance.sql_query(query, version=version)
         query_result = get_query_result(api_instance, api_response.query_id, 0, 1000)
         return [list(t.values())[0] for t in query_result]
+def test(host=CDA_API_URL):
+    with cda_client.ApiClient(
+        configuration= cda_client.Configuration(host=host)
+    ) as api_client:
+        api_instance = QueryApi(api_client)
+        print(api_instance.sql_query())
 
 
 def unique_terms(col_name, system=None, version=table_version, host=CDA_API_URL):
@@ -167,6 +175,7 @@ def unique_terms(col_name, system=None, version=table_version, host=CDA_API_URL)
     ) as api_client:
         api_instance = QueryApi(api_client)
         _new_col, _unnest_col = _get_unnest_clause(col_name=col_name)
+       
 
         if system:
             _new_system, _unnest_system = _get_unnest_clause(col_name='ResearchSubject.identifier.system')
@@ -188,6 +197,9 @@ def unique_terms(col_name, system=None, version=table_version, host=CDA_API_URL)
         # Execute query
         api_response = api_instance.sql_query(query, version=version)
         query_result = get_query_result(api_instance, api_response.query_id, 0, 1000)
+        for i in [list(t.values())[0] for t in query_result]:
+            print(i)
+
         return [list(t.values())[0] for t in query_result]
 
 
@@ -201,11 +213,11 @@ def unique_terms(col_name, system=None, version=table_version, host=CDA_API_URL)
 # SELECT DISTINCT(_D.column) FROM TABLE, UNNEST(A) AS _A, UNNEST(_A.B) AS _B, UNNEST(_B.C) AS _C, UNNEST(_C.D) AS _D
 def _get_unnest_clause(col_name):
     _new_col, _unnest = col_name, []
-    c = col_name.split(".")
-    if len(c) > 1:
-        _new_col = f"_{c[-2]}.{c[-1]}"
-        _unnest = [f"UNNEST({c[0]}) AS _{c[0]}"]
-        for n in range(1, len(c) - 1):
-            _unnest += [f"UNNEST(_{c[n - 1]}.{c[n]}) AS _{c[n]}"]
-
+    col_nameArray = col_name.split(".")
+    if len(col_nameArray) > 1:
+        _new_col = f"_{col_nameArray[-2]}.{col_nameArray[-1]}"
+        _unnest = [f"UNNEST({col_nameArray[0]}) AS _{col_nameArray[0]}"]
+        for n in range(1, len(col_nameArray) - 1):
+            _unnest += [f"UNNEST(_{col_nameArray[n - 1]}.{col_nameArray[n]}) AS _{col_nameArray[n]}"]
+    print(_new_col,_unnest)
     return _new_col, _unnest
