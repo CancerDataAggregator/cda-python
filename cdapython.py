@@ -48,8 +48,6 @@ def get_query_result(api_instance, query_id, offset, limit):
 class Q:
     def __init__(self, *args) -> None:
         self.query = Query()
-        keySQLTerms=["AND","OR","SUBQUERY","NOT"]
-
         if len(args) == 1:
             args[0].find()
             _l, _op, _r = args[0].split(" ", 2)
