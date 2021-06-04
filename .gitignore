@@ -13,3 +13,6 @@ cdapython.egg-info
 
 # pytest
 .pytest_cache
+
+#virtualenv
+venv
