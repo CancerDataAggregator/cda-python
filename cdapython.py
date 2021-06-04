@@ -49,7 +49,6 @@ class Q:
     def __init__(self, *args) -> None:
         self.query = Query()
         if len(args) == 1:
-            args[0].find()
             _l, _op, _r = args[0].split(" ", 2)
             _l = Col(_l)
             _r = infer_quote(_r)
@@ -159,12 +158,6 @@ def columns(version=table_version, host=CDA_API_URL):
         api_response = api_instance.sql_query(query, version=version)
         query_result = get_query_result(api_instance, api_response.query_id, 0, 1000)
         return [list(t.values())[0] for t in query_result]
-def test(host=CDA_API_URL):
-    with cda_client.ApiClient(
-        configuration= cda_client.Configuration(host=host)
-    ) as api_client:
-        api_instance = QueryApi(api_client)
-        print(api_instance.sql_query())
 
 
 def unique_terms(col_name, system=None, version=table_version, host=CDA_API_URL):
