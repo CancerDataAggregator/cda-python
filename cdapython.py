@@ -39,7 +39,6 @@ def infer_quote(val: Union[int, float, str, "Q", cda_client.Query]) -> cda_clien
 class Q:
     def __init__(self, *args) -> None:
         self.query = cda_client.Query()
-
         if len(args) == 1:
             _l, _op, _r = args[0].split(" ", 2)
             _l = Col(_l)

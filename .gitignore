@@ -13,3 +13,4 @@ cdapython.egg-info
 
 # pytest
 .pytest_cache
+venv

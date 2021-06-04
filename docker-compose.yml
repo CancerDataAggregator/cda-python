@@ -1,0 +1,6 @@
+version: '3'
+services:
+  jupiter:
+    build: .
+    ports:
+      - '8888:8888'
