@@ -21,21 +21,27 @@ def SqlTermFilter(query="") -> list[dict]:
     """
     strReturn = []
     filterValues = ["AND","OR","SUBQUERY","NOT"]
-    for queryWords in query.split(" "):
-        currentStrInLoop = queryWords.upper()
-        for values in filterValues:
-            if(currentStrInLoop in filterValues):
-                if(currentStrInLoop == values):
-                    print(currentStrInLoop)
-                    print(values,values in currentStrInLoop,currentStrInLoop)
-                    strReturn.append({values :re.split(fr"\b{values.lower()}|{values.upper()}",query)})
-            
-    return strReturn
+    token = ''
+    print(token.find(" "))
 
 
 tes = SqlTermFilter(query)
 
-for i in tes:
-    print(i)
+# for i in tes:
+#     print(i)
 
     
+
+
+
+# urrentStrInLoop = queryWords.upper()
+#         for values in filterValues:
+#             if(currentStrInLoop in filterValues):
+#                 if(currentStrInLoop == values):
+#                     print(currentStrInLoop)
+#                     print(values,values in currentStrInLoop,currentStrInLoop)
+#                     strReturn.append({values :re.split(fr"\b{values.lower()}|{values.upper()}",query)})
+
+
+
+
