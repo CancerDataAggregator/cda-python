@@ -1,6 +1,13 @@
 version: '3'
 services:
   jupiter:
-    build: .
+    image: jupyter/minimal-notebook:latest
+    working_dir: /home/joyvan/work
     ports:
       - '8888:8888'
+    volumes:
+      - .:/home/joyvan/work
+    env_file: 
+      - .env
+    command: bash -c "pip install git+https://github.com/CancerDataAggregator/cda-python.git && pip install git+https://github.com/CancerDataAggregator/cda-service-python-client.git"
+    command: bash -c "/usr/local/bin/start.sh jupyter notebook --NotebookApp.token=''"

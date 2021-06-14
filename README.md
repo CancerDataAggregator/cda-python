@@ -12,14 +12,16 @@ launch a Jupyter Notebook instance with our example notebook ready to run.
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/CancerDataAggregator/cda-python/HEAD?filepath=example.ipynb)
 
-# Runing CDA Python locally
+# Running CDA Python locally
 
 Install the CDA Python library locally:
 
-1. You need python3 installted
-   - windows users and mac os users that don't want to use hombrew click on this [link](https://www.python.org/downloads/) or go to this website https://www.python.org/downloads/ and dowload python 3
-
-`pip install git+https://github.com/CancerDataAggregator/cda-python.git`
+1. you will need to download docker go here [link](https://www.docker.com/products/docker-desktop)
+2. next you with need to open your a powershell or a terimal and navgate to the this folder then we will run a docker commad
+   - `docker compose up --build -d`
+3. Then go to this http://localhost:8888
+4. To stop the docker container run this
+   - `docker compose down`
 
 # Basics
 
