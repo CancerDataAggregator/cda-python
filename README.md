@@ -17,7 +17,7 @@ launch a Jupyter Notebook instance with our example notebook ready to run.
 Install the CDA Python library locally:
 
 1. you will need to download docker go here [link](https://www.docker.com/products/docker-desktop)
-2. next you with need to open your a powershell or a terimal and navgate to the this folder then we will run a docker commad
+2. next you need to open PowerShell or a terminal and navigate to this folder then we will run a docker command
    - `docker compose up --build -d`
 3. Then go to this http://localhost:8888
 4. To stop the docker container run this
