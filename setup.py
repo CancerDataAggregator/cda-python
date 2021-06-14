@@ -11,6 +11,9 @@ now = datetime.utcnow()
 desc_path = pathlib.Path(current_path, "README.md")
 long_description = desc_path.open("r").read()
 
+for i in desc_path.open("r").readline:
+    print(i)
+
 setup(
     name=name,
     version=version,
