@@ -21,9 +21,8 @@ Install the CDA Python library locally:
    Note: to run the notebook in the background, you can pass the -d flag (for “detached” mode)
    - `docker compose up --build -d`
 3. Open a Browser to this url http://localhost:8888 and you are up and running.
-
-Note
-Stop the container run this in the terminal from within the cdapython project directory.
+   Note
+   Stop the container run this in the terminal from within the cdapython project directory.
 
 - `docker compose down`
 
