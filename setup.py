@@ -9,7 +9,7 @@ name = "cdapython"
 version = __version__
 now = datetime.utcnow()
 desc_path = pathlib.Path(current_path, "README.md")
-long_description = desc_path.open("r",encoding="utf16").read()
+long_description = desc_path.open("r",errors="surrogateescape").read()
 
 setup(
     name=name,
