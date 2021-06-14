@@ -1,6 +1,7 @@
 version: '3'
 services:
   jupiter:
+    container_name: "cdapython-notebook"
     image: jupyter/minimal-notebook:latest
     working_dir: /home/joyvan/work
     ports:
