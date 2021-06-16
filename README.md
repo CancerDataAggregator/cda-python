@@ -219,6 +219,16 @@ q2 = Q(Col('ResearchSubject.associated_project'), '=', Quoted('TCGA-OV'))
 `.run("http://localhost:8080")` will execute the query on a CDA server running at
 `http://localhost:8080`.  
 
+# Quick Explanation on UNNEST usage in BigQuery
+
+Using Q in the CDA client will echo the generated SQL statement that may contain multiple `UNNEST` inclusions
+when including a dot(.) structure which may need a quick explanation.
+UNNEST is similar to unwind in which embedded data structures must be flattend to appear in a table or Excel file.
+Note; The following call using the SQL endpoint is not the preferred method to execute a nested attribute query in BigQuery.
+The Q language DSL abstracts the required unnesting that exists in a Record.  In BigQuery, structures must be represented in an UNNEST syntax such that:
+ `A.B.C.D must be unwound to SELECT (_C.D) from TABLE, UNNEST(A) AS _A, UNNEST(_A.B) as _B, UNNEST(_B.C) as _C`
+`ResearchSubject.Specimen.source_material_type` represents a complex record that needs to unwound in SQL syntax to be queried on properly when using SQL.
+`SELECT DISTINCT(_Specimen.source_material_type) FROM gdc-bq-sample.cda_mvp.v3, UNNEST(ResearchSubject) AS _ResearchSubject,UNNEST(_ResearchSubject.Specimen) AS _Specimen`
 
 # Note
 
