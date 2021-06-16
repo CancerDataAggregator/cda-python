@@ -6,10 +6,10 @@ import cda_client
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query import Query
 
-__version__ = "2021.5.14"
+__version__ = "2021.6.15"
 
-#CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
-CDA_API_URL = "http://localhost:8080"
+CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
+
 table_version = "v3"
 
 pp = pprint.PrettyPrinter(indent=2)
