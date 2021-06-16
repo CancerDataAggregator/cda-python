@@ -16,3 +16,4 @@ cdapython.egg-info
 
 #virtualenv
 venv
+.vscode
