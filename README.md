@@ -18,11 +18,13 @@ Install the CDA Python library locally:
 
 1. Download and install docker click this [link](https://www.docker.com/products/docker-desktop) or copy url https://www.docker.com/products/docker-desktop to your Browser
 2. Open Terminal or PowerShell a and navigate to this folder then we will run a docker command
-   Note: to run the notebook in the background, you can pass the -d flag (for “detached” mode)
-   - `docker compose up --build -d`
+   - `docker compose up --build`
 3. Open a Browser to this url http://localhost:8888 and you are up and running.
    Note
-   Stop the container run this in the terminal from within the cdapython project directory.
+
+4. To Stop the container from running return to the terminal where the cdapython project is on your keyboard you will click **Control C to stop** the container .
+
+To delete the container use this command in the cdapython project directory.
 
 - `docker compose down`
 

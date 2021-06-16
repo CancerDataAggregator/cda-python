@@ -7,5 +7,5 @@ services:
     ports:
       - '8888:8888'
     volumes:
-      - .:/home/joyvan/work
+      - ./notebooks:/home/joyvan/work
     command: bash -c "pip install git+https://github.com/CancerDataAggregator/cda-python.git && pip install git+https://github.com/CancerDataAggregator/cda-service-python-client.git && /usr/local/bin/start.sh jupyter notebook --NotebookApp.token=''"
