@@ -20,7 +20,6 @@ Install the CDA Python library locally:
 2. Open Terminal or PowerShell a and navigate to this folder then we will run a docker command
    - `docker compose up --build`
 3. Open a Browser to this url http://localhost:8888 and you are up and running.
-   Note
 
 4. To Stop the container from running return to the terminal where the cdapython project is on your keyboard you will click **Control C to stop** the container .
 
