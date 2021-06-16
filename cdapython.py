@@ -149,7 +149,7 @@ More pages: {self.has_next_page}
 
 def columns(version=table_version, host=CDA_API_URL):
     """Get columns names from the database."""
-    query = f"SELECT field_path FROM `gdc-bq-sample.cda_mvp.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS`"
+    query = f"SELECT field_path FROM `gdc-bq-sample.cda_mvp.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS` WHERE table_name = '{version}'"
     sys.stderr.write(f"{query}\n")
     # Execute query
     with cda_client.ApiClient(
