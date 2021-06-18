@@ -1,6 +1,7 @@
 # CDA Python
-This library sits on top of the machine generated 
-[CDA Python Client](https://github.com/CancerDataAggregator/cda-service-python-client) and offers some syntactic 
+
+This library sits on top of the machine generated
+[CDA Python Client](https://github.com/CancerDataAggregator/cda-service-python-client) and offers some syntactic
 sugar to make it more pleasant to query the CDA.
 
 # Launch in Binder
@@ -11,11 +12,20 @@ launch a Jupyter Notebook instance with our example notebook ready to run.
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/CancerDataAggregator/cda-python/HEAD?filepath=example.ipynb)
 
-# Install
+# Running CDA Python locally
 
-If you want to install the CDA Python library locally:
+Install the CDA Python library locally:
 
-`pip install git+https://github.com/CancerDataAggregator/cda-python.git`
+1. Download and install docker click this [link](https://www.docker.com/products/docker-desktop) or copy url https://www.docker.com/products/docker-desktop to your Browser
+2. Open Terminal or PowerShell a and navigate to cda-python folder then we will run a docker command
+   - `docker compose up --build`
+3. Open a Browser to this url http://localhost:8888 and you are up and running.
+
+4. To Stop the container from running return to the terminal where the cdapython project is on your keyboard you will click **Control C to stop** the container .
+
+To delete the container use this command in the cdapython project directory.
+
+- `docker compose down`
 
 # Basics
 
@@ -123,7 +133,7 @@ r.pretty_print(0) # Prints the nth result nicely
 #   'sex': None}
 
 
-r2 = r.next_page()  # Fetches the next page of results 
+r2 = r.next_page()  # Fetches the next page of results
 
 print(r2)
 
@@ -134,13 +144,12 @@ print(r2)
 # More pages: Yes
 ```
 
-
-
 # A simple query
 
 > Select data from TCGA-OV project, with donors over age 50
 
 ## Quick form
+
 ```
 from cdapython import Q
 
@@ -190,13 +199,14 @@ r.pretty_print(2)
 ```
 
 Any given part of a query is expressed as a string of three parts separated by spaces:
+
 ```
 Q('esearchSubject.associated_project = "TCGA-OV"')
 ```
+
 The first part is interpreted as a column name, the second as a comparator and
 the third part as a value. If the value is a string, it needs to be put in
 quotes.
-
 
 ## Detailed form
 
@@ -211,13 +221,12 @@ q1 = Q(Col('ResearchSubject.Diagnosis.age_at_diagnosis'), '>=', 50 * 365)
 q2 = Q(Col('ResearchSubject.associated_project'), '=', Quoted('TCGA-OV'))
 ```
 
-
 # Pointing to a custom CDA instance
 
 `.run()` will execute the query on the public CDA API (`https://cda.cda-dev.broadinstitute.org/api/cda/v1/`).
 
 `.run("http://localhost:8080")` will execute the query on a CDA server running at
-`http://localhost:8080`.  
+`http://localhost:8080`.
 
 # Quick Explanation on UNNEST usage in BigQuery
 
@@ -225,12 +234,12 @@ Using Q in the CDA client will echo the generated SQL statement that may contain
 when including a dot(.) structure which may need a quick explanation.
 UNNEST is similar to unwind in which embedded data structures must be flattend to appear in a table or Excel file.
 Note; The following call using the SQL endpoint is not the preferred method to execute a nested attribute query in BigQuery.
-The Q language DSL abstracts the required unnesting that exists in a Record.  In BigQuery, structures must be represented in an UNNEST syntax such that:
- `A.B.C.D must be unwound to SELECT (_C.D) from TABLE, UNNEST(A) AS _A, UNNEST(_A.B) as _B, UNNEST(_B.C) as _C`
+The Q language DSL abstracts the required unnesting that exists in a Record. In BigQuery, structures must be represented in an UNNEST syntax such that:
+`A.B.C.D must be unwound to SELECT (_C.D) from TABLE, UNNEST(A) AS _A, UNNEST(_A.B) as _B, UNNEST(_B.C) as _C`
 `ResearchSubject.Specimen.source_material_type` represents a complex record that needs to unwound in SQL syntax to be queried on properly when using SQL.
 `SELECT DISTINCT(_Specimen.source_material_type) FROM gdc-bq-sample.cda_mvp.v3, UNNEST(ResearchSubject) AS _ResearchSubject,UNNEST(_ResearchSubject.Specimen) AS _Specimen`
 
 # Note
 
-This is the spiritual successor of the 
+This is the spiritual successor of the
 [Query Translator Prototype](https://github.com/CancerDataAggregator/translator-prototype)
