@@ -63,6 +63,8 @@ class Q:
         self.query.node_type = _op
         self.query.l = _l
         self.query.r = _r
+    def __repr__(self):
+        return str(self.__class__) + ": " + str(self.__dict__)
 
     def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False):
         with cda_client.ApiClient(

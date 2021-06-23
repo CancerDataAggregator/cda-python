@@ -5,6 +5,7 @@ from setuptools import setup, find_packages
 __version__ = "2021.6.15"
 current_path = pathlib.Path(__file__).parent
 
+
 name = "cdapython"
 version = __version__
 now = datetime.utcnow()
@@ -19,6 +20,7 @@ setup(
     platforms=['POSIX', 'MacOS', 'Windows'],
     python_requires='>=3.6',
     install_requires=[
+    
         "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git",
     ],
     description='User friendly Python library to access CDA service.',
