@@ -166,9 +166,11 @@ def unique_terms(col_name, system=None, version=table_version, host=CDA_API_URL)
             configuration=cda_client.Configuration(host=host)
     ) as api_client:
         api_instance = QueryApi(api_client)
-
+        if system is None:
+          system = ''
         # Execute query
         api_response = api_instance.unique_values(version=version, body=col_name, system=system)
         query_result = get_query_result(api_instance, api_response.query_id, 0, 1000)
         return [list(t.values())[0] for t in query_result]
+
 
