@@ -1,15 +1,20 @@
-import pathlib
+
 from datetime import datetime
 from setuptools import setup, find_packages
-
-__version__ = "2021.6.15"
-current_path = pathlib.Path(__file__).parent
+from pathlib import Path
+import os
+from dotenv import load_dotenv
+load_dotenv()
+env_path = Path('.')/'.env'
+load_dotenv(dotenv_path=env_path)
+__version__ = os.getenv("VERISON")
+current_path = Path(__file__).parent
 
 
 name = "cdapython"
 version = __version__
 now = datetime.utcnow()
-desc_path = pathlib.Path(current_path, "README.md")
+desc_path = Path(current_path, "README.md")
 with open(desc_path,"r", encoding="utf-8",errors="surrogateescape") as fh:
     long_description = fh.read()
     
