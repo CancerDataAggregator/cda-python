@@ -1,9 +1,10 @@
 import cda_client
 from cda_client.api.query_api import QueryApi
-from cda_client.model.query import Query
-
+from cda_client.model.query import Query 
 from constantVariables import CDA_API_URL,table_version,__version__
-import get_query_result
+from .get_query_result import get_query_result
+from .functions import Col
+from .infer_quote import infer_quote
 
 class Q:
     def __init__(self, *args) -> None:
