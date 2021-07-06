@@ -8,7 +8,8 @@ from cda_client.model.query import Query
 
 __version__ = "2021.6.28"
 
-CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
+#CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
+CDA_API_URL = "http://localhost:8080"
 table_version = "v3"
 
 pp = pprint.PrettyPrinter(indent=2)
@@ -161,15 +162,13 @@ def columns(version=table_version, host=CDA_API_URL):
         return [list(t.values())[0] for t in query_result]
 
 
-def unique_terms(col_name, system=None, version=table_version, host=CDA_API_URL):
+def unique_terms(col_name, system=''):
     with cda_client.ApiClient(
-            configuration=cda_client.Configuration(host=host)
+            configuration=cda_client.Configuration(host=CDA_API_URL)
     ) as api_client:
         api_instance = QueryApi(api_client)
-        if system is None:
-          system = ''
+        api_response = api_instance.unique_values(version=table_version, body=col_name, system=system)
         # Execute query
-        api_response = api_instance.unique_values(version=version, body=col_name, system=system)
         query_result = get_query_result(api_instance, api_response.query_id, 0, 1000)
         return [list(t.values())[0] for t in query_result]
 
