@@ -1,5 +1,5 @@
-from constantVariables import table_version,CDA_API_URL
-import get_query_result
+from .constantVariables import table_version,CDA_API_URL
+from .Result import get_query_result
 import cda_client,sys
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query import Query

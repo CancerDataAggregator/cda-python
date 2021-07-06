@@ -1,9 +1,10 @@
-import sys
 import cda_client
-from constantVariables import table_version
-from cda_client import QueryApi
+import sys
+from cda_client.api.query_api import QueryApi
+from .Result import get_query_result
+from .constantVariables import table_version,CDA_API_URL
 from ._get_unnest_clause import _get_unnest_clause
-from .get_query_result import get_query_result
+
 def unique_terms(col_name, system=None, version=table_version, host=CDA_API_URL):
     with cda_client.ApiClient(
             configuration=cda_client.Configuration(host=host)
