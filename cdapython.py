@@ -6,7 +6,7 @@ import cda_client
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query import Query
 
-__version__ = "2021.6.28"
+__version__ = "2021.7.06"
 
 CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
 table_version = "v3"
