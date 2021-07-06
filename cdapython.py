@@ -6,7 +6,7 @@ import cda_client
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query import Query
 
-__version__ = "2021.6.28"
+__version__ = "2021.7.06"
 
 CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
 table_version = "v3"
@@ -161,14 +161,15 @@ def columns(version=table_version, host=CDA_API_URL):
         return [list(t.values())[0] for t in query_result]
 
 
-def unique_terms(col_name, system=None, version=table_version, host=CDA_API_URL):
+def unique_terms(col_name, system=''):
     with cda_client.ApiClient(
-            configuration=cda_client.Configuration(host=host)
+            configuration=cda_client.Configuration(host=CDA_API_URL)
     ) as api_client:
+        system = str(system) 
         api_instance = QueryApi(api_client)
-
+        api_response = api_instance.unique_values(version=table_version, body=col_name, system=system)
         # Execute query
-        api_response = api_instance.unique_values(version=version, body=col_name, system=system)
         query_result = get_query_result(api_instance, api_response.query_id, 0, 1000)
         return [list(t.values())[0] for t in query_result]
+
 
