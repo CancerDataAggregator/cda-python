@@ -25,7 +25,7 @@ setup(
     platforms=['POSIX', 'MacOS', 'Windows'],
     python_requires='>=3.6',
     install_requires=[
-    
+        "wheel",
         "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git",
     ],
     description='User friendly Python library to access CDA service.',
