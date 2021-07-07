@@ -9,7 +9,7 @@ from cda_client.api.meta_api import MetaApi
 
 __version__ = "2021.7.06"
 
-CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
+CDA_API_URL = "https://cda.cda-dev.broadinstitute.org" 
 table_version = "v3"
 
 pp = pprint.PrettyPrinter(indent=2)
