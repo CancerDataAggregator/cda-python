@@ -5,6 +5,7 @@ from typing import Union
 import cda_client
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query import Query
+from cda_client.api.meta_api import MetaApi
 
 __version__ = "2021.7.06"
 
@@ -162,6 +163,15 @@ def columns(version=table_version, host=CDA_API_URL):
 
 
 def unique_terms(col_name, system=''):
+    """[summary]
+
+    Args:
+        col_name (str): [description] needs Colname to look up in bigquery 
+        system (str, optional): [description]. Defaults to ''.
+
+    Returns:
+        [type]: [description]
+    """
     with cda_client.ApiClient(
             configuration=cda_client.Configuration(host=CDA_API_URL)
     ) as api_client:
@@ -173,3 +183,12 @@ def unique_terms(col_name, system=''):
         return [list(t.values())[0] for t in query_result]
 
 
+def statusBigQuery() -> str:
+    """[summary]
+    Uses the cda_client library's MetaClass to get status check on the cda's BigQuery table
+    Returns:
+        str: status messages
+    """
+ 
+    return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
+   
