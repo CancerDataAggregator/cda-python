@@ -8,5 +8,5 @@ env_path = Path('.')/'.env'
 load_dotenv(dotenv_path=env_path)
 
 __version__ = os.getenv("VERSION")
-CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
+CDA_API_URL = os.getenv("CDA_API_URL")
 table_version = os.getenv("DATABASETABLE")

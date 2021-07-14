@@ -1,11 +1,5 @@
 import pprint as pp
 
-
-def get_query_result(api_instance, query_id, offset, limit):
-    while True:
-        response = api_instance.query(id=query_id, offset=offset, limit=limit)
-        if response.total_row_count is not None:
-            return Result(response, query_id, offset, limit, api_instance)
 class Result:
     """A convenient wrapper around the response object from the CDA service."""
 
@@ -63,3 +57,10 @@ More pages: {self.has_next_page}
 
     def _get_result(self, _offset, _limit):
         return get_query_result(self._api_instance, self._query_id, _offset, _limit)
+
+
+def get_query_result(api_instance, query_id, offset, limit) -> Result:
+    while True:
+        response = api_instance.query(id=query_id, offset=offset, limit=limit)
+        if response.total_row_count is not None:
+            return Result(response, query_id, offset, limit, api_instance)

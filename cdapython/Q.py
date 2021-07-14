@@ -2,33 +2,20 @@ from typing import Union
 from cda_client import ApiClient, Configuration
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query import Query
-from .functions import Col
 from .constantVariables import CDA_API_URL,table_version,__version__
 from .Result import get_query_result
-from .functions import Quoted, Unquoted
+from .functions import Quoted, Unquoted, Col
+from .Qparser import parser
 
-def infer_quote(val: Union[int, float, str, "Q", Query]) -> Query:
-    """[summary]
-     Handles Strings With quotes
-    Args:
-        val (Union[int, float, str,): [description]
-
-    Returns:
-        Query: [description]
-    """
-    if isinstance(val, (Q, Query)):
-        return val
-    if isinstance(val, str) and val.startswith('"') and val.endswith('"'):
-        return Quoted(val[1:-1])
-    return Unquoted(val)
 class Q:
     """
     Q lang is Language used to send query to the cda servi
     """
-    def __init__(self, *args) -> None:
+    def __init__(self, *args:tuple) -> None:
         self.query = Query()
 
         if len(args) == 1:
+            parser(args[0])
             _l, _op, _r = args[0].split(" ", 2)
             _l = Col(_l)
             _r = infer_quote(_r)
@@ -44,8 +31,20 @@ class Q:
         self.query.node_type = _op
         self.query.l = _l
         self.query.r = _r
+
     def __repr__(self):
         return str(self.__class__) + ": " + str(self.__dict__)
+
+    @staticmethod
+    def sql(sql ,host=CDA_API_URL,dry_run=False, offset=0, limit=1000):
+        with ApiClient(
+            configuration= Configuration(host=host)
+        ) as api_client:
+            api_instance = QueryApi(api_client)
+            api_response = api_instance.sql_query(sql)
+        if dry_run is True:
+                return api_response
+        return get_query_result(api_instance, api_response.query_id, offset, limit)
 
     def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False):
         """[summary]
@@ -58,7 +57,7 @@ class Q:
             dry_run (bool, optional): [description]. Defaults to False.
 
         Returns:
-            [type]: [description]
+            [Result]: [description]
         """
         with ApiClient(
                 configuration=Configuration(host=host)
@@ -69,3 +68,28 @@ class Q:
             if dry_run is True:
                 return api_response
             return get_query_result(api_instance, api_response.query_id, offset, limit)
+    def And(self, right: "Q"):
+        return Q(self.query, "AND", right.query)
+
+    def Or(self, right: "Q"):
+        return Q(self.query, "OR", right.query)
+
+    def From(self, right: "Q"):
+        return Q(self.query, "SUBQUERY", right.query)
+
+    def Not(self):
+        return Q(self.query, "NOT", None)
+def infer_quote(val: Union[int, float, str, "Q", Query]) -> Query:
+    """[summary]
+     Handles Strings With quotes
+    Args:
+        val (Union[int, float, str,): [description]
+
+    Returns:
+        Query: [description]
+    """
+    if isinstance(val, (Q, Query)):
+        return val
+    if isinstance(val, str) and val.startswith('"') and val.endswith('"'):
+        return Quoted(val[1:-1])
+    return Unquoted(val) 
