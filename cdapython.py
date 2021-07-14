@@ -4,6 +4,8 @@ from typing import Union
 
 import cda_client
 from cda_client.api.query_api import QueryApi
+from cda_client.api_client import ApiClient
+from cda_client.configuration import Configuration
 from cda_client.model.query import Query
 
 __version__ = "2021.7.06"
@@ -63,6 +65,17 @@ class Q:
         self.query.node_type = _op
         self.query.l = _l
         self.query.r = _r
+        
+    @staticmethod
+    def sql(sql ,host=CDA_API_URL,dry_run=False, offset=0, limit=1000):
+        with ApiClient(
+            configuration= Configuration(host=host)
+        ) as api_client:
+            api_instance = QueryApi(api_client)
+            api_response = api_instance.sql_query(sql)
+        if dry_run is True:
+                return api_response
+        return get_query_result(api_instance, api_response.query_id, offset, limit)
 
     def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False):
         with cda_client.ApiClient(
