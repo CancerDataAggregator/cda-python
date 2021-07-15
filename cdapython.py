@@ -65,16 +65,16 @@ class Q:
         self.query.node_type = _op
         self.query.l = _l
         self.query.r = _r
-        
+       
     @staticmethod
-    def sql(sql ,host=CDA_API_URL,dry_run=False, offset=0, limit=1000):
+    def sql(sql, host=CDA_API_URL, dry_run=False, offset=0, limit=1000):
         with ApiClient(
             configuration= Configuration(host=host)
         ) as api_client:
             api_instance = QueryApi(api_client)
             api_response = api_instance.sql_query(sql)
         if dry_run is True:
-                return api_response
+            return api_response
         return get_query_result(api_instance, api_response.query_id, offset, limit)
 
     def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False):
@@ -184,5 +184,3 @@ def unique_terms(col_name, system=''):
         # Execute query
         query_result = get_query_result(api_instance, api_response.query_id, 0, 1000)
         return [list(t.values())[0] for t in query_result]
-
-
