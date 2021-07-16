@@ -16,4 +16,8 @@ cdapython.egg-info
 
 #virtualenv
 venv
+#vscode
 .vscode
+
+#sonrqube scanner
+.scannerwork
