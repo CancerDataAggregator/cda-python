@@ -73,7 +73,7 @@ class Q:
         ) as api_client:
             api_instance = QueryApi(api_client)
             api_response = api_instance.sql_query(sql)
-        if dry_run is True:
+        if dry_run:
             return api_response
         return get_query_result(api_instance, api_response.query_id, offset, limit)
 
@@ -84,7 +84,7 @@ class Q:
             api_instance = QueryApi(api_client)
             # Execute boolean query
             api_response = api_instance.boolean_query(self.query, version=version, dry_run=dry_run)
-            if dry_run is True:
+            if dry_run:
                 return api_response
             return get_query_result(api_instance, api_response.query_id, offset, limit)
 
