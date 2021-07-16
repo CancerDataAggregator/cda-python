@@ -6,6 +6,7 @@ def test_basic_integration():
     cols = columns()
     assert "race" in cols
 
+
 def test_unique_terms():
     terms = unique_terms('sex', 'GDC')
     assert "female" in terms
