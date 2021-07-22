@@ -1,6 +1,6 @@
-from cdapython import statusBigQuery
+from cdapython import Q
 
 
 def test1():
-    assert statusBigQuery() == 'everything is fine'
+    assert Q.statusbigquery() == 'everything is fine'
 
