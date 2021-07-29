@@ -27,7 +27,15 @@ To delete the container use this command in the cdapython project directory.
 
 - `docker compose down`
 
+Alternatively, if you have `pip` on your system, you can run CDA using `pip install git+https://github.com/CancerDataAggregator/cda-python.git`
+
 # Basics
+
+We will now show you the basic structure of `CDA python` through the use of the most commands:
+- `columns()`: show all available columns in the table, 
+- `unique_terms()`: for a given column show all unique terms,  
+- `Q`: Executes this query on the public CDA server, and
+- `Q.sql`: allows you to enter SQL style queries.
 
 (Also see example [IPython notebook](example.ipynb))
 
@@ -142,7 +150,56 @@ print(r2)
 # Limit: 2
 # Count: 2
 # More pages: Yes
+
+r1 = Q.sql("""
+SELECT 
+* 
+FROM gdc-bq-sample.cda_mvp.v1, UNNEST(ResearchSubject) AS _ResearchSubject 
+WHERE (_ResearchSubject.primary_disease_type = 'Adenomas and Adenocarcinomas')
+""")
+
+r1.pretty_print(0)
+#
+#{ 'Diagnosis': [],
+#  'ResearchSubject': [ { 'Diagnosis': [],
+#                         'Specimen': [],
+#                         'associated_project': 'CGCI-HTMCP-CC',
+#                         'id': '4d54f72c-e8ac-44a7-8ab9-9f20001750b3',
+#                         'identifier': [ { 'system': 'GDC',
+#                                           'value': '4d54f72c-e8ac-44a7-8ab9-9f20001750b3'}],
+#                         'primary_disease_site': 'Cervix uteri',
+#                         'primary_disease_type': 'Adenomas and '
+#                                                 'Adenocarcinomas'}],
+#  'Specimen': [],
+#  'associated_project': 'CGCI-HTMCP-CC',
+#  'days_to_birth': None,
+#  'ethnicity': None,
+#  'id': 'HTMCP-03-06-02177',
+#  'id_1': '4d54f72c-e8ac-44a7-8ab9-9f20001750b3',
+#  'identifier': [ { 'system': 'GDC',
+#                    'value': '4d54f72c-e8ac-44a7-8ab9-9f20001750b3'}],
+#  'primary_disease_site': 'Cervix uteri',
+#  'primary_disease_type': 'Adenomas and Adenocarcinomas',
+#  'race': None,
+#  'sex': None}
 ```
+
+# Comparison operators
+
+The following comparsion operators can be used with the `Q` command: 
+
+| operator      | Description | Q.sql required? |
+| ----------- | ----------- | ----------- |
+| =      | condition equals       | no |
+| !=   | condition is not equal         | no |
+| <      | condition is less than       | no |
+| >   | condition is greater than        | no |
+| <=      | condition is less than or equal to       | no |
+| >=   | condition is less than or equal to        | no |
+| like      | similar to = but always wildcards ('%', '_', etc)       | yes |
+| in   | compares to a set        | yes |
+
+additionally, more complex SQL can be used with the `Q.sql` command. 
 
 # A simple query
 
