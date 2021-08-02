@@ -27,7 +27,12 @@ To delete the container use this command in the cdapython project directory.
 
 - `docker compose down`
 
-Alternatively, if you have `pip` on your system, you can run CDA using `pip install git+https://github.com/CancerDataAggregator/cda-python.git`
+### Pip install
+Alternatively, CDA Python can be installed using `pip`. However, this requires python >= 3.6 on your system. To check your version at the command-line run `python -V`. To update your version you can download from [https://www.python.org/downloads/]('https://www.python.org/downloads/') additional python installation help can be found [here]('https://realpython.com/installing-python/'). Once you have the proper python version, you can run CDA using:
+
+`pip install git+https://github.com/CancerDataAggregator/cda-python.git`
+
+**NOTE: We recommend the docker method because pip installation can be a bit more cumbersome, and will not be as closely monitored as the docker installation.** 
 
 # Basics
 
@@ -292,9 +297,19 @@ when including a dot(.) structure which may need a quick explanation.
 UNNEST is similar to unwind in which embedded data structures must be flattend to appear in a table or Excel file.
 Note; The following call using the SQL endpoint is not the preferred method to execute a nested attribute query in BigQuery.
 The Q language DSL abstracts the required unnesting that exists in a Record. In BigQuery, structures must be represented in an UNNEST syntax such that:
-`A.B.C.D must be unwound to SELECT (_C.D) from TABLE, UNNEST(A) AS _A, UNNEST(_A.B) as _B, UNNEST(_B.C) as _C`
+`A.B.C.D` must be unwound to `SELECT (_C.D)` in the following fashion: 
+```
+SELECT (_C.D) 
+from TABLE, UNNEST(A) AS _A, UNNEST(_A.B) as _B, UNNEST(_B.C) as _C
+```
+
 `ResearchSubject.Specimen.source_material_type` represents a complex record that needs to unwound in SQL syntax to be queried on properly when using SQL.
-`SELECT DISTINCT(_Specimen.source_material_type) FROM gdc-bq-sample.cda_mvp.v3, UNNEST(ResearchSubject) AS _ResearchSubject,UNNEST(_ResearchSubject.Specimen) AS _Specimen`
+```
+SELECT DISTINCT(_Specimen.source_material_type) 
+FROM gdc-bq-sample.cda_mvp.v3, 
+UNNEST(ResearchSubject) AS _ResearchSubject,
+UNNEST(_ResearchSubject.Specimen) AS _Specimen
+```
 
 # Note
 
