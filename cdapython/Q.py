@@ -1,23 +1,23 @@
-from typing import Union
+from typing import Tuple, Union
 from cda_client import ApiClient, Configuration
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query import Query
-from .constantVariables import CDA_API_URL,table_version,__version__
-from .Result import get_query_result
-from .functions import Quoted, Unquoted, Col
-from .Qparser import parser
+from constantVariables import CDA_API_URL, table_version
+from Result import get_query_result
+from functions import Quoted, Unquoted, col
+
 
 class Q:
     """
     Q lang is Language used to send query to the cda servi
     """
-    def __init__(self, *args:tuple) -> None:
+    def __init__(self, *args: Tuple[str]) -> None:
         self.query = Query()
 
         if len(args) == 1:
-            parser(args[0])
-            _l, _op, _r = args[0].split(" ", 2)
-            _l = Col(_l)
+
+            _l,  _op, _r = args[0].split(" ", 2)
+            _l = col(_l)
             _r = infer_quote(_r)
         elif len(args) != 3:
             raise RuntimeError(
@@ -36,14 +36,14 @@ class Q:
         return str(self.__class__) + ": " + str(self.__dict__)
 
     @staticmethod
-    def sql(sql ,host=CDA_API_URL,dry_run=False, offset=0, limit=1000):
+    def sql(sql: str, host: str = CDA_API_URL, dry_run:bool = False, offset:int = 0, limit:int = 1000):
         with ApiClient(
             configuration= Configuration(host=host)
         ) as api_client:
             api_instance = QueryApi(api_client)
             api_response = api_instance.sql_query(sql)
         if dry_run is True:
-                return api_response
+            return api_response
         return get_query_result(api_instance, api_response.query_id, offset, limit)
 
     def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False):
@@ -68,6 +68,7 @@ class Q:
             if dry_run is True:
                 return api_response
             return get_query_result(api_instance, api_response.query_id, offset, limit)
+
     def And(self, right: "Q"):
         return Q(self.query, "AND", right.query)
 
@@ -79,9 +80,11 @@ class Q:
 
     def Not(self):
         return Q(self.query, "NOT", None)
+
+
 def infer_quote(val: Union[int, float, str, "Q", Query]) -> Query:
     """[summary]
-     Handles Strings With quotes
+    Handles Strings With quotes
     Args:
         val (Union[int, float, str,): [description]
 
@@ -92,4 +95,4 @@ def infer_quote(val: Union[int, float, str, "Q", Query]) -> Query:
         return val
     if isinstance(val, str) and val.startswith('"') and val.endswith('"'):
         return Quoted(val[1:-1])
-    return Unquoted(val) 
+    return Unquoted(val)

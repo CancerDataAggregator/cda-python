@@ -1,6 +1,7 @@
 from cda_client.model.query import Query
 
-def Col(col_name) -> Query:
+
+def col(col_name) -> Query:
     return Query(node_type="column", value=col_name)
 
 

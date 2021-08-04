@@ -1,82 +1,88 @@
+from Q import Q
 import re
-import collections
-AND = r'(?P<AND>((\s|\))(AND|and)(\s|\()))'
-OR = r'(?P<OR>((\s|\))(OR|or)(\s|\()))'
-SUBQUERY = r'(?P<SUBQUERY>((\s|\))(SUBQUERY|subquery)(\s|\()))'
-NOT  = r'(?P<NOT>((\s|\))(NOT|not)(\s|\()))'
-LPAREN  = r'(?P<LPAREN>\()'
-RPAREN  = r'(?P<RPAREN>\))'
-EQUALS = r'(?P<EQUALS>\w+=\w+)'
-WS      = r'(?P<WS>\s+)'
+from tdparser import Lexer, Token
 
 
-main_pattern = re.compile("|".join((AND,OR,SUBQUERY,NOT,LPAREN, RPAREN,EQUALS,WS)))
-Token = collections.namedtuple('Token', ['type', 'value'])
+class Expression(Token):
+    def __init__(self, text: str):
+        self.value = str(text).strip()
 
-def generate_tokens(pattern,text):
-    print(type(text))
-    scanner = pattern.scanner(text)
+    def nud(self, context):
+        """What the token evaluates to"""
+        return self.value.strip()
 
-    for m in iter(scanner.match,None):
-        token = Token(m.lastgroup, m.group())
-        print(token)
-        if token.type != "WS":
-            yield token
 
-class parser():
-    def __init__(self,text):
-        self.tokens = generate_tokens(main_pattern,text)
-        self.current_token = None
-        self.next_token = None
-        self._advance()
-        return self.expr()
+class Eq(Token):
+    lbp = 10  # Precedence
 
-    def _advance(self):
-        self.current_token, self.next_token = self.next_token, next(self.tokens,None)
+    def led(self, left: str, context):
+        """Compute the value of this token when between two expressions."""
+        # Fetch the expression to the right, stoping at the next boundary
+        # of same precedence
+        right_side = context.expression(self.lbp)
+        return Q(left.strip()+" = "+right_side.strip())
 
-    def _accept(self,token_type:main_pattern) -> bool:
-        """[summary]
+class Greaterthen(Token):
+    lbp = 10  # Precedence
 
-        Args:
-            token_type ([type]): [description]
+    def led(self, left: str, context):
+        """Compute the value of this token when between two expressions."""
+        # Fetch the expression to the right, stoping at the next boundary
+        # of same precedence
+        right_side = context.expression(self.lbp)
+        return Q(left.strip()+" > "+right_side.strip())
 
-        Returns:
-            bool: [description]
-        """
-        if self.next_token and self.next_token.type == token_type:
-            self._advance()
-            return True
-        else:
-            return False
+class Lessthen(Token):
+    lbp = 10  # Precedence
+
+    def led(self, left: str, context):
+        """Compute the value of this token when between two expressions."""
+        # Fetch the expression to the right, stoping at the next boundary
+        # of same precedence
+        right_side = context.expression(self.lbp)
+        return Q(left.strip()+" < "+right_side.strip())
+class Doublequotes(Token):
+    lbp = 10  # Precedence
     
-    def _expect(self,token_type):
-        if not self._accept(token_type=token_type):
-            raise SyntaxError(f"Expected {token_type}")
-    def expr(self):
-        '''
-        expression ::= term { (+|-) term} *
-        '''
-        # it first expect a term according to grammer rule
-        expr_value = self.term()
-    def term(self):
-        '''
-        term ::= factor { ("*" | '/')} factor *
-        '''
-        term_value = self.factor()
-    
-    def factor(self):
-        '''
-        factor  ::= NUM | (expr)
 
-        '''
-        if self._accept("EQUALS"):
-             print(self.current_token.value)
-             return self.current_token.value
-        elif self._accept("LPAREN"):
-            expr_value = self.expr()
+    def nud(self, context):
+        """Compute the value of this token when between two expressions."""
+        # Fetch the expression to the right, stoping at the next boundary
+        # of same precedence
+        value = self
+        return value.text
 
-            self._expect("RPAREN")
+class And(Token):
+    lbp = 5 # Precedence
 
-            return expr_value
-        else:
-            raise SyntaxError('Expect NUMBER or LPAREN')
+    def led(self, left: Q, context):
+        """Compute the value of this token when between two expressions."""
+        # Fetch the expression to the right, stoping at the next boundary
+        # of same precedence
+        right_side = context.expression(self.lbp)
+        return left.And(right_side)
+
+
+class Or(Token):
+    lbp = 5  # Precedence
+
+    def led(self, left: Q, context):
+        """Compute the value of this token when between two expressions."""
+        # Fetch the expression to the right, stoping at the next boundary
+        # of same precedence
+        right_side = context.expression(self.lbp)
+        return left.Or(right_side)
+
+
+lexer = Lexer(with_parens=True)
+lexer.register_token(Expression, re.compile(r'(\-[\S]+)|(\"[\w\s]+\")|(\b(?!\bAND\b)(?!\bOR\b)(?!\bNOT\b)[\w.\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)'))
+# lexer.register_token(Doublequotes, re.compile(r'(".*?")'))
+lexer.register_token(Greaterthen, re.compile(r'(\s+>+\s)'))
+lexer.register_token(Lessthen, re.compile(r'(\s+<+\s)'))
+lexer.register_token(Eq, re.compile(r'(\s+=+\s)'))
+lexer.register_token(And, re.compile(r'(AND)'))
+lexer.register_token(Or, re.compile(r'(OR)'))
+
+
+def parser(text):
+    return lexer.parse(text)
