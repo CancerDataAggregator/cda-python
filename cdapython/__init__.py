@@ -10,6 +10,8 @@ load_dotenv()
 
 __name__ = "cdapython"
 __version__ = getenv("VERISON")
-__about__ ="Q {version}"
+__about__ = f"Q {__version__}"
+
+
 def __repr__():
     return __version__

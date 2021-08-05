@@ -38,7 +38,7 @@ class Q:
     @staticmethod
     def sql(sql: str, host: str = CDA_API_URL, dry_run: bool = False, offset: int = 0, limit: int = 1000):
         with ApiClient(
-            configuration= Configuration(host=host)
+            configuration=Configuration(host=host)
         ) as api_client:
             api_instance = QueryApi(api_client)
             api_response = api_instance.sql_query(sql)
