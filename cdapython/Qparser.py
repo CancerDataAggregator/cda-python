@@ -22,6 +22,7 @@ class Eq(Token):
         right_side = context.expression(self.lbp)
         return Q(left.strip()+" = "+right_side.strip())
 
+
 class Greaterthen(Token):
     lbp = 10  # Precedence
 
@@ -31,6 +32,7 @@ class Greaterthen(Token):
         # of same precedence
         right_side = context.expression(self.lbp)
         return Q(left.strip()+" > "+right_side.strip())
+
 
 class Lessthen(Token):
     lbp = 10  # Precedence
@@ -51,6 +53,7 @@ class Doublequotes(Token):
         # of same precedence
         value = self
         return value.text
+
 
 class And(Token):
     lbp = 5 # Precedence
@@ -76,7 +79,7 @@ class Or(Token):
 
 lexer = Lexer(with_parens=True)
 lexer.register_token(Expression, re.compile(r'(\-[\S]+)|(\"[\w\s]+\")|(\b(?!\bAND\b)(?!\bOR\b)(?!\bNOT\b)[\w.\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)'))
-# lexer.register_token(Doublequotes, re.compile(r'(".*?")'))
+lexer.register_token(Doublequotes, re.compile(r'(".*?")'))
 lexer.register_token(Greaterthen, re.compile(r'(\s+>+\s)'))
 lexer.register_token(Lessthen, re.compile(r'(\s+<+\s)'))
 lexer.register_token(Eq, re.compile(r'(\s+=+\s)'))

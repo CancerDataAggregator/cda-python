@@ -36,7 +36,7 @@ class Q:
         return str(self.__class__) + ": " + str(self.__dict__)
 
     @staticmethod
-    def sql(sql: str, host: str = CDA_API_URL, dry_run:bool = False, offset:int = 0, limit:int = 1000):
+    def sql(sql: str, host: str = CDA_API_URL, dry_run: bool = False, offset: int = 0, limit: int = 1000):
         with ApiClient(
             configuration= Configuration(host=host)
         ) as api_client:
