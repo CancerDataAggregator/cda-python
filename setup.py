@@ -15,11 +15,12 @@ name = "cdapython"
 version = __version__
 now = datetime.utcnow()
 desc_path = Path(current_path, "README.md")
-with open(desc_path,"r", encoding="utf-8",errors="surrogateescape") as fh:
+with open(desc_path, "r", encoding="utf-8",errors="surrogateescape") as fh:
     long_description = fh.read()
     
 setup(
     name=name,
+    packages=find_packages(),
     version=version,
     py_modules=['cdapython'],
     platforms=['POSIX', 'MacOS', 'Windows'],

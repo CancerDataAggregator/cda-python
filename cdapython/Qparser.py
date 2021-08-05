@@ -1,4 +1,4 @@
-from Q import Q
+from cdapython.Q import Q
 import re
 from tdparser import Lexer, Token
 

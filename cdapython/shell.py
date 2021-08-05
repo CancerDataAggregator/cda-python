@@ -1,17 +1,40 @@
-from Q import Q
-from Qparser import parser
+
+from tdparser.topdown import MissingTokensError
+from cdapython.Q import Q
+from cdapython.Qparser import parser
 from tdparser.lexer import LexerError
+import readline
 
 """[summary]
     add's history to shell in current session
 """
-try:
-    import readline
-except ImportError:
-    pass  #readline not available
+new = True
+
+
+def help():
+    print("""
+        Welcome to Q shell's help utility
+        how to use Q shell
+        Enter in a Query without Single quotes Q only supports Double quotes
+        Example
+        ResearchSubject.id = "Enter Value"
+        Functions
+        help()
+        exit()
+        clear()
+        \n
+        """)
+
 
 while True:
+    if(new is True):
+        help()
+        new = False
     text = input('Q > ')
+    if(text == "help()"):
+        help()
+        continue
+
     if(text == "exit()"):
         break
     if (text == "clear()"):
@@ -30,5 +53,7 @@ while True:
     except LexerError as e:
         print(e)
     except IndexError as e:
+        print(e)
+    except MissingTokensError as e:
         print(e)
 

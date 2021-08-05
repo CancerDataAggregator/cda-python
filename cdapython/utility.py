@@ -1,8 +1,8 @@
 import cda_client
 import sys
 from cda_client.api.query_api import QueryApi
-from .Result import get_query_result
-from .constantVariables import table_version,CDA_API_URL
+from cdapython.Result import get_query_result
+from cdapython.constantVariables import table_version,CDA_API_URL
 
 
 def unique_terms(col_name, system='') -> list:

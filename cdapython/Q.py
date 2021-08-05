@@ -2,9 +2,9 @@ from typing import Tuple, Union
 from cda_client import ApiClient, Configuration
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query import Query
-from constantVariables import CDA_API_URL, table_version
-from Result import get_query_result
-from functions import Quoted, Unquoted, col
+from cdapython.constantVariables import CDA_API_URL, table_version
+from cdapython.Result import get_query_result
+from cdapython.functions import Quoted, Unquoted, col
 
 
 class Q:
