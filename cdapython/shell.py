@@ -1,3 +1,4 @@
+from Q import Q
 from Qparser import parser
 from tdparser.lexer import LexerError
 
@@ -13,10 +14,13 @@ while True:
     text = input('Q > ')
     if(text == "exit()"):
         break
+    if (text == "clear()"):
+        print("\n" * 100)
+        continue
     try:
-        result = parser(str(text).strip())
-        print(type(result), result.run())
-
+        result: Q = parser(str(text).strip())
+        queryResult = result.run()
+        print(type(result), queryResult)     
     except AttributeError as e:
         print(e)
     except ValueError as e:
@@ -25,5 +29,6 @@ while True:
         print(e)
     except LexerError as e:
         print(e)
-
+    except IndexError as e:
+        print(e)
 

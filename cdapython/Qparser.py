@@ -67,7 +67,7 @@ class And(Token):
 
 
 class Or(Token):
-    lbp = 5  # Precedence
+    lbp = 6  # Precedence
 
     def led(self, left: Q, context):
         """Compute the value of this token when between two expressions."""
