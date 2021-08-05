@@ -1,3 +1,4 @@
 git+https://github.com/CancerDataAggregator/cda-python.git
 python-dotenv==0.18.0
 wheel==0.36.2
+tdparser
