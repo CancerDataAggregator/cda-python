@@ -41,9 +41,10 @@ while True:
         print("\n" * 100)
         continue
     try:
-        result: Q = parser(str(text).strip())
+        result: Q = Q(text)
+        print(result)
         queryResult = result.run()
-        print(type(result), queryResult)     
+        print(type(result), queryResult)
     except AttributeError as e:
         print(e)
     except ValueError as e:

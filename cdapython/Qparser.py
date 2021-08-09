@@ -1,4 +1,4 @@
-from cdapython.Q import Q
+from cdapython.Qbase import Qbase
 import re
 from tdparser import Lexer, Token
 
@@ -20,7 +20,7 @@ class Eq(Token):
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
         right_side = context.expression(self.lbp)
-        return Q(left.strip()+" = "+right_side.strip())
+        return Qbase(left.strip()+" = "+right_side.strip())
 
 
 class Greaterthen(Token):
@@ -31,7 +31,7 @@ class Greaterthen(Token):
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
         right_side = context.expression(self.lbp)
-        return Q(left.strip()+" > "+right_side.strip())
+        return Qbase(left.strip()+" > "+right_side.strip())
 
 
 class Lessthen(Token):
@@ -42,11 +42,12 @@ class Lessthen(Token):
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
         right_side = context.expression(self.lbp)
-        return Q(left.strip()+" < "+right_side.strip())
+        return Qbase(left.strip()+" < "+right_side.strip())
+
+
 class Doublequotes(Token):
     lbp = 10  # Precedence
     
-
     def nud(self, context):
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
@@ -58,7 +59,7 @@ class Doublequotes(Token):
 class And(Token):
     lbp = 5 # Precedence
 
-    def led(self, left: Q, context):
+    def led(self, left: Qbase, context):
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
@@ -69,7 +70,7 @@ class And(Token):
 class Or(Token):
     lbp = 6  # Precedence
 
-    def led(self, left: Q, context):
+    def led(self, left: Qbase, context):
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
