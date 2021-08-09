@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 __name__ = "cdapython"
-__version__ = getenv("VERISON")
+__version__ = getenv("VERSION")
 __about__ = f"Q {__version__}"
 
 
