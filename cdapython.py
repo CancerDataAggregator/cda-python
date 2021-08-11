@@ -12,6 +12,7 @@ from cda_client.api.meta_api import MetaApi
 __version__ = "2021.7.06"
 
 CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
+table = "gdc-bq.sample.cda_mvp"
 table_version = "v3"
 
 pp = pprint.PrettyPrinter(indent=2)
@@ -99,8 +100,10 @@ class Q:
             limit=1000,
             version=table_version,
             host=CDA_API_URL,
-            dry_run=False
+            dry_run=False,
+            table=table
             ):
+
         with cda_client.ApiClient(
                 configuration=cda_client.Configuration(host=host)
         ) as api_client:
@@ -109,8 +112,10 @@ class Q:
             api_response = api_instance.boolean_query(
                 self.query,
                 version,
-                dry_run
+                dry_run,
+                table
             )
+
             if dry_run:
                 return api_response
             return get_query_result(
