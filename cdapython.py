@@ -11,6 +11,7 @@ from cda_client.model.query import Query
 __version__ = "2021.7.06"
 
 CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
+table = "gdc-bq.sample.cda_mvp"
 table_version = "v3"
 
 pp = pprint.PrettyPrinter(indent=2)
@@ -77,13 +78,13 @@ class Q:
             return api_response
         return get_query_result(api_instance, api_response.query_id, offset, limit)
 
-    def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False):
+    def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False, table=table):
         with cda_client.ApiClient(
                 configuration=cda_client.Configuration(host=host)
         ) as api_client:
             api_instance = QueryApi(api_client)
             # Execute boolean query
-            api_response = api_instance.boolean_query(self.query, version=version, dry_run=dry_run)
+            api_response = api_instance.boolean_query(self.query, version=version, dry_run=dry_run, table=table)
             if dry_run:
                 return api_response
             return get_query_result(api_instance, api_response.query_id, offset, limit)
