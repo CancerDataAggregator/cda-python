@@ -7,6 +7,7 @@ from cda_client.api.query_api import QueryApi
 from cda_client.api_client import ApiClient
 from cda_client.configuration import Configuration
 from cda_client.model.query import Query
+from cda_client.api.meta_api import MetaApi
 
 __version__ = "2021.7.06"
 
@@ -65,28 +66,59 @@ class Q:
         self.query.node_type = _op
         self.query.l = _l
         self.query.r = _r
-       
+
     @staticmethod
     def sql(sql, host=CDA_API_URL, dry_run=False, offset=0, limit=1000):
         with ApiClient(
-            configuration= Configuration(host=host)
+            configuration=Configuration(host=host)
         ) as api_client:
             api_instance = QueryApi(api_client)
             api_response = api_instance.sql_query(sql)
         if dry_run:
             return api_response
-        return get_query_result(api_instance, api_response.query_id, offset, limit)
+        return get_query_result(
+            api_instance,
+            api_response.query_id,
+            offset,
+            limit
+        )
 
-    def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False):
+
+    @staticmethod
+    def statusbigquery() -> str:
+        """[summary]
+        Uses the cda_client library's MetaClass to get status check on the cda
+        BigQuery table
+        Returns:
+            str: status messages
+        """
+        return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
+
+    def run(self,
+            offset=0,
+            limit=1000,
+            version=table_version,
+            host=CDA_API_URL,
+            dry_run=False
+            ):
         with cda_client.ApiClient(
                 configuration=cda_client.Configuration(host=host)
         ) as api_client:
             api_instance = QueryApi(api_client)
             # Execute boolean query
-            api_response = api_instance.boolean_query(self.query, version=version, dry_run=dry_run)
+            api_response = api_instance.boolean_query(
+                self.query,
+                version,
+                dry_run
+            )
             if dry_run:
                 return api_response
-            return get_query_result(api_instance, api_response.query_id, offset, limit)
+            return get_query_result(
+                api_instance,
+                api_response.query_id,
+                offset,
+                limit
+            )
 
     def And(self, right: "Q"):
         return Q(self.query, "AND", right.query)
@@ -157,7 +189,12 @@ More pages: {self.has_next_page}
         return self._get_result(_offset, _limit)
 
     def _get_result(self, _offset, _limit):
-        return get_query_result(self._api_instance, self._query_id, _offset, _limit)
+        return get_query_result(
+            self._api_instance,
+            self._query_id,
+            _offset,
+            _limit
+        )
 
 
 def columns(version=table_version, host=CDA_API_URL):
@@ -175,12 +212,30 @@ def columns(version=table_version, host=CDA_API_URL):
 
 
 def unique_terms(col_name, system=''):
+    """[summary]
+
+    Args:
+        col_name (str): [description] needs Colname to look up in bigquery
+        system (str, optional): [description]. Defaults to ''.
+
+    Returns:
+        [type]: [description]
+    """
     with cda_client.ApiClient(
             configuration=cda_client.Configuration(host=CDA_API_URL)
     ) as api_client:
-        system = str(system) 
+        system = str(system)
         api_instance = QueryApi(api_client)
-        api_response = api_instance.unique_values(version=table_version, body=col_name, system=system)
+        api_response = api_instance.unique_values(
+            version=table_version,
+            body=col_name,
+            system=system
+        )
         # Execute query
-        query_result = get_query_result(api_instance, api_response.query_id, 0, 1000)
+        query_result = get_query_result(
+            api_instance,
+            api_response.query_id,
+            0,
+            1000
+        )
         return [list(t.values())[0] for t in query_result]
