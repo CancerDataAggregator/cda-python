@@ -1,9 +1,15 @@
+
+from cdapython.Q import Q
 import cda_client
 import sys
 from cda_client.api.query_api import QueryApi
 from cdapython.Result import get_query_result
 from cdapython.constantVariables import table_version,CDA_API_URL
+from cdapython.Qparser import parser
 
+
+def single_operator_parser(text: str) -> Q:
+        return parser(text)
 
 def unique_terms(col_name, system='',limit=1000) -> list:
     with cda_client.ApiClient(

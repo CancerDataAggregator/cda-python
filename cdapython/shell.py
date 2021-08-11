@@ -1,4 +1,5 @@
 
+from cdapython.utility import single_operator_parser
 from tdparser.topdown import MissingTokensError
 from cdapython.Q import Q
 from cdapython.Qparser import parser
@@ -41,8 +42,7 @@ while True:
         print("\n" * 100)
         continue
     try:
-        result: Q = Q(text)
-        print(result)
+        result: Q = single_operator_parser(text=text)
         queryResult = result.run()
         print(type(result), queryResult)
     except AttributeError as e:
