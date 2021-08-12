@@ -1,6 +1,6 @@
 import pprint
 import sys
-from typing import Union
+from typing import Optional, Union
 
 import cda_client
 from cda_client.api.query_api import QueryApi
@@ -66,9 +66,9 @@ class Q:
         self.query.node_type = _op
         self.query.l = _l
         self.query.r = _r
-       
+
     @staticmethod
-    def sql(sql, host=CDA_API_URL, dry_run=False, offset=0, limit=1000):
+    def sql(sql: str, host:str = CDA_API_URL, dry_run:bool=False, offset:int = 0, limit: int = 1000):
         with ApiClient(
             configuration= Configuration(host=host)
         ) as api_client:
@@ -77,6 +77,15 @@ class Q:
         if dry_run:
             return api_response
         return get_query_result(api_instance, api_response.query_id, offset, limit)
+    @staticmethod
+    def statusbigquery() -> str:
+        """[summary]
+        Uses the cda_client library's MetaClass to get status check on the cda
+        BigQuery table
+        Returns:
+            str: status messages
+        """
+        return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
 
     def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False):
         with cda_client.ApiClient(
@@ -194,14 +203,3 @@ def unique_terms(col_name, system=''):
         # Execute query
         query_result = get_query_result(api_instance, api_response.query_id, 0, 1000)
         return [list(t.values())[0] for t in query_result]
-
-
-def statusbigquery() -> str:
-    """[summary]
-    Uses the cda_client library's MetaClass to get status check on the cda's BigQuery table
-    Returns:
-        str: status messages
-    """
- 
-    return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
-   
