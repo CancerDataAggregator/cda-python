@@ -6,4 +6,4 @@ q2 = Q('ResearchSubject.associated_project = "TCGA-OV"')
 q = q1.And(q2)
 r = q.run()
 
-print(r)
+assert r.count == 461
