@@ -100,8 +100,7 @@ class Q:
             limit=1000,
             version=table_version,
             host=CDA_API_URL,
-            dry_run=False,
-            table=table
+            dry_run=False
             ):
 
         with cda_client.ApiClient(
@@ -112,8 +111,7 @@ class Q:
             api_response = api_instance.boolean_query(
                 self.query,
                 version,
-                dry_run,
-                table
+                dry_run
             )
 
             if dry_run:
