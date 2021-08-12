@@ -1,16 +1,17 @@
 import pprint
 import sys
-from typing import Union
+from typing import Optional, Union
 
 import cda_client
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import ApiClient
 from cda_client.configuration import Configuration
 from cda_client.model.query import Query
+from cda_client.api.meta_api import MetaApi
 
 __version__ = "2021.7.06"
 
-CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
+CDA_API_URL = "https://cda.cda-dev.broadinstitute.org" 
 table_version = "v3"
 
 pp = pprint.PrettyPrinter(indent=2)
@@ -70,7 +71,7 @@ class Q:
         return str(self.__class__) + ": " + str(self.__dict__)
 
     @staticmethod
-    def sql(sql, host=CDA_API_URL, dry_run=False, offset=0, limit=1000):
+    def sql(sql: str, host:str = CDA_API_URL, dry_run:bool=False, offset:int = 0, limit: int = 1000):
         with ApiClient(
             configuration= Configuration(host=host)
         ) as api_client:
@@ -79,6 +80,15 @@ class Q:
         if dry_run:
             return api_response
         return get_query_result(api_instance, api_response.query_id, offset, limit)
+    @staticmethod
+    def statusbigquery() -> str:
+        """[summary]
+        Uses the cda_client library's MetaClass to get status check on the cda
+        BigQuery table
+        Returns:
+            str: status messages
+        """
+        return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
 
     def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False):
         with cda_client.ApiClient(
@@ -178,6 +188,15 @@ def columns(version=table_version, host=CDA_API_URL):
 
 
 def unique_terms(col_name, system=''):
+    """[summary]
+
+    Args:
+        col_name (str): [description] needs Colname to look up in bigquery 
+        system (str, optional): [description]. Defaults to ''.
+
+    Returns:
+        [type]: [description]
+    """
     with cda_client.ApiClient(
             configuration=cda_client.Configuration(host=CDA_API_URL)
     ) as api_client:
