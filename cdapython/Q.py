@@ -5,7 +5,7 @@ from cda_client.model.query import Query
 from cdapython.constantVariables import CDA_API_URL, table_version
 from cdapython.Result import get_query_result
 from cdapython.functions import Quoted, Unquoted, col
-
+from cda_client.api.meta_api import MetaApi
 class Q:
     """
     Q lang is Language used to send query to the cda servi
@@ -44,6 +44,17 @@ class Q:
         if dry_run is True:
             return api_response
         return get_query_result(api_instance, api_response.query_id, offset, limit)
+
+    @staticmethod
+    def statusbigquery() -> str:
+        """[summary]
+        Uses the cda_client library's MetaClass to get status check on the cda
+        BigQuery table
+        Returns:
+            str: status messages
+        """
+        return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
+
 
     def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False):
         """[summary]
