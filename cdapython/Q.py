@@ -6,6 +6,7 @@ from cdapython.constantVariables import CDA_API_URL, table_version
 from cdapython.Result import get_query_result
 from cdapython.functions import Quoted, Unquoted, col
 from cda_client.api.meta_api import MetaApi
+from cdapython.decorators import measure
 class Q:
     """
     Q lang is Language used to send query to the cda servi
@@ -55,7 +56,7 @@ class Q:
         """
         return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
 
-
+    @measure
     def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False):
         """[summary]
 
