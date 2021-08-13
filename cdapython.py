@@ -79,7 +79,6 @@ class Q:
         return get_query_result(api_instance, api_response.query_id, offset, limit)
 
     def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False, table=default_table):
-        print(table)
         with cda_client.ApiClient(
                 configuration=cda_client.Configuration(host=host)
         ) as api_client:
