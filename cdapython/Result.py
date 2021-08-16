@@ -3,7 +3,7 @@ import pprint as pp
 class Result:
     """A convenient wrapper around the response object from the CDA service."""
 
-    def __init__(self, api_response, query_id, offset, limit, api_instance) -> None:
+    def __init__(self, api_response, query_id, offset: int, limit: int, api_instance) -> None:
         self._api_response = api_response
         self._query_id = query_id
         self._offset = offset
@@ -18,6 +18,7 @@ Count: {self.count}
 Total Row Count: {self.total_row_count}
 More pages: {self.has_next_page}
 """
+
     def __repr__(self) -> str:
         return f"""
 Query: {self.sql}

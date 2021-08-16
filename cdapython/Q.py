@@ -7,6 +7,8 @@ from cdapython.Result import get_query_result
 from cdapython.functions import Quoted, Unquoted, col
 from cda_client.api.meta_api import MetaApi
 from cdapython.decorators import measure
+
+
 class Q:
     """
     Q lang is Language used to send query to the cda servi
@@ -33,10 +35,11 @@ class Q:
         self.query.r = _r
 
     def __repr__(self):
-        return str(self.__class__) + ": " + str(self.__dict__)
+        return str(self.__class__) + ": \n" + str(self.__dict__)
 
     @staticmethod
-    def sql(sql: str, host: str = CDA_API_URL, dry_run:bool = False, offset:int = 0, limit:int = 1000):
+    def sql(sql: str, host: str = CDA_API_URL, dry_run: bool = False,
+            offset: int = 0, limit: int = 1000):
         with ApiClient(
             configuration= Configuration(host=host)
         ) as api_client:
@@ -44,7 +47,9 @@ class Q:
             api_response = api_instance.sql_query(sql)
         if dry_run is True:
             return api_response
-        return get_query_result(api_instance, api_response.query_id, offset, limit)
+        return get_query_result(api_instance,
+                                api_response.query_id, offset,
+                                limit)
 
     @staticmethod
     def statusbigquery() -> str:
@@ -57,7 +62,10 @@ class Q:
         return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
 
     @measure
-    def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False):
+    def run(self, offset=0,
+            limit: int = 1000, version: str = table_version,
+            host: str = CDA_API_URL,
+            dry_run=False):
         """[summary]
 
         Args:

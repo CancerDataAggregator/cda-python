@@ -3,12 +3,18 @@ from datetime import datetime
 from setuptools import setup, find_packages
 from pathlib import Path
 import os
-from dotenv import load_dotenv
-load_dotenv()
-env_path = Path('.')/'.env'
-load_dotenv(dotenv_path=env_path)
-__version__ = os.getenv("VERSION")
+
+def getVersion(filepath:str):
+    with open(filepath, 'r') as f:
+        for i in f.readlines():
+            if(i.find("VERSION") != -1):
+                return(str(i.split("=")[1].strip().replace("\"", "")))
+
+
+__version__ = getVersion(".env")
+print(__version__)
 current_path = Path(__file__).parent
+
 
 
 name = "cdapython"

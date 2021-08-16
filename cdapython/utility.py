@@ -11,7 +11,7 @@ from cdapython.Qparser import parser
 def single_operator_parser(text: str) -> Q:
         return parser(text)
 
-def unique_terms(col_name, system='',limit=1000) -> list:
+def unique_terms(col_name, system='', limit=1000) -> list:
     with cda_client.ApiClient(
             configuration=cda_client.Configuration(host=CDA_API_URL)
     ) as api_client:
@@ -22,7 +22,7 @@ def unique_terms(col_name, system='',limit=1000) -> list:
         return [list(t.values())[0] for t in query_result]
 
 
-def columns(version=table_version, host=CDA_API_URL) -> list:
+def columns(version:str = table_version, host:str = CDA_API_URL) -> list:
     """Get columns names from the database."""
     query = f"SELECT field_path FROM `gdc-bq-sample.cda_mvp.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS` WHERE table_name = '{version}'"
     sys.stderr.write(f"{query}\n")
