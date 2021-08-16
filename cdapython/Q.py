@@ -2,7 +2,7 @@ from typing import Tuple, Union
 from cda_client import ApiClient, Configuration
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query import Query
-from cdapython.constantVariables import CDA_API_URL, table_version
+from cdapython.constantVariables import CDA_API_URL, table_version, default_table
 from cdapython.Result import get_query_result
 from cdapython.functions import Quoted, Unquoted, col
 from cda_client.api.meta_api import MetaApi
@@ -65,7 +65,9 @@ class Q:
     def run(self, offset=0,
             limit: int = 1000, version: str = table_version,
             host: str = CDA_API_URL,
-            dry_run=False):
+            dry_run=False,
+            table=default_table
+            ):
         """[summary]
 
         Args:
@@ -84,7 +86,7 @@ class Q:
             api_instance = QueryApi(api_client)
             # Execute boolean query
             print("Getting results from database", end="\n\n")
-            api_response = api_instance.boolean_query(self.query, version=version, dry_run=dry_run)
+            api_response = api_instance.boolean_query(self.query, version=version, dry_run=dry_run, table=table)            
             if dry_run is True:
                 return api_response
             return get_query_result(api_instance, api_response.query_id, offset, limit)

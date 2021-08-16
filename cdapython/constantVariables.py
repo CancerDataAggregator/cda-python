@@ -9,4 +9,5 @@ load_dotenv(dotenv_path=env_path)
 
 __version__ = os.getenv("VERSION")
 CDA_API_URL = os.getenv("CDA_API_URL")
-table_version = os.getenv("DATABASETABLE")
+table_version = os.getenv("DATABASETABLE_VERSION")
+default_table = os.getenv("DATABASETABLE")
