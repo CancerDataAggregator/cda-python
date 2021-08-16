@@ -45,6 +45,7 @@ We will now show you the basic structure of `CDA python` through the use of the 
 - `unique_terms()`: for a given column show all unique terms,
 - `Q`: Executes this query on the public CDA server, and
 - `Q.sql`: allows you to enter SQL style queries.
+- `single_operator_parser` : allows you to write long form Q statments with out chaining
 
 (Also see example [IPython notebook](example.ipynb))
 
@@ -191,6 +192,10 @@ r1.pretty_print(0)
 #  'primary_disease_type': 'Adenomas and Adenocarcinomas',
 #  'race': None,
 #  'sex': None}
+
+
+single_operator_parser('ResearchSubject.identifier.system = "GDC" FROM ResearchSubject.primary_disease_type = "Ovarian Serous Cystadenocarcinoma" AND ResearchSubject.identifier.system = "PDC"')
+result = q1.run()
 ```
 
 # Comparison operators
