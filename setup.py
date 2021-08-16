@@ -2,9 +2,9 @@
 from datetime import datetime
 from setuptools import setup, find_packages
 from pathlib import Path
-import os
 
-def getVersion(filepath:str):
+
+def getVersion(filepath: str):
     with open(filepath, 'r') as f:
         for i in f.readlines():
             if(i.find("VERSION") != -1):
@@ -16,14 +16,13 @@ print(__version__)
 current_path = Path(__file__).parent
 
 
-
 name = "cdapython"
 version = __version__
 now = datetime.utcnow()
 desc_path = Path(current_path, "README.md")
 with open(desc_path, "r", encoding="utf-8", errors="surrogateescape") as fh:
     long_description = fh.read()
-    
+
 setup(
     name=name,
     packages=find_packages(),

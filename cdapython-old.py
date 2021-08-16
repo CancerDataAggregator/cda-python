@@ -9,10 +9,11 @@ from cda_client.configuration import Configuration
 from cda_client.model.query import Query
 from cda_client.api.meta_api import MetaApi
 
-__version__ = "2021.7.06"
+__version__ = "2021.8.13"
 
 CDA_API_URL = "https://cda.cda-dev.broadinstitute.org" 
 table_version = "v3"
+default_table = "gdc-bq-sample.cda_mvp"
 
 pp = pprint.PrettyPrinter(indent=2)
 
@@ -90,13 +91,13 @@ class Q:
         """
         return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
 
-    def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False):
+    def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False, table=default_table):
         with cda_client.ApiClient(
                 configuration=cda_client.Configuration(host=host)
         ) as api_client:
             api_instance = QueryApi(api_client)
             # Execute boolean query
-            api_response = api_instance.boolean_query(self.query, version=version, dry_run=dry_run)
+            api_response = api_instance.boolean_query(self.query, version=version, dry_run=dry_run, table=table)
             if dry_run:
                 return api_response
             return get_query_result(api_instance, api_response.query_id, offset, limit)
@@ -132,7 +133,14 @@ Count: {self.count}
 Total Row Count: {self.total_row_count}
 More pages: {self.has_next_page}
 """
-
+    def __repr__(self) -> str:
+        return f"""
+Query: {self.sql}
+Offset: {self._offset}
+Count: {self.count}
+Total Row Count: {self.total_row_count}
+More pages: {self.has_next_page}
+"""
     @property
     def sql(self):
         return self._api_response.query_sql
