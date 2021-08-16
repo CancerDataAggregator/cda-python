@@ -2,7 +2,6 @@
 from cdapython.utility import single_operator_parser
 from tdparser.topdown import MissingTokensError
 from cdapython.Q import Q
-from cdapython.Qparser import parser
 from tdparser.lexer import LexerError
 import readline
 
