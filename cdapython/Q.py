@@ -1,4 +1,6 @@
-from typing import Tuple, Union
+import logging
+import multiprocessing.pool
+from typing import Union, Optional
 from cda_client import ApiClient, Configuration
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query import Query
@@ -7,18 +9,20 @@ from cdapython.Result import get_query_result
 from cdapython.functions import Quoted, Unquoted, col
 from cda_client.api.meta_api import MetaApi
 from cdapython.decorators import measure
+import logging
 
 
 class Q:
     """
-    Q lang is Language used to send query to the cda servi
+    Q lang is Language used to send query to the cda service
     """
-    def __init__(self, *args: Tuple[str]) -> None:
+
+    def __init__(self, *args: str) -> None:
         self.query = Query()
 
         if len(args) == 1:
 
-            _l,  _op, _r = args[0].split(" ", 2)
+            _l, _op, _r = args[0].split(" ", 2)
             _l = col(_l)
             _r = infer_quote(_r)
         elif len(args) != 3:
@@ -38,18 +42,31 @@ class Q:
         return str(self.__class__) + ": \n" + str(self.__dict__)
 
     @staticmethod
-    def sql(sql: str, host: str = CDA_API_URL, dry_run: bool = False,
-            offset: int = 0, limit: int = 1000):
-        with ApiClient(
-            configuration= Configuration(host=host)
-        ) as api_client:
+    def sql(
+        sql: str,
+        host: Optional[str] = CDA_API_URL,
+        dry_run: bool = False,
+        offset: int = 0,
+        limit: int = 1000,
+    ):
+        """
+
+        Args:
+            sql (str): [description]
+            host (str, optional): [description]. Defaults to CDA_API_URL.
+            dry_run (bool, optional): [description]. Defaults to False.
+            offset (int, optional): [description]. Defaults to 0.
+            limit (int, optional): [description]. Defaults to 1000.
+
+        Returns:
+            [Result]: [description]
+        """
+        with ApiClient(configuration=Configuration(host=host)) as api_client:
             api_instance = QueryApi(api_client)
             api_response = api_instance.sql_query(sql)
         if dry_run is True:
             return api_response
-        return get_query_result(api_instance,
-                                api_response.query_id, offset,
-                                limit)
+        return get_query_result(api_instance, api_response.query_id, offset, limit)
 
     @staticmethod
     def statusbigquery() -> str:
@@ -61,13 +78,34 @@ class Q:
         """
         return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
 
+    @staticmethod
+    def queryjobstatus(id: str, host: Optional[str] = CDA_API_URL) -> object:
+        """[summary]
+
+        Args:
+            id (str): [description]
+            host (str, optional): [description]. Defaults to CDA_API_URL.
+
+        Returns:
+            [type]: [description]
+        """
+        with ApiClient(configuration=Configuration(host=host)) as api_client:
+            api_instance = QueryApi(api_client)
+            api_response = api_instance.job_status(id)
+            print(type(api_response))
+            return api_response["status"]
+
     @measure
-    def run(self, offset=0,
-            limit: int = 1000, version: str = table_version,
-            host: str = CDA_API_URL,
-            dry_run=False,
-            table=default_table
-            ):
+    def run(
+        self,
+        offset: int = 0,
+        limit: int = 1000,
+        version: Optional[str] = table_version,
+        host: Optional[str] = CDA_API_URL,
+        dry_run: bool = False,
+        table: Optional[str] = default_table,
+        async_call: bool = False,
+    ):
         """[summary]
 
         Args:
@@ -80,16 +118,34 @@ class Q:
         Returns:
             [Result]: [description]
         """
-        with ApiClient(
-                configuration=Configuration(host=host)
-        ) as api_client:
-            api_instance = QueryApi(api_client)
-            # Execute boolean query
-            print("Getting results from database", end="\n\n")
-            api_response = api_instance.boolean_query(self.query, version=version, dry_run=dry_run, table=table)            
-            if dry_run is True:
-                return api_response
-            return get_query_result(api_instance, api_response.query_id, offset, limit)
+        try:
+            with ApiClient(configuration=Configuration(host=host)) as api_client:
+                api_instance = QueryApi(api_client)
+                # Execute boolean query
+                print("Getting results from database", end="\n\n")
+                api_response = api_instance.boolean_query(
+                    self.query,
+                    version=version,
+                    dry_run=dry_run,
+                    table=table,
+                    async_req=async_call,
+                )
+
+                if isinstance(api_response, multiprocessing.pool.ApplyResult):
+                    if api_response.ready() is False:
+                        api_response.wait(1000.0)
+                        api_response = api_response.get()
+                    else:
+                        api_response = api_response.get()
+
+                if dry_run is True:
+                    return api_response
+
+                return get_query_result(
+                    api_instance, api_response.query_id, offset, limit
+                )
+        except Exception as httpError:
+            logging.error(f"{httpError}")
 
     def And(self, right: "Q"):
         return Q(self.query, "AND", right.query)

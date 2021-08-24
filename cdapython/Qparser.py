@@ -20,7 +20,9 @@ class Eq(Token):
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
         right_side = context.expression(self.lbp)
-        return Q(left.strip()+" = "+right_side.strip())
+        return Q(left.strip() + " = " + right_side.strip())
+
+
 class Greatertheneq(Token):
     lbp = 10  # Precedence
 
@@ -29,7 +31,8 @@ class Greatertheneq(Token):
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
         right_side = context.expression(self.lbp)
-        return Q(left.strip()+" >= "+right_side.strip())
+        return Q(left.strip() + " >= " + right_side.strip())
+
 
 class Greaterthen(Token):
     lbp = 10  # Precedence
@@ -39,7 +42,8 @@ class Greaterthen(Token):
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
         right_side = context.expression(self.lbp)
-        return Q(left.strip()+" > "+right_side.strip())
+        return Q(left.strip() + " > " + right_side.strip())
+
 
 class Lesstheneq(Token):
     lbp = 10  # Precedence
@@ -49,7 +53,8 @@ class Lesstheneq(Token):
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
         right_side = context.expression(self.lbp)
-        return Q(left.strip()+" =< "+right_side.strip())
+        return Q(left.strip() + " =< " + right_side.strip())
+
 
 class Lessthen(Token):
     lbp = 10  # Precedence
@@ -59,12 +64,12 @@ class Lessthen(Token):
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
         right_side = context.expression(self.lbp)
-        return Q(left.strip()+" < "+right_side.strip())
+        return Q(left.strip() + " < " + right_side.strip())
 
 
 class Doublequotes(Token):
     lbp = 10  # Precedence
-    
+
     def nud(self, context):
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
@@ -72,15 +77,17 @@ class Doublequotes(Token):
         value = self
         return value.text
 
+
 class Singlequotes(Token):
     lbp = 10  # Precedence
-    
+
     def nud(self, context):
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
         value = self
         return value.text
+
 
 class And(Token):
     lbp = 5  # Precedence
@@ -103,6 +110,7 @@ class Or(Token):
         right_side = context.expression(self.lbp)
         return left.Or(right_side)
 
+
 class From(Token):
     lbp = 4  # Precedence
 
@@ -115,17 +123,22 @@ class From(Token):
 
 
 lexer = Lexer(with_parens=True)
-lexer.register_token(Expression, re.compile(r'(\-[\S]+)|(\"[\w\s]+\")|(\b(?!\bAND\b)(?!\bOR\b)(?!\bNOT\b)(?!\bFROM\b)[\w.\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)'))
+lexer.register_token(
+    Expression,
+    re.compile(
+        r"(\-[\S]+)|(\"[\w\s]+\")|(\b(?!\bAND\b)(?!\bOR\b)(?!\bNOT\b)(?!\bFROM\b)[\w.\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
+    ),
+)
 lexer.register_token(Doublequotes, re.compile(r'(".*?")'))
 lexer.register_token(Singlequotes, re.compile(r"('.*?')"))
-lexer.register_token(Greaterthen, re.compile(r'(\s+>+\s)'))
-lexer.register_token(Greatertheneq, re.compile(r'(\s+>=+\s)'))
-lexer.register_token(Lessthen, re.compile(r'(\s+<+\s)'))
-lexer.register_token(Lesstheneq, re.compile(r'(\s+<=+\s)'))
-lexer.register_token(Eq, re.compile(r'(\s+=+\s)'))
-lexer.register_token(And, re.compile(r'(AND)'))
-lexer.register_token(Or, re.compile(r'(OR)'))
-lexer.register_token(From, re.compile(r'(FROM)'))
+lexer.register_token(Greaterthen, re.compile(r"(\s+>+\s)"))
+lexer.register_token(Greatertheneq, re.compile(r"(\s+>=+\s)"))
+lexer.register_token(Lessthen, re.compile(r"(\s+<+\s)"))
+lexer.register_token(Lesstheneq, re.compile(r"(\s+<=+\s)"))
+lexer.register_token(Eq, re.compile(r"(\s+=+\s)"))
+lexer.register_token(And, re.compile(r"(AND)"))
+lexer.register_token(Or, re.compile(r"(OR)"))
+lexer.register_token(From, re.compile(r"(FROM)"))
 
 
 def parser(text):

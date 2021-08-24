@@ -1,9 +1,12 @@
 import pprint as pp
 
+
 class Result:
     """A convenient wrapper around the response object from the CDA service."""
 
-    def __init__(self, api_response, query_id, offset: int, limit: int, api_instance) -> None:
+    def __init__(
+        self, api_response, query_id, offset: int, limit: int, api_instance
+    ) -> None:
         self._api_response = api_response
         self._query_id = query_id
         self._offset = offset
@@ -12,6 +15,7 @@ class Result:
 
     def __str__(self) -> str:
         return f"""
+QueryID: {self._query_id}
 Query: {self.sql}
 Offset: {self._offset}
 Count: {self.count}
@@ -21,6 +25,7 @@ More pages: {self.has_next_page}
 
     def __repr__(self) -> str:
         return f"""
+QueryID: {self._query_id}
 Query: {self.sql}
 Offset: {self._offset}
 Count: {self.count}
@@ -70,6 +75,7 @@ More pages: {self.has_next_page}
 
 def get_query_result(api_instance, query_id, offset, limit) -> Result:
     while True:
+        print(api_instance)
         response = api_instance.query(id=query_id, offset=offset, limit=limit)
         if response.total_row_count is not None:
             return Result(response, query_id, offset, limit, api_instance)

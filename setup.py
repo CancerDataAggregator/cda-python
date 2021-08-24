@@ -1,14 +1,13 @@
-
 from datetime import datetime
 from setuptools import setup, find_packages
 from pathlib import Path
 
 
 def getVersion(filepath: str):
-    with open(filepath, 'r') as f:
+    with open(filepath, "r") as f:
         for i in f.readlines():
-            if(i.find("VERSION") != -1):
-                return(str(i.split("=")[1].strip().replace("\"", "")))
+            if i.find("VERSION") != -1:
+                return str(i.split("=")[1].strip().replace('"', ""))
 
 
 __version__ = getVersion(".env")
@@ -27,16 +26,16 @@ setup(
     name=name,
     packages=find_packages(),
     version=version,
-    py_modules=['cdapython'],
-    platforms=['POSIX', 'MacOS', 'Windows'],
-    python_requires='>=3.6',
+    py_modules=["cdapython"],
+    platforms=["POSIX", "MacOS", "Windows"],
+    python_requires=">=3.6",
     install_requires=[
         "tdparser",
         "wheel",
         "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git",
-        "python-dotenv"
+        "python-dotenv",
     ],
-    description='User friendly Python library to access CDA service.',
+    description="User friendly Python library to access CDA service.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     include_package_data=True,

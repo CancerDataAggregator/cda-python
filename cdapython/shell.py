@@ -1,4 +1,3 @@
-
 from cdapython.utility import single_operator_parser
 from tdparser.topdown import MissingTokensError
 from cdapython.Q import Q
@@ -12,7 +11,8 @@ new = True
 
 
 def help():
-    print("""
+    print(
+        """
         Welcome to Q shell's help utility
         how to use Q shell
         Enter in a Query without Single quotes Q only supports Double quotes
@@ -23,21 +23,22 @@ def help():
         exit()
         clear()
         \n
-        """)
+        """
+    )
 
 
 while True:
-    if(new is True):
+    if new is True:
         help()
         new = False
-    text = input('Q > ')
-    if(text == "help()"):
+    text = input("Q > ")
+    if text == "help()":
         help()
         continue
 
-    if(text == "exit()"):
+    if text == "exit()":
         break
-    if (text == "clear()"):
+    if text == "clear()":
         print("\n" * 100)
         continue
     try:
@@ -56,4 +57,3 @@ while True:
         print(e)
     except MissingTokensError as e:
         print(e)
-

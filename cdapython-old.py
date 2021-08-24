@@ -11,7 +11,7 @@ from cda_client.api.meta_api import MetaApi
 
 __version__ = "2021.8.13"
 
-CDA_API_URL = "https://cda.cda-dev.broadinstitute.org" 
+CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
 table_version = "v3"
 default_table = "gdc-bq-sample.cda_mvp"
 
@@ -67,20 +67,25 @@ class Q:
         self.query.node_type = _op
         self.query.l = _l
         self.query.r = _r
-    
+
     def __repr__(self):
         return str(self.__class__) + ": " + str(self.__dict__)
 
     @staticmethod
-    def sql(sql: str, host:str = CDA_API_URL, dry_run:bool=False, offset:int = 0, limit: int = 1000):
-        with ApiClient(
-            configuration= Configuration(host=host)
-        ) as api_client:
+    def sql(
+        sql: str,
+        host: str = CDA_API_URL,
+        dry_run: bool = False,
+        offset: int = 0,
+        limit: int = 1000,
+    ):
+        with ApiClient(configuration=Configuration(host=host)) as api_client:
             api_instance = QueryApi(api_client)
             api_response = api_instance.sql_query(sql)
         if dry_run:
             return api_response
         return get_query_result(api_instance, api_response.query_id, offset, limit)
+
     @staticmethod
     def statusbigquery() -> str:
         """[summary]
@@ -91,13 +96,23 @@ class Q:
         """
         return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
 
-    def run(self, offset=0, limit=1000, version=table_version, host=CDA_API_URL, dry_run=False, table=default_table):
+    def run(
+        self,
+        offset=0,
+        limit=1000,
+        version=table_version,
+        host=CDA_API_URL,
+        dry_run=False,
+        table=default_table,
+    ):
         with cda_client.ApiClient(
-                configuration=cda_client.Configuration(host=host)
+            configuration=cda_client.Configuration(host=host)
         ) as api_client:
             api_instance = QueryApi(api_client)
             # Execute boolean query
-            api_response = api_instance.boolean_query(self.query, version=version, dry_run=dry_run, table=table)
+            api_response = api_instance.boolean_query(
+                self.query, version=version, dry_run=dry_run, table=table
+            )
             if dry_run:
                 return api_response
             return get_query_result(api_instance, api_response.query_id, offset, limit)
@@ -133,6 +148,7 @@ Count: {self.count}
 Total Row Count: {self.total_row_count}
 More pages: {self.has_next_page}
 """
+
     def __repr__(self) -> str:
         return f"""
 Query: {self.sql}
@@ -141,6 +157,7 @@ Count: {self.count}
 Total Row Count: {self.total_row_count}
 More pages: {self.has_next_page}
 """
+
     @property
     def sql(self):
         return self._api_response.query_sql
@@ -187,7 +204,7 @@ def columns(version=table_version, host=CDA_API_URL):
     sys.stderr.write(f"{query}\n")
     # Execute query
     with cda_client.ApiClient(
-            configuration=cda_client.Configuration(host=host)
+        configuration=cda_client.Configuration(host=host)
     ) as api_client:
         api_instance = QueryApi(api_client)
         api_response = api_instance.sql_query(query)
@@ -195,22 +212,24 @@ def columns(version=table_version, host=CDA_API_URL):
         return [list(t.values())[0] for t in query_result]
 
 
-def unique_terms(col_name, system=''):
+def unique_terms(col_name, system=""):
     """[summary]
 
     Args:
-        col_name (str): [description] needs Colname to look up in bigquery 
+        col_name (str): [description] needs Colname to look up in bigquery
         system (str, optional): [description]. Defaults to ''.
 
     Returns:
         [type]: [description]
     """
     with cda_client.ApiClient(
-            configuration=cda_client.Configuration(host=CDA_API_URL)
+        configuration=cda_client.Configuration(host=CDA_API_URL)
     ) as api_client:
-        system = str(system) 
+        system = str(system)
         api_instance = QueryApi(api_client)
-        api_response = api_instance.unique_values(version=table_version, body=col_name, system=system)
+        api_response = api_instance.unique_values(
+            version=table_version, body=col_name, system=system
+        )
         # Execute query
         query_result = get_query_result(api_instance, api_response.query_id, 0, 1000)
         return [list(t.values())[0] for t in query_result]
