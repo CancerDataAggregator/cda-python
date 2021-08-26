@@ -9,7 +9,7 @@ from cdapython.Result import get_query_result
 from cdapython.functions import Quoted, Unquoted, col
 from cda_client.api.meta_api import MetaApi
 from cdapython.decorators import measure
-import logging
+
 
 
 class Q:
@@ -132,11 +132,12 @@ class Q:
                 )
 
                 if isinstance(api_response, multiprocessing.pool.ApplyResult):
-                    if api_response.ready() is False:
-                        api_response.wait(1000.0)
-                        api_response = api_response.get()
-                    else:
-                        api_response = api_response.get()
+                    print("Wating for results")
+                    while api_response.ready() is False:
+                        if api_response.ready() is False:
+                            api_response.wait(1000.0)
+
+                    api_response = api_response.get()
 
                 if dry_run is True:
                     return api_response

@@ -73,9 +73,10 @@ More pages: {self.has_next_page}
         return get_query_result(self._api_instance, self._query_id, _offset, _limit)
 
 
-def get_query_result(api_instance, query_id, offset, limit) -> Result:
+def get_query_result(
+    api_instance: object, query_id: object, offset: int, limit: int
+) -> Result:
     while True:
-        print(api_instance)
         response = api_instance.query(id=query_id, offset=offset, limit=limit)
         if response.total_row_count is not None:
             return Result(response, query_id, offset, limit, api_instance)

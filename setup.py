@@ -31,6 +31,7 @@ setup(
     python_requires=">=3.6",
     install_requires=[
         "tdparser",
+        "numpy",
         "wheel",
         "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git",
         "python-dotenv",
