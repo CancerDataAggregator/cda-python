@@ -11,7 +11,6 @@ from cda_client.api.meta_api import MetaApi
 from cdapython.decorators import measure
 
 
-
 class Q:
     """
     Q lang is Language used to send query to the cda service
@@ -38,7 +37,7 @@ class Q:
         self.query.l = _l
         self.query.r = _r
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
 
     @staticmethod
@@ -134,8 +133,7 @@ class Q:
                 if isinstance(api_response, multiprocessing.pool.ApplyResult):
                     print("Wating for results")
                     while api_response.ready() is False:
-                        if api_response.ready() is False:
-                            api_response.wait(1000.0)
+                        api_response.wait(10000)
 
                     api_response = api_response.get()
 
@@ -148,16 +146,16 @@ class Q:
         except Exception as httpError:
             logging.error(f"{httpError}")
 
-    def And(self, right: "Q"):
+    def And(self, right: "Q") -> "Q":
         return Q(self.query, "AND", right.query)
 
-    def Or(self, right: "Q"):
+    def Or(self, right: "Q") -> "Q":
         return Q(self.query, "OR", right.query)
 
-    def From(self, right: "Q"):
+    def From(self, right: "Q") -> "Q":
         return Q(self.query, "SUBQUERY", right.query)
 
-    def Not(self):
+    def Not(self) -> "Q":
         return Q(self.query, "NOT", None)
 
 

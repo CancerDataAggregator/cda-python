@@ -1,13 +1,14 @@
+from typing import Any
 from cdapython.Q import Q
 import re
-from tdparser import Lexer, Token
+from tdparser import Lexer, Token, Parser
 
 
 class Expression(Token):
     def __init__(self, text: str):
         self.value = str(text).strip()
 
-    def nud(self, context):
+    def nud(self, context: Parser) -> str:
         """What the token evaluates to"""
         return self.value.strip()
 
@@ -15,7 +16,7 @@ class Expression(Token):
 class Eq(Token):
     lbp = 10  # Precedence
 
-    def led(self, left: str, context):
+    def led(self, left: str, context: Parser) -> Q:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
@@ -26,7 +27,7 @@ class Eq(Token):
 class Greatertheneq(Token):
     lbp = 10  # Precedence
 
-    def led(self, left: str, context):
+    def led(self, left: str, context: Parser) -> Q:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
@@ -37,7 +38,7 @@ class Greatertheneq(Token):
 class Greaterthen(Token):
     lbp = 10  # Precedence
 
-    def led(self, left: str, context):
+    def led(self, left: str, context: Parser) -> Q:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
@@ -48,7 +49,7 @@ class Greaterthen(Token):
 class Lesstheneq(Token):
     lbp = 10  # Precedence
 
-    def led(self, left: str, context):
+    def led(self, left: str, context: Parser) -> Q:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
@@ -59,7 +60,7 @@ class Lesstheneq(Token):
 class Lessthen(Token):
     lbp = 10  # Precedence
 
-    def led(self, left: str, context):
+    def led(self, left: str, context: Parser) -> Q:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
@@ -70,7 +71,7 @@ class Lessthen(Token):
 class Doublequotes(Token):
     lbp = 10  # Precedence
 
-    def nud(self, context):
+    def nud(self, context: Parser) -> str:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
@@ -81,7 +82,7 @@ class Doublequotes(Token):
 class Singlequotes(Token):
     lbp = 10  # Precedence
 
-    def nud(self, context):
+    def nud(self, context: Parser) -> str:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
@@ -92,7 +93,7 @@ class Singlequotes(Token):
 class And(Token):
     lbp = 5  # Precedence
 
-    def led(self, left: Q, context):
+    def led(self, left: Q, context: Parser) -> Q:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
@@ -103,7 +104,7 @@ class And(Token):
 class Or(Token):
     lbp = 6  # Precedence
 
-    def led(self, left: Q, context):
+    def led(self, left: Q, context: Parser) -> Q:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
@@ -114,7 +115,7 @@ class Or(Token):
 class From(Token):
     lbp = 4  # Precedence
 
-    def led(self, left: Q, context):
+    def led(self, left: Q, context: Parser) -> Q:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence

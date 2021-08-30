@@ -1,5 +1,7 @@
 import pprint as pp
 
+import cda_client.api.query_api
+
 
 class Result:
     """A convenient wrapper around the response object from the CDA service."""
@@ -74,7 +76,10 @@ More pages: {self.has_next_page}
 
 
 def get_query_result(
-    api_instance: object, query_id: object, offset: int, limit: int
+    api_instance: cda_client.api.query_api.QueryApi,
+    query_id: str,
+    offset: int,
+    limit: int,
 ) -> Result:
     while True:
         response = api_instance.query(id=query_id, offset=offset, limit=limit)

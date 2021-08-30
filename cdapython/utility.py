@@ -28,7 +28,9 @@ def unique_terms(col_name: str, system: str = "", limit: int = 1000) -> object:
         return uniqueArray.tolist()
 
 
-def columns(version: Optional[str] = table_version, host: str = CDA_API_URL) -> object:
+def columns(
+    version: Optional[str] = table_version, host: str = CDA_API_URL, limit=1000
+) -> object:
 
     query = f"SELECT field_path FROM `gdc-bq-sample.cda_mvp.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS` WHERE table_name = '{version}'"
     sys.stderr.write(f"{query}\n")
@@ -38,6 +40,6 @@ def columns(version: Optional[str] = table_version, host: str = CDA_API_URL) -> 
     ) as api_client:
         api_instance = QueryApi(api_client)
         api_response = api_instance.sql_query(query)
-        query_result = get_query_result(api_instance, api_response.query_id, 0, 1000)
+        query_result = get_query_result(api_instance, api_response.query_id, 0, limit)
         column_array = np.array([list(t.values())[0] for t in query_result])
         return column_array.tolist()
