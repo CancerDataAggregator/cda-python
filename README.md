@@ -16,7 +16,7 @@ launch a Jupyter Notebook instance with our example notebook ready to run.
 Click on the logo below. This will
 launch a Jupyter Notebook instance with our example notebook ready to run.
 
-[![MyBinder.org](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/CancerDataAggregator/cda-python/integration)
+[![MyBinder.org](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/CancerDataAggregator/cda-python/integration?filepath=/notebooks/example.ipynb)
 # Running CDA Python locally
 
 Install the CDA Python library locally:
