@@ -173,8 +173,8 @@ class Q:
     def Less_Then_EQ(self, right: "Q"):
         return Q(self.query, "<=", right.query)
 
-    def Less_Then(self, right: "Q"):
-        return Q(self.query, "<", right.query)
+    def Less_Then_EQ(self, right: "Q"):
+        return Q(self.query, "<=", right.query)
 
 
 def infer_quote(val: Union[int, float, str, "Q", Query]) -> Query:

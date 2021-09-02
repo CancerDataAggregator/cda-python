@@ -77,7 +77,7 @@ class Lesstheneq(Token):
         if isinstance(left, Q):
             return left.Less_Then_EQ(right_side)
         else:
-            return Q(left.strip() + " <=" + right_side.strip())
+            return Q(left.strip() + " <= " + right_side.strip())
 
 
 class Lessthen(Token):
@@ -117,7 +117,7 @@ class Singlequotes(Token):
 
 
 class And(Token):
-    lbp = 5  # Precedence
+    lbp = 3  # Precedence
 
     def led(self, left: Q, context: Parser) -> Q:
         """Compute the value of this token when between two expressions."""

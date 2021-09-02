@@ -1,7 +1,9 @@
-from cdapython.utility import single_operator_parser
+from cdapython.utility import query
 
-qc2 = single_operator_parser(
-    'ResearchSubject.Diagnosis.tumor_stage = "Stage IIIC" < ResearchSubject.Diagnosis.tumor_stage = "Stage IV" '
+q = query(
+    'ResearchSubject.associated_project = "TCGA-OV" AND ResearchSubject.Diagnosis.age_at_diagnosis != 21550'
 )
 
-print(qc2.run())
+r = q.run()
+
+print(r)
