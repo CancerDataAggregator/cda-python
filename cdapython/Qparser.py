@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Union
 from cdapython.Q import Q
 import re
 from tdparser import Lexer, Token, Parser
@@ -24,48 +24,74 @@ class Eq(Token):
         return Q(left.strip() + " = " + right_side.strip())
 
 
-class Greatertheneq(Token):
-    lbp = 10  # Precedence
+class Not_eq(Token):
+    lbp = 5  # Precedence
 
-    def led(self, left: str, context: Parser) -> Q:
+    def led(self, left: Union[str, Q], context: Parser) -> Q:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
         right_side = context.expression(self.lbp)
-        return Q(left.strip() + " >= " + right_side.strip())
+        if isinstance(left, Q):
+            return left.Not_EQ(right_side)
+        else:
+            return Q(left.strip() + " != " + right_side.strip())
+
+
+class Greatertheneq(Token):
+    lbp = 4  # Precedence
+
+    def led(self, left: Union[str, Q], context: Parser) -> Q:
+        """Compute the value of this token when between two expressions."""
+        # Fetch the expression to the right, stoping at the next boundary
+        # of same precedence
+        right_side = context.expression(self.lbp)
+        if isinstance(left, Q):
+            return left.Greater_Then_EQ(right_side)
+        else:
+            return Q(left.strip() + " >= " + right_side.strip())
 
 
 class Greaterthen(Token):
-    lbp = 10  # Precedence
+    lbp = 4  # Precedence
 
     def led(self, left: str, context: Parser) -> Q:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
         right_side = context.expression(self.lbp)
-        return Q(left.strip() + " > " + right_side.strip())
+        if isinstance(left, Q):
+            return left.Greater_Then(right_side)
+        else:
+            return Q(left.strip() + " > " + right_side.strip())
 
 
 class Lesstheneq(Token):
-    lbp = 10  # Precedence
+    lbp = 4  # Precedence
 
     def led(self, left: str, context: Parser) -> Q:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
         right_side = context.expression(self.lbp)
-        return Q(left.strip() + " =< " + right_side.strip())
+        if isinstance(left, Q):
+            return left.Less_Then_EQ(right_side)
+        else:
+            return Q(left.strip() + " <=" + right_side.strip())
 
 
 class Lessthen(Token):
-    lbp = 10  # Precedence
+    lbp = 4  # Precedence
 
     def led(self, left: str, context: Parser) -> Q:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
         right_side = context.expression(self.lbp)
-        return Q(left.strip() + " < " + right_side.strip())
+        if isinstance(left, Q):
+            return left.Less_Then(right_side)
+        else:
+            return Q(left.strip() + " < " + right_side.strip())
 
 
 class Doublequotes(Token):
@@ -136,6 +162,7 @@ lexer.register_token(Greaterthen, re.compile(r"(\s+>+\s)"))
 lexer.register_token(Greatertheneq, re.compile(r"(\s+>=+\s)"))
 lexer.register_token(Lessthen, re.compile(r"(\s+<+\s)"))
 lexer.register_token(Lesstheneq, re.compile(r"(\s+<=+\s)"))
+lexer.register_token(Not_eq, re.compile(r"(\s+!=+\s)"))
 lexer.register_token(Eq, re.compile(r"(\s+=+\s)"))
 lexer.register_token(And, re.compile(r"(AND)"))
 lexer.register_token(Or, re.compile(r"(OR)"))

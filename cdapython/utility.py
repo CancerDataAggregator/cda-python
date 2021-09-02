@@ -9,7 +9,7 @@ from typing import Optional
 import numpy as np
 
 
-def single_operator_parser(text: str) -> Q:
+def query(text: str) -> Q:
     return parser(text)
 
 
@@ -29,7 +29,9 @@ def unique_terms(col_name: str, system: str = "", limit: int = 1000) -> object:
 
 
 def columns(
-    version: Optional[str] = table_version, host: Optional[str] = CDA_API_URL, limit: int = 1000
+    version: Optional[str] = table_version,
+    host: Optional[str] = CDA_API_URL,
+    limit: int = 1000,
 ) -> object:
 
     query = f"SELECT field_path FROM `gdc-bq-sample.cda_mvp.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS` WHERE table_name = '{version}'"

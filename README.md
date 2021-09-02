@@ -13,6 +13,7 @@ launch a Jupyter Notebook instance with our example notebook ready to run.
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/CancerDataAggregator/cda-python/HEAD?filepath=/notebooks/example.ipynb)
 
 ## For Testers use this Binder
+
 Click on the logo below. This will
 launch a Jupyter Notebook instance with our example notebook ready to run.
 
@@ -49,7 +50,7 @@ We will now show you the basic structure of `CDA python` through the use of the 
 - `unique_terms()`: for a given column show all unique terms,
 - `Q`: Executes this query on the public CDA server, and
 - `Q.sql`: allows you to enter SQL style queries.
-- `single_operator_parser` : allows you to write long form Q statments with out chaining
+- `query` : allows you to write long form Q statments with out chaining
 
 (Also see example [IPython notebook](example.ipynb))
 
