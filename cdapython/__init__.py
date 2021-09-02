@@ -6,6 +6,7 @@ from .utility import unique_terms, columns, single_operator_parser
 from ._get_unnest_clause import _get_unnest_clause
 from os import getenv
 from dotenv import load_dotenv
+from typing import Optional
 
 load_dotenv()
 
@@ -14,5 +15,5 @@ __version__ = getenv("VERSION")
 __about__ = f"Q {__version__}"
 
 
-def __repr__() -> str:
+def __repr__() -> Optional[str]:
     return __version__

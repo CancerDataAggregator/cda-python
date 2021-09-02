@@ -2,7 +2,7 @@ from cdapython.Q import Q
 from cdapython.utility import single_operator_parser
 
 
-def test_parser() -> Q:
+def test_parser() -> None:
     qc2 = single_operator_parser(
         'ResearchSubject.Diagnosis.tumor_stage = "Stage IIIC" OR  ResearchSubject.Diagnosis.tumor_stage = "Stage IV" '
     )

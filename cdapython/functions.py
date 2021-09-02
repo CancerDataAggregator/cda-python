@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 from cda_client.model.query import Query
 
 
@@ -10,5 +10,5 @@ def Quoted(quoted_val: Optional[str]) -> Query:
     return Query(node_type="quoted", value=quoted_val)
 
 
-def Unquoted(val: Optional[str]) -> Query:
+def Unquoted(val: Optional[Union[str, Query]]) -> Query:
     return Query(node_type="unquoted", value=val)

@@ -1,8 +1,9 @@
 from functools import wraps
 from time import time
+from typing import  Any
 
 
-def measure(func):
+def measure(func)-> Any:
     @wraps(func)
     def _time_it(*args, **kwargs):
         start_time = int(round(time() * 1000))

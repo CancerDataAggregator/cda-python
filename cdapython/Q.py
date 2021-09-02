@@ -1,6 +1,6 @@
 import logging
 import multiprocessing.pool
-from typing import Union, Optional
+from typing import Optional
 from cda_client import ApiClient, Configuration
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query import Query
@@ -9,6 +9,7 @@ from cdapython.Result import get_query_result
 from cdapython.functions import Quoted, Unquoted, col
 from cda_client.api.meta_api import MetaApi
 from cdapython.decorators import measure
+from typing import Union
 
 
 class Q:
@@ -16,7 +17,7 @@ class Q:
     Q lang is Language used to send query to the cda service
     """
 
-    def __init__(self, *args: str) -> None:
+    def __init__(self, *args: Union[str, Query]) -> None:
         self.query = Query()
 
         if len(args) == 1:
@@ -108,6 +109,8 @@ class Q:
         """[summary]
 
         Args:
+            async_call:(bool)
+            table (str)
             offset (int, optional): [description]. Defaults to 0.
             limit (int, optional): [description]. Defaults to 1000.
             version ([type], optional): [description]. Defaults to table_version.
@@ -131,7 +134,7 @@ class Q:
                 )
 
                 if isinstance(api_response, multiprocessing.pool.ApplyResult):
-                    print("Wating for results")
+                    print("Waiting for results")
                     while api_response.ready() is False:
                         api_response.wait(10000)
 
