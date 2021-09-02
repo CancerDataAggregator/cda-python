@@ -199,7 +199,7 @@ r1.pretty_print(0)
 #  'sex': None}
 
 
-single_operator_parser('ResearchSubject.identifier.system = "GDC" FROM ResearchSubject.primary_disease_type = "Ovarian Serous Cystadenocarcinoma" AND ResearchSubject.identifier.system = "PDC"')
+query('ResearchSubject.identifier.system = "GDC" FROM ResearchSubject.primary_disease_type = "Ovarian Serous Cystadenocarcinoma" AND ResearchSubject.identifier.system = "PDC"')
 result = q1.run()
 ```
 
@@ -277,7 +277,7 @@ r.pretty_print(2)
 Any given part of a query is expressed as a string of three parts separated by spaces:
 
 ```
-Q('esearchSubject.associated_project = "TCGA-OV"')
+Q('ResearchSubject.associated_project = "TCGA-OV"')
 ```
 
 The first part is interpreted as a column name, the second as a comparator and
