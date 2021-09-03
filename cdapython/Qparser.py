@@ -139,7 +139,7 @@ class Or(Token):
 
 
 class From(Token):
-    lbp = 4  # Precedence
+    lbp = 2  # Precedence
 
     def led(self, left: Q, context: Parser) -> Q:
         """Compute the value of this token when between two expressions."""
