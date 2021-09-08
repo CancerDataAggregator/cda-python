@@ -16,7 +16,7 @@ class Q:
     """
     Q lang is Language used to send query to the cda service
     """
-
+    __url = CDA_API_URL
     def __init__(self, *args: Union[str, Query]) -> None:
         self.query = Query()
 
@@ -41,13 +41,21 @@ class Q:
     def __repr__(self) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
 
+    @classmethod
+    def set_host_url(cls: "Q", url_host: str) -> None:
+        cls.__url = url_host
+
+    @classmethod
+    def get_host_url(cls: "Q") -> str:
+        return cls.__url
+
     @staticmethod
     def sql(
         sql: str,
-        host: Optional[str] = CDA_API_URL,
+        host: Optional[str] = __url,
         dry_run: bool = False,
         offset: int = 0,
-        limit: int = 1000,
+        limit: int = 100,
     ):
         """
 
@@ -68,6 +76,7 @@ class Q:
             return api_response
         return get_query_result(api_instance, api_response.query_id, offset, limit)
 
+
     @staticmethod
     def statusbigquery() -> str:
         """[summary]
@@ -79,7 +88,7 @@ class Q:
         return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
 
     @staticmethod
-    def queryjobstatus(id: str, host: Optional[str] = CDA_API_URL) -> object:
+    def queryjobstatus(id: str, host: Optional[str] = __url) -> object:
         """[summary]
 
         Args:
@@ -99,20 +108,21 @@ class Q:
     def run(
         self,
         offset: int = 0,
-        limit: int = 1000,
+        limit: int = 100,
         version: Optional[str] = table_version,
-        host: Optional[str] = CDA_API_URL,
+        host: Optional[str] = get_host_url(),
         dry_run: bool = False,
         table: Optional[str] = default_table,
         async_call: bool = False,
     ):
+        print(host)
         """[summary]
 
         Args:
             async_call:(bool)
             table (str)
             offset (int, optional): [description]. Defaults to 0.
-            limit (int, optional): [description]. Defaults to 1000.
+            limit (int, optional): [description]. Defaults to 100.
             version ([type], optional): [description]. Defaults to table_version.
             host ([type], optional): [description]. Defaults to CDA_API_URL.
             dry_run (bool, optional): [description]. Defaults to False.
