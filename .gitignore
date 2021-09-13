@@ -21,3 +21,4 @@ venv
 
 #sonrqube scanner
 .scannerwork
+/notebooks/example-dev.ipynb
