@@ -5,7 +5,7 @@ services:
     image: jupyter/minimal-notebook:latest
     working_dir: /home/joyvan/work
     ports:
-      - '8888:8888'
+      - '${NOTEBOOK_PORT}:8888'
     volumes:
       - ./notebooks:/home/joyvan/work
     command: bash -c "python -m pip cache purge"
