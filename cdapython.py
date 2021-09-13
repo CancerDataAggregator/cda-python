@@ -11,8 +11,8 @@ from cda_client.model.query import Query
 __version__ = "2021.8.13"
 
 CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
-table_version = "v3"
-default_table = "gdc-bq-sample.cda_mvp"
+table_version = "all_v1"
+default_table = "gdc-bq-sample.integration"
 
 pp = pprint.PrettyPrinter(indent=2)
 
