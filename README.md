@@ -86,11 +86,11 @@ r = q1.run()                                 # Executes this query on the public
 
 
 r.sql   # Return SQL string used to generate the query e.g.
-# "SELECT * FROM gdc-bq-sample.cda_mvp.v1, UNNEST(ResearchSubject) AS _ResearchSubject WHERE (_ResearchSubject.primary_disease_type = 'Adenomas and Adenocarcinomas')"
+# "SELECT * FROM gdc-bq-sample.integration.all_v1, UNNEST(ResearchSubject) AS _ResearchSubject WHERE (_ResearchSubject.primary_disease_type = 'Adenomas and Adenocarcinomas')"
 
 print(r) # Prints some brief information about the result page eg:
 #
-# Query: SELECT * FROM gdc-bq-sample.cda_mvp.v1, UNNEST(ResearchSubject) AS _ResearchSubject WHERE (_ResearchSubject.# primary_disease_type = 'Adenomas and Adenocarcinomas')
+# Query: SELECT * FROM gdc-bq-sample.integration.all_v1, UNNEST(ResearchSubject) AS _ResearchSubject WHERE (_ResearchSubject.# primary_disease_type = 'Adenomas and Adenocarcinomas')
 # Offset: 0
 # Limit: 2
 # Count: 2
@@ -150,7 +150,7 @@ r2 = r.next_page()  # Fetches the next page of results
 
 print(r2)
 
-# Query: SELECT * FROM gdc-bq-sample.cda_mvp.v1, UNNEST(ResearchSubject) AS _ResearchSubject WHERE (_ResearchSubject.# primary_disease_type = 'Adenomas and Adenocarcinomas')
+# Query: SELECT * FROM gdc-bq-sample.integration.all_v1, UNNEST(ResearchSubject) AS _ResearchSubject WHERE (_ResearchSubject.# primary_disease_type = 'Adenomas and Adenocarcinomas')
 # Offset: 2
 # Limit: 2
 # Count: 2
@@ -159,7 +159,7 @@ print(r2)
 r1 = Q.sql("""
 SELECT 
 * 
-FROM gdc-bq-sample.cda_mvp.v1, UNNEST(ResearchSubject) AS _ResearchSubject 
+FROM gdc-bq-sample.integration.all_v1, UNNEST(ResearchSubject) AS _ResearchSubject 
 WHERE (_ResearchSubject.primary_disease_type = 'Adenomas and Adenocarcinomas')
 """)
 
@@ -223,7 +223,7 @@ r = q.run()
 
 print(r)
 
-# Query: SELECT * FROM gdc-bq-sample.cda_mvp.v1, UNNEST(ResearchSubject) AS _ResearchSubject, UNNEST(_ResearchSubject.Diagnosis) AS # _Diagnosis WHERE ((_Diagnosis.age_at_diagnosis > 50*365) AND (_ResearchSubject.associated_project = 'TCGA-OV'))
+# Query: SELECT * FROM gdc-bq-sample.integration.all_v1, UNNEST(ResearchSubject) AS _ResearchSubject, UNNEST(_ResearchSubject.Diagnosis) AS # _Diagnosis WHERE ((_Diagnosis.age_at_diagnosis > 50*365) AND (_ResearchSubject.associated_project = 'TCGA-OV'))
 # Offset: 0
 # Limit: 1000
 # Count: 461
@@ -306,7 +306,7 @@ from TABLE, UNNEST(A) AS _A, UNNEST(_A.B) as _B, UNNEST(_B.C) as _C
 `ResearchSubject.Specimen.source_material_type` represents a complex record that needs to unwound in SQL syntax to be queried on properly when using SQL.
 ```
 SELECT DISTINCT(_Specimen.source_material_type) 
-FROM gdc-bq-sample.cda_mvp.v3, 
+FROM gdc-bq-sample.integration.all_v1, 
 UNNEST(ResearchSubject) AS _ResearchSubject,
 UNNEST(_ResearchSubject.Specimen) AS _Specimen
 ```
