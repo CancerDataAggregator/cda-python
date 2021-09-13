@@ -8,16 +8,11 @@ from cda_client.api_client import ApiClient
 from cda_client.configuration import Configuration
 from cda_client.model.query import Query
 
-__version__ = "2021.8.13"
+__version__ = "2021.10.13"
 
 CDA_API_URL = "https://cda.cda-dev.broadinstitute.org"
-<<<<<<< HEAD:cdapython-old.py
 table_version = "all_v1"
 default_table = "gdc-bq-sample.integration"
-=======
-table_version = "v3"
-default_table = "gdc-bq-sample.cda_mvp"
->>>>>>> main:cdapython.py
 
 pp = pprint.PrettyPrinter(indent=2)
 
