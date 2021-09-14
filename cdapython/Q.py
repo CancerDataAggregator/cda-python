@@ -99,7 +99,7 @@ class Q:
     def run(
         self,
         offset: int = 0,
-        limit: int = 1000,
+        limit: int = 100,
         version: Optional[str] = table_version,
         host: Optional[str] = CDA_API_URL,
         dry_run: bool = False,
