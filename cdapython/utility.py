@@ -34,7 +34,7 @@ def columns(
     limit: int = 1000,
 ) -> object:
 
-    query = f"SELECT field_path FROM `gdc-bq-sample.cda_mvp.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS` WHERE table_name = '{version}'"
+    query = f"SELECT field_path FROM `gdc-bq-sample.integration.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS` WHERE table_name = '{version}'"
     sys.stderr.write(f"{query}\n")
     # Execute query
     with cda_client.ApiClient(
