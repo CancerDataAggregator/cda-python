@@ -13,7 +13,7 @@ def query(text: str) -> Q:
     return parser(text)
 
 
-def unique_terms(col_name: str, system: str = "", limit: int = 1000) -> object:
+def unique_terms(col_name: str, system: str = "", limit: int = 100) -> object:
 
     with cda_client.ApiClient(
         configuration=cda_client.Configuration(host=CDA_API_URL)
@@ -31,7 +31,7 @@ def unique_terms(col_name: str, system: str = "", limit: int = 1000) -> object:
 def columns(
     version: Optional[str] = table_version,
     host: Optional[str] = CDA_API_URL,
-    limit: int = 1000,
+    limit: int = 100,
 ) -> object:
 
     query = f"SELECT field_path FROM `gdc-bq-sample.integration.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS` WHERE table_name = '{version}'"

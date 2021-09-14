@@ -47,7 +47,7 @@ class Q:
         host: Optional[str] = CDA_API_URL,
         dry_run: bool = False,
         offset: int = 0,
-        limit: int = 1000,
+        limit: int = 100,
     ):
         """
 
