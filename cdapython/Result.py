@@ -54,6 +54,9 @@ More pages: {self.has_next_page}
     def __getitem__(self, idx):
         return self._api_response.result[idx]
 
+    def __iter__(self):
+        return iter(self._api_response.result)
+
     def pretty_print(self, idx):
         pp.pprint(self[idx])
 
