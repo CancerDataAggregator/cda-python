@@ -7,7 +7,7 @@ import readline
 
 if TYPE_CHECKING:
     from cdapython.Q import Q
-    
+
 """[summary]
     add's history to shell in current session
 """
