@@ -3,7 +3,7 @@
 
 # Jupyter Notebooks
 .ipynb_checkpoints
-
+.DS_Store
 # pip install -e generated
 cdapython.egg-info
 
