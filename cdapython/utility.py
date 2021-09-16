@@ -110,13 +110,13 @@ def unique_terms(
 def columns(
     version: Optional[str] = table_version,
     host: Optional[str] = None,
-    limit: int = 1000,
+    limit: int = 100,
     table: Optional[str] = DEFAULT_TABLE,
 ):
     version = tableWhiteList(table, version)
 
     query = f"SELECT field_path FROM `gdc-bq-sample.{table}.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS` WHERE table_name = '{version}'"
-    sys.stderr.write(f"{query}\n")
+    sys.stdout.write(f"{query}\n")
     try:
         # Execute query
         if host is None:
