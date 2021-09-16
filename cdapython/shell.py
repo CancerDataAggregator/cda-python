@@ -1,8 +1,12 @@
-from cdapython.utility import single_operator_parser
+from typing import TYPE_CHECKING
+from cdapython.utility import query
 from tdparser.topdown import MissingTokensError
 from cdapython.Q import Q
 from tdparser.lexer import LexerError
 import readline
+
+if TYPE_CHECKING:
+    from cdapython.Q import Q
 
 """[summary]
     add's history to shell in current session
@@ -42,7 +46,7 @@ while True:
         print("\n" * 100)
         continue
     try:
-        result: Q = single_operator_parser(text=text)
+        result: Q = query(text=text)
         queryResult = result.run()
         print(type(result), queryResult)
     except AttributeError as e:
