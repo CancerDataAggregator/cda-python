@@ -8,6 +8,8 @@ def test_basic_integration():
 
 
 def test_unique_terms():
-    # pytest.set_trace()
     terms = unique_terms("sex", "GDC")
     assert "female" in terms
+
+
+test_unique_terms()

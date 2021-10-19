@@ -5,7 +5,7 @@ from typing import Optional
 from cda_client import ApiClient, Configuration
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query import Query
-from cdapython.constantVariables import table_version, default_table
+from cdapython.constantVariables import table_version, default_table,project_name
 from cdapython.Result import get_query_result
 from cdapython.functions import Quoted, Unquoted, col
 from cda_client.api.meta_api import MetaApi
@@ -77,6 +77,8 @@ class Q:
         Returns:
             [Result]: [description]
         """
+        if sql.find(project_name) == -1:
+            raise Exception("Your database is outside of the project")
 
         if host is None:
             host = const.CDA_API_URL
