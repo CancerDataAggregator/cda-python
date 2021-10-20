@@ -2,7 +2,7 @@ from cdapython import Q
 import pytest
 
 
-def test():
+def test_sql_wrong_table():
     with pytest.raises(Exception) as excinfo:
         Q.sql("""
         select acc, biosample, bioproject, releasedate, librarylayout, mbases, organism
