@@ -1,8 +1,6 @@
 from cdapython import columns
-import pytest
 
 
 def test_basic_integration():
-    with pytest.raises(ValueError):
-        cols = columns(table="data")
-        assert cols
+    cols = columns()
+    assert isinstance(cols, list) is True

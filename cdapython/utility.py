@@ -91,7 +91,7 @@ def unique_terms(
                 version=version,
                 body=col_name,
                 system=str(system),
-                table_name=table,
+                table=table,
             )
 
             # Execute query
@@ -114,9 +114,6 @@ def columns(
     table: Optional[str] = DEFAULT_TABLE,
 ):
     version = tableWhiteList(table, version)
-
-    query = f"SELECT field_path FROM `gdc-bq-sample.{table}.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS` WHERE table_name = '{version}'"
-    sys.stdout.write(f"{query}\n")
     try:
         # Execute query
         if host is None:
@@ -126,7 +123,10 @@ def columns(
             configuration=cda_client.Configuration(host=host)
         ) as api_client:
             api_instance = QueryApi(api_client)
-            api_response = api_instance.sql_query(query)
+            api_response = api_instance.columns(
+                version=version,
+                table=table
+                )
             query_result = get_query_result(
                 api_instance, api_response.query_id, 0, limit
             )
