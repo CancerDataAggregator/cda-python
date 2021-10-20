@@ -8,4 +8,4 @@ def test_and_op():
     q = q1.And(q2)
     r = q.run()
 
-    # assert isinstance(r.count, int) is True
+    assert isinstance(r.count, int) is True
