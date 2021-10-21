@@ -14,7 +14,8 @@ __version__ = getVersion(".env")
 print(__version__)
 current_path = Path(__file__).parent
 
-
+data = open(".env","r").read()
+writeoutEnv = open("cdapython/.env","w").write(data)
 name = "cdapython"
 version = __version__
 now = datetime.utcnow()
