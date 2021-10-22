@@ -5,7 +5,7 @@ from typing import Optional
 from dotenv import load_dotenv
 
 env_path = Path(".") / ".env"
-if env_path.exists is True():
+if env_path.exists() is True:
     load_dotenv(dotenv_path=env_path)
 else:
     from os.path import join, dirname
