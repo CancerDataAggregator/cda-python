@@ -4,14 +4,13 @@
 from .Q import Q
 from .utility import unique_terms, columns, query
 from ._get_unnest_clause import _get_unnest_clause
+from .constantVariables import VERSION
 from os import getenv
-from dotenv import load_dotenv
 from typing import Optional
 
-load_dotenv()
 
 __name__ = "cdapython"
-__version__ = getenv("VERSION")
+__version__ = VERSION
 __about__ = f"Q {__version__}"
 
 
