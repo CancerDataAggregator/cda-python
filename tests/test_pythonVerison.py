@@ -3,7 +3,12 @@ import os
 from pathlib import Path
 
 
-version = "2021.10.22"
+def getVersion(filepath: str):
+    with open(filepath, "r") as f:
+        for i in f.readlines():
+            if i.find("VERSION") != -1:
+                return str(i.split("=")[1].strip().replace('"', ""))
+version = getVersion("./cdapython/constantVariables.py")
 
 
 def test_pyVERSION() -> None:
