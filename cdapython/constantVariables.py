@@ -3,7 +3,7 @@ import os
 from typing import Optional
 
 
-VERSION = "2021.10.22"
+VERSION = "2021.10.25"
 DATABASETABLE_VERSION = "all_v2"
 DATABASETABLE = "gdc-bq-sample.integration"
 CDA_API_URL_ENV = "https://cda.cda-dev.broadinstitute.org"
