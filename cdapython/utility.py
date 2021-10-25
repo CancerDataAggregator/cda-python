@@ -123,10 +123,7 @@ def columns(
             configuration=cda_client.Configuration(host=host)
         ) as api_client:
             api_instance = QueryApi(api_client)
-            api_response = api_instance.columns(
-                version=version,
-                table=table
-                )
+            api_response = api_instance.columns(version=version, table=table)
             query_result = get_query_result(
                 api_instance, api_response.query_id, 0, limit
             )

@@ -1,6 +1,7 @@
 from cdapython import Q
 from time import sleep
 
+
 def test_Q_sql():
     sleep(1)
     qr = Q.sql(
