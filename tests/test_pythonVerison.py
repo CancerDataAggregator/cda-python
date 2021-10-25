@@ -9,6 +9,7 @@ def getVersion(filepath: str):
             if i.find("VERSION") != -1:
                 return str(i.split("=")[1].strip().replace('"', ""))
 version = getVersion("./cdapython/constantVariables.py")
+Path.absolute(str(Path("./cdapython/constantVariables.py").resolve()))
 
 
 def test_pyVERSION() -> None:
