@@ -10,7 +10,7 @@ def getVersion(filepath: str):
                 return str(i.split("=")[1].strip().replace('"', ""))
 
 
-__version__ = getVersion(".env")
+__version__ = getVersion("cdapython/constantVariables.py")
 print(__version__)
 current_path = Path(__file__).parent
 
