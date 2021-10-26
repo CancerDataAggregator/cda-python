@@ -1,14 +1,8 @@
 from cdapython import __version__
-import os
-from pathlib import Path
+from os.path import abspath
 
 
-def getVersion(filepath: str):
-    with open(filepath, "r") as f:
-        for i in f.readlines():
-            if i.find("VERSION") != -1:
-                return str(i.split("=")[1].strip().replace('"', ""))
-version = getVersion(Path.absolute(str(Path("./cdapython/constantVariables.py").resolve())))
+version = "2021.10.25"
 
 
 
