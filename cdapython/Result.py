@@ -1,6 +1,7 @@
 import pprint as pp
 
 import cda_client.api.query_api
+import json
 
 
 class Result:
@@ -57,8 +58,8 @@ More pages: {self.has_next_page}
     def __iter__(self):
         return iter(self._api_response.result)
 
-    def pretty_print(self, idx):
-        pp.pprint(self[idx])
+    def pretty_print(self, idx: int):
+        print(json.dumps(self[idx],indent=4))
 
     def next_page(self, limit=None):
         if not self.has_next_page:

@@ -3,7 +3,11 @@ from cdapython.utility import query
 from tdparser.topdown import MissingTokensError
 from cdapython.Q import Q
 from tdparser.lexer import LexerError
-import readline
+
+try:
+    import readline
+except ImportError:
+    raise ImportError()
 
 if TYPE_CHECKING:
     from cdapython.Q import Q
