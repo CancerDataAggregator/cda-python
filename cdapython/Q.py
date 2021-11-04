@@ -5,6 +5,7 @@ from typing import Optional
 from cda_client import ApiClient, Configuration
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query import Query
+from cda_client.model.query_created_data import QueryCreatedData
 from cdapython.Result import Result, get_query_result
 from cdapython.functions import Quoted, Unquoted, col
 from cda_client.api.meta_api import MetaApi
@@ -143,20 +144,24 @@ class Q:
         dry_run: bool = False,
         table: Optional[str] = default_table,
         async_call: bool = False,
-    ) -> Optional[Result]:
-        """
+    ) -> Union[
+            QueryCreatedData,
+            multiprocessing.pool.ApplyResult,
+            Result,
+            None]:
+        """[summary]
+        
         Args:
-            async_call:(bool)
-            table (str)
             offset (int, optional): [description]. Defaults to 0.
             limit (int, optional): [description]. Defaults to 100.
-            version ([type], optional): [description]. Defaults table_version.
-            host ([type], optional): [description]. Defaults to CDA_API_URL.
+            version (Optional[str], optional): [description]. Defaults to table_version.
+            host (Optional[str], optional): [description]. Defaults to None.
             dry_run (bool, optional): [description]. Defaults to False.
+            table (Optional[str], optional): [description]. Defaults to default_table.
+            async_call (bool, optional): [description]. Defaults to False.
 
         Returns:
-            [Result]: [A convenient wrapper around the response object from
-            the CDA service]
+            Union[ QueryCreatedData, multiprocessing.pool.ApplyResult, Result, None]: [description]
         """
         try:
 
@@ -167,7 +172,10 @@ class Q:
                 api_instance = QueryApi(api_client)
                 # Execute boolean query
                 print("Getting results from database", end="\n\n")
-                api_response = api_instance.boolean_query(
+                api_response: Union[
+                    QueryCreatedData,
+                    multiprocessing.pool.ApplyResult
+                    ] = api_instance.boolean_query(
                     self.query,
                     version=version,
                     dry_run=dry_run,
@@ -186,7 +194,10 @@ class Q:
                     return api_response
 
                 return get_query_result(
-                    api_instance, api_response.query_id, offset, limit
+                    api_instance,
+                    api_response.query_id,
+                    offset,
+                    limit
                 )
         except ServiceException as httpError:
             if(httpError.body is not None):
