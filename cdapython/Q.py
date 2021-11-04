@@ -35,8 +35,8 @@ class Q:
 
         if len(args) == 1:
 
-            if(args[0] is None):
-                raise RuntimeError("Q statment parse error")
+            if args[0] is None:
+                raise RuntimeError("Q statement parse error")
 
             _l, _op, _r = args[0].split(" ", 2)
             _l = col(_l)
@@ -200,7 +200,7 @@ class Q:
                     limit
                 )
         except ServiceException as httpError:
-            if(httpError.body is not None):
+            if httpError.body is not None:
                 logging.error(
                     f"""
                 Http Status: {httpError.status}

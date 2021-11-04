@@ -1,5 +1,5 @@
 from cdapython import Q
-import json
+
 
 sex = Q('sex = "female"')
 cancer = Q('ResearchSubject.primary_disease_type = "Breast Invasive Carcinoma"')

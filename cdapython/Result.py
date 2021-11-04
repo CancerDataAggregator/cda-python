@@ -86,7 +86,7 @@ def get_query_result(
     limit: int,
 ) -> Result:
     """[summary]
-    This will call the next query and wait for the result then return a Result Object to the user.
+    This will call the next query and wait for the result then return a Result object to the user.
     Args:
         api_instance (cda_client.api.query_api.QueryApi): [description]
         query_id (str): [description]

@@ -1,7 +1,7 @@
 from typing import Optional
 
 
-VERSION = "2021.10.29"
+VERSION = "2021.11.4"
 DATABASETABLE_VERSION = "all_v2"
 DATABASETABLE = "gdc-bq-sample.integration"
 CDA_API_URL_ENV = "https://cda.cda-dev.broadinstitute.org"
