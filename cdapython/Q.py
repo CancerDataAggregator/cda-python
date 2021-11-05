@@ -5,14 +5,19 @@ from typing import Optional
 from cda_client import ApiClient, Configuration
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query import Query
-from cdapython.constantVariables import table_version, default_table, project_name
-from cdapython.Result import get_query_result
+from cda_client.model.query_created_data import QueryCreatedData
+from cdapython.Result import Result, get_query_result
 from cdapython.functions import Quoted, Unquoted, col
 from cda_client.api.meta_api import MetaApi
 from cdapython.decorators import measure
 from typing import Union
 import cdapython.constantVariables as const
 from cda_client.exceptions import ServiceException
+from cdapython.constantVariables import (
+    table_version,
+    default_table,
+    project_name
+)
 
 
 class Q:
@@ -29,6 +34,9 @@ class Q:
         self.query = Query()
 
         if len(args) == 1:
+
+            if args[0] is None:
+                raise RuntimeError("Q statement parse error")
 
             _l, _op, _r = args[0].split(" ", 2)
             _l = col(_l)
@@ -77,7 +85,8 @@ class Q:
         Returns:
             [Result]: [description]
         """
-        if sql.find(project_name) == -1:
+
+        if project_name is not None and sql.find(project_name) == -1:
             raise Exception("Your database is outside of the project")
 
         if host is None:
@@ -88,7 +97,12 @@ class Q:
             api_response = api_instance.sql_query(sql)
         if dry_run is True:
             return api_response
-        return get_query_result(api_instance, api_response.query_id, offset, limit)
+        return get_query_result(
+            api_instance,
+            api_response.query_id,
+            offset,
+            limit
+        )
 
     @staticmethod
     def statusbigquery() -> str:
@@ -101,7 +115,10 @@ class Q:
         return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
 
     @staticmethod
-    def queryjobstatus(id: str, host: Optional[str] = const.CDA_API_URL) -> object:
+    def queryjobstatus(
+        id: str,
+        host: Optional[str] = const.CDA_API_URL
+    ) -> object:
         """[summary]
 
         Args:
@@ -127,32 +144,38 @@ class Q:
         dry_run: bool = False,
         table: Optional[str] = default_table,
         async_call: bool = False,
-    ):
-
+    ) -> Union[
+            QueryCreatedData,
+            multiprocessing.pool.ApplyResult,
+            Result,
+            None]:
         """[summary]
-
+        
         Args:
-            async_call:(bool)
-            table (str)
             offset (int, optional): [description]. Defaults to 0.
             limit (int, optional): [description]. Defaults to 100.
-            version ([type], optional): [description]. Defaults to table_version.
-            host ([type], optional): [description]. Defaults to CDA_API_URL.
+            version (Optional[str], optional): [description]. Defaults to table_version.
+            host (Optional[str], optional): [description]. Defaults to None.
             dry_run (bool, optional): [description]. Defaults to False.
+            table (Optional[str], optional): [description]. Defaults to default_table.
+            async_call (bool, optional): [description]. Defaults to False.
 
         Returns:
-            [Result]: [description]
+            Union[ QueryCreatedData, multiprocessing.pool.ApplyResult, Result, None]: [description]
         """
         try:
 
             if host is None:
                 host = const.CDA_API_URL
 
-            with ApiClient(configuration=Configuration(host=host)) as api_client:
+            with ApiClient(Configuration(host=host)) as api_client:
                 api_instance = QueryApi(api_client)
                 # Execute boolean query
                 print("Getting results from database", end="\n\n")
-                api_response = api_instance.boolean_query(
+                api_response: Union[
+                    QueryCreatedData,
+                    multiprocessing.pool.ApplyResult
+                    ] = api_instance.boolean_query(
                     self.query,
                     version=version,
                     dry_run=dry_run,
@@ -171,15 +194,20 @@ class Q:
                     return api_response
 
                 return get_query_result(
-                    api_instance, api_response.query_id, offset, limit
+                    api_instance,
+                    api_response.query_id,
+                    offset,
+                    limit
                 )
         except ServiceException as httpError:
-            logging.error(
-                f"""
-            Http Status: {httpError.status}
-            Error Message: {json.loads(httpError.body)["message"]}
-            """
+            if httpError.body is not None:
+                logging.error(
+                    f"""
+                Http Status: {httpError.status}
+                Error Message: {json.loads(httpError.body)["message"]}
+                """
             )
+            return None
 
     def And(self, right: "Q") -> "Q":
         return Q(self.query, "AND", right.query)
@@ -209,11 +237,11 @@ class Q:
         return Q(self.query, "<", right.query)
 
 
-def infer_quote(val: Union[int, float, str, "Q", Query]) -> Union[Q, Query]:
+def infer_quote(val: Union[str, "Q", Query]) -> Union[Q, Query]:
     """[summary]
     Handles Strings With quotes
     Args:
-        val (Union[int, float, str,): [description]
+        val (Union[str,"Q",Query): [description]
 
     Returns:
         Query: [description]

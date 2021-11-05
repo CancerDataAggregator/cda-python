@@ -1,8 +1,7 @@
 import logging
 
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 import cda_client
-import sys
 from cda_client.api.query_api import QueryApi
 from cdapython.Result import get_query_result
 from cdapython.constantVariables import table_version
@@ -14,21 +13,22 @@ from cda_client.exceptions import ServiceException
 import cdapython.constantVariables as const
 
 
-# This is added for Type Checking classs to remove a circular import)
+# This is added for Type Checking classes to remove a circular import)
 if TYPE_CHECKING:
     from cdapython.Q import Q
 
 
 # Creating constant
 if isinstance(const.default_table, str):
-    DEFAULT_TABLE: str = const.default_table.split(".")[1]
+    if const.default_table is not None:
+        DEFAULT_TABLE: Optional[str] = const.default_table.split(".")[1]
 
 
 if isinstance(const.CDA_API_URL, str):
     URL_TABLE: str = const.CDA_API_URL
 
 
-def httpErrorLogger(httpError: ServiceException):
+def http_error_logger(httpError: ServiceException):
     logging.error(
         f"""
             Http Status: {httpError.status}
@@ -41,7 +41,7 @@ def query(text: str) -> "Q":
     return parser(text)
 
 
-def tableWhiteList(table: Optional[str], version: Optional[str]) -> Optional[str]:
+def table_white_list(table: Optional[str], version: Optional[str]) -> Optional[str]:
     """[summary]
     This checks the allowed list List and Throws a error if there is a table not allowed
     Args:
@@ -80,7 +80,7 @@ def unique_terms(
         if isinstance(const.default_table, str):
             table = DEFAULT_TABLE
 
-    version = tableWhiteList(table, table_version)
+    version = table_white_list(table, table_version)
 
     try:
         with cda_client.ApiClient(
@@ -101,7 +101,7 @@ def unique_terms(
             uniqueArray = np.array([list(t.values())[0] for t in query_result])
             return uniqueArray.tolist()
     except ServiceException as httpError:
-        httpErrorLogger(httpError)
+        http_error_logger(httpError)
 
     except Exception as e:
         print(e)
@@ -113,7 +113,7 @@ def columns(
     limit: int = 100,
     table: Optional[str] = DEFAULT_TABLE,
 ):
-    version = tableWhiteList(table, version)
+    version = table_white_list(table, version)
     try:
         # Execute query
         if host is None:
@@ -130,7 +130,7 @@ def columns(
             column_array = np.array([list(t.values())[0] for t in query_result])
             return column_array.tolist()
     except ServiceException as httpError:
-        httpErrorLogger(httpError)
+        http_error_logger(httpError)
 
     except Exception as e:
         print(e)

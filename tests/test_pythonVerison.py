@@ -1,9 +1,7 @@
 from cdapython import __version__
-from os.path import abspath
 
 
-version = "2021.10.25"
-
+version = "2021.11.4"
 
 
 def test_pyVERSION() -> None:
