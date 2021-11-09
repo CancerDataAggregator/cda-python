@@ -52,7 +52,7 @@ We will now show you the basic structure of `CDA python` through the use of the 
 - `Q.sql`: allows you to enter SQL style queries.
 - `query` : allows you to write long form Q statments with out chaining
 
-(Also see example [IPython notebook](notebooks/example.ipynb)
+(Also see example [IPython notebook](notebooks/example.ipynb))
 
 ```
 from cdapython import Q, columns, unique_terms
