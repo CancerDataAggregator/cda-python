@@ -25,6 +25,7 @@ with open(desc_path, "r", encoding="utf-8", errors="surrogateescape") as fh:
 setup(
     name=name,
     packages=find_packages(),
+    package_data={"cdapython": ['py.typed'], "": [".env"]},
     version=version,
     py_modules=["cdapython"],
     platforms=["POSIX", "MacOS", "Windows"],
@@ -39,6 +40,5 @@ setup(
     description="User friendly Python library to access CDA service.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    include_package_data=True,
-    package_data={"":[".env"]}
+    include_package_data=True
 )

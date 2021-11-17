@@ -12,7 +12,9 @@ import numpy as np
 import json
 from cda_client.exceptions import ServiceException
 import cdapython.constantVariables as const
-
+import os
+import ssl
+from urllib3.exceptions import InsecureRequestWarning
 
 # This is added for Type Checking classs to remove a circular import)
 if TYPE_CHECKING:
@@ -39,6 +41,19 @@ def httpErrorLogger(httpError: ServiceException):
 
 def query(text: str) -> "Q":
     return parser(text)
+
+
+def find_ssl_path() -> bool:
+    print("checking")
+    openssl_dir, openssl_cafile = os.path.split(
+        ssl.get_default_verify_paths().openssl_cafile
+    )
+    print(openssl_dir, openssl_cafile)
+    
+    if openssl_cafile.find("pem"):
+        return True
+    else:
+        return False
 
 
 def tableWhiteList(table: Optional[str], version: Optional[str]) -> Optional[str]:
@@ -114,26 +129,32 @@ def columns(
     table: Optional[str] = DEFAULT_TABLE,
 ):
     version = tableWhiteList(table, version)
+    tmp: cda_client.Configuration = cda_client.Configuration(host=host)
     try:
         # Execute query
         if host is None:
             host = const.CDA_API_URL
-
-        with cda_client.ApiClient(
-            configuration=cda_client.Configuration(host=host)
-        ) as api_client:
+        if find_ssl_path():
+            tmp.verify_ssl = True
+        else:
+            print(
+                "Your ssl local cert verify has failed please review our readthedocs for help but you can still use the our lib"
+            )
+            tmp.verify_ssl = True
+        tmp = tmp
+        cda_ClientObj = cda_client.ApiClient(configuration=tmp)
+        with cda_ClientObj as api_client:
             api_instance = QueryApi(api_client)
-            api_response = api_instance.columns(
-                version=version,
-                table=table
-                )
+            api_response = api_instance.columns(version=version, table=table)
             query_result = get_query_result(
                 api_instance, api_response.query_id, 0, limit
             )
             column_array = np.array([list(t.values())[0] for t in query_result])
             return column_array.tolist()
+
     except ServiceException as httpError:
         httpErrorLogger(httpError)
-
+    except InsecureRequestWarning:
+        pass
     except Exception as e:
         print(e)

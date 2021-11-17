@@ -18,4 +18,5 @@ __version__: Optional[str] = os.getenv("VERSION")
 CDA_API_URL: Optional[str] = os.getenv("CDA_API_URL")
 table_version: Optional[str] = os.getenv("DATABASETABLE_VERSION")
 default_table: Optional[str] = os.getenv("DATABASETABLE")
-project_name: Optional[str] = default_table.split(".")[0]
+if isinstance(default_table, str):
+    project_name: str = default_table.split(".")[0]
