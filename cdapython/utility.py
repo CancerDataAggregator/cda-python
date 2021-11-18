@@ -1,8 +1,6 @@
 import logging
-
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Any, List
 import cda_client
-import sys
 from cda_client.api.query_api import QueryApi
 from cdapython.Result import get_query_result
 from cdapython.constantVariables import table_version
@@ -12,11 +10,13 @@ import numpy as np
 import json
 from cda_client.exceptions import ServiceException
 import cdapython.constantVariables as const
-import os
-import ssl
 from urllib3.exceptions import InsecureRequestWarning
+from .functions import find_ssl_path
 
+logging.captureWarnings(InsecureRequestWarning)
 # This is added for Type Checking classs to remove a circular import)
+
+
 if TYPE_CHECKING:
     from cdapython.Q import Q
 
@@ -43,22 +43,10 @@ def query(text: str) -> "Q":
     return parser(text)
 
 
-def find_ssl_path() -> bool:
-    print("checking")
-    openssl_dir, openssl_cafile = os.path.split(
-        ssl.get_default_verify_paths().openssl_cafile
-    )
-    print(openssl_dir, openssl_cafile)
-    
-    if openssl_cafile.find("pem"):
-        return True
-    else:
-        return False
-
-
 def tableWhiteList(table: Optional[str], version: Optional[str]) -> Optional[str]:
     """[summary]
-    This checks the allowed list List and Throws a error if there is a table not allowed
+    This checks the allowed list List and Throws a error if there is a table
+    not allowed
     Args:
         table (str): [sets table from allowed list]
         version (str): [sets the version if the value if needed]
@@ -86,21 +74,35 @@ def unique_terms(
     limit: int = 100,
     host: Optional[str] = None,
     table: Optional[str] = None,
-):
+    ssl_check: Optional[bool] = None,
+) -> Optional[List[Any]]:
+    """[summary]
 
+    Args:
+        col_name (str): [description]
+        system (str, optional): [description]. Defaults to "".
+        limit (int, optional): [description]. Defaults to 100.
+        host (Optional[str], optional): [description]. Defaults to None.
+        table (Optional[str], optional): [description]. Defaults to None.
+        ssl_check (Optional[bool], optional): [description]. Defaults to None.
+
+    Returns:
+        Optional[List[Any]]: [description]
+    """
+    tmp_configuration: cda_client.Configuration = cda_client.Configuration(host=host)
     if host is None:
         host = const.CDA_API_URL
+
+    if ssl_check is None:
+        tmp_configuration.verify_ssl = find_ssl_path()
 
     if table is None:
         if isinstance(const.default_table, str):
             table = DEFAULT_TABLE
-
     version = tableWhiteList(table, table_version)
-
+    cda_ClientObj = cda_client.ApiClient(configuration=tmp_configuration)
     try:
-        with cda_client.ApiClient(
-            configuration=cda_client.Configuration(host=host)
-        ) as api_client:
+        with cda_ClientObj as api_client:
             api_instance = QueryApi(api_client)
             api_response = api_instance.unique_values(
                 version=version,
@@ -120,29 +122,45 @@ def unique_terms(
 
     except Exception as e:
         print(e)
+    return None
 
 
 def columns(
     version: Optional[str] = table_version,
     host: Optional[str] = None,
     limit: int = 100,
-    table: Optional[str] = DEFAULT_TABLE,
-):
+    table: Optional[str] = None,
+    ssl_check: Optional[bool] = None,
+) -> Optional[List[Any]]:
+    """[summary]
+
+    Args:
+        version (Optional[str], optional): [description]. Defaults to table_version.
+        host (Optional[str], optional): [description]. Defaults to None.
+        limit (int, optional): [description]. Defaults to 100.
+        table (Optional[str], optional): [description]. Defaults to None.
+        ssl_check (Optional[bool], optional): [description]. Defaults to None.
+
+    Returns:
+        Optional[List[Any]]: [description]
+    """
+
+    tmp_configuration: cda_client.Configuration = cda_client.Configuration(host=host)
+    # Execute query
+    if host is None:
+        host = const.CDA_API_URL
+
+    if ssl_check is None:
+        tmp_configuration.verify_ssl = find_ssl_path()
+
+    if table is None:
+        if isinstance(const.default_table, str):
+            table = DEFAULT_TABLE
+
     version = tableWhiteList(table, version)
-    tmp: cda_client.Configuration = cda_client.Configuration(host=host)
+    cda_ClientObj = cda_client.ApiClient(configuration=tmp_configuration)
+
     try:
-        # Execute query
-        if host is None:
-            host = const.CDA_API_URL
-        if find_ssl_path():
-            tmp.verify_ssl = True
-        else:
-            print(
-                "Your ssl local cert verify has failed please review our readthedocs for help but you can still use the our lib"
-            )
-            tmp.verify_ssl = True
-        tmp = tmp
-        cda_ClientObj = cda_client.ApiClient(configuration=tmp)
         with cda_ClientObj as api_client:
             api_instance = QueryApi(api_client)
             api_response = api_instance.columns(version=version, table=table)
@@ -151,10 +169,10 @@ def columns(
             )
             column_array = np.array([list(t.values())[0] for t in query_result])
             return column_array.tolist()
-
     except ServiceException as httpError:
         httpErrorLogger(httpError)
     except InsecureRequestWarning:
         pass
     except Exception as e:
         print(e)
+    return None

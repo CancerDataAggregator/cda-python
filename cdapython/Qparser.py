@@ -1,7 +1,11 @@
-from typing import Union
+from typing import TYPE_CHECKING, Union
 from cdapython.Q import Q
 import re
 from tdparser import Lexer, Token, Parser
+
+
+if TYPE_CHECKING:
+    from cdapython.Q import Q
 
 
 class Expression(Token):

@@ -16,7 +16,7 @@ current_path = Path(__file__).parent
 
 
 name = "cdapython"
-version = __version__
+version:str = __version__
 now = datetime.utcnow()
 desc_path = Path(current_path, "README.md")
 with open(desc_path, "r", encoding="utf-8", errors="surrogateescape") as fh:
@@ -25,7 +25,7 @@ with open(desc_path, "r", encoding="utf-8", errors="surrogateescape") as fh:
 setup(
     name=name,
     packages=find_packages(),
-    package_data={"cdapython": ['py.typed'], "": [".env"]},
+    package_data={"cdapython": ["py.typed"], "": [".env"]},
     version=version,
     py_modules=["cdapython"],
     platforms=["POSIX", "MacOS", "Windows"],
@@ -40,5 +40,5 @@ setup(
     description="User friendly Python library to access CDA service.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    include_package_data=True
+    include_package_data=True,
 )

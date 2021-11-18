@@ -74,7 +74,7 @@ More pages: {self.has_next_page}
         _limit = limit or self._limit
         return self._get_result(_offset, _limit)
 
-    def _get_result(self, _offset, _limit):
+    def _get_result(self, _offset: int, _limit: int):
         return get_query_result(self._api_instance, self._query_id, _offset, _limit)
 
 

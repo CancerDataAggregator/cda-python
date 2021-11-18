@@ -1,6 +1,5 @@
 from functools import wraps
 from time import time
-from typing import Any
 
 
 def measure(func):

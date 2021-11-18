@@ -13,6 +13,7 @@ from cdapython.decorators import measure
 from typing import Union
 import cdapython.constantVariables as const
 from cda_client.exceptions import ServiceException
+from .functions import find_ssl_path
 
 
 class Q:
@@ -55,7 +56,6 @@ class Q:
 
     @staticmethod
     def get_host_url() -> Optional[str]:
-
         return const.CDA_API_URL
 
     @staticmethod
@@ -65,26 +65,38 @@ class Q:
         dry_run: bool = False,
         offset: int = 0,
         limit: int = 100,
+        ssl_check: Optional[bool] = None,
     ):
-        """
+        """[summary]
 
         Args:
             sql (str): [description]
-            host (str, optional): [description]. Defaults to CDA_API_URL.
+            host (Optional[str], optional): [description]. Defaults to None.
             dry_run (bool, optional): [description]. Defaults to False.
             offset (int, optional): [description]. Defaults to 0.
-            limit (int, optional): [description]. Defaults to 1000.
+            limit (int, optional): [description]. Defaults to 100.
+            ssl_check (Optional[bool], optional): [description]. Defaults to None.
+
+        Raises:
+            Exception: [description]
 
         Returns:
-            [Result]: [description]
+            [type]: [description]
         """
+
+        tmp_configuration: Configuration = Configuration(host=host)
+
         if sql.find(project_name) == -1:
             raise Exception("Your database is outside of the project")
 
         if host is None:
             host = const.CDA_API_URL
 
-        with ApiClient(configuration=Configuration(host=host)) as api_client:
+        if ssl_check is None:
+            tmp_configuration.verify_ssl = find_ssl_path()
+
+        cda_ClientObj = ApiClient(configuration=tmp_configuration)
+        with cda_ClientObj as api_client:
             api_instance = QueryApi(api_client)
             api_response = api_instance.sql_query(sql)
         if dry_run is True:
@@ -102,17 +114,30 @@ class Q:
         return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
 
     @staticmethod
-    def queryjobstatus(id: str, host: Optional[str] = const.CDA_API_URL) -> object:
+    def queryjobstatus(
+        id: str, host: Optional[str] = None, ssl_check: Optional[bool] = None
+    ) -> object:
         """[summary]
 
         Args:
             id (str): [description]
-            host (str, optional): [description]. Defaults to CDA_API_URL.
+            host (Optional[str], optional): [description]. Defaults to None.
+            ssl_check (Optional[bool], optional): [description]. Defaults to None.
 
         Returns:
-            [type]: [description]
+            object: [description]
         """
-        with ApiClient(configuration=Configuration(host=host)) as api_client:
+        tmp_configuration: Configuration = Configuration(host=host)
+
+        if host is None:
+            host = const.CDA_API_URL
+
+        if ssl_check is None:
+            tmp_configuration.verify_ssl = find_ssl_path()
+
+        cda_ClientObj = ApiClient(configuration=tmp_configuration)
+
+        with cda_ClientObj as api_client:
             api_instance = QueryApi(api_client)
             api_response = api_instance.job_status(id)
             print(type(api_response))
@@ -128,28 +153,33 @@ class Q:
         dry_run: bool = False,
         table: Optional[str] = default_table,
         async_call: bool = False,
+        ssl_check: Optional[bool] = None,
     ):
-
         """[summary]
 
         Args:
-            async_call:(bool)
-            table (str)
             offset (int, optional): [description]. Defaults to 0.
             limit (int, optional): [description]. Defaults to 100.
-            version ([type], optional): [description]. Defaults to table_version.
-            host ([type], optional): [description]. Defaults to CDA_API_URL.
+            version (Optional[str], optional): [description]. Defaults to table_version.
+            host (Optional[str], optional): [description]. Defaults to None.
             dry_run (bool, optional): [description]. Defaults to False.
+            table (Optional[str], optional): [description]. Defaults to default_table.
+            async_call (bool, optional): [description]. Defaults to False.
+            ssl_check (Optional[bool], optional): [description]. Defaults to None.
 
         Returns:
-            [Result]: [description]
+            [type]: [description]
         """
+        tmp_configuration: Configuration = Configuration(host=host)
+        if host is None:
+            host = const.CDA_API_URL
+        if ssl_check is None:
+            tmp_configuration.verify_ssl = find_ssl_path()
+
+        cda_ClientObj = ApiClient(configuration=tmp_configuration)
+
         try:
-
-            if host is None:
-                host = const.CDA_API_URL
-
-            with ApiClient(configuration=Configuration(host=host)) as api_client:
+            with cda_ClientObj as api_client:
                 api_instance = QueryApi(api_client)
                 # Execute boolean query
                 print("Getting results from database", end="\n\n")
@@ -165,7 +195,6 @@ class Q:
                     print("Waiting for results")
                     while api_response.ready() is False:
                         api_response.wait(10000)
-
                     api_response = api_response.get()
 
                 if dry_run is True:
@@ -181,6 +210,8 @@ class Q:
             Error Message: {json.loads(httpError.body)["message"]}
             """
             )
+        except Exception as e:
+            print(e)
 
     def And(self, right: "Q") -> "Q":
         return Q(self.query, "AND", right.query)
