@@ -1,12 +1,8 @@
 from cdapython import __version__
-import os
-from dotenv import load_dotenv
-from pathlib import Path
 
-load_dotenv()
-env_path = Path(".") / ".env"
-load_dotenv(dotenv_path=env_path)
+
+version = "2021.11.4"
 
 
 def test_pyVERSION() -> None:
-    assert __version__ == os.getenv("VERSION")
+    assert __version__ == version

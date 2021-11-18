@@ -23,14 +23,15 @@ if TYPE_CHECKING:
 
 # Creating constant
 if isinstance(const.default_table, str):
-    DEFAULT_TABLE: str = const.default_table.split(".")[1]
+    if const.default_table is not None:
+        DEFAULT_TABLE: Optional[str] = const.default_table.split(".")[1]
 
 
 if isinstance(const.CDA_API_URL, str):
     URL_TABLE: str = const.CDA_API_URL
 
 
-def httpErrorLogger(httpError: ServiceException):
+def http_error_logger(httpError: ServiceException):
     logging.error(
         f"""
             Http Status: {httpError.status}
@@ -43,7 +44,7 @@ def query(text: str) -> "Q":
     return parser(text)
 
 
-def tableWhiteList(table: Optional[str], version: Optional[str]) -> Optional[str]:
+def table_white_list(table: Optional[str], version: Optional[str]) -> Optional[str]:
     """[summary]
     This checks the allowed list List and Throws a error if there is a table
     not allowed
@@ -99,7 +100,7 @@ def unique_terms(
     if table is None:
         if isinstance(const.default_table, str):
             table = DEFAULT_TABLE
-    version = tableWhiteList(table, table_version)
+    version = table_white_list(table, table_version)
     cda_ClientObj = cda_client.ApiClient(configuration=tmp_configuration)
     try:
         with cda_ClientObj as api_client:
@@ -118,7 +119,7 @@ def unique_terms(
             uniqueArray = np.array([list(t.values())[0] for t in query_result])
             return uniqueArray.tolist()
     except ServiceException as httpError:
-        httpErrorLogger(httpError)
+        http_error_logger(httpError)
 
     except Exception as e:
         print(e)

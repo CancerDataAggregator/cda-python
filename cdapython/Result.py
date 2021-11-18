@@ -1,6 +1,7 @@
 import pprint as pp
 
 import cda_client.api.query_api
+import json
 
 
 class Result:
@@ -57,8 +58,8 @@ More pages: {self.has_next_page}
     def __iter__(self):
         return iter(self._api_response.result)
 
-    def pretty_print(self, idx):
-        pp.pprint(self[idx])
+    def pretty_print(self, idx: int):
+        print(json.dumps(self[idx], indent=4))
 
     def next_page(self, limit=None):
         if not self.has_next_page:
@@ -84,6 +85,17 @@ def get_query_result(
     offset: int,
     limit: int,
 ) -> Result:
+    """[summary]
+    This will call the next query and wait for the result then return a Result object to the user.
+    Args:
+        api_instance (cda_client.api.query_api.QueryApi): [description]
+        query_id (str): [description]
+        offset (int): [description]
+        limit (int): [description]
+
+    Returns:
+        Result: [description]
+    """
     while True:
         response = api_instance.query(id=query_id, offset=offset, limit=limit)
         if response.total_row_count is not None:

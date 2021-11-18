@@ -10,13 +10,14 @@ def getVersion(filepath: str):
                 return str(i.split("=")[1].strip().replace('"', ""))
 
 
-__version__ = getVersion(".env")
+__version__ = getVersion("cdapython/constantVariables.py")
 print(__version__)
 current_path = Path(__file__).parent
 
-
+# data = open(".env", "r").read()
+# writeoutEnv = open("cdapython/.env", "w").write(data)
 name = "cdapython"
-version:str = __version__
+version: str = __version__
 now = datetime.utcnow()
 desc_path = Path(current_path, "README.md")
 with open(desc_path, "r", encoding="utf-8", errors="surrogateescape") as fh:

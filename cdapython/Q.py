@@ -5,8 +5,8 @@ from typing import Optional
 from cda_client import ApiClient, Configuration
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query import Query
-from cdapython.constantVariables import table_version, default_table, project_name
-from cdapython.Result import get_query_result
+from cda_client.model.query_created_data import QueryCreatedData
+from cdapython.Result import Result, get_query_result
 from cdapython.functions import Quoted, Unquoted, col
 from cda_client.api.meta_api import MetaApi
 from cdapython.decorators import measure
@@ -14,6 +14,7 @@ from typing import Union
 import cdapython.constantVariables as const
 from cda_client.exceptions import ServiceException
 from .functions import find_ssl_path
+from cdapython.constantVariables import table_version, default_table, project_name
 
 
 class Q:
@@ -30,6 +31,9 @@ class Q:
         self.query = Query()
 
         if len(args) == 1:
+
+            if args[0] is None:
+                raise RuntimeError("Q statement parse error")
 
             _l, _op, _r = args[0].split(" ", 2)
             _l = col(_l)
@@ -86,7 +90,7 @@ class Q:
 
         tmp_configuration: Configuration = Configuration(host=host)
 
-        if sql.find(project_name) == -1:
+        if project_name is not None and sql.find(project_name) == -1:
             raise Exception("Your database is outside of the project")
 
         if host is None:
@@ -154,7 +158,7 @@ class Q:
         table: Optional[str] = default_table,
         async_call: bool = False,
         ssl_check: Optional[bool] = None,
-    ):
+    ) -> Union[QueryCreatedData, multiprocessing.pool.ApplyResult, Result, None]:
         """[summary]
 
         Args:
@@ -168,7 +172,7 @@ class Q:
             ssl_check (Optional[bool], optional): [description]. Defaults to None.
 
         Returns:
-            [type]: [description]
+            Union[ QueryCreatedData, multiprocessing.pool.ApplyResult, Result, None]: [description]
         """
         tmp_configuration: Configuration = Configuration(host=host)
         if host is None:
@@ -183,7 +187,9 @@ class Q:
                 api_instance = QueryApi(api_client)
                 # Execute boolean query
                 print("Getting results from database", end="\n\n")
-                api_response = api_instance.boolean_query(
+                api_response: Union[
+                    QueryCreatedData, multiprocessing.pool.ApplyResult
+                ] = api_instance.boolean_query(
                     self.query,
                     version=version,
                     dry_run=dry_run,
@@ -204,14 +210,16 @@ class Q:
                     api_instance, api_response.query_id, offset, limit
                 )
         except ServiceException as httpError:
-            logging.error(
-                f"""
-            Http Status: {httpError.status}
-            Error Message: {json.loads(httpError.body)["message"]}
-            """
-            )
+            if httpError.body is not None:
+                logging.error(
+                    f"""
+                Http Status: {httpError.status}
+                Error Message: {json.loads(httpError.body)["message"]}
+                """
+                )
         except Exception as e:
             print(e)
+            return None
 
     def And(self, right: "Q") -> "Q":
         return Q(self.query, "AND", right.query)
@@ -241,11 +249,11 @@ class Q:
         return Q(self.query, "<", right.query)
 
 
-def infer_quote(val: Union[int, float, str, "Q", Query]) -> Union[Q, Query]:
+def infer_quote(val: Union[str, "Q", Query]) -> Union[Q, Query]:
     """[summary]
     Handles Strings With quotes
     Args:
-        val (Union[int, float, str,): [description]
+        val (Union[str,"Q",Query): [description]
 
     Returns:
         Query: [description]
