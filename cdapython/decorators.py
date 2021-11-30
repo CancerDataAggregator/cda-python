@@ -1,10 +1,11 @@
 from functools import wraps
 from time import time
+from typing import Callable
 
 
-def measure(func):
+def measure(func) -> Callable:
     @wraps(func)
-    def _time_it(*args, **kwargs):
+    def _time_it(*args, **kwargs) -> Callable:
         start_time = int(round(time() * 1000))
         try:
             return func(*args, **kwargs)

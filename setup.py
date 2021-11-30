@@ -25,7 +25,7 @@ with open(desc_path, "r", encoding="utf-8", errors="surrogateescape") as fh:
 
 setup(
     name=name,
-    packages=find_packages(),
+    packages=find_packages(exclude=("tests*")),
     package_data={"cdapython": ["py.typed"], "": [".env"]},
     version=version,
     py_modules=["cdapython"],

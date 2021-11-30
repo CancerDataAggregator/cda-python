@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Union
 from cdapython.Q import Q
 import re
 from tdparser import Lexer, Token, Parser
+from tdparser.topdown import Parser
 
 
 if TYPE_CHECKING:
@@ -9,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class Expression(Token):
-    def __init__(self, text: str):
+    def __init__(self, text: str) -> None:
         self.value = str(text).strip()
 
     def nud(self, context: Parser) -> str:
@@ -173,5 +174,5 @@ lexer.register_token(Or, re.compile(r"(OR)"))
 lexer.register_token(From, re.compile(r"(FROM)"))
 
 
-def parser(text):
+def parser(text: str) -> Q:
     return lexer.parse(text)

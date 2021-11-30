@@ -1,10 +1,11 @@
 """
- cdapython is a library used to interact with the machine generated CDA Python Client and offers some syntactic sugar to make it more pleasant to query the CDA.
+cdapython is a library used to interact with the machine generated CDA Python Client and offers some syntactic sugar to make it more pleasant to query the CDA.
 """
-from .Q import Q
-from .utility import unique_terms, columns, query
-from ._get_unnest_clause import _get_unnest_clause
-from .constantVariables import VERSION
+
+from cdapython.Q import Q
+from cdapython.utility import unique_terms, columns, query
+from cdapython._get_unnest_clause import _get_unnest_clause
+from cdapython.constantVariables import VERSION
 from typing import Optional
 
 

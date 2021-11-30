@@ -1,11 +1,10 @@
+from __future__ import annotations
 import json
 import logging
 import multiprocessing.pool
 from typing import Optional
-from cda_client import ApiClient, Configuration
-from cda_client.api.query_api import QueryApi
-from cda_client.model.query import Query
-from cda_client.model.query_created_data import QueryCreatedData
+
+from urllib3.exceptions import InsecureRequestWarning
 from cdapython.Result import Result, get_query_result
 from cdapython.functions import Quoted, Unquoted, col
 from cda_client.api.meta_api import MetaApi
@@ -13,8 +12,20 @@ from cdapython.decorators import measure
 from typing import Union
 import cdapython.constantVariables as const
 from cda_client.exceptions import ServiceException
-from .functions import find_ssl_path
-from cdapython.constantVariables import table_version, default_table, project_name
+from cdapython.functions import find_ssl_path
+from urllib3.connection import NewConnectionError
+from urllib3.connectionpool import MaxRetryError
+
+
+from cda_client.model.query import Query
+from cda_client.api.query_api import QueryApi
+from cda_client import ApiClient, Configuration
+from cda_client.model.query_created_data import QueryCreatedData
+from cdapython.constantVariables import (
+    table_version,
+    default_table,
+    project_name
+)
 
 
 class Q:
@@ -70,7 +81,7 @@ class Q:
         offset: int = 0,
         limit: int = 100,
         ssl_check: Optional[bool] = None,
-    ):
+    ) -> Optional[Result]:
         """[summary]
 
         Args:
@@ -79,7 +90,8 @@ class Q:
             dry_run (bool, optional): [description]. Defaults to False.
             offset (int, optional): [description]. Defaults to 0.
             limit (int, optional): [description]. Defaults to 100.
-            ssl_check (Optional[bool], optional): [description]. Defaults to None.
+            ssl_check (Optional[bool], optional): [description].
+            Defaults to None.
 
         Raises:
             Exception: [description]
@@ -89,6 +101,12 @@ class Q:
         """
 
         tmp_configuration: Configuration = Configuration(host=host)
+        if (
+            "create table" in sql.lower()
+            or "delete from" in sql.lower()
+            or "drop table" in sql.lower()
+        ):
+            raise Exception("Those actions are not available in Q.sql")
 
         if project_name is not None and sql.find(project_name) == -1:
             raise Exception("Your database is outside of the project")
@@ -99,13 +117,25 @@ class Q:
         if ssl_check is None:
             tmp_configuration.verify_ssl = find_ssl_path()
 
+        if ssl_check is False:
+            tmp_configuration.verify_ssl = False
         cda_ClientObj = ApiClient(configuration=tmp_configuration)
-        with cda_ClientObj as api_client:
-            api_instance = QueryApi(api_client)
-            api_response = api_instance.sql_query(sql)
-        if dry_run is True:
-            return api_response
-        return get_query_result(api_instance, api_response.query_id, offset, limit)
+
+        try:
+
+            with cda_ClientObj as api_client:
+                api_instance = QueryApi(api_client)
+                api_response = api_instance.sql_query(sql)
+            if dry_run is True:
+                return api_response
+            return get_query_result(api_instance, api_response.query_id, offset, limit)
+
+        except InsecureRequestWarning as e:
+            print(e)
+
+        except Exception as e:
+            print(e)
+        return None
 
     @staticmethod
     def statusbigquery() -> str:
@@ -120,13 +150,15 @@ class Q:
     @staticmethod
     def queryjobstatus(
         id: str, host: Optional[str] = None, ssl_check: Optional[bool] = None
-    ) -> object:
+    ):
         """[summary]
 
         Args:
             id (str): [description]
-            host (Optional[str], optional): [description]. Defaults to None.
-            ssl_check (Optional[bool], optional): [description]. Defaults to None.
+            host (Optional[str], optional): [description].
+            Defaults to None.
+            ssl_check (Optional[bool], optional):
+            [description]. Defaults to None.
 
         Returns:
             object: [description]
@@ -139,13 +171,20 @@ class Q:
         if ssl_check is None:
             tmp_configuration.verify_ssl = find_ssl_path()
 
+        if ssl_check is False:
+            tmp_configuration.verify_ssl = False
         cda_ClientObj = ApiClient(configuration=tmp_configuration)
+        try:
+            with cda_ClientObj as api_client:
+                api_instance = QueryApi(api_client)
+                api_response = api_instance.job_status(id)
+                print(type(api_response))
+                return api_response["status"]
 
-        with cda_ClientObj as api_client:
-            api_instance = QueryApi(api_client)
-            api_response = api_instance.job_status(id)
-            print(type(api_response))
-            return api_response["status"]
+        except InsecureRequestWarning as e:
+            print(e)
+        except Exception as e:
+            print(e)
 
     @measure
     def run(
@@ -159,27 +198,42 @@ class Q:
         async_call: bool = False,
         ssl_check: Optional[bool] = None,
     ) -> Union[QueryCreatedData, multiprocessing.pool.ApplyResult, Result, None]:
+
         """[summary]
 
         Args:
-            offset (int, optional): [description]. Defaults to 0.
-            limit (int, optional): [description]. Defaults to 100.
-            version (Optional[str], optional): [description]. Defaults to table_version.
-            host (Optional[str], optional): [description]. Defaults to None.
-            dry_run (bool, optional): [description]. Defaults to False.
-            table (Optional[str], optional): [description]. Defaults to default_table.
-            async_call (bool, optional): [description]. Defaults to False.
-            ssl_check (Optional[bool], optional): [description]. Defaults to None.
+            offset (int, optional): [description].
+            Defaults to 0.
+            limit (int, optional): [description].
+            Defaults to 100.
+            version (Optional[str], optional): [description].
+            Defaults to table_version.
+            host (Optional[str], optional): [description].
+            Defaults to None.
+            dry_run (bool, optional): [description].
+            'Defaults to False.
+            table (Optional[str], optional): [description].
+            Defaults to default_table.
+            async_call (bool, optional): [description].
+            Defaults to False.
+            ssl_check (Optional[bool], optional): [description].
+            Defaults to None.
 
         Returns:
-            Union[ QueryCreatedData, multiprocessing.pool.ApplyResult, Result, None]: [description]
+            Union[
+                QueryCreatedData,
+                multiprocessing.pool.ApplyResult,
+                Result,
+                None
+            ]: [description]
         """
         tmp_configuration: Configuration = Configuration(host=host)
         if host is None:
             host = const.CDA_API_URL
         if ssl_check is None:
             tmp_configuration.verify_ssl = find_ssl_path()
-
+        if ssl_check is False:
+            tmp_configuration.verify_ssl = False
         cda_ClientObj = ApiClient(configuration=tmp_configuration)
 
         try:
@@ -217,9 +271,19 @@ class Q:
                 Error Message: {json.loads(httpError.body)["message"]}
                 """
                 )
+
+        except MaxRetryError:
+            print("Connection error max retry limit of 3 hit please check url")
+
+        except NewConnectionError as e:
+            print("Connection error")
+
+        except InsecureRequestWarning as e:
+            print(e)
+
         except Exception as e:
             print(e)
-            return None
+        return None
 
     def And(self, right: "Q") -> "Q":
         return Q(self.query, "AND", right.query)

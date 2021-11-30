@@ -1,3 +1,4 @@
+from functools import lru_cache
 import logging
 from typing import TYPE_CHECKING, Any, List
 import cda_client
@@ -12,6 +13,7 @@ from cda_client.exceptions import ServiceException
 import cdapython.constantVariables as const
 from urllib3.exceptions import InsecureRequestWarning
 from .functions import find_ssl_path
+from .decorators_cache import lru_cache_timed
 
 logging.captureWarnings(InsecureRequestWarning)
 # This is added for Type Checking classs to remove a circular import)
@@ -69,6 +71,7 @@ def table_white_list(table: Optional[str], version: Optional[str]) -> Optional[s
     return None
 
 
+@lru_cache_timed(seconds=10)
 def unique_terms(
     col_name: str,
     system: str = "",
@@ -96,6 +99,9 @@ def unique_terms(
 
     if ssl_check is None:
         tmp_configuration.verify_ssl = find_ssl_path()
+
+    if ssl_check is False:
+        tmp_configuration.verify_ssl = False
 
     if table is None:
         if isinstance(const.default_table, str):
@@ -126,6 +132,7 @@ def unique_terms(
     return None
 
 
+@lru_cache_timed(seconds=60)
 def columns(
     version: Optional[str] = table_version,
     host: Optional[str] = None,
@@ -154,11 +161,13 @@ def columns(
     if ssl_check is None:
         tmp_configuration.verify_ssl = find_ssl_path()
 
+    if ssl_check is False:
+        tmp_configuration.verify_ssl = False
     if table is None:
         if isinstance(const.default_table, str):
             table = DEFAULT_TABLE
 
-    version = tableWhiteList(table, version)
+    version = table_white_list(table, version)
     cda_ClientObj = cda_client.ApiClient(configuration=tmp_configuration)
 
     try:
@@ -171,7 +180,7 @@ def columns(
             column_array = np.array([list(t.values())[0] for t in query_result])
             return column_array.tolist()
     except ServiceException as httpError:
-        httpErrorLogger(httpError)
+        http_error_logger(httpError)
     except InsecureRequestWarning:
         pass
     except Exception as e:
