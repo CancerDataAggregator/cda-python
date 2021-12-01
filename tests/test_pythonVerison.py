@@ -1,8 +1,8 @@
 from cdapython import __version__
 
 
-version = "2021.11.19"
+version = "2021.11.30"
 
 
-def test_pyVERSION() -> None:
+def test_python_version() -> None:
     assert __version__ == version
