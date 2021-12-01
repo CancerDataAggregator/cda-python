@@ -3,19 +3,17 @@ from setuptools import setup, find_packages
 from pathlib import Path
 
 
-def getVersion(filepath: str):
+def get_version(filepath: str):
     with open(filepath, "r") as f:
         for i in f.readlines():
             if i.find("VERSION") != -1:
                 return str(i.split("=")[1].strip().replace('"', ""))
 
 
-__version__ = getVersion("cdapython/constantVariables.py")
+__version__ = get_version("cdapython/constantVariables.py")
 print(__version__)
 current_path = Path(__file__).parent
 
-# data = open(".env", "r").read()
-# writeoutEnv = open("cdapython/.env", "w").write(data)
 name = "cdapython"
 version: str = __version__
 now = datetime.utcnow()
