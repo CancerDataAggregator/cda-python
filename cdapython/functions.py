@@ -8,11 +8,11 @@ def col(col_name: Optional[str]) -> Query:
     return Query(node_type="column", value=col_name)
 
 
-def Quoted(quoted_val: Optional[str]) -> Query:
+def quoted(quoted_val: Optional[str]) -> Query:
     return Query(node_type="quoted", value=quoted_val)
 
 
-def Unquoted(val: Optional[Union[str, Query]]) -> Query:
+def unquoted(val: Optional[Union[str, Query]]) -> Query:
     return Query(node_type="unquoted", value=val)
 
 
@@ -20,6 +20,8 @@ def find_ssl_path() -> bool:
     """[summary]
     This will look in your local computer for a ssl pem file and
     return True or False if the file is there.
+    if value is False Q will accept any TLS certificate presented by a server, 
+    and will ignore hostname mismatches and expired certificates
     Returns:
         bool: [description]
     """

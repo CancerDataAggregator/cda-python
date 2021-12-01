@@ -15,7 +15,7 @@ from urllib3.exceptions import InsecureRequestWarning
 from .functions import find_ssl_path
 from .decorators_cache import lru_cache_timed
 
-logging.captureWarnings(InsecureRequestWarning)
+
 # This is added for Type Checking classs to remove a circular import)
 
 
@@ -24,20 +24,19 @@ if TYPE_CHECKING:
 
 
 # Creating constant
-if isinstance(const.default_table, str):
-    if const.default_table is not None:
-        DEFAULT_TABLE: Optional[str] = const.default_table.split(".")[1]
+if isinstance(const.default_table, str) and const.default_table is not None:
+    DEFAULT_TABLE: Optional[str] = const.default_table.split(".")[1]
 
 
 if isinstance(const.CDA_API_URL, str):
     URL_TABLE: str = const.CDA_API_URL
 
 
-def http_error_logger(httpError: ServiceException):
+def http_error_logger(http_error: ServiceException):
     logging.error(
         f"""
-            Http Status: {httpError.status}
-            Error Message: {json.loads(httpError.body)["message"]}
+            Http Status: {http_error.status}
+            Error Message: {json.loads(http_error.body)["message"]}
             """
     )
 
@@ -64,9 +63,8 @@ def table_white_list(table: Optional[str], version: Optional[str]) -> Optional[s
         if table not in ["cda_mvp", "integration"]:
             raise ValueError("Table not in allowlist list")
 
-        if table == "cda_mvp":
-            if version == "all_v1":
-                version = "v3"
+        if table == "cda_mvp" and version == "all_v1":
+            version = "v3"
         return version
     return None
 
@@ -78,7 +76,7 @@ def unique_terms(
     limit: int = 100,
     host: Optional[str] = None,
     table: Optional[str] = None,
-    ssl_check: Optional[bool] = None,
+    verify: Optional[bool] = None,
 ) -> Optional[List[Any]]:
     """[summary]
 
@@ -88,7 +86,7 @@ def unique_terms(
         limit (int, optional): [description]. Defaults to 100.
         host (Optional[str], optional): [description]. Defaults to None.
         table (Optional[str], optional): [description]. Defaults to None.
-        ssl_check (Optional[bool], optional): [description]. Defaults to None.
+        verify (Optional[bool], optional): [description]. Defaults to None.
 
     Returns:
         Optional[List[Any]]: [description]
@@ -97,19 +95,19 @@ def unique_terms(
     if host is None:
         host = const.CDA_API_URL
 
-    if ssl_check is None:
+    if verify is None:
         tmp_configuration.verify_ssl = find_ssl_path()
 
-    if ssl_check is False:
+    if verify is False:
         tmp_configuration.verify_ssl = False
 
-    if table is None:
-        if isinstance(const.default_table, str):
-            table = DEFAULT_TABLE
+    if table is None and isinstance(const.default_table, str):
+        table = DEFAULT_TABLE
+
     version = table_white_list(table, table_version)
-    cda_ClientObj = cda_client.ApiClient(configuration=tmp_configuration)
+    cda_client_obj = cda_client.ApiClient(configuration=tmp_configuration)
     try:
-        with cda_ClientObj as api_client:
+        with cda_client_obj as api_client:
             api_instance = QueryApi(api_client)
             api_response = api_instance.unique_values(
                 version=version,
@@ -122,10 +120,10 @@ def unique_terms(
             query_result = get_query_result(
                 api_instance, api_response.query_id, 0, limit
             )
-            uniqueArray = np.array([list(t.values())[0] for t in query_result])
-            return uniqueArray.tolist()
-    except ServiceException as httpError:
-        http_error_logger(httpError)
+            unique_array = np.array([list(t.values())[0] for t in query_result])
+            return unique_array.tolist()
+    except ServiceException as http_error:
+        http_error_logger(http_error)
 
     except Exception as e:
         print(e)
@@ -138,7 +136,7 @@ def columns(
     host: Optional[str] = None,
     limit: int = 100,
     table: Optional[str] = None,
-    ssl_check: Optional[bool] = None,
+    verify: Optional[bool] = None,
 ) -> Optional[List[Any]]:
     """[summary]
 
@@ -147,7 +145,7 @@ def columns(
         host (Optional[str], optional): [description]. Defaults to None.
         limit (int, optional): [description]. Defaults to 100.
         table (Optional[str], optional): [description]. Defaults to None.
-        ssl_check (Optional[bool], optional): [description]. Defaults to None.
+        verify (Optional[bool], optional): [description]. Defaults to None.
 
     Returns:
         Optional[List[Any]]: [description]
@@ -158,20 +156,19 @@ def columns(
     if host is None:
         host = const.CDA_API_URL
 
-    if ssl_check is None:
+    if verify is None:
         tmp_configuration.verify_ssl = find_ssl_path()
 
-    if ssl_check is False:
+    if verify is False:
         tmp_configuration.verify_ssl = False
-    if table is None:
-        if isinstance(const.default_table, str):
-            table = DEFAULT_TABLE
+    if table is None and isinstance(const.default_table, str):
+        table = DEFAULT_TABLE
 
     version = table_white_list(table, version)
-    cda_ClientObj = cda_client.ApiClient(configuration=tmp_configuration)
+    cda_client_obj = cda_client.ApiClient(configuration=tmp_configuration)
 
     try:
-        with cda_ClientObj as api_client:
+        with cda_client_obj as api_client:
             api_instance = QueryApi(api_client)
             api_response = api_instance.columns(version=version, table=table)
             query_result = get_query_result(
@@ -179,8 +176,8 @@ def columns(
             )
             column_array = np.array([list(t.values())[0] for t in query_result])
             return column_array.tolist()
-    except ServiceException as httpError:
-        http_error_logger(httpError)
+    except ServiceException as http_error:
+        http_error_logger(http_error)
     except InsecureRequestWarning:
         pass
     except Exception as e:

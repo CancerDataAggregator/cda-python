@@ -3,7 +3,7 @@ from time import time
 from typing import Callable
 
 
-def measure(func) -> Callable:
+def measure(func):
     @wraps(func)
     def _time_it(*args, **kwargs) -> Callable:
         start_time = int(round(time() * 1000))

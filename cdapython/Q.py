@@ -1,12 +1,11 @@
-from __future__ import annotations
 import json
 import logging
 import multiprocessing.pool
 from typing import Optional
 
-from urllib3.exceptions import InsecureRequestWarning
+from urllib3.exceptions import InsecureRequestWarning, SSLError
 from cdapython.Result import Result, get_query_result
-from cdapython.functions import Quoted, Unquoted, col
+from cdapython.functions import col, quoted, unquoted
 from cda_client.api.meta_api import MetaApi
 from cdapython.decorators import measure
 from typing import Union
@@ -21,11 +20,11 @@ from cda_client.model.query import Query
 from cda_client.api.query_api import QueryApi
 from cda_client import ApiClient, Configuration
 from cda_client.model.query_created_data import QueryCreatedData
-from cdapython.constantVariables import (
-    table_version,
-    default_table,
-    project_name
-)
+from cdapython.constantVariables import table_version, default_table, project_name
+import warnings
+
+
+warnings.filterwarnings("once")
 
 
 class Q:
@@ -80,7 +79,7 @@ class Q:
         dry_run: bool = False,
         offset: int = 0,
         limit: int = 100,
-        ssl_check: Optional[bool] = None,
+        verify: Optional[bool] = None,
     ) -> Optional[Result]:
         """[summary]
 
@@ -90,7 +89,7 @@ class Q:
             dry_run (bool, optional): [description]. Defaults to False.
             offset (int, optional): [description]. Defaults to 0.
             limit (int, optional): [description]. Defaults to 100.
-            ssl_check (Optional[bool], optional): [description].
+            verify (Optional[bool], optional): [description].
             Defaults to None.
 
         Raises:
@@ -114,24 +113,21 @@ class Q:
         if host is None:
             host = const.CDA_API_URL
 
-        if ssl_check is None:
+        if verify is None:
             tmp_configuration.verify_ssl = find_ssl_path()
 
-        if ssl_check is False:
+        if verify is False:
             tmp_configuration.verify_ssl = False
-        cda_ClientObj = ApiClient(configuration=tmp_configuration)
+        cda_client_obj = ApiClient(configuration=tmp_configuration)
 
         try:
 
-            with cda_ClientObj as api_client:
+            with cda_client_obj as api_client:
                 api_instance = QueryApi(api_client)
                 api_response = api_instance.sql_query(sql)
             if dry_run is True:
                 return api_response
             return get_query_result(api_instance, api_response.query_id, offset, limit)
-
-        except InsecureRequestWarning as e:
-            print(e)
 
         except Exception as e:
             print(e)
@@ -149,7 +145,7 @@ class Q:
 
     @staticmethod
     def queryjobstatus(
-        id: str, host: Optional[str] = None, ssl_check: Optional[bool] = None
+        id: str, host: Optional[str] = None, verify: Optional[bool] = None
     ):
         """[summary]
 
@@ -157,7 +153,7 @@ class Q:
             id (str): [description]
             host (Optional[str], optional): [description].
             Defaults to None.
-            ssl_check (Optional[bool], optional):
+            verify (Optional[bool], optional):
             [description]. Defaults to None.
 
         Returns:
@@ -168,14 +164,14 @@ class Q:
         if host is None:
             host = const.CDA_API_URL
 
-        if ssl_check is None:
+        if verify is None:
             tmp_configuration.verify_ssl = find_ssl_path()
 
-        if ssl_check is False:
+        if verify is False:
             tmp_configuration.verify_ssl = False
-        cda_ClientObj = ApiClient(configuration=tmp_configuration)
+        cda_client_obj = ApiClient(configuration=tmp_configuration)
         try:
-            with cda_ClientObj as api_client:
+            with cda_client_obj as api_client:
                 api_instance = QueryApi(api_client)
                 api_response = api_instance.job_status(id)
                 print(type(api_response))
@@ -196,7 +192,7 @@ class Q:
         dry_run: bool = False,
         table: Optional[str] = default_table,
         async_call: bool = False,
-        ssl_check: Optional[bool] = None,
+        verify: Optional[bool] = None,
     ) -> Union[QueryCreatedData, multiprocessing.pool.ApplyResult, Result, None]:
 
         """[summary]
@@ -216,7 +212,7 @@ class Q:
             Defaults to default_table.
             async_call (bool, optional): [description].
             Defaults to False.
-            ssl_check (Optional[bool], optional): [description].
+            verify (Optional[bool], optional): [description].
             Defaults to None.
 
         Returns:
@@ -230,14 +226,14 @@ class Q:
         tmp_configuration: Configuration = Configuration(host=host)
         if host is None:
             host = const.CDA_API_URL
-        if ssl_check is None:
+        if verify is None:
             tmp_configuration.verify_ssl = find_ssl_path()
-        if ssl_check is False:
+        if verify is False:
             tmp_configuration.verify_ssl = False
-        cda_ClientObj = ApiClient(configuration=tmp_configuration)
+        cda_client_obj = ApiClient(configuration=tmp_configuration)
 
         try:
-            with cda_ClientObj as api_client:
+            with cda_client_obj as api_client:
                 api_instance = QueryApi(api_client)
                 # Execute boolean query
                 print("Getting results from database", end="\n\n")
@@ -259,6 +255,12 @@ class Q:
 
                 if dry_run is True:
                     return api_response
+                warnings.formatwarning(
+                    message="Insecure Request Warning you are seeing this because you python install dose not have a ssl pem file in the openssl module please look at our readthedocs to see a fix",
+                    category=InsecureRequestWarning,
+                    filename=__name__ + ".py",
+                    lineno=4,
+                )
 
                 return get_query_result(
                     api_instance, api_response.query_id, offset, limit
@@ -272,14 +274,21 @@ class Q:
                 """
                 )
 
-        except MaxRetryError:
-            print("Connection error max retry limit of 3 hit please check url")
-
         except NewConnectionError as e:
             print("Connection error")
 
-        except InsecureRequestWarning as e:
+        except SSLError as e:
             print(e)
+
+        except InsecureRequestWarning as e:
+            print(
+                "Adding certificate verification pem is strongly advised please read our https://cda.readthedocs.io/en/latest/Installation.html "
+            )
+
+        except MaxRetryError as e:
+            print(
+                f"Connection error max retry limit of 3 hit please check url or local python ssl pem {e}"
+            )
 
         except Exception as e:
             print(e)
@@ -325,5 +334,5 @@ def infer_quote(val: Union[str, "Q", Query]) -> Union[Q, Query]:
     if isinstance(val, (Q, Query)):
         return val
     if isinstance(val, str) and val.startswith('"') and val.endswith('"'):
-        return Quoted(val[1:-1])
-    return Unquoted(val)
+        return quoted(val[1:-1])
+    return unquoted(val)

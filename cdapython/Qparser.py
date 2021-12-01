@@ -29,7 +29,7 @@ class Eq(Token):
         return Q(left.strip() + " = " + right_side.strip())
 
 
-class Not_eq(Token):
+class NotEq(Token):
     lbp = 5  # Precedence
 
     def led(self, left: Union[str, Q], context: Parser) -> Q:
@@ -167,7 +167,7 @@ lexer.register_token(Greaterthen, re.compile(r"(\s+>+\s)"))
 lexer.register_token(Greatertheneq, re.compile(r"(\s+>=+\s)"))
 lexer.register_token(Lessthen, re.compile(r"(\s+<+\s)"))
 lexer.register_token(Lesstheneq, re.compile(r"(\s+<=+\s)"))
-lexer.register_token(Not_eq, re.compile(r"(\s+!=+\s)"))
+lexer.register_token(NotEq, re.compile(r"(\s+!=+\s)"))
 lexer.register_token(Eq, re.compile(r"(\s+=+\s)"))
 lexer.register_token(And, re.compile(r"(AND)"))
 lexer.register_token(Or, re.compile(r"(OR)"))
