@@ -3,21 +3,19 @@ from setuptools import setup, find_packages
 from pathlib import Path
 
 
-def getVersion(filepath: str):
+def get_version(filepath: str):
     with open(filepath, "r") as f:
         for i in f.readlines():
             if i.find("VERSION") != -1:
                 return str(i.split("=")[1].strip().replace('"', ""))
 
 
-__version__ = getVersion("cdapython/constantVariables.py")
+__version__ = get_version("cdapython/constantVariables.py")
 print(__version__)
 current_path = Path(__file__).parent
 
-# data = open(".env", "r").read()
-# writeoutEnv = open("cdapython/.env", "w").write(data)
 name = "cdapython"
-version = __version__
+version: str = __version__
 now = datetime.utcnow()
 desc_path = Path(current_path, "README.md")
 with open(desc_path, "r", encoding="utf-8", errors="surrogateescape") as fh:
@@ -25,7 +23,8 @@ with open(desc_path, "r", encoding="utf-8", errors="surrogateescape") as fh:
 
 setup(
     name=name,
-    packages=find_packages(),
+    packages=find_packages(exclude=("tests*")),
+    package_data={"cdapython": ["py.typed"], "": [".env"]},
     version=version,
     py_modules=["cdapython"],
     platforms=["POSIX", "MacOS", "Windows"],
@@ -41,5 +40,4 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     include_package_data=True,
-    package_data={"": [".env"]},
 )

@@ -19,6 +19,8 @@ venv
 #vscode
 .vscode
 
+monkeytype.*
+
 #sonrqube scanner
 .scannerwork
 /notebooks/example-dev.ipynb

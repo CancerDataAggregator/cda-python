@@ -1,11 +1,16 @@
-from typing import Union
+from typing import TYPE_CHECKING, Union
 from cdapython.Q import Q
 import re
 from tdparser import Lexer, Token, Parser
+from tdparser.topdown import Parser
+
+
+if TYPE_CHECKING:
+    from cdapython.Q import Q
 
 
 class Expression(Token):
-    def __init__(self, text: str):
+    def __init__(self, text: str) -> None:
         self.value = str(text).strip()
 
     def nud(self, context: Parser) -> str:
@@ -24,7 +29,7 @@ class Eq(Token):
         return Q(left.strip() + " = " + right_side.strip())
 
 
-class Not_eq(Token):
+class NotEq(Token):
     lbp = 5  # Precedence
 
     def led(self, left: Union[str, Q], context: Parser) -> Q:
@@ -162,12 +167,12 @@ lexer.register_token(Greaterthen, re.compile(r"(\s+>+\s)"))
 lexer.register_token(Greatertheneq, re.compile(r"(\s+>=+\s)"))
 lexer.register_token(Lessthen, re.compile(r"(\s+<+\s)"))
 lexer.register_token(Lesstheneq, re.compile(r"(\s+<=+\s)"))
-lexer.register_token(Not_eq, re.compile(r"(\s+!=+\s)"))
+lexer.register_token(NotEq, re.compile(r"(\s+!=+\s)"))
 lexer.register_token(Eq, re.compile(r"(\s+=+\s)"))
 lexer.register_token(And, re.compile(r"(AND)"))
 lexer.register_token(Or, re.compile(r"(OR)"))
 lexer.register_token(From, re.compile(r"(FROM)"))
 
 
-def parser(text):
+def parser(text: str) -> Q:
     return lexer.parse(text)
