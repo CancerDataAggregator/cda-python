@@ -23,7 +23,7 @@ with open(desc_path, "r", encoding="utf-8", errors="surrogateescape") as fh:
 
 setup(
     name=NAME,
-    packages=find_packages(exclude=("tests*")),
+    packages=find_packages(),
     include_package_data=True,
     package_data={"cdapython": ["py.typed"], "": [".env"]},
     package_dir={"cdapython": "cdapython"},
