@@ -14,19 +14,19 @@ __version__ = get_version("cdapython/constantVariables.py")
 print(__version__)
 current_path = Path(__file__).parent
 
-name = "cdapython"
-version: str = __version__
+NAME = "cdapython"
+VERSION: str = __version__
 now = datetime.utcnow()
 desc_path = Path(current_path, "README.md")
 with open(desc_path, "r", encoding="utf-8", errors="surrogateescape") as fh:
     long_description = fh.read()
 
 setup(
-    name=name,
+    name=NAME,
     packages=find_packages(),
     include_package_data = True,
     package_data={"cdapython": ["py.typed"], "": [".env"]},
-    version=version,
+    version=VERSION,
     py_modules=["cdapython"],
     platforms=["POSIX", "MacOS", "Windows"],
     python_requires=">=3.6",
