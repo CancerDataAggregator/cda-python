@@ -1,4 +1,3 @@
-from functools import lru_cache
 import logging
 from typing import TYPE_CHECKING, Any, List
 import cda_client
@@ -12,10 +11,13 @@ import json
 from cda_client.exceptions import ServiceException
 import cdapython.constantVariables as const
 from urllib3.exceptions import InsecureRequestWarning
+
+from cdapython.errorLogger import unverfiedHttp
 from .functions import find_ssl_path
 from .decorators_cache import lru_cache_timed
 
 
+logging.captureWarnings(InsecureRequestWarning)
 # This is added for Type Checking classs to remove a circular import)
 
 
@@ -99,6 +101,7 @@ def unique_terms(
         tmp_configuration.verify_ssl = find_ssl_path()
 
     if verify is False:
+        unverfiedHttp()
         tmp_configuration.verify_ssl = False
 
     if table is None and isinstance(const.default_table, str):
@@ -160,6 +163,7 @@ def columns(
         tmp_configuration.verify_ssl = find_ssl_path()
 
     if verify is False:
+        unverfiedHttp()
         tmp_configuration.verify_ssl = False
     if table is None and isinstance(const.default_table, str):
         table = DEFAULT_TABLE

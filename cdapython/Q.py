@@ -1,5 +1,6 @@
 from json import loads
 from logging import error as logError
+import logging
 from multiprocessing.pool import ApplyResult
 from typing import Optional
 from urllib3.exceptions import InsecureRequestWarning, SSLError
@@ -13,15 +14,14 @@ from cda_client.exceptions import ServiceException
 from cdapython.functions import find_ssl_path
 from urllib3.connection import NewConnectionError
 from urllib3.connectionpool import MaxRetryError
-
-
+from cdapython.errorLogger import unverfiedHttp
 from cda_client.model.query import Query
 from cda_client.api.query_api import QueryApi
 from cda_client import ApiClient, Configuration
 from cda_client.model.query_created_data import QueryCreatedData
 from cdapython.constantVariables import table_version, default_table, project_name
 
-
+logging.captureWarnings(InsecureRequestWarning)
 class Q:
     """
     Q lang is Language used to send query to the cda service
@@ -112,9 +112,9 @@ class Q:
             tmp_configuration.verify_ssl = find_ssl_path()
 
         if verify is False:
+            unverfiedHttp()
             tmp_configuration.verify_ssl = False
         cda_client_obj = ApiClient(configuration=tmp_configuration)
-
         try:
 
             with cda_client_obj as api_client:
@@ -163,6 +163,7 @@ class Q:
             tmp_configuration.verify_ssl = find_ssl_path()
 
         if verify is False:
+            unverfiedHttp()
             tmp_configuration.verify_ssl = False
         cda_client_obj = ApiClient(configuration=tmp_configuration)
         try:
@@ -224,6 +225,7 @@ class Q:
         if verify is None:
             tmp_configuration.verify_ssl = find_ssl_path()
         if verify is False:
+            unverfiedHttp()
             tmp_configuration.verify_ssl = False
         cda_client_obj = ApiClient(configuration=tmp_configuration)
 

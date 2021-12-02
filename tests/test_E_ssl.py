@@ -1,5 +1,5 @@
 from cdapython import Q
-import warnings
+
 
 
 def test_ssl():
@@ -9,4 +9,4 @@ def test_ssl():
     q1.run(verify=False)
 
 
-test_ssl()
+
