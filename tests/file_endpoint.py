@@ -8,6 +8,9 @@ ageU = Q("days_to_birth >= -45*365")
 
 q1 = sex.And(cancer.And(ageL.And(ageU)))
 
-r1 = q1.run(host="http://localhost:8080")
+r1 = q1.run()
+# sleep(11)
+print("cache")
+r2 = q1.run()
 
-r1.pretty_print(0)
+# r2.pretty_print(0)

@@ -9,8 +9,6 @@ try:
 except ImportError:
     raise ImportError()
 
-if TYPE_CHECKING:
-    from cdapython.Q import Q
 
 """[summary]
     add's history to shell in current session
@@ -18,7 +16,7 @@ if TYPE_CHECKING:
 new = True
 
 
-def help():
+def help() -> None:
     print(
         """
         Welcome to Q shell's help utility
