@@ -1,8 +1,7 @@
-import json
-import logging
-import multiprocessing.pool
+from json import loads
+from logging import error as logError
+from multiprocessing.pool import ApplyResult
 from typing import Optional
-
 from urllib3.exceptions import InsecureRequestWarning, SSLError
 from cdapython.Result import Result, get_query_result
 from cdapython.functions import col, quoted, unquoted
@@ -21,10 +20,6 @@ from cda_client.api.query_api import QueryApi
 from cda_client import ApiClient, Configuration
 from cda_client.model.query_created_data import QueryCreatedData
 from cdapython.constantVariables import table_version, default_table, project_name
-import warnings
-
-
-warnings.filterwarnings("once")
 
 
 class Q:
@@ -193,7 +188,7 @@ class Q:
         table: Optional[str] = default_table,
         async_call: bool = False,
         verify: Optional[bool] = None,
-    ) -> Union[QueryCreatedData, multiprocessing.pool.ApplyResult, Result, None]:
+    ) -> Union[QueryCreatedData, ApplyResult, Result, None]:
 
         """[summary]
 
@@ -218,7 +213,7 @@ class Q:
         Returns:
             Union[
                 QueryCreatedData,
-                multiprocessing.pool.ApplyResult,
+                ApplyResult,
                 Result,
                 None
             ]: [description]
@@ -238,7 +233,7 @@ class Q:
                 # Execute boolean query
                 print("Getting results from database", end="\n\n")
                 api_response: Union[
-                    QueryCreatedData, multiprocessing.pool.ApplyResult
+                    QueryCreatedData, ApplyResult
                 ] = api_instance.boolean_query(
                     self.query,
                     version=version,
@@ -247,7 +242,7 @@ class Q:
                     async_req=async_call,
                 )
 
-                if isinstance(api_response, multiprocessing.pool.ApplyResult):
+                if isinstance(api_response, ApplyResult):
                     print("Waiting for results")
                     while api_response.ready() is False:
                         api_response.wait(10000)
@@ -255,22 +250,16 @@ class Q:
 
                 if dry_run is True:
                     return api_response
-                warnings.formatwarning(
-                    message="Insecure Request Warning you are seeing this because you python install dose not have a ssl pem file in the openssl module please look at our readthedocs to see a fix",
-                    category=InsecureRequestWarning,
-                    filename=__name__ + ".py",
-                    lineno=4,
-                )
 
                 return get_query_result(
                     api_instance, api_response.query_id, offset, limit
                 )
         except ServiceException as httpError:
             if httpError.body is not None:
-                logging.error(
+                logError(
                     f"""
                 Http Status: {httpError.status}
-                Error Message: {json.loads(httpError.body)["message"]}
+                Error Message: {loads(httpError.body)["message"]}
                 """
                 )
 

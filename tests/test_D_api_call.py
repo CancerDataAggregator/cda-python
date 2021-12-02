@@ -8,6 +8,3 @@ def test_call_api():
     r = q.run(verify=False)
     print(r)
     assert isinstance(r.sql, str) is True
-
-
-test_call_api()

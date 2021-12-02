@@ -20,7 +20,7 @@ def find_ssl_path() -> bool:
     """[summary]
     This will look in your local computer for a ssl pem file and
     return True or False if the file is there.
-    if value is False Q will accept any TLS certificate presented by a server, 
+    if value is False Q will accept any TLS certificate presented by a server,
     and will ignore hostname mismatches and expired certificates
     Returns:
         bool: [description]
