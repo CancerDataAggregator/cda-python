@@ -22,6 +22,8 @@ from cda_client.model.query_created_data import QueryCreatedData
 from cdapython.constantVariables import table_version, default_table, project_name
 
 logging.captureWarnings(InsecureRequestWarning)
+
+
 class Q:
     """
     Q lang is Language used to send query to the cda service
@@ -94,7 +96,6 @@ class Q:
             [type]: [description]
         """
 
-        tmp_configuration: Configuration = Configuration(host=host)
         if (
             "create table" in sql.lower()
             or "delete from" in sql.lower()
@@ -107,6 +108,8 @@ class Q:
 
         if host is None:
             host = const.CDA_API_URL
+
+        tmp_configuration: Configuration = Configuration(host=host)
 
         if verify is None:
             tmp_configuration.verify_ssl = find_ssl_path()
@@ -127,6 +130,42 @@ class Q:
         except Exception as e:
             print(e)
         return None
+
+    @staticmethod
+    def bulk_download(
+        version: Optional[str] = table_version,
+        host: Optional[str] = None,
+        dry_run: bool = False,
+        table: Optional[str] = default_table,
+        async_call: bool = False,
+        verify: Optional[bool] = None,
+        offset: int = 0,
+        limit: int = 100,
+    ):
+
+        if host is None:
+            host = const.CDA_API_URL
+
+        tmp_configuration: Configuration = Configuration(host=host)
+
+        if verify is None:
+            tmp_configuration.verify_ssl = find_ssl_path()
+
+        if verify is False:
+            unverfiedHttp()
+            tmp_configuration.verify_ssl = False
+
+        cda_client_obj = ApiClient(configuration=tmp_configuration)
+        try:
+
+            with cda_client_obj as api_client:
+                api_instance = QueryApi(api_client)
+                api_response = api_instance.bulk_data(version)
+            if dry_run is True:
+                return api_response
+            return get_query_result(api_instance, api_response.query_id, offset, limit)
+        except Exception as e:
+            print(e)
 
     @staticmethod
     def statusbigquery() -> str:

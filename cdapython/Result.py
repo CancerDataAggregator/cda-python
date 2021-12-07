@@ -1,5 +1,5 @@
 import pprint as pp
-from typing import Dict, Optional
+from typing import Counter, Dict, Optional
 from .decorators_cache import lru_cache_timed
 import json
 from cda_client.model.query_response_data import QueryResponseData
@@ -30,6 +30,7 @@ class Result:
         Offset: {self._offset}
         Count: {self.count}
         Total Row Count: {self.total_row_count}
+        {self.countResult}
         More pages: {self.has_next_page}
         """
 
@@ -40,8 +41,21 @@ class Result:
         Offset: {self._offset}
         Count: {self.count}
         Total Row Count: {self.total_row_count}
+        {self.countResult}
         More pages: {self.has_next_page}
         """
+
+    @property
+    def countResult(self) -> str:
+        dic = Counter(
+            [
+                identifier["system"]
+                for patient in self._api_response.result
+                for file in patient["File"]
+                for identifier in file["identifier"]
+            ]
+        )
+        return f"GDC Count: {dic['GDC']} \n \tPDC Count: {dic['PDC']} \n \tIDC Count: {dic['IDC']}"
 
     @property
     def sql(self) -> str:
@@ -88,7 +102,6 @@ class Result:
         return get_query_result(self._api_instance, self._query_id, _offset, _limit)
 
 
-@lru_cache_timed(seconds=10)
 def get_query_result(
     api_instance: QueryApi,
     query_id: str,
