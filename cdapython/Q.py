@@ -24,6 +24,22 @@ from cdapython.constantVariables import table_version, default_table, project_na
 logging.captureWarnings(InsecureRequestWarning)
 
 
+def builderApiClient(host: Optional[str], verify: Optional[bool]) -> Configuration:
+    if host is None:
+        host = const.CDA_API_URL
+
+    tmp_configuration: Configuration = Configuration(host=host)
+
+    if verify is None:
+        tmp_configuration.verify_ssl = find_ssl_path()
+
+    if verify is False:
+        unverfiedHttp()
+        tmp_configuration.verify_ssl = False
+
+    return tmp_configuration
+
+
 class Q:
     """
     Q lang is Language used to send query to the cda service
@@ -106,18 +122,7 @@ class Q:
         if project_name is not None and sql.find(project_name) == -1:
             raise Exception("Your database is outside of the project")
 
-        if host is None:
-            host = const.CDA_API_URL
-
-        tmp_configuration: Configuration = Configuration(host=host)
-
-        if verify is None:
-            tmp_configuration.verify_ssl = find_ssl_path()
-
-        if verify is False:
-            unverfiedHttp()
-            tmp_configuration.verify_ssl = False
-        cda_client_obj = ApiClient(configuration=tmp_configuration)
+        cda_client_obj = ApiClient(configuration=builderApiClient(host, verify))
         try:
 
             with cda_client_obj as api_client:
@@ -142,27 +147,25 @@ class Q:
         offset: int = 0,
         limit: int = 100,
     ):
-
-        if host is None:
-            host = const.CDA_API_URL
-
-        tmp_configuration: Configuration = Configuration(host=host)
-
-        if verify is None:
-            tmp_configuration.verify_ssl = find_ssl_path()
-
-        if verify is False:
-            unverfiedHttp()
-            tmp_configuration.verify_ssl = False
-
-        cda_client_obj = ApiClient(configuration=tmp_configuration)
+        cda_client_obj = ApiClient(
+            configuration=builderApiClient(host=host, verify=verify)
+        )
         try:
 
             with cda_client_obj as api_client:
                 api_instance = QueryApi(api_client)
-                api_response = api_instance.bulk_data(version)
+                api_response = api_instance.bulk_data(
+                    version=version, async_req=async_call
+                )
+
             if dry_run is True:
                 return api_response
+
+            if isinstance(api_response, ApplyResult):
+                print("Waiting for results")
+                while api_response.ready() is False:
+                    api_response.wait(10000)
+                api_response = api_response.get()
             return get_query_result(api_instance, api_response.query_id, offset, limit)
         except Exception as e:
             print(e)
@@ -193,18 +196,10 @@ class Q:
         Returns:
             object: [description]
         """
-        tmp_configuration: Configuration = Configuration(host=host)
 
-        if host is None:
-            host = const.CDA_API_URL
-
-        if verify is None:
-            tmp_configuration.verify_ssl = find_ssl_path()
-
-        if verify is False:
-            unverfiedHttp()
-            tmp_configuration.verify_ssl = False
-        cda_client_obj = ApiClient(configuration=tmp_configuration)
+        cda_client_obj = ApiClient(
+            configuration=builderApiClient(host=host, verify=verify)
+        )
         try:
             with cda_client_obj as api_client:
                 api_instance = QueryApi(api_client)
@@ -228,7 +223,7 @@ class Q:
         table: Optional[str] = default_table,
         async_call: bool = False,
         verify: Optional[bool] = None,
-    ) -> Union[QueryCreatedData, ApplyResult, Result, None]:
+    ) -> Optional[Result]:
 
         """[summary]
 
@@ -258,15 +253,10 @@ class Q:
                 None
             ]: [description]
         """
-        tmp_configuration: Configuration = Configuration(host=host)
-        if host is None:
-            host = const.CDA_API_URL
-        if verify is None:
-            tmp_configuration.verify_ssl = find_ssl_path()
-        if verify is False:
-            unverfiedHttp()
-            tmp_configuration.verify_ssl = False
-        cda_client_obj = ApiClient(configuration=tmp_configuration)
+
+        cda_client_obj = ApiClient(
+            configuration=builderApiClient(host=host, verify=verify)
+        )
 
         try:
             with cda_client_obj as api_client:

@@ -1,5 +1,5 @@
 import pprint as pp
-from typing import Counter, Dict, Optional
+from typing import Counter, Dict, List, Optional, Union
 from .decorators_cache import lru_cache_timed
 import json
 from cda_client.model.query_response_data import QueryResponseData
@@ -74,10 +74,20 @@ class Result:
         if isinstance(self._offset, int) and isinstance(self._limit, int):
             return (self._offset + self._limit) <= self.total_row_count
         return None
+    
+    def __len__(self):
+        return self.count
 
-    def __getitem__(self, idx: int) -> Dict[str, Optional[str]]:
-        return self._api_response.result[idx]
-
+    def __getitem__(self, idx:Union[int, slice]) -> Union[Dict[str, Optional[str] ] , List[dict]]:
+        if isinstance(idx, int):
+            if idx < 0:
+                idx = self.count + idx
+            return self._api_response.result[idx]
+        else:
+            # for slicing result
+            start, stop, step = idx.indices(self.count)
+            rangeIndex = range(start, stop, step)
+            return [self._api_response.result[i] for i in rangeIndex]
     def __iter__(self):
         return iter(self._api_response.result)
 

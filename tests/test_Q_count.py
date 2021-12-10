@@ -1,5 +1,6 @@
 from cdapython import Q
-import sys
+from collections import Counter
+import pandas as pd
 
 sex = Q('sex = "female"')
 cancer = Q('ResearchSubject.primary_disease_type = "Breast Invasive Carcinoma"')
@@ -8,12 +9,8 @@ ageU = Q("days_to_birth >= -45*365")
 
 q1 = sex.And(cancer.And(ageL.And(ageU)))
 
-r1 = q1.run()
-tmp = r1[0]
-# sleep(11)
-print("cache")
-r2 = q1.run()
 
-print(sys.getsizeof(r2))
+r3 = q1.run(host="http://localhost:8080")
 
-# r2.pretty_print(0)
+
+print(r3)

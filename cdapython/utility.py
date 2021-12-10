@@ -18,9 +18,9 @@ from .decorators_cache import lru_cache_timed
 
 
 logging.captureWarnings(InsecureRequestWarning)
+
+
 # This is added for Type Checking classs to remove a circular import)
-
-
 if TYPE_CHECKING:
     from cdapython.Q import Q
 
