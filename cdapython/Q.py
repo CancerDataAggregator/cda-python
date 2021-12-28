@@ -147,6 +147,21 @@ class Q:
         offset: int = 0,
         limit: int = 100,
     ):
+        """[summary]
+
+        Args:
+            version (Optional[str], optional): [description]. Defaults to table_version.
+            host (Optional[str], optional): [description]. Defaults to None.
+            dry_run (bool, optional): [description]. Defaults to False.
+            table (Optional[str], optional): [description]. Defaults to default_table.
+            async_call (bool, optional): [description]. Defaults to False.
+            verify (Optional[bool], optional): [description]. Defaults to None.
+            offset (int, optional): [description]. Defaults to 0.
+            limit (int, optional): [description]. Defaults to 100.
+
+        Returns:
+            [Result | None]: [This will return a Result class]
+        """
         cda_client_obj = ApiClient(
             configuration=builderApiClient(host=host, verify=verify)
         )
@@ -212,7 +227,7 @@ class Q:
         except Exception as e:
             print(e)
 
-    @measure
+    @measure()
     def run(
         self,
         offset: int = 0,
@@ -223,37 +238,24 @@ class Q:
         table: Optional[str] = default_table,
         async_call: bool = False,
         verify: Optional[bool] = None,
+        verbose: Optional[bool] = True,
     ) -> Optional[Result]:
-
-        """[summary]
-
-        Args:
-            offset (int, optional): [description].
-            Defaults to 0.
-            limit (int, optional): [description].
-            Defaults to 100.
-            version (Optional[str], optional): [description].
-            Defaults to table_version.
-            host (Optional[str], optional): [description].
-            Defaults to None.
-            dry_run (bool, optional): [description].
-            'Defaults to False.
-            table (Optional[str], optional): [description].
-            Defaults to default_table.
-            async_call (bool, optional): [description].
-            Defaults to False.
-            verify (Optional[bool], optional): [description].
-            Defaults to None.
-
-        Returns:
-            Union[
-                QueryCreatedData,
-                ApplyResult,
-                Result,
-                None
-            ]: [description]
         """
 
+        Args:
+            offset (int, optional): [description]. Defaults to 0.
+            limit (int, optional): [description]. Defaults to 100.
+            version (Optional[str], optional): [description]. Defaults to table_version.
+            host (Optional[str], optional): [description]. Defaults to None.
+            dry_run (bool, optional): [description]. Defaults to False.
+            table (Optional[str], optional): [description]. Defaults to default_table.
+            async_call (bool, optional): [description]. Defaults to False.
+            verify (Optional[bool], optional): [description]. Defaults to None.
+            verbose (Optional[bool], optional): [Turn on logs]. Defaults to True.
+
+        Returns:
+            Optional[Result]: [description]
+        """
         cda_client_obj = ApiClient(
             configuration=builderApiClient(host=host, verify=verify)
         )
@@ -262,7 +264,8 @@ class Q:
             with cda_client_obj as api_client:
                 api_instance = QueryApi(api_client)
                 # Execute boolean query
-                print("Getting results from database", end="\n\n")
+                if verbose:
+                    print("Getting results from database", end="\n\n")
                 api_response: Union[
                     QueryCreatedData, ApplyResult
                 ] = api_instance.boolean_query(
@@ -274,7 +277,8 @@ class Q:
                 )
 
                 if isinstance(api_response, ApplyResult):
-                    print("Waiting for results")
+                    if verbose:
+                        print("Waiting for results")
                     while api_response.ready() is False:
                         api_response.wait(10000)
                     api_response = api_response.get()
@@ -283,7 +287,7 @@ class Q:
                     return api_response
 
                 return get_query_result(
-                    api_instance, api_response.query_id, offset, limit
+                    api_instance, api_response.query_id, offset, limit, async_call
                 )
         except ServiceException as httpError:
             if httpError.body is not None:

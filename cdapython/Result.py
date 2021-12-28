@@ -1,9 +1,12 @@
-import pprint as pp
+from multiprocessing.pool import ApplyResult
 from typing import Counter, Dict, List, Optional, Union
-from .decorators_cache import lru_cache_timed
+
+import numpy
+from cdapython.decorators_cache import lru_cache_timed
 import json
 from cda_client.model.query_response_data import QueryResponseData
 from cda_client.api.query_api import QueryApi
+from pandas import DataFrame
 
 
 class Result:
@@ -74,11 +77,23 @@ class Result:
         if isinstance(self._offset, int) and isinstance(self._limit, int):
             return (self._offset + self._limit) <= self.total_row_count
         return None
-    
+
+    def to_DataFrame(self) -> Union[DataFrame, None]:
+        """[summary]
+        Creates a pandas DataFrame for the Results
+
+        Returns:
+            DataFrame: [description]
+        """
+
+        return DataFrame(numpy.array([i for i in self._api_response.result]))
+
     def __len__(self):
         return self.count
 
-    def __getitem__(self, idx:Union[int, slice]) -> Union[Dict[str, Optional[str] ] , List[dict]]:
+    def __getitem__(
+        self, idx: Union[int, slice]
+    ) -> Union[Dict[str, Optional[str]], List[dict]]:
         if isinstance(idx, int):
             if idx < 0:
                 idx = self.count + idx
@@ -88,6 +103,7 @@ class Result:
             start, stop, step = idx.indices(self.count)
             rangeIndex = range(start, stop, step)
             return [self._api_response.result[i] for i in rangeIndex]
+
     def __iter__(self):
         return iter(self._api_response.result)
 
@@ -112,12 +128,15 @@ class Result:
         return get_query_result(self._api_instance, self._query_id, _offset, _limit)
 
 
+@lru_cache_timed(10)
 def get_query_result(
     api_instance: QueryApi,
     query_id: str,
     offset: int,
     limit: int,
-) -> Result:
+    async_req: bool,
+    pre_stream: bool = True,
+) -> Optional[Result]:
     """[summary]
     This will call the next query and wait for the result then return a Result object to the user.
     Args:
@@ -130,6 +149,18 @@ def get_query_result(
         Result: [description]
     """
     while True:
-        response = api_instance.query(id=query_id, offset=offset, limit=limit)
+        response = api_instance.query(
+            id=query_id,
+            offset=offset,
+            limit=limit,
+            async_req=async_req,
+            _preload_content=pre_stream,
+        )
+
+        if isinstance(response, ApplyResult):
+            response = response.get()
+            # for chunk in response.stream(32):
+            #     print(bytes(chunk).decode("utf-8"))
+
         if response.total_row_count is not None:
             return Result(response, query_id, offset, limit, api_instance)
