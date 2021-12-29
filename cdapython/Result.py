@@ -125,7 +125,14 @@ class Result:
         return self._get_result(_offset, _limit)
 
     def _get_result(self, _offset: int, _limit: int):
-        return get_query_result(self._api_instance, self._query_id, _offset, _limit)
+        return get_query_result(
+            self._api_instance, 
+            self._query_id, 
+            _offset, 
+            _limit,
+            async_req=False,
+            pre_stream=True
+            )
 
 
 @lru_cache_timed(10)
@@ -138,15 +145,17 @@ def get_query_result(
     pre_stream: bool = True,
 ) -> Optional[Result]:
     """[summary]
-    This will call the next query and wait for the result then return a Result object to the user.
+        This will call the next query and wait for the result then return a Result object to the user.
     Args:
-        api_instance (cda_client.api.query_api.QueryApi): [description]
+        api_instance (QueryApi): [description]
         query_id (str): [description]
         offset (int): [description]
         limit (int): [description]
+        async_req (bool): [description]
+        pre_stream (bool, optional): [description]. Defaults to True.
 
     Returns:
-        Result: [description]
+        Optional[Result]: [returns a class Result Object]
     """
     while True:
         response = api_instance.query(

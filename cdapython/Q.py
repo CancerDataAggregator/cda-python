@@ -92,7 +92,9 @@ class Q:
         dry_run: bool = False,
         offset: int = 0,
         limit: int = 100,
+        async_call: bool = False,
         verify: Optional[bool] = None,
+        verbose: Optional[bool] = True,
     ) -> Optional[Result]:
         """[summary]
 
@@ -102,14 +104,16 @@ class Q:
             dry_run (bool, optional): [description]. Defaults to False.
             offset (int, optional): [description]. Defaults to 0.
             limit (int, optional): [description]. Defaults to 100.
-            verify (Optional[bool], optional): [description].
-            Defaults to None.
+            async_call (bool, optional): [description]. Defaults to False.
+            verify (Optional[bool], optional): [description]. Defaults to None.
+            verbose (Optional[bool], optional): [description]. Defaults to True.
 
         Raises:
             Exception: [description]
+            Exception: [description]
 
         Returns:
-            [type]: [description]
+            Optional[Result]: [description]
         """
 
         if (
@@ -130,7 +134,10 @@ class Q:
                 api_response = api_instance.sql_query(sql)
             if dry_run is True:
                 return api_response
-            return get_query_result(api_instance, api_response.query_id, offset, limit)
+
+            return get_query_result(
+                api_instance, api_response.query_id, offset, limit, async_call
+            )
 
         except Exception as e:
             print(e)
@@ -177,11 +184,15 @@ class Q:
                 return api_response
 
             if isinstance(api_response, ApplyResult):
+
                 print("Waiting for results")
                 while api_response.ready() is False:
                     api_response.wait(10000)
                 api_response = api_response.get()
-            return get_query_result(api_instance, api_response.query_id, offset, limit)
+
+            return get_query_result(
+                api_instance, api_response.query_id, offset, limit, async_call
+            )
         except Exception as e:
             print(e)
 

@@ -79,6 +79,8 @@ def unique_terms(
     host: Optional[str] = None,
     table: Optional[str] = None,
     verify: Optional[bool] = None,
+    async_req:Optional[bool] = None,
+    pre_stream: bool = True
 ) -> Optional[List[Any]]:
     """[summary]
 
@@ -89,6 +91,8 @@ def unique_terms(
         host (Optional[str], optional): [description]. Defaults to None.
         table (Optional[str], optional): [description]. Defaults to None.
         verify (Optional[bool], optional): [description]. Defaults to None.
+        async_req (Optional[bool], optional): [description]. Defaults to None.
+        pre_stream (bool, optional): [description]. Defaults to True.
 
     Returns:
         Optional[List[Any]]: [description]
@@ -107,6 +111,9 @@ def unique_terms(
     if table is None and isinstance(const.default_table, str):
         table = DEFAULT_TABLE
 
+    if async_req is None:
+        async_req = False
+
     version = table_white_list(table, table_version)
     cda_client_obj = cda_client.ApiClient(configuration=tmp_configuration)
     try:
@@ -121,7 +128,11 @@ def unique_terms(
 
             # Execute query
             query_result = get_query_result(
-                api_instance, api_response.query_id, 0, limit
+                api_instance, 
+                api_response.query_id, 
+                0, 
+                limit, 
+                async_req
             )
             unique_array = np.array([list(t.values())[0] for t in query_result])
             return unique_array.tolist()
@@ -140,7 +151,9 @@ def columns(
     limit: int = 100,
     table: Optional[str] = None,
     verify: Optional[bool] = None,
-) -> Optional[List[Any]]:
+    async_req:Optional[bool] = None,
+    pre_stream: bool = True
+) -> Optional[object]:
     """[summary]
 
     Args:
@@ -149,9 +162,11 @@ def columns(
         limit (int, optional): [description]. Defaults to 100.
         table (Optional[str], optional): [description]. Defaults to None.
         verify (Optional[bool], optional): [description]. Defaults to None.
+        async_req (Optional[bool], optional): [description]. Defaults to None.
+        pre_stream (bool, optional): [description]. Defaults to True.
 
     Returns:
-        Optional[List[Any]]: [description]
+        Optional[object]: [description]
     """
 
     tmp_configuration: cda_client.Configuration = cda_client.Configuration(host=host)
@@ -168,6 +183,9 @@ def columns(
     if table is None and isinstance(const.default_table, str):
         table = DEFAULT_TABLE
 
+    if async_req is None:
+        async_req = False
+
     version = table_white_list(table, version)
     cda_client_obj = cda_client.ApiClient(configuration=tmp_configuration)
 
@@ -176,7 +194,11 @@ def columns(
             api_instance = QueryApi(api_client)
             api_response = api_instance.columns(version=version, table=table)
             query_result = get_query_result(
-                api_instance, api_response.query_id, 0, limit
+                api_instance,
+                api_response.query_id,
+                0,
+                limit,
+                async_req
             )
             column_array = np.array([list(t.values())[0] for t in query_result])
             return column_array.tolist()
