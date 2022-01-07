@@ -48,11 +48,11 @@ class Result:
         More pages: {self.has_next_page}
         """
 
-    def filter(self, filter_key: str, check: Optional[str]) -> list:
+    def filter(self, filter_key: str, check: Optional[str] = None) -> list:
         data = []
         for item in self._api_response.result:
             for i in item[filter_key]:
-                if check in i.values():
+                if check in i.values() or check is None:
                     data.append(i)
         return data
 
