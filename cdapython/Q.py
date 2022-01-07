@@ -20,7 +20,8 @@ from cda_client.api.query_api import QueryApi
 from cda_client import ApiClient, Configuration
 from cda_client.model.query_created_data import QueryCreatedData
 from cdapython.constantVariables import table_version, default_table, project_name
-
+from time import sleep
+import pandas as pd
 logging.captureWarnings(InsecureRequestWarning)
 
 
@@ -170,7 +171,8 @@ class Q:
             [Result | None]: [This will return a Result class]
         """
         cda_client_obj = ApiClient(
-            configuration=builderApiClient(host=host, verify=verify)
+            configuration=builderApiClient(host=host, verify=verify),
+            pool_threads = 2
         )
         try:
 
@@ -189,11 +191,30 @@ class Q:
                 while api_response.ready() is False:
                     api_response.wait(10000)
                 api_response = api_response.get()
-
-            return get_query_result(
-                api_instance, api_response.query_id, offset, limit, async_call
+            
+            r =  get_query_result(
+                api_instance, 
+                api_response.query_id, 
+                offset, 
+                limit, 
+                async_call
             )
+            
+            
+            data = []
+            count = 0
+            while r.has_next_page is True:
+                count += r.count
+                print(f"Row {count} out of {r.total_row_count} {int((count/r.total_row_count)*100)}%")
+                sleep(1)
+                data.extend(r)
+                r.next_page()
+            df = pd.DataFrame(data=data)
+            df.to_csv("test.tsv", "\t")
+            return df
         except Exception as e:
+            df = pd.DataFrame(data)
+            df.to_csv("error.tsv", "\t")
             print(e)
 
     @staticmethod

@@ -48,6 +48,22 @@ class Result:
         More pages: {self.has_next_page}
         """
 
+    def filter(self, filter_key: str, check: Optional[str]) -> list:
+        data = []
+        for item in self._api_response.result:
+            for i in item[filter_key]:
+                if check in i.values():
+                    data.append(i)
+        return data
+
+    def __contains__(self, value):
+        exist = False
+        for item in self._api_response.result:
+            if value in item.values():
+                exist = True
+
+        return exist
+
     @property
     def countResult(self) -> str:
         dic = Counter(
@@ -88,6 +104,13 @@ class Result:
 
         return DataFrame(numpy.array([i for i in self._api_response.result]))
 
+    def stream(self):
+        box = []
+        while self.has_next_page:
+            box.append(self)
+            yield self.next_page()
+        return box
+
     def __len__(self):
         return self.count
 
@@ -110,32 +133,26 @@ class Result:
     def pretty_print(self, idx: int):
         print(json.dumps(self[idx], indent=4))
 
-    def next_page(self, limit: Optional[int] = None):
+    def next_page(self, limit: Optional[int] = None, async_req=False, pre_stream=True):
         if not self.has_next_page:
             raise StopIteration
         if isinstance(self._offset, int) and isinstance(self._limit, int):
             _offset = self._offset + self._limit
             _limit = limit or self._limit
-            return self._get_result(_offset, _limit)
+            return self._get_result(_offset, _limit, async_req, pre_stream)
 
-    def prev_page(self, limit=None):
+    def prev_page(self, limit=None, async_req=False, pre_stream=True):
         _offset = self._offset - self._limit
         _offset = max(0, _offset)
         _limit = limit or self._limit
-        return self._get_result(_offset, _limit)
+        return self._get_result(_offset, _limit, async_req, pre_stream)
 
-    def _get_result(self, _offset: int, _limit: int):
+    def _get_result(self, _offset: int, _limit: int, async_req=False, pre_stream=True):
         return get_query_result(
-            self._api_instance, 
-            self._query_id, 
-            _offset, 
-            _limit,
-            async_req=False,
-            pre_stream=True
-            )
+            self._api_instance, self._query_id, _offset, _limit, async_req, pre_stream
+        )
 
 
-@lru_cache_timed(10)
 def get_query_result(
     api_instance: QueryApi,
     query_id: str,

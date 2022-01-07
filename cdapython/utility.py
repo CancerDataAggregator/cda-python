@@ -124,6 +124,7 @@ def unique_terms(
                 body=col_name,
                 system=str(system),
                 table=table,
+                
             )
 
             # Execute query
