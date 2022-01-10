@@ -48,12 +48,32 @@ class Result:
         More pages: {self.has_next_page}
         """
 
-    def filter(self, filter_key: str, check: Optional[str] = None) -> list:
+    def filter(self, filter_key: str, check: Optional[str] = None, to_DF:Optional[bool] = False):
+        """[summary]
+         This method will filter results based on item keys 
+         
+        Args:
+            filter_key (str): searchs on id, identifier, sex, race, ethnicity, days_to_birth subject_associated_project, File, ResearchSubject
+            check (Optional[str], optional): [description]. Defaults to None.
+            to_DF (Optional[bool], optional): [description]. Defaults to False.
+        Returns:
+            DataFrame | list
+        """
         data = []
+        if filter_key.capitalize() == "Files" or filter_key.lower() == "files":
+            filter_key = "File"
+        if filter_key is None or not filter_key:
+            raise Exception("filter needs to have a value to filter on like id, identifier, sex, race, ethnicity, days_to_birth subject_associated_project,File, ResearchSubject")
         for item in self._api_response.result:
-            for i in item[filter_key]:
-                if check in i.values() or check is None:
-                    data.append(i)
+            if isinstance(item[filter_key], list):
+                for i in item[filter_key]:
+                    if check in i.values() or check is None:
+                        data.append(i)
+            
+            if isinstance(item[filter_key], str):
+                data.append(item[filter_key])
+        if to_DF is True:
+            return DataFrame(numpy.array([i for i in data]))
         return data
 
     def __contains__(self, value):
