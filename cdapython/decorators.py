@@ -14,7 +14,7 @@ class measure:
             try:
                 return func(*args, **kwargs)
             finally:
-                if not "verbose" in self.kwargs or self.kwargs["verbose"] is True:
+                if "verbose" not in self.kwargs or self.kwargs["verbose"] is True:
                     end_ = int(round(time() * 1000)) - start_time
                     print(f"Total execution time: {end_ if end_ > 0 else 0} ms")
 

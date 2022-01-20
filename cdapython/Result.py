@@ -48,10 +48,15 @@ class Result:
         More pages: {self.has_next_page}
         """
 
-    def filter(self, filter_key: str, check: Optional[str] = None, to_DF:Optional[bool] = False):
+    def filter(
+        self,
+        filter_key: str,
+        check: Optional[str] = None,
+        to_DF: Optional[bool] = False,
+    ):
         """[summary]
-         This method will filter results based on item keys 
-         
+         This method will filter results based on item keys
+
         Args:
             filter_key (str): searchs on id, identifier, sex, race, ethnicity, days_to_birth subject_associated_project, File, ResearchSubject
             check (Optional[str], optional): [description]. Defaults to None.
@@ -63,13 +68,15 @@ class Result:
         if filter_key.capitalize() == "Files" or filter_key.lower() == "files":
             filter_key = "File"
         if filter_key is None or not filter_key:
-            raise Exception("filter needs to have a value to filter on like id, identifier, sex, race, ethnicity, days_to_birth subject_associated_project,File, ResearchSubject")
+            raise Exception(
+                "filter needs to have a value to filter on like id, identifier, sex, race, ethnicity, days_to_birth subject_associated_project,File, ResearchSubject"
+            )
         for item in self._api_response.result:
             if isinstance(item[filter_key], list):
                 for i in item[filter_key]:
                     if check in i.values() or check is None:
                         data.append(i)
-            
+
             if isinstance(item[filter_key], str):
                 data.append(item[filter_key])
         if to_DF is True:
@@ -86,6 +93,14 @@ class Result:
 
     @property
     def countResult(self) -> str:
+        # if self._api_response.result
+        if "GDC" in self._api_response.result[0]:
+            text = ""
+            data = self._api_response.result[0]
+            for i in data:
+                text += f"{i} Count: {data[i]} "
+            return f"Total Database Counts of {text},"
+
         dic = Counter(
             [
                 identifier["system"]

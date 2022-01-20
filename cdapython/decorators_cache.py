@@ -1,4 +1,4 @@
-from functools import lru_cache, wraps
+from functools import _lru_cache_wrapper, lru_cache, wraps
 from datetime import datetime, timedelta
 from typing import Callable
 
@@ -7,7 +7,7 @@ def lru_cache_timed(seconds: int, maxsize: int = 128) -> Callable:
     if maxsize is None:
         maxsize = 128
 
-    def wrapper_cache(func: lru_cache):
+    def wrapper_cache(func:lru_cache) -> Callable:
         func = lru_cache(maxsize=maxsize)(func)
         func.lifetime = timedelta(seconds=seconds)
         func.expiration = datetime.utcnow() + func.lifetime

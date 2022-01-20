@@ -9,5 +9,6 @@ tumors = Q('ResearchSubject.Specimen.source_material_type = "Primary Tumor"')
 
 q = normals.From(tumors.And(brca.And(bams.And(female.And(age1.And(age2))))))
 r = q.run(host="http://localhost:8080")
+print(r)
 data = r.filter("files", to_DF=True)
 print(data.head())

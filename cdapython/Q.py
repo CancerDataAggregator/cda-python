@@ -2,7 +2,7 @@ from json import loads
 from logging import error as logError
 import logging
 from multiprocessing.pool import ApplyResult
-from typing import Optional
+from typing import Optional, List
 from urllib3.exceptions import InsecureRequestWarning, SSLError
 from cdapython.Result import Result, get_query_result
 from cdapython.functions import col, quoted, unquoted
@@ -46,7 +46,7 @@ class Q:
     Q lang is Language used to send query to the cda service
     """
 
-    def __init__(self, *args: Union[str, Query]) -> None:
+    def __init__(self, *args: Union[str, Query,None]) -> None:
         """
 
         Args:
@@ -191,17 +191,19 @@ class Q:
                 while api_response.ready() is False:
                     api_response.wait(10000)
                 api_response = api_response.get()
-            
+
             r =  get_query_result(
-                api_instance, 
-                api_response.query_id, 
-                offset, 
-                limit, 
+                api_instance,
+                api_response.query_id,
+                offset,
+                limit,
                 async_call
             )
-            
-            
-            data = []
+            if r is None:
+                return None
+
+            data: List[Result] = []
+
             count = 0
             while r.has_next_page is True:
                 count += r.count
@@ -218,7 +220,7 @@ class Q:
             print(e)
 
     @staticmethod
-    def statusbigquery() -> str:
+    def bigquery_status() -> str:
         """[summary]
         Uses the cda_client library's MetaClass to get status check on the cda
         BigQuery table
@@ -226,9 +228,40 @@ class Q:
             str: status messages
         """
         return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
+    
+    @staticmethod
+    def global_counts(
+        host: Optional[str] = None, 
+        verify: Optional[bool] = None,
+        version: Optional[str] = table_version,
+        table: Optional[str] = default_table,
+        offset: int = 0,
+        limit: int = 1,
+        async_call: bool = False,
+        dry_run: Optional[bool] = False
+        ):
+        cda_client_obj = ApiClient(
+            configuration=builderApiClient(host=host, verify=verify)
+        )
+        try:
+
+            with cda_client_obj as api_client:
+                api_instance = QueryApi(api_client)
+                api_response = api_instance.global_counts(table=table,version=version)
+            if dry_run is True:
+                return api_response
+
+            return get_query_result(
+                api_instance, api_response.query_id, offset, limit, async_call
+            )
+
+        except Exception as e:
+            print(e)
+        return None
+
 
     @staticmethod
-    def queryjobstatus(
+    def query_job_status(
         id: str, host: Optional[str] = None, verify: Optional[bool] = None
     ):
         """[summary]

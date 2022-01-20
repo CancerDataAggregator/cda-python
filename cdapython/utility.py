@@ -79,8 +79,8 @@ def unique_terms(
     host: Optional[str] = None,
     table: Optional[str] = None,
     verify: Optional[bool] = None,
-    async_req:Optional[bool] = None,
-    pre_stream: bool = True
+    async_req: Optional[bool] = None,
+    pre_stream: bool = True,
 ) -> Optional[List[Any]]:
     """[summary]
 
@@ -97,10 +97,12 @@ def unique_terms(
     Returns:
         Optional[List[Any]]: [description]
     """
-    tmp_configuration: cda_client.Configuration = cda_client.Configuration(host=host)
+
     if host is None:
         host = const.CDA_API_URL
-
+    
+    tmp_configuration: cda_client.Configuration = cda_client.Configuration(host=host)
+    
     if verify is None:
         tmp_configuration.verify_ssl = find_ssl_path()
 
@@ -124,17 +126,16 @@ def unique_terms(
                 body=col_name,
                 system=str(system),
                 table=table,
-                
             )
 
             # Execute query
             query_result = get_query_result(
-                api_instance, 
-                api_response.query_id, 
-                0, 
-                limit, 
-                async_req
+                api_instance, api_response.query_id, 0, limit, async_req
             )
+            
+            if query_result is None:
+                return None 
+
             unique_array = np.array([list(t.values())[0] for t in query_result])
             return unique_array.tolist()
     except ServiceException as http_error:
@@ -152,8 +153,8 @@ def columns(
     limit: int = 100,
     table: Optional[str] = None,
     verify: Optional[bool] = None,
-    async_req:Optional[bool] = None,
-    pre_stream: bool = True
+    async_req: Optional[bool] = None,
+    pre_stream: bool = True,
 ) -> Optional[object]:
     """[summary]
 
@@ -170,10 +171,11 @@ def columns(
         Optional[object]: [description]
     """
 
-    tmp_configuration: cda_client.Configuration = cda_client.Configuration(host=host)
     # Execute query
     if host is None:
         host = const.CDA_API_URL
+
+    tmp_configuration: cda_client.Configuration = cda_client.Configuration(host=host)
 
     if verify is None:
         tmp_configuration.verify_ssl = find_ssl_path()
@@ -195,12 +197,12 @@ def columns(
             api_instance = QueryApi(api_client)
             api_response = api_instance.columns(version=version, table=table)
             query_result = get_query_result(
-                api_instance,
-                api_response.query_id,
-                0,
-                limit,
-                async_req
+                api_instance, api_response.query_id, 0, limit, async_req
             )
+
+            if query_result is None:
+                return None
+            
             column_array = np.array([list(t.values())[0] for t in query_result])
             return column_array.tolist()
     except ServiceException as http_error:
