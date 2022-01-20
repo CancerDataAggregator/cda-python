@@ -1,5 +1,5 @@
 
-VERSION = "2021.12.29"
+VERSION = "2022.1.20"
 DATABASETABLE_VERSION = "all_v2"
 DATABASETABLE = "gdc-bq-sample.integration"
 CDA_API_URL_ENV = "https://cda.cda-dev.broadinstitute.org"
