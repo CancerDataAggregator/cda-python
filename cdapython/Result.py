@@ -80,7 +80,7 @@ class Result:
             if isinstance(item[filter_key], str):
                 data.append(item[filter_key])
         if to_DF is True:
-            return DataFrame(numpy.array([i for i in data]))
+            return json_normalize([i for i in data])
         return data
 
     def __contains__(self, value):
