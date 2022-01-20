@@ -6,7 +6,7 @@ from cdapython.decorators_cache import lru_cache_timed
 import json
 from cda_client.model.query_response_data import QueryResponseData
 from cda_client.api.query_api import QueryApi
-from pandas import DataFrame
+from pandas import DataFrame,json_normalize
 
 
 class Result:
@@ -136,8 +136,8 @@ class Result:
         Returns:
             DataFrame: [description]
         """
-
-        return DataFrame(numpy.array([i for i in self._api_response.result]))
+        
+        return json_normalize([i for i in self._api_response.result])
 
     def stream(self):
         box = []
