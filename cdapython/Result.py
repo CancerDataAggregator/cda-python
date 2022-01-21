@@ -81,7 +81,7 @@ class Result:
         Returns:
             DataFrame | list
         """
-        # test = self.__flatten_json(self._api_response.result)
+        test = self.__flatten_json(self._api_response.result)
         data = []
         print(filter_key.find("."))
 
