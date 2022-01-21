@@ -74,12 +74,12 @@ def table_white_list(table: Optional[str], version: Optional[str]) -> Optional[s
 @lru_cache_timed(seconds=10)
 def unique_terms(
     col_name: str,
-    version: str = table_version,
     system: str = "",
     limit: int = 100,
     host: Optional[str] = None,
     table: Optional[str] = None,
     verify: Optional[bool] = None,
+    version: str = table_version,
 ) -> Optional[List[Any]]:
     """[summary]
 
