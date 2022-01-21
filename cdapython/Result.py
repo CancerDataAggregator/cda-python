@@ -2,11 +2,12 @@ from multiprocessing.pool import ApplyResult
 from typing import Counter, Dict, List, Optional, Union
 
 import numpy
+from pyrsistent import v
 from cdapython.decorators_cache import lru_cache_timed
 import json
 from cda_client.model.query_response_data import QueryResponseData
 from cda_client.api.query_api import QueryApi
-from pandas import DataFrame,json_normalize
+from pandas import DataFrame, json_normalize
 
 
 class Result:
@@ -48,6 +49,22 @@ class Result:
         More pages: {self.has_next_page}
         """
 
+    def __flatten_json(self, obj):
+        ret = {}
+
+        def flatten(x, flatten_key=""):
+            if isinstance(x, dict):
+                for current_key in x:
+                    flatten(x[current_key], flatten_key + current_key + "_")
+            elif isinstance(x, list):
+                for index, elem in enumerate(x):
+                    flatten(elem, flatten_key + str(index) + "_")
+            else:
+                ret[flatten_key[:-1]] = x
+
+        flatten(obj)
+        return ret
+
     def filter(
         self,
         filter_key: str,
@@ -64,23 +81,29 @@ class Result:
         Returns:
             DataFrame | list
         """
+        # test = self.__flatten_json(self._api_response.result)
         data = []
+        print(filter_key.find("."))
+
+        if filter_key.find(".") is not -1:
+            filter_key, check = filter_key.split(".")
         if filter_key.capitalize() == "Files" or filter_key.lower() == "files":
             filter_key = "File"
         if filter_key is None or not filter_key:
             raise Exception(
-                "filter needs to have a value to filter on like id, identifier, sex, race, ethnicity, days_to_birth subject_associated_project,File, ResearchSubject"
+                "filter needs to have a value to filter on like id, identifier, sex, race, ethnicity, days_to_birth subject_associated_project,File, ResearchSubject,vital_status,species"
             )
-        for item in self._api_response.result:
-            if isinstance(item[filter_key], list):
-                for i in item[filter_key]:
-                    if check in i.values() or check is None:
-                        data.append(i)
-
-            if isinstance(item[filter_key], str):
-                data.append(item[filter_key])
+        for key, value in test.items():
+            if value is not None:
+                if check is not None:
+                    if check in value:
+                        data.append({key: value})
+                elif key.find(filter_key) is not -1:
+                    data.append({key: value})
         if to_DF is True:
-            return json_normalize([i for i in data])
+            if isinstance(data, list):
+                return json_normalize([i for i in data])
+
         return data
 
     def __contains__(self, value):
@@ -130,14 +153,18 @@ class Result:
         return None
 
     def to_DataFrame(self) -> Union[DataFrame, None]:
+        # test = self.__flatten_json(self._api_response.result)
         """[summary]
         Creates a pandas DataFrame for the Results
 
         Returns:
             DataFrame: [description]
         """
-        
+
+        # return DataFrame.from_dict(test, orient="index")
         return json_normalize([i for i in self._api_response.result])
+
+        
 
     def stream(self):
         box = []
