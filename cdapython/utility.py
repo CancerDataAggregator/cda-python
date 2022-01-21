@@ -74,6 +74,7 @@ def table_white_list(table: Optional[str], version: Optional[str]) -> Optional[s
 @lru_cache_timed(seconds=10)
 def unique_terms(
     col_name: str,
+    version: str = table_version,
     system: str = "",
     limit: int = 100,
     host: Optional[str] = None,
@@ -107,7 +108,8 @@ def unique_terms(
     if table is None and isinstance(const.default_table, str):
         table = DEFAULT_TABLE
 
-    version = table_white_list(table, table_version)
+    version = table_white_list(table, version)
+
     cda_client_obj = cda_client.ApiClient(configuration=tmp_configuration)
     try:
         with cda_client_obj as api_client:
