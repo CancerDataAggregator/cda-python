@@ -1,4 +1,5 @@
 import pprint as pp
+from time import sleep
 from typing import Dict, Optional
 from .decorators_cache import lru_cache_timed
 import json
@@ -107,6 +108,7 @@ def get_query_result(
         Result: [description]
     """
     while True:
+        sleep(2)
         response = api_instance.query(id=query_id, offset=offset, limit=limit)
         if response.total_row_count is not None:
             return Result(response, query_id, offset, limit, api_instance)

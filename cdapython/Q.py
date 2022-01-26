@@ -22,6 +22,8 @@ from cda_client.model.query_created_data import QueryCreatedData
 from cdapython.constantVariables import table_version, default_table, project_name
 
 logging.captureWarnings(InsecureRequestWarning)
+
+
 class Q:
     """
     Q lang is Language used to send query to the cda service
