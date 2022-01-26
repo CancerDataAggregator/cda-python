@@ -4,6 +4,11 @@ This library sits on top of the machine generated
 [CDA Python Client](https://github.com/CancerDataAggregator/cda-service-python-client) and offers some syntactic
 sugar to make it more pleasant to query the CDA.
 
+---
+## Read The Docs
+[CDA Read The Docs](https://cda.readthedocs.io/en/latest/)
+
+---
 # Launch in Binder
 
 To try out the example notebook in [MyBinder.org](https://mybinder.org/)

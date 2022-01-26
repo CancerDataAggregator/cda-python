@@ -47,7 +47,7 @@ def query(text: str) -> "Q":
     return parser(text)
 
 
-def table_white_list(table: Optional[str], version: Optional[str]) -> Optional[str]:
+def table_white_list(table: Optional[str], version: Optional[str]):
     """[summary]
     This checks the allowed list List and Throws a error if there is a table
     not allowed
@@ -62,19 +62,17 @@ def table_white_list(table: Optional[str], version: Optional[str]) -> Optional[s
         str: [description]
     """
     if table is not None and version is not None:
-        if table not in ["cda_mvp", "integration"]:
+        if table not in ["cda_mvp", "integration", "dev"]:
             raise ValueError("Table not in allowlist list")
 
-        if table == "cda_mvp" and version == "all_v1":
+        if table == "cda_mvp" and version == "all_v1_1":
             version = "v3"
         return version
-    return None
 
 
 @lru_cache_timed(seconds=10)
 def unique_terms(
     col_name: str,
-    version:str = table_version,
     system: str = "",
     limit: int = 100,
     host: Optional[str] = None,
@@ -82,6 +80,7 @@ def unique_terms(
     verify: Optional[bool] = None,
     async_req: Optional[bool] = None,
     pre_stream: bool = True,
+    version: Optional[str] = table_version,
 ) -> Optional[List[Any]]:
     """[summary]
 
@@ -101,9 +100,9 @@ def unique_terms(
 
     if host is None:
         host = const.CDA_API_URL
-    
+
     tmp_configuration: cda_client.Configuration = cda_client.Configuration(host=host)
-    
+
     if verify is None:
         tmp_configuration.verify_ssl = find_ssl_path()
 
@@ -118,6 +117,7 @@ def unique_terms(
         async_req = False
 
     version = table_white_list(table, version)
+
     cda_client_obj = cda_client.ApiClient(configuration=tmp_configuration)
     try:
         with cda_client_obj as api_client:
@@ -133,9 +133,9 @@ def unique_terms(
             query_result = get_query_result(
                 api_instance, api_response.query_id, 0, limit, async_req
             )
-            
+
             if query_result is None:
-                return None 
+                return None
 
             unique_array = np.array([list(t.values())[0] for t in query_result])
             return unique_array.tolist()
@@ -203,7 +203,7 @@ def columns(
 
             if query_result is None:
                 return None
-            
+
             column_array = np.array([list(t.values())[0] for t in query_result])
             return column_array.tolist()
     except ServiceException as http_error:
