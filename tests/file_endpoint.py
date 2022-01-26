@@ -2,7 +2,7 @@ from cdapython import Q
 import sys
 
 sex = Q('sex = "female"')
-cancer = Q('ResearchSubject.primary_disease_type = "Breast Invasive Carcinoma"')
+cancer = Q('ResearchSubject.primary_diagnosis_condition = "Breast Invasive Carcinoma"')
 ageL = Q("days_to_birth <= -30*365")
 ageU = Q("days_to_birth >= -45*365")
 
