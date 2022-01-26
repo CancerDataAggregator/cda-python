@@ -47,7 +47,7 @@ def query(text: str) -> "Q":
     return parser(text)
 
 
-def table_white_list(table: Optional[str], version: Optional[str]) -> Optional[str]:
+def table_white_list(table: Optional[str], version: Optional[str]):
     """[summary]
     This checks the allowed list List and Throws a error if there is a table
     not allowed
@@ -62,13 +62,12 @@ def table_white_list(table: Optional[str], version: Optional[str]) -> Optional[s
         str: [description]
     """
     if table is not None and version is not None:
-        if table not in ["cda_mvp", "integration"]:
+        if table not in ["cda_mvp", "integration", "dev"]:
             raise ValueError("Table not in allowlist list")
 
-        if table == "cda_mvp" and version == "all_v1":
+        if table == "cda_mvp" and version == "all_v1_1":
             version = "v3"
         return version
-    return None
 
 
 @lru_cache_timed(seconds=10)
@@ -79,7 +78,7 @@ def unique_terms(
     host: Optional[str] = None,
     table: Optional[str] = None,
     verify: Optional[bool] = None,
-    version: str = table_version,
+    version: Optional[str] = table_version,
 ) -> Optional[List[Any]]:
     """[summary]
 
