@@ -3,10 +3,12 @@ from cdapython.utility import query
 from tdparser.topdown import MissingTokensError
 from cdapython.Q import Q
 from tdparser.lexer import LexerError
-import readline
 
-if TYPE_CHECKING:
-    from cdapython.Q import Q
+try:
+    import readline
+except ImportError:
+    raise ImportError()
+
 
 """[summary]
     add's history to shell in current session
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
 new = True
 
 
-def help():
+def help() -> None:
     print(
         """
         Welcome to Q shell's help utility

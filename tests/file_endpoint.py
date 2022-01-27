@@ -1,8 +1,16 @@
 from cdapython import Q
 
-q1 = Q('ResearchSubject.identifier = "GDC"')
-q2 = Q('ResearchSubject.Specimen.source_material_type = "Primary Tumor"')
-q3 = Q('ResearchSubject.Specimen.source_material_type = "Blood Derived Normal"')
-q = q1.And(q2.Or(q3))
-r = q.run()
-print()
+
+sex = Q('sex = "female"')
+cancer = Q('ResearchSubject.primary_diagnosis_condition = "Breast Invasive Carcinoma"')
+ageL = Q("days_to_birth <= -30*365")
+ageU = Q("days_to_birth >= -45*365")
+
+q1 = sex.And(cancer.And(ageL.And(ageU)))
+
+r1 = q1.run()
+# sleep(11)
+print("cache")
+r2 = q1.run()
+
+# r2.pretty_print(0)

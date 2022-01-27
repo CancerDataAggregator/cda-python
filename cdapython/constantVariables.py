@@ -1,21 +1,11 @@
-from pathlib import Path
-import os
-from typing import Optional
+# Versioning Year Month Day of last push
+VERSION = "2022.1.24"
+DATABASETABLE_VERSION = "all_v2_1"
+DATABASETABLE = "gdc-bq-sample.integration"
+CDA_API_URL_ENV = "https://cda.cda-dev.broadinstitute.org"
 
-from dotenv import load_dotenv
-
-env_path = Path(".") / ".env"
-if env_path.exists() is True:
-    load_dotenv(dotenv_path=env_path)
-else:
-    from os.path import join, dirname
-
-    dotenv_path = join(dirname(__file__), ".env")
-    load_dotenv(dotenv_path)
-
-
-__version__: Optional[str] = os.getenv("VERSION")
-CDA_API_URL: Optional[str] = os.getenv("CDA_API_URL")
-table_version: Optional[str] = os.getenv("DATABASETABLE_VERSION")
-default_table: Optional[str] = os.getenv("DATABASETABLE")
-project_name: Optional[str] = default_table.split(".")[0]
+__version__: str = VERSION
+CDA_API_URL: str = CDA_API_URL_ENV
+table_version: str = DATABASETABLE_VERSION
+default_table: str = DATABASETABLE
+project_name: str = default_table.split(".")[0]
