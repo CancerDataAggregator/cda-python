@@ -14,7 +14,7 @@ from cda_client.exceptions import ServiceException
 from cdapython.functions import find_ssl_path
 from urllib3.connection import NewConnectionError
 from urllib3.connectionpool import MaxRetryError
-from cdapython.errorLogger import unverfiedHttp
+from cdapython.errorLogger import deprecated_values, unverfiedHttp
 from cda_client.model.query import Query
 from cda_client.api.query_api import QueryApi
 from cda_client import ApiClient, Configuration
@@ -46,7 +46,7 @@ class Q:
             
             if _l in convertionMap:
                 tmpL = convertionMap[_l]
-                print(f" This Value {_l} has been deprecated but will be converted it for you in the background please use the new value {tmpL}")
+                deprecated_values(old=_l,new=tmpL)
                 _l = tmpL
 
             _l = col(_l)

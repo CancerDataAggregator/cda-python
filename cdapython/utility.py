@@ -13,7 +13,7 @@ from cda_client.exceptions import ServiceException
 import cdapython.constantVariables as const
 from urllib3.exceptions import InsecureRequestWarning
 
-from cdapython.errorLogger import unverfiedHttp
+from cdapython.errorLogger import deprecated_values, unverfiedHttp
 from .functions import col, find_ssl_path
 from .decorators_cache import lru_cache_timed
 
@@ -113,9 +113,7 @@ def unique_terms(
 
     if col_name in convertionMap:
         tmpL = convertionMap[col_name]
-        print(
-            f" This Value {col_name} has been deprecated but will be converted it for you in the background please use the new value {tmpL}"
-        )
+        deprecated_values(old=col_name,new=tmpL)
         col_name = tmpL
 
     cda_client_obj = cda_client.ApiClient(configuration=tmp_configuration)
