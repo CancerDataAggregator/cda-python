@@ -20,7 +20,7 @@ from cda_client.api.query_api import QueryApi
 from cda_client import ApiClient, Configuration
 from cda_client.model.query_created_data import QueryCreatedData
 from cdapython.constantVariables import table_version, default_table, project_name
-
+from cdapython.ConvertionMap import convertionMap
 logging.captureWarnings(InsecureRequestWarning)
 
 
@@ -43,6 +43,12 @@ class Q:
                 raise RuntimeError("Q statement parse error")
 
             _l, _op, _r = args[0].split(" ", 2)
+            
+            if _l in convertionMap:
+                tmpL = convertionMap[_l]
+                print(f" This Value {_l} has been deprecated but will be converted it for you in the background please use the new value {tmpL}")
+                _l = tmpL
+
             _l = col(_l)
             _r = infer_quote(_r)
         elif len(args) != 3:
