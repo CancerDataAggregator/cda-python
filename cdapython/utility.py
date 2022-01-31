@@ -2,6 +2,7 @@ import logging
 from typing import TYPE_CHECKING, Any, List
 import cda_client
 from cda_client.api.query_api import QueryApi
+from cdapython.ConvertionMap import convertionMap
 from cdapython.Result import get_query_result
 from cdapython.constantVariables import table_version
 from cdapython.Qparser import parser
@@ -12,8 +13,8 @@ from cda_client.exceptions import ServiceException
 import cdapython.constantVariables as const
 from urllib3.exceptions import InsecureRequestWarning
 
-from cdapython.errorLogger import unverfiedHttp
-from .functions import find_ssl_path
+from cdapython.errorLogger import deprecated_values, unverfiedHttp
+from .functions import col, find_ssl_path
 from .decorators_cache import lru_cache_timed
 
 
@@ -94,6 +95,7 @@ def unique_terms(
         Optional[List[Any]]: [description]
     """
     tmp_configuration: cda_client.Configuration = cda_client.Configuration(host=host)
+
     if host is None:
         host = const.CDA_API_URL
 
@@ -108,6 +110,11 @@ def unique_terms(
         table = DEFAULT_TABLE
 
     version = table_white_list(table, version)
+
+    if col_name in convertionMap:
+        tmpL = convertionMap[col_name]
+        deprecated_values(old=col_name,new=tmpL)
+        col_name = tmpL
 
     cda_client_obj = cda_client.ApiClient(configuration=tmp_configuration)
     try:
