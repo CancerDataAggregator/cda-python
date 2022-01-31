@@ -1,9 +1,8 @@
 from multiprocessing.pool import ApplyResult
 from typing import Counter, Dict, List, Optional, Union
-
-import numpy
-from pyrsistent import v
 from cdapython.decorators_cache import lru_cache_timed
+from time import sleep
+from typing import Dict, Optional
 import json
 from cda_client.model.query_response_data import QueryResponseData
 from cda_client.api.query_api import QueryApi
@@ -207,5 +206,7 @@ def get_query_result(
             # for chunk in response.stream(32):
             #     print(bytes(chunk).decode("utf-8"))
 
+        sleep(2)
+        response = api_instance.query(id=query_id, offset=offset, limit=limit)
         if response.total_row_count is not None:
             return Result(response, query_id, offset, limit, api_instance)

@@ -62,6 +62,13 @@ class Q:
 
             _l, _op, _r = args[0].split(" ", 2)
 
+            if _l in convertionMap:
+                tmpL = convertionMap[_l]
+                print(
+                    f" This Value {_l} has been deprecated but will be converted it for you in the background please use the new value {tmpL}"
+                )
+                _l = tmpL
+
             _l = col(_l)
             _r = infer_quote(_r)
         elif len(args) != 3:
