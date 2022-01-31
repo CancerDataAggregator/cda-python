@@ -22,6 +22,7 @@ from cda_client.model.query_created_data import QueryCreatedData
 from cdapython.constantVariables import table_version, default_table, project_name
 from time import sleep
 import pandas as pd
+
 logging.captureWarnings(InsecureRequestWarning)
 
 
@@ -46,7 +47,7 @@ class Q:
     Q lang is Language used to send query to the cda service
     """
 
-    def __init__(self, *args: Union[str, Query,None]) -> None:
+    def __init__(self, *args: Union[str, Query, None]) -> None:
         """
 
         Args:
@@ -60,6 +61,7 @@ class Q:
                 raise RuntimeError("Q statement parse error")
 
             _l, _op, _r = args[0].split(" ", 2)
+
             _l = col(_l)
             _r = infer_quote(_r)
         elif len(args) != 3:
@@ -171,8 +173,7 @@ class Q:
             [Result | None]: [This will return a Result class]
         """
         cda_client_obj = ApiClient(
-            configuration=builderApiClient(host=host, verify=verify),
-            pool_threads = 2
+            configuration=builderApiClient(host=host, verify=verify), pool_threads=2
         )
         try:
 
@@ -192,12 +193,8 @@ class Q:
                     api_response.wait(10000)
                 api_response = api_response.get()
 
-            r =  get_query_result(
-                api_instance,
-                api_response.query_id,
-                offset,
-                limit,
-                async_call
+            r = get_query_result(
+                api_instance, api_response.query_id, offset, limit, async_call
             )
             if r is None:
                 return None
@@ -207,7 +204,9 @@ class Q:
             count = 0
             while r.has_next_page is True:
                 count += r.count
-                print(f"Row {count} out of {r.total_row_count} {int((count/r.total_row_count)*100)}%")
+                print(
+                    f"Row {count} out of {r.total_row_count} {int((count/r.total_row_count)*100)}%"
+                )
                 sleep(1)
                 data.extend(r)
                 r.next_page()
@@ -228,18 +227,18 @@ class Q:
             str: status messages
         """
         return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
-    
+
     @staticmethod
     def global_counts(
-        host: Optional[str] = None, 
+        host: Optional[str] = None,
         verify: Optional[bool] = None,
         version: Optional[str] = table_version,
         table: Optional[str] = default_table,
         offset: int = 0,
         limit: int = 1,
         async_call: bool = False,
-        dry_run: Optional[bool] = False
-        ):
+        dry_run: Optional[bool] = False,
+    ):
         cda_client_obj = ApiClient(
             configuration=builderApiClient(host=host, verify=verify)
         )
@@ -247,7 +246,7 @@ class Q:
 
             with cda_client_obj as api_client:
                 api_instance = QueryApi(api_client)
-                api_response = api_instance.global_counts(table=table,version=version)
+                api_response = api_instance.global_counts(table=table, version=version)
             if dry_run is True:
                 return api_response
 
@@ -258,7 +257,6 @@ class Q:
         except Exception as e:
             print(e)
         return None
-
 
     @staticmethod
     def query_job_status(
@@ -304,6 +302,7 @@ class Q:
         async_call: bool = False,
         verify: Optional[bool] = None,
         verbose: Optional[bool] = True,
+        selecter: Optional[str] = "",
     ) -> Optional[Result]:
         """
 
