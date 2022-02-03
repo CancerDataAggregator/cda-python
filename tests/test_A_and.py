@@ -13,4 +13,3 @@ def test_and_op():
     assert isinstance(r.count, int) is True
 
 
-test_and_op()

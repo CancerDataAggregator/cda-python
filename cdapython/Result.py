@@ -157,8 +157,12 @@ class Result:
     def __iter__(self):
         return iter(self._api_response.result)
 
-    def pretty_print(self, idx: int):
-        print(json.dumps(self[idx], indent=4))
+    def pretty_print(self, idx: Optional[int] = None):
+        if idx is None:
+            for i in range(self.count):
+                print(json.dumps(self[i], indent=4))
+        else:
+            print(json.dumps(self[idx], indent=4))
 
     def next_page(self, limit: Optional[int] = None, async_req=False, pre_stream=True):
         if not self.has_next_page:

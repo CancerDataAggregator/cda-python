@@ -1,5 +1,4 @@
 from cdapython import Q
-from time import sleep
 
 
 def test_call_api():
@@ -8,3 +7,6 @@ def test_call_api():
     r = q.run(verify=False)
     r.pretty_print()
     assert isinstance(r.sql, str) is True
+
+
+
