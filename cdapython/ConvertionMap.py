@@ -1,6 +1,6 @@
-'''
+"""
 This dictionary is made for updating name changes in the schema this is a way to keep backwards compatibility for the user and hopefully inform them to use the new names
-'''
+"""
 convertionMap = {
     "ResearchSubject.associated_project": "ResearchSubject.member_of_research_project",
     "ResearchSubject.primary_disease_type": "ResearchSubject.primary_diagnosis_condition",

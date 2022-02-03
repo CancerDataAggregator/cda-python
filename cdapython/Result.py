@@ -25,7 +25,8 @@ class Result:
         self._offset = offset
         self._limit = limit
         self._api_instance = api_instance
-
+        self.showCounts = True
+        # add a if check to query output for counts to hide sql
     def __str__(self) -> str:
         return f"""
         QueryID: {self._query_id}
@@ -47,6 +48,10 @@ class Result:
         {self.countResult}
         More pages: {self.has_next_page}
         """
+
+
+    def __dict__(self):
+        return self
 
     # def __flatten_json(self, obj):
     #     ret = {}
@@ -74,13 +79,17 @@ class Result:
 
     @property
     def countResult(self) -> str:
-        # if self._api_response.result
-        if "GDC" in self._api_response.result[0]:
+        if self._api_response.result is None:
+            return "No counts could be found"
+
+        if "system" in self._api_response.result[0]:
+            self.showCounts = False
             text = ""
-            data = self._api_response.result[0]
-            for i in data:
-                text += f"{i} Count: {data[i]} "
-            return f"Total Database Counts of {text},"
+            data = self._api_response.result
+            for item in data:
+                for key, value in item.items():
+                    text += f"{key} Count: {value} \n \t"
+            return f"Total Database Counts:\n\n\t{text}"
 
         dic = Counter(
             [

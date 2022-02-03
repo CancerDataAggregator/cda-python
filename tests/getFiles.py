@@ -1,4 +1,5 @@
 from cdapython import Q
+
 age1 = Q("ResearchSubject.Diagnosis.age_at_diagnosis >= 40*365")
 age2 = Q("ResearchSubject.Diagnosis.age_at_diagnosis <= 45*365")
 female = Q('sex = "female"')

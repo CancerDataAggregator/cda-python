@@ -7,5 +7,4 @@ def test_bigquery_status():
     assert Q.bigquery_status() == "everything is fine"
 
 
-
 print(Q.bigquery_status())

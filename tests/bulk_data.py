@@ -1,7 +1,6 @@
 from cdapython import Q
 
 
-
 r = Q.bulk_download(host="http://localhost:8080")
 print(len(r))
 # for count, value in enumerate(Q.bulk_download(host="http://localhost:8080").stream()):

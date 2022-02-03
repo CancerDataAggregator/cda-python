@@ -61,7 +61,7 @@ class Q:
             if args[0] is None:
                 raise RuntimeError("Q statement parse error")
 
-            _l, _op, _r = args[0].split(" ", 2)
+            _l, _op, _r = str(args[0]).strip().replace("\n", "").split(" ", 2)
 
             if _l in convertionMap:
                 tmpL = convertionMap[_l]
@@ -236,14 +236,14 @@ class Q:
         """
         return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
 
-    @staticmethod
-    def global_counts(
+    def counts(
+        self,
         host: Optional[str] = None,
         verify: Optional[bool] = None,
         version: Optional[str] = table_version,
         table: Optional[str] = default_table,
         offset: int = 0,
-        limit: int = 1,
+        limit: int = 100,
         async_call: bool = False,
         dry_run: Optional[bool] = False,
     ):
@@ -254,7 +254,14 @@ class Q:
 
             with cda_client_obj as api_client:
                 api_instance = QueryApi(api_client)
-                api_response = api_instance.global_counts(table=table, version=version)
+                api_response = api_instance.global_counts(
+                    self.query,
+                    version=version,
+                    dry_run=dry_run,
+                    table=table,
+                    async_req=async_call,
+                )
+
             if dry_run is True:
                 return api_response
 
