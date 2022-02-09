@@ -27,6 +27,7 @@ class Result:
         self._api_instance = api_instance
         self.showCounts = True
         # add a if check to query output for counts to hide sql
+
     def __str__(self) -> str:
         return f"""
         QueryID: {self._query_id}
@@ -48,7 +49,6 @@ class Result:
         {self.countResult}
         More pages: {self.has_next_page}
         """
-
 
     def __dict__(self):
         return self
@@ -119,17 +119,22 @@ class Result:
             return (self._offset + self._limit) <= self.total_row_count
         return None
 
-    def to_DataFrame(self) -> Union[DataFrame, None]:
-        # test = self.__flatten_json(self._api_response.result)
+    def to_DataFrame(
+        self,
+        record_path: Optional[Union[str, list]],
+        meta: Optional[Union[str, List[Union[str, List[str]]]]],
+        meta_prefix: Optional[str],
+    ):
         """[summary]
         Creates a pandas DataFrame for the Results
 
         Returns:
             DataFrame: [description]
         """
+        if record_path is None:
+            return json_normalize(self.__iter__())
 
-        # return DataFrame.from_dict(test, orient="index")
-        return json_normalize([i for i in self._api_response.result])
+        return json_normalize(self.__iter__(), record_path=record_path, meta=meta, meta_prefix=meta_prefix)
 
     def stream(self):
         box = []
