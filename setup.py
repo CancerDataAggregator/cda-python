@@ -35,6 +35,7 @@ setup(
         "tdparser",
         "numpy",
         "wheel",
+        "urllib3",
         "pandas",
         "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git",
         "python-dotenv",

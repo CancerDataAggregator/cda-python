@@ -131,6 +131,8 @@ class Q:
             "create table" in sql.lower()
             or "delete from" in sql.lower()
             or "drop table" in sql.lower()
+            or "update" in sql.lower()
+            or "alter table" in sql.lower()
         ):
             raise Exception("Those actions are not available in Q.sql")
 
