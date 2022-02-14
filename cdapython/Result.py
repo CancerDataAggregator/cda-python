@@ -79,7 +79,7 @@ class Result:
 
     @property
     def countResult(self) -> str:
-        if self._api_response.result is None:
+        if self._api_response.result is None or len(self._api_response.result) == 0:
             return "No counts could be found"
 
         if "system" in self._api_response.result[0]:
