@@ -16,8 +16,8 @@ def test_sql_wrong_table():
 
 def test():
     with pytest.raises(Exception) as excinfo:
-    Q.sql(
-        """SELECT * FROM region-us.INFORMATION_SCHEMA.TABLES;""",
-        host="http://localhost:8080",
-    )
+        Q.sql(
+            """SELECT * FROM region-us.INFORMATION_SCHEMA.TABLES;""",
+            host="http://localhost:8080",
+        )
     assert str(excinfo) == "Your database is outside of the project"

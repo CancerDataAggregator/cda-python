@@ -134,7 +134,9 @@ class Result:
         if record_path is None:
             return json_normalize(self.__iter__())
 
-        return json_normalize(self.__iter__(), record_path=record_path, meta=meta, meta_prefix=meta_prefix)
+        return json_normalize(
+            self.__iter__(), record_path=record_path, meta=meta, meta_prefix=meta_prefix
+        )
 
     def stream(self):
         box = []
