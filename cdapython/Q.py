@@ -220,11 +220,11 @@ class Q:
                 sleep(1)
                 data.extend(r)
                 r.next_page()
-            df = pd.DataFrame(data=data)
+            df = pd.json_normalize(data=data)
             df.to_csv("test.tsv", "\t")
             return df
         except Exception as e:
-            df = pd.DataFrame(data)
+            df = pd.json_normalize(data)
             df.to_csv("error.tsv", "\t")
             print(e)
 
@@ -242,8 +242,6 @@ class Q:
         self,
         host: Optional[str] = None,
         verify: Optional[bool] = None,
-        version: Optional[str] = table_version,
-        table: Optional[str] = default_table,
         offset: int = 0,
         limit: int = 100,
         async_call: bool = False,
@@ -252,6 +250,8 @@ class Q:
         cda_client_obj = ApiClient(
             configuration=builderApiClient(host=host, verify=verify)
         )
+        version: Optional[str] = table_version
+        table: Optional[str] = default_table
         try:
 
             with cda_client_obj as api_client:
@@ -319,7 +319,7 @@ class Q:
         async_call: bool = False,
         verify: Optional[bool] = None,
         verbose: Optional[bool] = True,
-        selecter: Optional[str] = "",
+        filter: Optional[str] = None,
     ) -> Optional[Result]:
         """
 
@@ -340,6 +340,11 @@ class Q:
         cda_client_obj = ApiClient(
             configuration=builderApiClient(host=host, verify=verify)
         )
+
+
+        # if filter is not None:
+        #     self.query = Q.__select(self, fields=filter).query
+        #     print(self.query)
 
         try:
             with cda_client_obj as api_client:
@@ -425,6 +430,25 @@ class Q:
 
     def Less_Then(self, right: "Q"):
         return Q(self.query, "<", right.query)
+    
+    # def __select(self, fields: str):
+    #     """[summary]
+
+    #     Args:
+    #         fields (str): [takes in a list of select values]
+
+    #     Returns:
+    #         [Q]: [returns a Q object]
+    #     """
+    #     ""
+    #     # This lambda will strip a comma and rejoin the string
+    #     fields = ",".join(map(lambda fields: fields.strip(","), fields.split()))
+
+    #     tmp = Query()
+    #     tmp.node_type = "SELECTVALUES"
+    #     tmp.value = fields
+    #     return Q(tmp, "SELECT", self.query)
+
 
 
 def infer_quote(val: Union[str, "Q", Query]) -> Union[Q, Query]:
