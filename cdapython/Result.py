@@ -1,7 +1,6 @@
 from multiprocessing.pool import ApplyResult
 from re import S
 from typing import Counter, Dict, List, Optional, Union
-from typing_extensions import Self
 from cdapython.decorators_cache import lru_cache_timed
 from time import sleep
 from typing import Dict, Optional
@@ -141,7 +140,7 @@ class Result:
             self.__iter__(), record_path=record_path, meta=meta, meta_prefix=meta_prefix
         )
 
-    def stream(self, toDf:bool = False) -> Self | DataFrame:
+    def stream(self, toDf:bool = False):
         count = 0
         while self.total_row_count >= count:
             count += self.count
