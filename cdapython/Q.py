@@ -3,10 +3,11 @@ from logging import error as logError
 import logging
 from multiprocessing.pool import ApplyResult
 from typing import Optional, List
+from unsync import unsync
 from urllib3.exceptions import InsecureRequestWarning, SSLError
 from cdapython.ConvertionMap import convertionMap
 from cdapython.Result import Result, get_query_result
-from cdapython.functions import col, quoted, unquoted
+from cdapython.functions import backwardsComp, col, quoted, unquoted
 from cda_client.api.meta_api import MetaApi
 from cdapython.decorators import measure
 from typing import Union
@@ -62,14 +63,7 @@ class Q:
                 raise RuntimeError("Q statement parse error")
 
             _l, _op, _r = str(args[0]).strip().replace("\n", "").split(" ", 2)
-
-            if _l in convertionMap:
-                tmpL = convertionMap[_l]
-                print(
-                    f" This Value {_l} has been deprecated but will be converted it for you in the background please use the new value {tmpL}"
-                )
-                _l = tmpL
-
+            _l = backwardsComp(_l)
             _l = col(_l)
             _r = infer_quote(_r)
         elif len(args) != 3:
@@ -185,12 +179,14 @@ class Q:
         cda_client_obj = ApiClient(
             configuration=builderApiClient(host=host, verify=verify), pool_threads=2
         )
+        data: List[Result] = []
+
         try:
 
             with cda_client_obj as api_client:
                 api_instance = QueryApi(api_client)
                 api_response = api_instance.bulk_data(
-                    version=version, async_req=async_call
+                    table=table, version=version, async_req=async_call
                 )
 
             if dry_run is True:
@@ -209,9 +205,8 @@ class Q:
             if r is None:
                 return None
 
-            data: List[Result] = []
-
             count = 0
+
             while r.has_next_page is True:
                 count += r.count
                 print(
@@ -224,8 +219,9 @@ class Q:
             df.to_csv("test.tsv", "\t")
             return df
         except Exception as e:
-            df = pd.json_normalize(data)
-            df.to_csv("error.tsv", "\t")
+            if len(data) > 0:
+                df = pd.json_normalize(data)
+                df.to_csv("error.tsv", "\t")
             print(e)
 
     @staticmethod
@@ -341,7 +337,6 @@ class Q:
             configuration=builderApiClient(host=host, verify=verify)
         )
 
-
         # if filter is not None:
         #     self.query = Q.__select(self, fields=filter).query
         #     print(self.query)
@@ -375,6 +370,7 @@ class Q:
                 return get_query_result(
                     api_instance, api_response.query_id, offset, limit, async_call
                 )
+
         except ServiceException as httpError:
             if httpError.body is not None:
                 logError(
@@ -430,7 +426,7 @@ class Q:
 
     def Less_Then(self, right: "Q"):
         return Q(self.query, "<", right.query)
-    
+
     # def __select(self, fields: str):
     #     """[summary]
 
@@ -448,7 +444,6 @@ class Q:
     #     tmp.node_type = "SELECTVALUES"
     #     tmp.value = fields
     #     return Q(tmp, "SELECT", self.query)
-
 
 
 def infer_quote(val: Union[str, "Q", Query]) -> Union[Q, Query]:

@@ -37,6 +37,7 @@ setup(
         "wheel",
         "urllib3",
         "pandas",
+        "unsync",
         "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git",
         "python-dotenv",
     ],

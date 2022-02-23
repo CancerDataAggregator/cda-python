@@ -103,6 +103,8 @@ typing-extensions==4.1.1
     # via
     #   black
     #   mypy
+unsync==1.4.0
+    # via -r requirements-dev.in
 urllib3==1.26.8
     # via cda-client
 wheel==0.36.2

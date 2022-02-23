@@ -1,5 +1,7 @@
 from multiprocessing.pool import ApplyResult
+from re import S
 from typing import Counter, Dict, List, Optional, Union
+from typing_extensions import Self
 from cdapython.decorators_cache import lru_cache_timed
 from time import sleep
 from typing import Dict, Optional
@@ -26,6 +28,7 @@ class Result:
         self._limit = limit
         self._api_instance = api_instance
         self.showCounts = True
+        self._dataTmp = []
         # add a if check to query output for counts to hide sql
 
     def __str__(self) -> str:
@@ -124,7 +127,7 @@ class Result:
         record_path: Optional[Union[str, list]],
         meta: Optional[Union[str, List[Union[str, List[str]]]]],
         meta_prefix: Optional[str],
-    ):
+    ) -> DataFrame:
         """[summary]
         Creates a pandas DataFrame for the Results
 
@@ -138,12 +141,21 @@ class Result:
             self.__iter__(), record_path=record_path, meta=meta, meta_prefix=meta_prefix
         )
 
-    def stream(self):
-        box = []
-        while self.has_next_page:
-            box.append(self)
-            yield self.next_page()
-        return box
+    def stream(self, toDf:bool = False) -> Self | DataFrame:
+        count = 0
+        while self.total_row_count >= count:
+            count += self.count
+            print(
+                    f"Row {count} out of {self.total_row_count} {int((count/self.total_row_count)*100)}%"
+                )
+            self._dataTmp.extend(self._api_response.result)
+            self.next_page()
+            self._api_response.result = []
+            self._api_response.result.extend(self._dataTmp)
+        if toDf is False:
+            return self
+        else:
+            return self.to_DataFrame()
 
     def __len__(self):
         return self.count
@@ -227,6 +239,5 @@ def get_query_result(
             #     print(bytes(chunk).decode("utf-8"))
 
         sleep(2)
-        response = api_instance.query(id=query_id, offset=offset, limit=limit)
         if response.total_row_count is not None:
             return Result(response, query_id, offset, limit, api_instance)

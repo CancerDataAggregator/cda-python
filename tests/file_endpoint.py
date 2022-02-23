@@ -8,12 +8,13 @@ ageU = Q("days_to_birth >= -45*365")
 
 q1 = sex.And(cancer.And(ageL.And(ageU)))
 
-r1 = q1.run()
+r1 = q1.run(async_call=True)
 
 tmp = r1[0]
 # sleep(11)
 print("cache")
-r2 = q1.run()
+r2 = q1.run(async_call=True)
+
 
 print(sys.getsizeof(r2))
 

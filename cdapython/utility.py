@@ -13,7 +13,7 @@ import cdapython.constantVariables as const
 from urllib3.exceptions import InsecureRequestWarning
 
 from cdapython.errorLogger import unverfiedHttp
-from .functions import find_ssl_path
+from .functions import backwardsComp, find_ssl_path
 from .decorators_cache import lru_cache_timed
 
 
@@ -115,7 +115,7 @@ def unique_terms(
 
     if async_req is None:
         async_req = False
-
+    col_name = backwardsComp(col_name)
     version = table_white_list(table, version)
 
     cda_client_obj = cda_client.ApiClient(configuration=tmp_configuration)

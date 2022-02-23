@@ -7,3 +7,6 @@ def test_call_api():
     r = q.run(verify=False)
     r.pretty_print()
     assert isinstance(r.sql, str) is True
+
+
+test_call_api()
