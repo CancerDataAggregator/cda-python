@@ -2,6 +2,7 @@ from json import loads
 from logging import error as logError
 import logging
 from multiprocessing.pool import ApplyResult
+import profile
 from typing import Optional, List
 from unsync import unsync
 from urllib3.exceptions import InsecureRequestWarning, SSLError
@@ -21,7 +22,13 @@ from cda_client.model.query import Query
 from cda_client.api.query_api import QueryApi
 from cda_client import ApiClient, Configuration
 from cda_client.model.query_created_data import QueryCreatedData
-from cdapython.constantVariables import table_version, default_table, project_name
+from cdapython.constantVariables import (
+    table_version,
+    default_table,
+    project_name,
+    default_file_table,
+    file_table_version,
+)
 from time import sleep
 import pandas as pd
 
@@ -303,6 +310,113 @@ class Q:
         except Exception as e:
             print(e)
 
+    def files(
+        self,
+        offset: int = 0,
+        limit: int = 100,
+        version: Optional[str] = table_version,
+        host: Optional[str] = None,
+        dry_run: bool = False,
+        table: Optional[str] = default_table,
+        async_call: bool = False,
+        verify: Optional[bool] = None,
+        verbose: Optional[bool] = True,
+        filter: Optional[str] = None,
+    ):
+        """
+
+        Args:
+            offset (int, optional): [description]. Defaults to 0.
+            limit (int, optional): [description]. Defaults to 100.
+            version (Optional[str], optional): [description]. Defaults to table_version.
+            host (Optional[str], optional): [description]. Defaults to None.
+            dry_run (bool, optional): [description]. Defaults to False.
+            table (Optional[str], optional): [description]. Defaults to default_table.
+            async_call (bool, optional): [description]. Defaults to False.
+            verify (Optional[bool], optional): [description]. Defaults to None.
+            verbose (Optional[bool], optional): [Turn on logs]. Defaults to True.
+
+        Returns:
+            Optional[Result]: [description]
+        """
+        cda_client_obj = ApiClient(
+            configuration=builderApiClient(host=host, verify=verify)
+        )
+
+        if filter is not None:
+            self.query = Q.__select(self, fields=filter).query
+
+        try:
+            with cda_client_obj as api_client:
+                api_instance = QueryApi(api_client)
+                # Execute boolean query
+                if verbose:
+                    print("Getting results from database", end="\n\n")
+                api_response: Union[
+                    QueryCreatedData, ApplyResult
+                ] = api_instance.boolean_query(
+                    self.query,
+                    version=version,
+                    dry_run=dry_run,
+                    table=table,
+                    async_req=async_call,
+                )
+
+                if isinstance(api_response, ApplyResult):
+                    if verbose:
+                        print("Waiting for results")
+                    while api_response.ready() is False:
+                        api_response.wait(10000)
+                    api_response = api_response.get()
+
+                if dry_run is True:
+                    return api_response
+
+                r = get_query_result(
+                    api_instance, api_response.query_id, offset, limit, async_call
+                )
+                # api_response: Union[QueryCreatedData, ApplyResult] = api_instance.files(
+                #     self.query,
+                #     version=version,
+                #     dry_run=dry_run,
+                #     table=table,
+                #     async_req=async_call,
+                # )
+                file_id = []
+                for i in r:
+                    for file in i.File:
+                        file_id.append(file["id"])
+                return file_id
+
+        except ServiceException as httpError:
+            if httpError.body is not None:
+                logError(
+                    f"""
+                Http Status: {httpError.status}
+                Error Message: {loads(httpError.body)["message"]}
+                """
+                )
+
+        except NewConnectionError as e:
+            print("Connection error")
+
+        except SSLError as e:
+            print(e)
+
+        except InsecureRequestWarning as e:
+            print(
+                "Adding certificate verification pem is strongly advised please read our https://cda.readthedocs.io/en/latest/Installation.html "
+            )
+
+        except MaxRetryError as e:
+            print(
+                f"Connection error max retry limit of 3 hit please check url or local python ssl pem {e}"
+            )
+
+        except Exception as e:
+            print(e)
+        return None
+
     @measure()
     def run(
         self,
@@ -337,9 +451,8 @@ class Q:
             configuration=builderApiClient(host=host, verify=verify)
         )
 
-        # if filter is not None:
-        #     self.query = Q.__select(self, fields=filter).query
-        #     print(self.query)
+        if filter is not None:
+            self.query = Q.__select(self, fields=filter).query
 
         try:
             with cda_client_obj as api_client:
@@ -427,23 +540,23 @@ class Q:
     def Less_Then(self, right: "Q"):
         return Q(self.query, "<", right.query)
 
-    # def __select(self, fields: str):
-    #     """[summary]
+    def __select(self, fields: str):
+        """[summary]
 
-    #     Args:
-    #         fields (str): [takes in a list of select values]
+        Args:
+            fields (str): [takes in a list of select values]
 
-    #     Returns:
-    #         [Q]: [returns a Q object]
-    #     """
-    #     ""
-    #     # This lambda will strip a comma and rejoin the string
-    #     fields = ",".join(map(lambda fields: fields.strip(","), fields.split()))
+        Returns:
+            [Q]: [returns a Q object]
+        """
+        ""
+        # This lambda will strip a comma and rejoin the string
+        fields = ",".join(map(lambda fields: fields.strip(","), fields.split()))
 
-    #     tmp = Query()
-    #     tmp.node_type = "SELECTVALUES"
-    #     tmp.value = fields
-    #     return Q(tmp, "SELECT", self.query)
+        tmp = Query()
+        tmp.node_type = "SELECTVALUES"
+        tmp.value = fields
+        return Q(tmp, "SELECT", self.query)
 
 
 def infer_quote(val: Union[str, "Q", Query]) -> Union[Q, Query]:

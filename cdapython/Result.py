@@ -53,7 +53,7 @@ class Result:
         """
 
     def __dict__(self):
-        return self
+        return {key: value for (key, value) in  self._api_response.results}
 
     # def __flatten_json(self, obj):
     #     ret = {}
@@ -142,7 +142,7 @@ class Result:
 
     def stream(self, toDf:bool = False):
         count = 0
-        while self.total_row_count >= count:
+        while self.has_next_page:
             count += self.count
             print(
                     f"Row {count} out of {self.total_row_count} {int((count/self.total_row_count)*100)}%"
