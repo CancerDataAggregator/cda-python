@@ -314,15 +314,15 @@ class Q:
         self,
         offset: int = 0,
         limit: int = 100,
-        version: Optional[str] = table_version,
+        version: Optional[str] = file_table_version,
         host: Optional[str] = None,
         dry_run: bool = False,
-        table: Optional[str] = default_table,
+        table: Optional[str] = default_file_table,
         async_call: bool = False,
         verify: Optional[bool] = None,
         verbose: Optional[bool] = True,
         filter: Optional[str] = None,
-    ):
+    ) -> Optional[Result]:
         """
 
         Args:
@@ -352,9 +352,7 @@ class Q:
                 # Execute boolean query
                 if verbose:
                     print("Getting results from database", end="\n\n")
-                api_response: Union[
-                    QueryCreatedData, ApplyResult
-                ] = api_instance.boolean_query(
+                api_response: Union[QueryCreatedData, ApplyResult] = api_instance.files(
                     self.query,
                     version=version,
                     dry_run=dry_run,
@@ -372,21 +370,9 @@ class Q:
                 if dry_run is True:
                     return api_response
 
-                r = get_query_result(
+                return get_query_result(
                     api_instance, api_response.query_id, offset, limit, async_call
                 )
-                # api_response: Union[QueryCreatedData, ApplyResult] = api_instance.files(
-                #     self.query,
-                #     version=version,
-                #     dry_run=dry_run,
-                #     table=table,
-                #     async_req=async_call,
-                # )
-                file_id = []
-                for i in r:
-                    for file in i.File:
-                        file_id.append(file["id"])
-                return file_id
 
         except ServiceException as httpError:
             if httpError.body is not None:
@@ -552,7 +538,7 @@ class Q:
         ""
         # This lambda will strip a comma and rejoin the string
         fields = ",".join(map(lambda fields: fields.strip(","), fields.split()))
-
+        
         tmp = Query()
         tmp.node_type = "SELECTVALUES"
         tmp.value = fields
