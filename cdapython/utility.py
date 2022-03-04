@@ -29,6 +29,9 @@ if TYPE_CHECKING:
 if isinstance(const.default_table, str) and const.default_table is not None:
     DEFAULT_TABLE: Optional[str] = const.default_table.split(".")[1]
 
+if isinstance(const.default_file_table, str) and const.default_file_table is not None:
+    DEFAULT_TABLE_FILE: Optional[str] = const.default_file_table.split(".")[1]
+
 
 if isinstance(const.CDA_API_URL, str):
     URL_TABLE: str = const.CDA_API_URL
@@ -112,7 +115,7 @@ def unique_terms(
 
     if table is None and isinstance(const.default_table, str):
         table = DEFAULT_TABLE
-
+    
     if async_req is None:
         async_req = False
     col_name = backwardsComp(col_name)
@@ -156,6 +159,7 @@ def columns(
     verify: Optional[bool] = None,
     async_req: Optional[bool] = None,
     pre_stream: bool = True,
+    files:bool = False
 ) -> Optional[object]:
     """[summary]
 
@@ -171,6 +175,7 @@ def columns(
     Returns:
         Optional[object]: [description]
     """
+    
 
     # Execute query
     if host is None:
@@ -189,6 +194,9 @@ def columns(
 
     if async_req is None:
         async_req = False
+        
+    if files is True:
+        table = DEFAULT_TABLE_FILE
 
     version = table_white_list(table, version)
     cda_client_obj = cda_client.ApiClient(configuration=tmp_configuration)
