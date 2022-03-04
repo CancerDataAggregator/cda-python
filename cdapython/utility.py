@@ -32,6 +32,8 @@ if isinstance(const.default_table, str) and const.default_table is not None:
 if isinstance(const.default_file_table, str) and const.default_file_table is not None:
     DEFAULT_TABLE_FILE: Optional[str] = const.default_file_table.split(".")[1]
 
+if isinstance(const.file_table_version, str) and const.file_table_version is not None:
+    DATABASETABLE_VERSION_FOR_FILES: Optional[str] = const.file_table_version
 
 if isinstance(const.CDA_API_URL, str):
     URL_TABLE: str = const.CDA_API_URL
@@ -84,6 +86,7 @@ def unique_terms(
     async_req: Optional[bool] = None,
     pre_stream: bool = True,
     version: Optional[str] = table_version,
+    files:Optional[bool] = False
 ) -> Optional[List[Any]]:
     """[summary]
 
@@ -120,7 +123,9 @@ def unique_terms(
         async_req = False
     col_name = backwardsComp(col_name)
     version = table_white_list(table, version)
-
+    if files is True:
+        table = DEFAULT_TABLE_FILE
+        version = DATABASETABLE_VERSION_FOR_FILES
     cda_client_obj = cda_client.ApiClient(configuration=tmp_configuration)
     try:
         with cda_client_obj as api_client:
@@ -159,7 +164,7 @@ def columns(
     verify: Optional[bool] = None,
     async_req: Optional[bool] = None,
     pre_stream: bool = True,
-    files:bool = False
+    files:Optional[bool] = False
 ) -> Optional[object]:
     """[summary]
 
@@ -194,11 +199,14 @@ def columns(
 
     if async_req is None:
         async_req = False
-        
-    if files is True:
-        table = DEFAULT_TABLE_FILE
+
 
     version = table_white_list(table, version)
+
+    if files is True:
+        table = DEFAULT_TABLE_FILE
+        version = DATABASETABLE_VERSION_FOR_FILES
+
     cda_client_obj = cda_client.ApiClient(configuration=tmp_configuration)
 
     try:
