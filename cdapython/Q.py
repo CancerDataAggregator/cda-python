@@ -51,6 +51,13 @@ def builderApiClient(host: Optional[str], verify: Optional[bool]) -> Configurati
     return tmp_configuration
 
 
+def query_type_convertion(_r: str):
+    if _r.find("%") != -1:
+        tmp = Query()
+        tmp.node_type = "LIKE"
+        tmp.value = _r
+        return tmp
+    return _r
 class Q:
     """
     Q lang is Language used to send query to the cda service
@@ -72,6 +79,7 @@ class Q:
             _l, _op, _r = str(args[0]).strip().replace("\n", "").split(" ", 2)
             _l = backwardsComp(_l)
             _l = col(_l)
+            _r = query_type_convertion(_r)
             _r = infer_quote(_r)
         elif len(args) != 3:
             raise RuntimeError(

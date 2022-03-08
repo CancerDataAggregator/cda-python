@@ -1,9 +1,6 @@
 from multiprocessing.pool import ApplyResult
-from re import S
-from typing import Counter, Dict, List, Optional, Union
-from cdapython.decorators_cache import lru_cache_timed
+from typing import Counter, List, Union,Dict,Optional
 from time import sleep
-from typing import Dict, Optional
 import json
 from cda_client.model.query_response_data import QueryResponseData
 from cda_client.api.query_api import QueryApi
@@ -95,10 +92,9 @@ class Result:
 
         dic = Counter(
             [
-                identifier["system"]
+                file["system"]
                 for patient in self._api_response.result
-                for file in patient["File"]
-                for identifier in file["identifier"]
+                for file in patient["identifier"]
             ]
         )
         return f"GDC Count: {dic['GDC']} \n \tPDC Count: {dic['PDC']} \n \tIDC Count: {dic['IDC']}"
@@ -123,10 +119,10 @@ class Result:
 
     def to_DataFrame(
         self,
-        record_path: Optional[Union[str, list]],
-        meta: Optional[Union[str, List[Union[str, List[str]]]]],
-        meta_prefix: Optional[str],
-    ) -> DataFrame:
+        record_path: Optional[Union[str, list]] = None,
+        meta: Optional[Union[str, List[Union[str, List[str]]]]] = None,
+        meta_prefix: Optional[str] = None,
+    ) -> Optional[DataFrame]:
         """[summary]
         Creates a pandas DataFrame for the Results
 
@@ -237,6 +233,6 @@ def get_query_result(
             # for chunk in response.stream(32):
             #     print(bytes(chunk).decode("utf-8"))
 
-        sleep(2)
+        sleep(2.5)
         if response.total_row_count is not None:
             return Result(response, query_id, offset, limit, api_instance)
