@@ -14,6 +14,10 @@ cda-client @ git+https://github.com/CancerDataAggregator/cda-service-python-clie
     # via cdapython
 cdapython @ git+https://github.com/CancerDataAggregator/cda-python.git
     # via -r requirements-dev.in
+certifi==2021.10.8
+    # via requests
+charset-normalizer==2.0.12
+    # via requests
 click==8.0.3
     # via black
 coverage[toml]==6.3.1
@@ -24,12 +28,16 @@ gitdb==4.0.9
     # via gitpython
 gitpython==3.1.26
     # via bandit
+idna==3.3
+    # via requests
 iniconfig==1.1.1
     # via pytest
 mccabe==0.6.1
     # via flake8
 memory-profiler==0.60.0
-    # via -r requirements-dev.in
+    # via
+    #   -r requirements-dev.in
+    #   pytest-monitor
 mypy==0.910
     # via -r requirements-dev.in
 mypy-extensions==0.4.3
@@ -54,7 +62,9 @@ platformdirs==2.5.0
 pluggy==1.0.0
     # via pytest
 psutil==5.9.0
-    # via memory-profiler
+    # via
+    #   memory-profiler
+    #   pytest-monitor
 py==1.11.0
     # via pytest
 pycodestyle==2.8.0
@@ -67,7 +77,10 @@ pytest==6.2.5
     # via
     #   -r requirements-dev.in
     #   pytest-cov
+    #   pytest-monitor
 pytest-cov==3.0.0
+    # via -r requirements-dev.in
+pytest-monitor==1.6.3
     # via -r requirements-dev.in
 python-dateutil==2.8.2
     # via
@@ -83,6 +96,8 @@ pyyaml==6.0
     # via bandit
 regex==2022.1.18
     # via black
+requests==2.27.1
+    # via pytest-monitor
 six==1.16.0
     # via
     #   bandit
@@ -110,8 +125,11 @@ typing-extensions==4.1.1
 unsync==1.4.0
     # via -r requirements-dev.in
 urllib3==1.26.8
-    # via cda-client
+    # via
+    #   cda-client
+    #   requests
 wheel==0.36.2
     # via
     #   -r requirements-dev.in
     #   cdapython
+    #   pytest-monitor

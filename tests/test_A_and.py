@@ -7,7 +7,10 @@ def test_and_op():
     q2 = Q('ResearchSubject.associated_project = "TCGA-OV"')
 
     q = q1.And(q2)
-    r = q.run()
+    r = q.run(host="http://localhost:8080")
     print(r)
 
     assert isinstance(r.count, int) is True
+
+
+test_and_op()

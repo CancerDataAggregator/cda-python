@@ -5,3 +5,7 @@ q3 = Q('days_to_birth < -50*365')
 q4 = Q('File.data_category = "Imaging"')
 q = q4.And(q3.And(q1.Or(q2)))
 print(q)
+t = q.run(host="http://localhost:8080",async_call=True)
+
+print(t)
+print(t.to_DataFrame().head())

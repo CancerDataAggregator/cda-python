@@ -1,4 +1,4 @@
-from cdapython import Q
+from cdapython import Q,columns
 
 
 def test_ssl_sql():
@@ -14,3 +14,6 @@ def test_ssl_Q():
     q = Q('id = "TCGA-13-1409"')
     r = q.run(verify=False)
     assert r.count == 1
+
+
+columns(verify=False)
