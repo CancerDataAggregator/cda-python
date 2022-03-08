@@ -13,5 +13,5 @@ tdparser==1.1.6
 pandas==1.3.5
 pytest-cov
 flake8==4.0.1
-unsync
 memory_profiler
+pytest-xdist

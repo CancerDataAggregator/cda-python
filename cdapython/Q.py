@@ -2,9 +2,7 @@ from json import loads
 from logging import error as logError
 import logging
 from multiprocessing.pool import ApplyResult
-import profile
 from typing import Optional, List
-from unsync import unsync
 from urllib3.exceptions import InsecureRequestWarning, SSLError
 from cdapython.ConvertionMap import convertionMap
 from cdapython.Result import Result, get_query_result
