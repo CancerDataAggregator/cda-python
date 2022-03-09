@@ -29,6 +29,7 @@ from cdapython.constantVariables import (
 )
 from time import sleep
 import pandas as pd
+from json import dumps
 
 logging.captureWarnings(InsecureRequestWarning)
 
@@ -49,13 +50,31 @@ def builderApiClient(host: Optional[str], verify: Optional[bool]) -> Configurati
     return tmp_configuration
 
 
-def query_type_convertion(_r: str):
+def query_type_convertion(_op: str, _r: str):
+    """_summary_
+        This is for query type convertion
+    Args:
+        _op (str): _description_
+        _r (str): _description_
+
+    Returns:
+        (tuple[Literal['LIKE'], Query] | tuple[str, str])
+    """
     if _r.find("%") != -1:
         tmp = Query()
-        tmp.node_type = "LIKE"
+        tmp.node_type = "quoted"
         tmp.value = _r
-        return tmp
-    return _r
+        return ("LIKE", tmp)
+
+    if _r.find("LIKE") != -1:
+        tmp = Query()
+        tmp.node_type = "quoted"
+        tmp.value = _r
+        return ("LIKE", tmp)
+
+    return (_op, _r)
+
+
 class Q:
     """
     Q lang is Language used to send query to the cda service
@@ -77,7 +96,7 @@ class Q:
             _l, _op, _r = str(args[0]).strip().replace("\n", "").split(" ", 2)
             _l = backwardsComp(_l)
             _l = col(_l)
-            _r = query_type_convertion(_r)
+            _op, _r = query_type_convertion(_op, _r)
             _r = infer_quote(_r)
         elif len(args) != 3:
             raise RuntimeError(
@@ -544,7 +563,7 @@ class Q:
         ""
         # This lambda will strip a comma and rejoin the string
         fields = ",".join(map(lambda fields: fields.strip(","), fields.split()))
-        
+
         tmp = Query()
         tmp.node_type = "SELECTVALUES"
         tmp.value = fields

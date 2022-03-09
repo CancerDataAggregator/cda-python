@@ -27,3 +27,4 @@ monkeytype.*
 typeReport
 
 .DS_Store
+.pymon

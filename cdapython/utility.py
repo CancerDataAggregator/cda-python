@@ -75,7 +75,7 @@ def table_white_list(table: Optional[str], version: Optional[str]):
         return version
 
 
-# @lru_cache_timed(seconds=10)
+@lru_cache_timed(seconds=10)
 def unique_terms(
     col_name: str,
     system: str = "",
@@ -155,7 +155,7 @@ def unique_terms(
     return None
 
 
-# @lru_cache_timed(seconds=60)
+@lru_cache_timed(seconds=60)
 def columns(
     version: Optional[str] = table_version,
     host: Optional[str] = None,
