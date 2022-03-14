@@ -38,7 +38,7 @@ setup(
         "urllib3==1.26.8",
         "pandas==1.3.5",
         "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git",
-        "python-dotenv",
+        "python-dotenv==0.18.0",
     ],
     description="User friendly Python library to access CDA service.",
     long_description=long_description,

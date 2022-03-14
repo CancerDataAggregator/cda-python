@@ -1,10 +1,10 @@
 # Versioning Year Month Day of last push
 VERSION = "2022.3.4"
-DATABASETABLE_VERSION = "GDC_Subjects"
+DATABASETABLE_VERSION = "all_v3_0_subjects_meta"
 DATABASETABLE = "gdc-bq-sample.dev"
 CDA_API_URL_ENV = "https://cda.cda-dev.broadinstitute.org"
 DATABASETABLE_FOR_FILES = "gdc-bq-sample.dev"
-DATABASETABLE_VERSION_FOR_FILES = "GDC_Files"
+DATABASETABLE_VERSION_FOR_FILES = "all_v3_0_Files"
 
 __version__: str = VERSION
 CDA_API_URL: str = CDA_API_URL_ENV

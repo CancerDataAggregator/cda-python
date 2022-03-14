@@ -1,4 +1,4 @@
-from functools import _lru_cache_wrapper, lru_cache, wraps
+from functools import  lru_cache, wraps
 from datetime import datetime, timedelta
 from typing import Callable
 

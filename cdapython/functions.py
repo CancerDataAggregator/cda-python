@@ -5,7 +5,6 @@ from ssl import get_default_verify_paths
 from cdapython.ConvertionMap import convertionMap
 
 
-
 def col(col_name: Optional[str]) -> Query:
     return Query(node_type="column", value=col_name)
 

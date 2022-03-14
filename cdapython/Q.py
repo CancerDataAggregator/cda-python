@@ -12,10 +12,11 @@ from cdapython.decorators import measure
 from typing import Union
 import cdapython.constantVariables as const
 from cda_client.exceptions import ServiceException
+from cda_client.exceptions import ApiException
 from cdapython.functions import find_ssl_path
 from urllib3.connection import NewConnectionError
 from urllib3.connectionpool import MaxRetryError
-from cdapython.errorLogger import unverfiedHttp
+from cdapython.errorLogger import unverifiedHttp
 from cda_client.model.query import Query
 from cda_client.api.query_api import QueryApi
 from cda_client import ApiClient, Configuration
@@ -29,7 +30,7 @@ from cdapython.constantVariables import (
 )
 from time import sleep
 import pandas as pd
-from json import dumps
+
 
 logging.captureWarnings(InsecureRequestWarning)
 
@@ -44,7 +45,7 @@ def builderApiClient(host: Optional[str], verify: Optional[bool]) -> Configurati
         tmp_configuration.verify_ssl = find_ssl_path()
 
     if verify is False:
-        unverfiedHttp()
+        unverifiedHttp()
         tmp_configuration.verify_ssl = False
 
     return tmp_configuration
@@ -260,7 +261,7 @@ class Q:
     def bigquery_status() -> str:
         """[summary]
         Uses the cda_client library's MetaClass to get status check on the cda
-        BigQuery table
+        BigQuery tablas
         Returns:
             str: status messages
         """
@@ -408,13 +409,13 @@ class Q:
                 """
                 )
 
-        except NewConnectionError as e:
+        except NewConnectionError:
             print("Connection error")
 
         except SSLError as e:
             print(e)
 
-        except InsecureRequestWarning as e:
+        except InsecureRequestWarning:
             print(
                 "Adding certificate verification pem is strongly advised please read our https://cda.readthedocs.io/en/latest/Installation.html "
             )
@@ -423,6 +424,11 @@ class Q:
             print(
                 f"Connection error max retry limit of 3 hit please check url or local python ssl pem {e}"
             )
+        except ApiException as e:
+            if str(e.body).find("dose not exist"):
+                print(e.body)
+            else:
+                print(e.body)
 
         except Exception as e:
             print(e)
@@ -504,13 +510,13 @@ class Q:
                 """
                 )
 
-        except NewConnectionError as e:
+        except NewConnectionError:
             print("Connection error")
 
         except SSLError as e:
             print(e)
 
-        except InsecureRequestWarning as e:
+        except InsecureRequestWarning:
             print(
                 "Adding certificate verification pem is strongly advised please read our https://cda.readthedocs.io/en/latest/Installation.html "
             )
@@ -519,6 +525,8 @@ class Q:
             print(
                 f"Connection error max retry limit of 3 hit please check url or local python ssl pem {e}"
             )
+        except ApiException as e:
+            print(e.body)
 
         except Exception as e:
             print(e)
@@ -550,6 +558,9 @@ class Q:
 
     def Less_Then(self, right: "Q"):
         return Q(self.query, "<", right.query)
+
+    def IN(self, right: str):
+        return Q(self.query, "IN", right)
 
     def __select(self, fields: str):
         """[summary]
