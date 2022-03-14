@@ -1,4 +1,4 @@
-from cdapython import Q,columns
+from cdapython import Q, columns
 
 
 def test_ssl_sql():

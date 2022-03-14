@@ -12,7 +12,7 @@ from cda_client.exceptions import ServiceException
 import cdapython.constantVariables as const
 from urllib3.exceptions import InsecureRequestWarning
 
-from cdapython.errorLogger import unverfiedHttp
+from cdapython.errorLogger import unverifiedHttp
 from .functions import backwardsComp, find_ssl_path
 from .decorators_cache import lru_cache_timed
 
@@ -86,7 +86,7 @@ def unique_terms(
     async_req: Optional[bool] = None,
     pre_stream: bool = True,
     version: Optional[str] = table_version,
-    files:Optional[bool] = False
+    files: Optional[bool] = False,
 ) -> Optional[List[Any]]:
     """[summary]
 
@@ -113,12 +113,12 @@ def unique_terms(
         tmp_configuration.verify_ssl = find_ssl_path()
 
     if verify is False:
-        unverfiedHttp()
+        unverifiedHttp()
         tmp_configuration.verify_ssl = False
 
     if table is None and isinstance(const.default_table, str):
         table = DEFAULT_TABLE
-    
+
     if async_req is None:
         async_req = False
     col_name = backwardsComp(col_name)
@@ -164,7 +164,7 @@ def columns(
     verify: Optional[bool] = None,
     async_req: Optional[bool] = None,
     pre_stream: bool = True,
-    files:Optional[bool] = False
+    files: Optional[bool] = False,
 ) -> Optional[object]:
     """[summary]
 
@@ -180,7 +180,6 @@ def columns(
     Returns:
         Optional[object]: [description]
     """
-    
 
     # Execute query
     if host is None:
@@ -192,14 +191,13 @@ def columns(
         tmp_configuration.verify_ssl = find_ssl_path()
 
     if verify is False:
-        unverfiedHttp()
+        unverifiedHttp()
         tmp_configuration.verify_ssl = False
     if table is None and isinstance(const.default_table, str):
         table = DEFAULT_TABLE
 
     if async_req is None:
         async_req = False
-
 
     version = table_white_list(table, version)
 

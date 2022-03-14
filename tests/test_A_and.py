@@ -1,7 +1,8 @@
 from cdapython import Q
-from time import sleep
+from memory_profiler import profile
 
 
+@profile
 def test_and_op():
     q1 = Q("ResearchSubject.Diagnosis.age_at_diagnosis > 50*365")
     q2 = Q('ResearchSubject.associated_project = "TCGA-OV"')
@@ -11,3 +12,6 @@ def test_and_op():
     print(r)
 
     assert isinstance(r.count, int) is True
+
+
+test_and_op()

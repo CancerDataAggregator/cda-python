@@ -1,5 +1,5 @@
 from multiprocessing.pool import ApplyResult
-from typing import Counter, List, Union,Dict,Optional
+from typing import Counter, List, Union, Dict, Optional
 from time import sleep
 import json
 from cda_client.model.query_response_data import QueryResponseData
@@ -50,7 +50,7 @@ class Result:
         """
 
     def __dict__(self):
-        return {key: value for (key, value) in  self._api_response.results}
+        return {key: value for (key, value) in self._api_response.results}
 
     # def __flatten_json(self, obj):
     #     ret = {}
@@ -79,6 +79,9 @@ class Result:
     @property
     def countResult(self) -> str:
         if self._api_response.result is None or len(self._api_response.result) == 0:
+            return "No counts could be found"
+
+        if "identifier" not in self._api_response.result[0]:
             return "No counts could be found"
 
         if "system" in self._api_response.result[0]:
@@ -136,13 +139,13 @@ class Result:
             self.__iter__(), record_path=record_path, meta=meta, meta_prefix=meta_prefix
         )
 
-    def stream(self, toDf:bool = False):
+    def stream(self, toDf: bool = False):
         count = 0
         while self.has_next_page:
             count += self.count
             print(
-                    f"Row {count} out of {self.total_row_count} {int((count/self.total_row_count)*100)}%"
-                )
+                f"Row {count} out of {self.total_row_count} {int((count/self.total_row_count)*100)}%"
+            )
             self._dataTmp.extend(self._api_response.result)
             self.next_page()
             self._api_response.result = []

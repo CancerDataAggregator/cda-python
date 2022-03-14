@@ -1,6 +1,8 @@
 from cdapython import Q
+from memory_profiler import profile
 
 
+@profile
 def test_call_api():
     # sleep(1)
     q = Q('id = "TCGA-E2-A10A"')
