@@ -1,5 +1,6 @@
 from cdapython import Q
 import pytest
+from tests.global_settings import host
 
 
 def test_sql_wrong_table():
@@ -20,6 +21,6 @@ def test():
     with pytest.raises(Exception) as excinfo:
         Q.sql(
             """SELECT * FROM region-us.INFORMATION_SCHEMA.TABLES;""",
-            host="http://localhost:8080",
+            host=host,
         )
     assert str(excinfo.value) == "Your database is outside of the project"

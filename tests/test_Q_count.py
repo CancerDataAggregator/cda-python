@@ -1,6 +1,8 @@
 from cdapython import Q
 from collections import Counter
 import pandas as pd
+from tests.global_settings import host
+
 
 sex = Q('sex = "female"')
 cancer = Q('ResearchSubject.primary_disease_type = "Breast Invasive Carcinoma"')
@@ -9,7 +11,7 @@ ageU = Q("days_to_birth >= -45*365")
 
 q1 = sex.And(cancer.And(ageL.And(ageU)))
 
-print(q1.counts(host="http://localhost:8080"))
+print(q1.counts(host=host))
 
 # 0 r3 = q1.run(host="http://localhost:8080")
 

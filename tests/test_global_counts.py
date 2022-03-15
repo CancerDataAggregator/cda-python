@@ -1,9 +1,10 @@
 from cdapython import Q, query
+from tests.global_settings import host
 
 
 def test_glb_count() -> None:
     r = query('sex = "male" OR sex = "female"')
-    q1 = r.counts(host="http://localhost:8080", limit=100)
+    q1 = r.counts(host=host, limit=100)
     print(q1)
 
 

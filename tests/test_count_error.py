@@ -1,9 +1,10 @@
 from cdapython import Q
+from tests.global_settings import host
 
 q1 = Q('ResearchSubject.Specimen.primary_disease_type = "Nevi and Melanomas"')
 
 q = q1
 print(q)
-r = q.counts(host="http://localhost:8080")
+r = q.counts(host=host)
 
 print(r)

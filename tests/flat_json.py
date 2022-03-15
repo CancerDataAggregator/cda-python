@@ -1,12 +1,12 @@
 from memory_profiler import profile
 from cdapython import Q
-
+from tests.global_settings import host
 
 @profile
 def test():
     q = Q('id = "TCGA-E2-A10A"')
 
-    q1 = q.run(verbose=True, host="http://localhost:8080", filter="id")
+    q1 = q.run(verbose=True, host=host, filter="id")
     print(q1)
 
 

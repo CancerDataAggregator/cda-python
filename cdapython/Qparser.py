@@ -173,12 +173,8 @@ class IN(Token):
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
-        
         right_side = context.expression(self.lbp)
-        if isinstance(left, Q):
-            return left.IN(right_side)
-        else:
-            return Q(left.strip()+" IN "+right_side)
+        return Q(left.strip()+" IN "+right_side)
 class LIKE(Token):
     lbp = 4
     
@@ -188,10 +184,7 @@ class LIKE(Token):
         # of same precedence
         
         right_side = context.expression(self.lbp)
-        if isinstance(left, Q):
-            return left.IN(right_side)
-        else:
-            return Q(left.strip()+" LIKE "+right_side)
+        return Q(left.strip()+" LIKE "+right_side)
 lexer = Lexer(with_parens=True)
 lexer.register_token(
     Expression,

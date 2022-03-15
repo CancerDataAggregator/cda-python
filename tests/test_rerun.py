@@ -1,4 +1,5 @@
 from cdapython import Q
+from tests.global_settings import host
 
 try:
     q1 = Q('ResearchSubject.identifier.system = "PDC"')
@@ -7,7 +8,7 @@ try:
 
     q = q3.From(q1.From(q2))
 
-    r = q.run(host="http://localhost:8080", async_call=True)
+    r = q.run(host=host, async_call=True)
     print(r)
 
     q1 = Q('ResearchSubject.identifier.system = "PDC"')
@@ -16,7 +17,7 @@ try:
 
     q = q3.From(q1.From(q2))
 
-    r = q.run(host="http://localhost:8080", async_call=True)
+    r = q.run(host=host, async_call=True)
     print(r)
     q1 = Q('ResearchSubject.identifier.system = "PDC"')
     q2 = Q('ResearchSubject.identifier.system = "GDC"')
@@ -24,7 +25,7 @@ try:
 
     q = q3.From(q1.From(q2))
 
-    r = q.run(host="http://localhost:8080", async_call=True)
+    r = q.run(host=host, async_call=True)
     print(r)
 except Exception as e:
     print(e)

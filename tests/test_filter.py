@@ -1,8 +1,7 @@
 from cdapython import Q
+from tests.global_settings import host
 
 q = Q('id = "TCGA-13-1409"')  # note the double quotes for the string value
-# q1 = Q('id = "tcga-13-1409"')
-r = q.run(version="all_v2_1", verbose=False)
-# df = r.filter("Files",to_DF=True).to_csv("test.csv")
+r = q.run(host=host, verbose=False)
 
-print(r)
+# r.to_DataFrame().to_csv("test.tsv", sep="\t")

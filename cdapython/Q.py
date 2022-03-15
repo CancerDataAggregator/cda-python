@@ -90,11 +90,11 @@ class Q:
         self.query = Query()
 
         if len(args) == 1:
-
+            
             if args[0] is None:
                 raise RuntimeError("Q statement parse error")
-
-            _l, _op, _r = str(args[0]).strip().replace("\n", "").split(" ", 2)
+                 
+            _l, _op, _r = str(args[0]).strip().replace("\n", "").split(" ", 2) 
             _l = backwardsComp(_l)
             _l = col(_l)
             _op, _r = query_type_convertion(_op, _r)
@@ -273,14 +273,14 @@ class Q:
         verify: Optional[bool] = None,
         offset: int = 0,
         limit: int = 100,
+        version: Optional[str] = file_table_version,
+        table: Optional[str] = default_file_table,
         async_call: bool = False,
         dry_run: Optional[bool] = False,
     ):
         cda_client_obj = ApiClient(
             configuration=builderApiClient(host=host, verify=verify)
         )
-        version: Optional[str] = table_version
-        table: Optional[str] = default_table
         try:
 
             with cda_client_obj as api_client:
@@ -348,6 +348,8 @@ class Q:
         verify: Optional[bool] = None,
         verbose: Optional[bool] = True,
         filter: Optional[str] = None,
+        flatten: Optional[bool] = False,
+        format: Optional[str] = "json"
     ) -> Optional[Result]:
         """
 
@@ -447,6 +449,8 @@ class Q:
         verify: Optional[bool] = None,
         verbose: Optional[bool] = True,
         filter: Optional[str] = None,
+        flatten: Optional[bool] = False,
+        format: Optional[str] = "json"
     ) -> Optional[Result]:
         """
 
@@ -559,8 +563,11 @@ class Q:
     def Less_Then(self, right: "Q"):
         return Q(self.query, "<", right.query)
 
-    def IN(self, right: str):
-        return Q(self.query, "IN", right)
+    # def IN(self, right: str):
+    #     return Q(self.query, "IN", right)
+    
+    # def LIKE(self, right: str):
+    #     return Q(self.query +" LIKE " + right)
 
     def __select(self, fields: str):
         """[summary]

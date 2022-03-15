@@ -4,8 +4,14 @@ import cdapython
 
 
 def run_file(path):
-    with open(path) as f:
-        cdapython.query(f.read()).run()
+    with open(path, "r") as file:
+        for line in file:
+            line = line.strip()
+            if not line or line[0] == '#':
+                continue
+            parts = line.split()
+            print(parts)
+            cdapython.query(line).run(host="http://localhost:8080")
 
 
 if __name__ == "__main__":
@@ -15,4 +21,4 @@ if __name__ == "__main__":
 
         shell
     else:
-        run_file(args[0])
+        run_file(sys.argv[1])
