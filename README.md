@@ -397,6 +397,8 @@ just add dependency to the requirements.in and run
 pip-compile
 ```
 
+## Note For runing pytest 
+there is a global_setting.py here you can change the host server 
 
 
 
