@@ -2,6 +2,7 @@ from memory_profiler import profile
 from cdapython import Q
 from tests.global_settings import host
 
+
 @profile
 def test():
     q = Q('id = "TCGA-E2-A10A"')

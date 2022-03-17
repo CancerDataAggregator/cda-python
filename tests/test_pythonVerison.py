@@ -1,7 +1,7 @@
 from cdapython import __version__
 
 
-version = "2022.3.15"
+version = "2022.3.17"
 
 
 def test_python_version() -> None:

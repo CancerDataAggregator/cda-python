@@ -1,5 +1,6 @@
 from cdapython import Q
 from tests.global_settings import host
+
 q1 = Q('File.associated_project = "tcga_brca"')
 q2 = Q('File.associated_project = "TCGA-BRCA"')
 q3 = Q("Subject.days_to_birth < -50*365")
