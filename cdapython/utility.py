@@ -72,7 +72,7 @@ def table_white_list(table: Optional[str], version: Optional[str]):
 
         if table == "cda_mvp" and version == "all_v1_1":
             version = "v3"
-        
+
         return version
 
 

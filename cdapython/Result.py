@@ -18,6 +18,7 @@ class Result:
         limit: Optional[int],
         api_instance: QueryApi,
         show_sql: bool,
+        show_count: bool,
     ) -> None:
         self._api_response = api_response
         self._query_id = query_id
@@ -26,24 +27,25 @@ class Result:
         self._api_instance = api_instance
         self.show_sql: bool = show_sql
         self._dataTmp: List = []
+        self.show_count = show_count
         # add a if check to query output for counts to hide sql
 
-    def __repr_value(self, show_value: bool):
+    def __repr_value(self, show_value: bool, show_count: bool):
         return f"""
             QueryID: {self._query_id}
-            Query: {self.sql if show_value is True else ""  }
+            {"Query:"+self.sql if show_value is True else ""  }
             Offset: {self._offset}
             Count: {self.count}
             Total Row Count: {self.total_row_count}
-            {self.count_result}
+            {self.count_result if show_count is True else ""}
             More pages: {self.has_next_page}
         """
 
     def __repr__(self) -> str:
-        return self.__repr_value(show_value=self.show_sql)
+        return self.__repr_value(show_value=self.show_sql, show_count=self.show_count)
 
     def __str__(self) -> str:
-        return self.__repr_value(show_value=self.show_sql)
+        return self.__repr_value(show_value=self.show_sql, show_count=self.show_count)
 
     def __dict__(self):
         return {key: value for (key, value) in self._api_response.results}
@@ -205,6 +207,7 @@ def get_query_result(
     async_req: bool,
     pre_stream: bool = True,
     show_sql: bool = True,
+    show_count: bool = True,
 ) -> Optional[Result]:
     """[summary]
         This will call the next query and wait for the result then return a Result object to the user.
@@ -235,4 +238,6 @@ def get_query_result(
 
         sleep(2.5)
         if response.total_row_count is not None:
-            return Result(response, query_id, offset, limit, api_instance, show_sql)
+            return Result(
+                response, query_id, offset, limit, api_instance, show_sql, show_count
+            )

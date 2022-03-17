@@ -176,12 +176,12 @@ class Q:
                 return api_response
 
             return get_query_result(
-                api_instance= api_instance,
-                query_id= api_response.query_id,
-                offset=offset, 
+                api_instance=api_instance,
+                query_id=api_response.query_id,
+                offset=offset,
                 limit=limit,
                 async_req=async_call,
-                show_sql=True
+                show_sql=True,
             )
 
         except Exception as e:
@@ -308,6 +308,7 @@ class Q:
                 limit=limit,
                 async_req=async_call,
                 show_sql=False,
+                show_count=False,
             )
 
         except Exception as e:
@@ -415,6 +416,7 @@ class Q:
                 limit=limit,
                 async_req=async_call,
                 show_sql=True,
+                show_count=False,
             )
 
         except ServiceException as httpError:
@@ -520,6 +522,7 @@ class Q:
                 limit=limit,
                 async_req=async_call,
                 show_sql=True,
+                show_count=True,
             )
         except ServiceException as httpError:
             if httpError.body is not None:
