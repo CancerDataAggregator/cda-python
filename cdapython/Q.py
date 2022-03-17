@@ -35,7 +35,7 @@ import pandas as pd
 logging.captureWarnings(InsecureRequestWarning)
 
 
-def builderApiClient(host: Optional[str], verify: Optional[bool]) -> Configuration:
+def builder_api_client(host: Optional[str], verify: Optional[bool]) -> Configuration:
     if host is None:
         host = const.CDA_API_URL
 
@@ -90,11 +90,11 @@ class Q:
         self.query = Query()
 
         if len(args) == 1:
-            
+
             if args[0] is None:
                 raise RuntimeError("Q statement parse error")
-                 
-            _l, _op, _r = str(args[0]).strip().replace("\n", "").split(" ", 2) 
+
+            _l, _op, _r = str(args[0]).strip().replace("\n", "").split(" ", 2)
             _l = backwardsComp(_l)
             _l = col(_l)
             _op, _r = query_type_convertion(_op, _r)
@@ -166,7 +166,7 @@ class Q:
         if project_name is not None and sql.find(project_name) == -1:
             raise Exception("Your database is outside of the project")
 
-        cda_client_obj = ApiClient(configuration=builderApiClient(host, verify))
+        cda_client_obj = ApiClient(configuration=builder_api_client(host, verify))
         try:
 
             with cda_client_obj as api_client:
@@ -176,7 +176,12 @@ class Q:
                 return api_response
 
             return get_query_result(
-                api_instance, api_response.query_id, offset, limit, async_call
+                api_instance= api_instance,
+                query_id= api_response.query_id,
+                offset=offset, 
+                limit=limit,
+                async_req=async_call,
+                show_sql=True
             )
 
         except Exception as e:
@@ -210,7 +215,7 @@ class Q:
             [Result | None]: [This will return a Result class]
         """
         cda_client_obj = ApiClient(
-            configuration=builderApiClient(host=host, verify=verify), pool_threads=2
+            configuration=builder_api_client(host=host, verify=verify), pool_threads=2
         )
         data: List[Result] = []
 
@@ -273,13 +278,13 @@ class Q:
         verify: Optional[bool] = None,
         offset: int = 0,
         limit: int = 100,
-        version: Optional[str] = file_table_version,
-        table: Optional[str] = default_file_table,
+        version: Optional[str] = table_version,
+        table: Optional[str] = default_table,
         async_call: bool = False,
         dry_run: Optional[bool] = False,
     ):
         cda_client_obj = ApiClient(
-            configuration=builderApiClient(host=host, verify=verify)
+            configuration=builder_api_client(host=host, verify=verify)
         )
         try:
 
@@ -297,7 +302,12 @@ class Q:
                 return api_response
 
             return get_query_result(
-                api_instance, api_response.query_id, offset, limit, async_call
+                api_instance=api_instance,
+                query_id=api_response.query_id,
+                offset=offset,
+                limit=limit,
+                async_req=async_call,
+                show_sql=False,
             )
 
         except Exception as e:
@@ -322,7 +332,7 @@ class Q:
         """
 
         cda_client_obj = ApiClient(
-            configuration=builderApiClient(host=host, verify=verify)
+            configuration=builder_api_client(host=host, verify=verify)
         )
         try:
             with cda_client_obj as api_client:
@@ -349,7 +359,7 @@ class Q:
         verbose: Optional[bool] = True,
         filter: Optional[str] = None,
         flatten: Optional[bool] = False,
-        format: Optional[str] = "json"
+        format: Optional[str] = "json",
     ) -> Optional[Result]:
         """
 
@@ -368,7 +378,7 @@ class Q:
             Optional[Result]: [description]
         """
         cda_client_obj = ApiClient(
-            configuration=builderApiClient(host=host, verify=verify)
+            configuration=builder_api_client(host=host, verify=verify)
         )
 
         if filter is not None:
@@ -398,9 +408,14 @@ class Q:
                 if dry_run is True:
                     return api_response
 
-                return get_query_result(
-                    api_instance, api_response.query_id, offset, limit, async_call
-                )
+            return get_query_result(
+                api_instance=api_instance,
+                query_id=api_response.query_id,
+                offset=offset,
+                limit=limit,
+                async_req=async_call,
+                show_sql=True,
+            )
 
         except ServiceException as httpError:
             if httpError.body is not None:
@@ -427,10 +442,7 @@ class Q:
                 f"Connection error max retry limit of 3 hit please check url or local python ssl pem {e}"
             )
         except ApiException as e:
-            if str(e.body).find("dose not exist"):
-                print(e.body)
-            else:
-                print(e.body)
+            print(e.body)
 
         except Exception as e:
             print(e)
@@ -450,7 +462,7 @@ class Q:
         verbose: Optional[bool] = True,
         filter: Optional[str] = None,
         flatten: Optional[bool] = False,
-        format: Optional[str] = "json"
+        format: Optional[str] = "json",
     ) -> Optional[Result]:
         """
 
@@ -469,7 +481,7 @@ class Q:
             Optional[Result]: [description]
         """
         cda_client_obj = ApiClient(
-            configuration=builderApiClient(host=host, verify=verify)
+            configuration=builder_api_client(host=host, verify=verify)
         )
 
         if filter is not None:
@@ -501,10 +513,14 @@ class Q:
                 if dry_run is True:
                     return api_response
 
-                return get_query_result(
-                    api_instance, api_response.query_id, offset, limit, async_call
-                )
-
+            return get_query_result(
+                api_instance=api_instance,
+                query_id=api_response.query_id,
+                offset=offset,
+                limit=limit,
+                async_req=async_call,
+                show_sql=True,
+            )
         except ServiceException as httpError:
             if httpError.body is not None:
                 logError(
@@ -562,12 +578,6 @@ class Q:
 
     def Less_Then(self, right: "Q"):
         return Q(self.query, "<", right.query)
-
-    # def IN(self, right: str):
-    #     return Q(self.query, "IN", right)
-    
-    # def LIKE(self, right: str):
-    #     return Q(self.query +" LIKE " + right)
 
     def __select(self, fields: str):
         """[summary]

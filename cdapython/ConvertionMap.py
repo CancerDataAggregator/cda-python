@@ -17,5 +17,5 @@ convertionMap = {
     "File.associated_project": "associated_project",
     "File.drs_uri": "drs_uri",
     "File.byte_size": "byte_size",
-    "File.checksum": "checksum"
+    "File.checksum": "checksum",
 }

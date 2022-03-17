@@ -17,37 +17,33 @@ class Result:
         offset: Optional[int],
         limit: Optional[int],
         api_instance: QueryApi,
+        show_sql: bool,
     ) -> None:
         self._api_response = api_response
         self._query_id = query_id
         self._offset = offset
         self._limit = limit
         self._api_instance = api_instance
-        self.showCounts = True
-        self._dataTmp = []
+        self.show_sql: bool = show_sql
+        self._dataTmp: List = []
         # add a if check to query output for counts to hide sql
 
-    def __str__(self) -> str:
+    def __repr_value(self, show_value: bool):
         return f"""
-        QueryID: {self._query_id}
-        Query: {self.sql}
-        Offset: {self._offset}
-        Count: {self.count}
-        Total Row Count: {self.total_row_count}
-        {self.countResult}
-        More pages: {self.has_next_page}
+            QueryID: {self._query_id}
+            Query: {self.sql if show_value is True else ""  }
+            Offset: {self._offset}
+            Count: {self.count}
+            Total Row Count: {self.total_row_count}
+            {self.count_result}
+            More pages: {self.has_next_page}
         """
 
     def __repr__(self) -> str:
-        return f"""
-        QueryID: {self._query_id}
-        Query: {self.sql}
-        Offset: {self._offset}
-        Count: {self.count}
-        Total Row Count: {self.total_row_count}
-        {self.countResult}
-        More pages: {self.has_next_page}
-        """
+        return self.__repr_value(show_value=self.show_sql)
+
+    def __str__(self) -> str:
+        return self.__repr_value(show_value=self.show_sql)
 
     def __dict__(self):
         return {key: value for (key, value) in self._api_response.results}
@@ -77,7 +73,7 @@ class Result:
         return exist
 
     @property
-    def countResult(self) -> str:
+    def count_result(self) -> str:
         if self._api_response.result is None or len(self._api_response.result) == 0:
             return "No counts could be found"
 
@@ -85,7 +81,7 @@ class Result:
             return "No counts could be found"
 
         if "system" in self._api_response.result[0]:
-            self.showCounts = False
+            self.show_sql = False
             text = ""
             data = self._api_response.result
             for item in data:
@@ -208,6 +204,7 @@ def get_query_result(
     limit: int,
     async_req: bool,
     pre_stream: bool = True,
+    show_sql: bool = True,
 ) -> Optional[Result]:
     """[summary]
         This will call the next query and wait for the result then return a Result object to the user.
@@ -238,4 +235,4 @@ def get_query_result(
 
         sleep(2.5)
         if response.total_row_count is not None:
-            return Result(response, query_id, offset, limit, api_instance)
+            return Result(response, query_id, offset, limit, api_instance, show_sql)

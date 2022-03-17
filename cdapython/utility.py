@@ -67,11 +67,12 @@ def table_white_list(table: Optional[str], version: Optional[str]):
         str: [description]
     """
     if table is not None and version is not None:
-        if table not in ["cda_mvp", "integration", "dev"]:
+        if table not in ["cda_mvp", "integration", "dev", "cda_dev"]:
             raise ValueError("Table not in allowlist list")
 
         if table == "cda_mvp" and version == "all_v1_1":
             version = "v3"
+        
         return version
 
 

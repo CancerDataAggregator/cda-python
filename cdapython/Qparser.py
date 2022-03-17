@@ -111,7 +111,7 @@ class Doublequotes(Token):
 
 
 class ArrayType(Token):
-    
+
     lbp = 10
 
     def nud(self, context: Parser) -> str:
@@ -168,23 +168,27 @@ class From(Token):
 
 class IN(Token):
     lbp = 4
-    
+
     def led(self, left: str, context: Parser) -> Q:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
         right_side = context.expression(self.lbp)
-        return Q(left.strip()+" IN "+right_side)
+        return Q(left.strip() + " IN " + right_side)
+
+
 class LIKE(Token):
     lbp = 4
-    
+
     def led(self, left: str, context: Parser) -> Q:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stoping at the next boundary
         # of same precedence
-        
+
         right_side = context.expression(self.lbp)
-        return Q(left.strip()+" LIKE "+right_side)
+        return Q(left.strip() + " LIKE " + right_side)
+
+
 lexer = Lexer(with_parens=True)
 lexer.register_token(
     Expression,
@@ -206,6 +210,7 @@ lexer.register_token(Or, re.compile(r"(OR)"))
 lexer.register_token(From, re.compile(r"(FROM)"))
 lexer.register_token(IN, re.compile(r"(IN)"))
 lexer.register_token(LIKE, re.compile(r"(LIKE)"))
+
 
 def parser(text: str) -> Q:
     return lexer.parse(text)

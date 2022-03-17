@@ -54,7 +54,7 @@ while True:
         continue
     try:
         result: Q = query(text=text)
-        if setServer == None: 
+        if setServer == None:
             queryResult = result.run()
         else:
             queryResult = result.run(host=setServer)
