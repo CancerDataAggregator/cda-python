@@ -1,7 +1,5 @@
-
 from cdapython import Q
 from tests.global_settings import host
-
 
 
 def test():

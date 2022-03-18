@@ -1,4 +1,3 @@
-
 from cdapython import Q, query
 from tests.global_settings import host
 
