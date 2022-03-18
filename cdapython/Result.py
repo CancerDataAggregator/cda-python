@@ -118,7 +118,7 @@ class Result:
             return (self._offset + self._limit) <= self.total_row_count
         return None
 
-    def to_DataFrame(
+    def to_dataframe(
         self,
         record_path: Optional[Union[str, list]] = None,
         meta: Optional[Union[str, List[Union[str, List[str]]]]] = None,
