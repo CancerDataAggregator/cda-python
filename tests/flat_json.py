@@ -1,9 +1,9 @@
-from memory_profiler import profile
+
 from cdapython import Q
 from tests.global_settings import host
 
 
-@profile
+
 def test():
     q = Q('id = "TCGA-E2-A10A"')
 
@@ -12,7 +12,7 @@ def test():
 
 
 # print(q1.filter("id"))
-# df = q1.to_DataFrame()
+# df = q1.to_dataframe()
 
 # print(q1)
 

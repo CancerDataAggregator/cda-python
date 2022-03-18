@@ -137,7 +137,7 @@ class Result:
             self.__iter__(), record_path=record_path, meta=meta, meta_prefix=meta_prefix
         )
 
-    def stream(self, toDf: bool = False):
+    def stream(self, to_df: bool = False):
         count = 0
         while self.has_next_page:
             count += self.count
@@ -151,7 +151,7 @@ class Result:
         if toDf is False:
             return self
         else:
-            return self.to_DataFrame()
+            return self.to_dataframe()
 
     def __len__(self):
         return self.count

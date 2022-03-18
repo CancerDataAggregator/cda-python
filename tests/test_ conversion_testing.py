@@ -10,4 +10,4 @@ r = q.run(host=host)
 # t = r.stream()
 
 # if isinstance(t, DataFrame):
-#     print(t.to_DataFrame())
+#     print(t.to_dataframe())

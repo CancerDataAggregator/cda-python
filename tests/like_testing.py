@@ -1,9 +1,8 @@
-from memory_profiler import profile
+
 from cdapython import Q, query
 from tests.global_settings import host
 
 
-@profile
 def testing_like():
     q = query(
         'ResearchSubject.primary_disease_type LIKE "Lung%" AND ResearchSubject.id = "P012"'
