@@ -148,7 +148,7 @@ class Result:
             self.next_page()
             self._api_response.result = []
             self._api_response.result.extend(self._dataTmp)
-        if toDf is False:
+        if to_df is False:
             return self
         else:
             return self.to_dataframe()
