@@ -1,3 +1,4 @@
+import asyncio
 from multiprocessing.pool import ApplyResult
 from typing import Counter, List, Union, Dict, Optional
 from time import sleep
@@ -139,13 +140,14 @@ class Result:
 
     def stream(self, to_df: bool = False):
         count = 0
+        asyncio.run(self.async_next_page())
+
         while self.has_next_page:
             count += self.count
             print(
                 f"Row {count} out of {self.total_row_count} {int((count/self.total_row_count)*100)}%"
             )
             self._dataTmp.extend(self._api_response.result)
-            self.next_page()
             self._api_response.result = []
             self._api_response.result.extend(self._dataTmp)
         if to_df is False:
@@ -178,6 +180,11 @@ class Result:
                 print(json.dumps(self[i], indent=4))
         else:
             print(json.dumps(self[idx], indent=4))
+
+    async def async_next_page(
+        self, limit: Optional[int] = None, async_req=False, pre_stream=True
+    ):
+        return self.next_page()
 
     def next_page(self, limit: Optional[int] = None, async_req=False, pre_stream=True):
         if not self.has_next_page:

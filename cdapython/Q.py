@@ -6,7 +6,7 @@ from typing import Optional, List
 from urllib3.exceptions import InsecureRequestWarning, SSLError
 from cdapython.ConvertionMap import convertionMap
 from cdapython.Result import Result, get_query_result
-from cdapython.functions import backwardsComp, col, quoted, unquoted
+from cdapython.functions import backwards_comp, col, quoted, unquoted
 from cda_client.api.meta_api import MetaApi
 from cdapython.decorators import measure
 from typing import Union
@@ -14,9 +14,9 @@ import cdapython.constantVariables as const
 from cda_client.exceptions import ServiceException
 from cda_client.exceptions import ApiException
 from cdapython.functions import find_ssl_path
-from urllib3.connection import NewConnectionError
+from urllib3.connection import NewConnectionError  # type: ignore
 from urllib3.connectionpool import MaxRetryError
-from cdapython.errorLogger import unverifiedHttp
+from cdapython.errorLogger import unverified_http
 from cda_client.model.query import Query
 from cda_client.api.query_api import QueryApi
 from cda_client import ApiClient, Configuration
@@ -32,7 +32,11 @@ from time import sleep
 import pandas as pd
 
 
-logging.captureWarnings(InsecureRequestWarning)
+logging.captureWarnings(InsecureRequestWarning)  # type: ignore
+
+
+# constants
+WAITING_TEXT = "Waiting for results"
 
 
 def builder_api_client(host: Optional[str], verify: Optional[bool]) -> Configuration:
@@ -45,7 +49,7 @@ def builder_api_client(host: Optional[str], verify: Optional[bool]) -> Configura
         tmp_configuration.verify_ssl = find_ssl_path()
 
     if verify is False:
-        unverifiedHttp()
+        unverified_http()
         tmp_configuration.verify_ssl = False
 
     return tmp_configuration
@@ -81,7 +85,7 @@ class Q:
     Q lang is Language used to send query to the cda service
     """
 
-    def __init__(self, *args: Union[str, Query, None]) -> None:
+    def __init__(self, *args: Union[str, Query]) -> None:
         """
 
         Args:
@@ -95,7 +99,7 @@ class Q:
                 raise RuntimeError("Q statement parse error")
 
             _l, _op, _r = str(args[0]).strip().replace("\n", "").split(" ", 2)
-            _l = backwardsComp(_l)
+            _l = backwards_comp(_l)
             _l = col(_l)
             _op, _r = query_type_convertion(_op, _r)
             _r = infer_quote(_r)
@@ -198,6 +202,7 @@ class Q:
         verify: Optional[bool] = None,
         offset: int = 0,
         limit: int = 100,
+        verbose: Optional[bool] = True,
     ):
         """[summary]
 
@@ -231,8 +236,9 @@ class Q:
                 return api_response
 
             if isinstance(api_response, ApplyResult):
+                if verbose:
+                    print()
 
-                print("Waiting for results")
                 while api_response.ready() is False:
                     api_response.wait(10000)
                 api_response = api_response.get()
@@ -253,12 +259,12 @@ class Q:
                 sleep(1)
                 data.extend(r)
                 r.next_page()
-            df = pd.json_normalize(data=data)
+            df = pd.json_normalize(data=data)  # type: ignore
             df.to_csv("test.tsv", "\t")
             return df
         except Exception as e:
             if len(data) > 0:
-                df = pd.json_normalize(data)
+                df = pd.json_normalize(data=data)  # type: ignore
                 df.to_csv("error.tsv", "\t")
             print(e)
 
@@ -401,13 +407,13 @@ class Q:
 
                 if isinstance(api_response, ApplyResult):
                     if verbose:
-                        print("Waiting for results")
+                        print(WAITING_TEXT)
                     while api_response.ready() is False:
                         api_response.wait(10000)
                     api_response = api_response.get()
 
                 if dry_run is True:
-                    return api_response
+                    return api_response  # type: ignore
 
             return get_query_result(
                 api_instance=api_instance,
@@ -507,7 +513,7 @@ class Q:
 
                 if isinstance(api_response, ApplyResult):
                     if verbose:
-                        print("Waiting for results")
+                        print(WAITING_TEXT)
                     while api_response.ready() is False:
                         api_response.wait(10000)
                     api_response = api_response.get()

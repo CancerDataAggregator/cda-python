@@ -1,8 +1,8 @@
-from typing import TYPE_CHECKING
-from cdapython.utility import query
-from tdparser.topdown import MissingTokensError
-from cdapython.Q import Q
 from tdparser.lexer import LexerError
+from tdparser.topdown import MissingTokensError
+
+from cdapython.Q import Q
+from cdapython.utility import query
 
 try:
     import readline

@@ -26,6 +26,8 @@ def find_ssl_path() -> bool:
     Returns:
         bool: [description]
     """
+    openssl_cafile: str
+    openssl_dir:str
     openssl_dir, openssl_cafile = path.split(get_default_verify_paths().openssl_cafile)
     check: bool = True
 
@@ -38,11 +40,11 @@ def find_ssl_path() -> bool:
     return check
 
 
-def backwardsComp(value: str):
+def backwards_comp(value: str):
     if value in convertionMap:
-        tmpL = convertionMap[value]
+        tmp_l: str = convertionMap[value]
         print(
-            f" This Value {value} has been deprecated but will be converted it for you in the background please use the new value {tmpL}"
+            f" This Value {value} has been deprecated but will be converted it for you in the background please use the new value {tmp_l}"
         )
-        return tmpL
+        return tmp_ls
     return value

@@ -1,21 +1,21 @@
-import logging
-from typing import TYPE_CHECKING, Any, List
-import cda_client
-from cda_client.api.query_api import QueryApi
-from cdapython.Result import get_query_result
-from cdapython.constantVariables import table_version
-from cdapython.Qparser import parser
-from typing import Optional
-import numpy as np
 import json
+import logging
+from typing import Optional
+from typing import TYPE_CHECKING, Any, List
+
+import cda_client
+import numpy as np
+from cda_client.api.query_api import QueryApi
 from cda_client.exceptions import ServiceException
-import cdapython.constantVariables as const
 from urllib3.exceptions import InsecureRequestWarning
 
-from cdapython.errorLogger import unverifiedHttp
-from .functions import backwardsComp, find_ssl_path
+import cdapython.constantVariables as const
+from cdapython.Qparser import parser
+from cdapython.Result import get_query_result
+from cdapython.constantVariables import table_version
+from cdapython.errorLogger import unverified_http
 from .decorators_cache import lru_cache_timed
-
+from .functions import backwards_comp, find_ssl_path
 
 logging.captureWarnings(InsecureRequestWarning)
 
@@ -114,7 +114,7 @@ def unique_terms(
         tmp_configuration.verify_ssl = find_ssl_path()
 
     if verify is False:
-        unverifiedHttp()
+        unverified_http()
         tmp_configuration.verify_ssl = False
 
     if table is None and isinstance(const.default_table, str):
@@ -122,7 +122,7 @@ def unique_terms(
 
     if async_req is None:
         async_req = False
-    col_name = backwardsComp(col_name)
+    col_name = backwards_comp(col_name)
     version = table_white_list(table, version)
     if files is True:
         table = DEFAULT_TABLE_FILE
@@ -192,7 +192,7 @@ def columns(
         tmp_configuration.verify_ssl = find_ssl_path()
 
     if verify is False:
-        unverifiedHttp()
+        unverified_http()
         tmp_configuration.verify_ssl = False
     if table is None and isinstance(const.default_table, str):
         table = DEFAULT_TABLE
