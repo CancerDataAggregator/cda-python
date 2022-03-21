@@ -1,8 +1,8 @@
-from typing import TYPE_CHECKING
-from cdapython.utility import query
-from tdparser.topdown import MissingTokensError
-from cdapython.Q import Q
 from tdparser.lexer import LexerError
+from tdparser.topdown import MissingTokensError
+
+from cdapython.Q import Q
+from cdapython.utility import query
 
 try:
     import readline
@@ -14,6 +14,7 @@ except ImportError:
     add's history to shell in current session
 """
 new = True
+setServer = None
 
 
 def help() -> None:
@@ -28,6 +29,7 @@ def help() -> None:
         help()
         exit()
         clear()
+        server() set the server
         \n
         """
     )
@@ -47,9 +49,15 @@ while True:
     if text == "clear()":
         print("\n" * 100)
         continue
+    if text == "server()":
+        setServer = input("Enter your server ")
+        continue
     try:
         result: Q = query(text=text)
-        queryResult = result.run()
+        if setServer == None:
+            queryResult = result.run()
+        else:
+            queryResult = result.run(host=setServer)
         print(type(result), queryResult)
     except AttributeError as e:
         print(e)

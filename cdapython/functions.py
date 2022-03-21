@@ -2,6 +2,7 @@ from typing import Optional, Union
 from cda_client.model.query import Query
 from os import path
 from ssl import get_default_verify_paths
+from cdapython.ConversionMap import conversionMap
 
 
 def col(col_name: Optional[str]) -> Query:
@@ -25,6 +26,8 @@ def find_ssl_path() -> bool:
     Returns:
         bool: [description]
     """
+    openssl_cafile: str
+    openssl_dir:str
     openssl_dir, openssl_cafile = path.split(get_default_verify_paths().openssl_cafile)
     check: bool = True
 
@@ -35,3 +38,13 @@ def find_ssl_path() -> bool:
         check = False
 
     return check
+
+
+def backwards_comp(value: str):
+    if value in conversionMap:
+        tmp_l: str = conversionMap[value]
+        print(
+            f" This Value {value} has been deprecated but will be converted it for you in the background please use the new value {tmp_l}"
+        )
+        return tmp_l
+    return value

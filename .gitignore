@@ -25,3 +25,7 @@ monkeytype.*
 .scannerwork
 /notebooks/example-dev.ipynb
 typeReport
+
+.DS_Store
+.pymon
+*.Q
