@@ -4,7 +4,6 @@ import logging
 from multiprocessing.pool import ApplyResult
 from typing import Optional, List
 from urllib3.exceptions import InsecureRequestWarning, SSLError
-from cdapython.ConvertionMap import convertionMap
 from cdapython.Result import Result, get_query_result
 from cdapython.functions import backwards_comp, col, quoted, unquoted
 from cda_client.api.meta_api import MetaApi
