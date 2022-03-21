@@ -46,5 +46,5 @@ def backwards_comp(value: str):
         print(
             f" This Value {value} has been deprecated but will be converted it for you in the background please use the new value {tmp_l}"
         )
-        return tmp_ls
+        return tmp_l
     return value
