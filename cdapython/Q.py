@@ -56,7 +56,7 @@ def builder_api_client(host: Optional[str], verify: Optional[bool]) -> Configura
 
 def query_type_convertion(_op: str, _r: str):
     """_summary_
-        This is for query type convertion
+        This is for query type convertion in looking operator
     Args:
         _op (str): _description_
         _r (str): _description_
@@ -138,7 +138,7 @@ class Q:
         verbose: Optional[bool] = True,
     ) -> Optional[Result]:
         """[summary]
-
+        This function will let you write sql instead creating a Q statement
         Args:
             sql (str): [description]
             host (Optional[str], optional): [description]. Defaults to None.
@@ -288,6 +288,21 @@ class Q:
         async_call: bool = False,
         dry_run: Optional[bool] = False,
     ):
+        """_summary_
+
+        Args:
+            host (Optional[str], optional): _description_. Defaults to None.
+            verify (Optional[bool], optional): _description_. Defaults to None.
+            offset (int, optional): _description_. Defaults to 0.
+            limit (int, optional): _description_. Defaults to 100.
+            version (Optional[str], optional): _description_. Defaults to table_version.
+            table (Optional[str], optional): _description_. Defaults to default_table.
+            async_call (bool, optional): _description_. Defaults to False.
+            dry_run (Optional[bool], optional): _description_. Defaults to False.
+
+        Returns:
+            _type_: _description_
+        """
         cda_client_obj = ApiClient(
             configuration=builder_api_client(host=host, verify=verify)
         )
@@ -608,7 +623,7 @@ class Q:
 
 def infer_quote(val: Union[str, "Q", Query]) -> Union[Q, Query]:
     """[summary]
-    Handles Strings With quotes
+    Handles Strings With quotes by checking the value type
     Args:
         val (Union[str,"Q",Query): [description]
 

@@ -140,7 +140,7 @@ class Result:
 
     def stream(self, to_df: bool = False):
         count = 0
-        asyncio.run(self.async_next_page())
+            # asyncio.run(self.async_next_page())
 
         while self.has_next_page:
             count += self.count
@@ -185,6 +185,11 @@ class Result:
         self, limit: Optional[int] = None, async_req=False, pre_stream=True
     ):
         return self.next_page()
+        
+    async def async_prev_page(
+        self, limit: Optional[int] = None, async_req=False, pre_stream=True
+    ):
+        return self.prev_page()
 
     def next_page(self, limit: Optional[int] = None, async_req=False, pre_stream=True):
         if not self.has_next_page:

@@ -27,7 +27,7 @@ def find_ssl_path() -> bool:
         bool: [description]
     """
     openssl_cafile: str
-    openssl_dir:str
+    openssl_dir: str
     openssl_dir, openssl_cafile = path.split(get_default_verify_paths().openssl_cafile)
     check: bool = True
 
@@ -40,7 +40,15 @@ def find_ssl_path() -> bool:
     return check
 
 
-def backwards_comp(value: str):
+def backwards_comp(value: str) -> str:
+    """_summary_
+        This is a function will look up a string value in a dictionary
+    Args:
+        value (str): _description_
+
+    Returns:
+        str: _description_
+    """
     if value in conversionMap:
         tmp_l: str = conversionMap[value]
         print(
