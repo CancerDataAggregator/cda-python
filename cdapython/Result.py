@@ -140,8 +140,7 @@ class Result:
 
     def stream(self, to_df: bool = False):
         count = 0
-            # asyncio.run(self.async_next_page())
-
+        
         while self.has_next_page:
             count += self.count
             print(
@@ -150,6 +149,8 @@ class Result:
             self._dataTmp.extend(self._api_response.result)
             self._api_response.result = []
             self._api_response.result.extend(self._dataTmp)
+            self.next_page()
+    
         if to_df is False:
             return self
         else:
