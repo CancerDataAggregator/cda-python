@@ -29,3 +29,5 @@ typeReport
 .DS_Store
 .pymon
 *.Q
+*.tsv
+*.csv

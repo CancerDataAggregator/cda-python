@@ -7,6 +7,8 @@ from cda_client.model.query_response_data import QueryResponseData
 from cda_client.api.query_api import QueryApi
 from pandas import DataFrame, json_normalize
 
+from cdapython.Paginator import Paginator
+
 
 class Result:
     """A convenient wrapper around the response object from the CDA service."""
@@ -114,10 +116,10 @@ class Result:
         return self._api_response.total_row_count
 
     @property
-    def has_next_page(self) -> Optional[bool]:
+    def has_next_page(self) -> bool:
         if isinstance(self._offset, int) and isinstance(self._limit, int):
             return (self._offset + self._limit) <= self.total_row_count
-        return None
+        return False
 
     def to_dataframe(
         self,
@@ -138,27 +140,10 @@ class Result:
             self.__iter__(), record_path=record_path, meta=meta, meta_prefix=meta_prefix
         )
 
-    def stream(self, to_df: bool = False):
-        count = 0
-        
-        while self.has_next_page:
-            count += self.count
-            print(
-                f"Row {count} out of {self.total_row_count} {int((count/self.total_row_count)*100)}%"
-            )
-            self._dataTmp.extend(self._api_response.result)
-            self._api_response.result = []
-            self._api_response.result.extend(self._dataTmp)
-            self.next_page()
-    
-        if to_df is False:
-            return self
-        else:
-            return self.to_dataframe()
-
     def __len__(self):
         return self.count
-
+    def paginator(self,to_df:bool = False):
+        return Paginator(self,to_df=to_df)
     def __getitem__(
         self, idx: Union[int, slice]
     ) -> Union[Dict[str, Optional[str]], List[dict]]:
@@ -186,7 +171,7 @@ class Result:
         self, limit: Optional[int] = None, async_req=False, pre_stream=True
     ):
         return self.next_page()
-        
+
     async def async_prev_page(
         self, limit: Optional[int] = None, async_req=False, pre_stream=True
     ):

@@ -8,4 +8,6 @@ def unverified_http() -> None:
 
 
 def deprecated_values(old: str, new: str):
-    print(f" This Value {old} has been deprecated but will be converted it for you in the background please use the new value {new}")
+    print(
+        f" This Value {old} has been deprecated but will be converted it for you in the background please use the new value {new}"
+    )

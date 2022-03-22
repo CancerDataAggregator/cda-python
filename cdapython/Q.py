@@ -29,6 +29,7 @@ from cdapython.constantVariables import (
 )
 from time import sleep
 import pandas as pd
+from rich.progress import Progress
 
 
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
@@ -248,23 +249,14 @@ class Q:
             if r is None:
                 return None
 
-            count = 0
-
-            while r.has_next_page is True:
-                count += r.count
-                print(
-                    f"Row {count} out of {r.total_row_count} {int((count/r.total_row_count)*100)}%"
-                )
-                sleep(1)
-                data.extend(r)
-                r.next_page()
-            df = pd.json_normalize(data=data)  # type: ignore
-            df.to_csv("test.tsv", "\t")
+            df = pd.DataFrame()
+            with Progress() as progress:
+                download_task = progress.add_task("download",total=r.total_row_count)
+                for i in r.paginator(to_df=True):
+                    df = pd.concat([df, i])
+                    progress.update(download_task,advance=len(i))
             return df
         except Exception as e:
-            if len(data) > 0:
-                df = pd.json_normalize(data=data)  # type: ignore
-                df.to_csv("error.tsv", "\t")
             print(e)
 
     @staticmethod
