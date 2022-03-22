@@ -1,7 +1,8 @@
 from cdapython import query
 from pandas import DataFrame,concat
+from global_settings import host
 
-q = query('ResearchSubject.primary_disease_type LIKE "Lung%"').run(host="http://localhost:8080")
+q = query('ResearchSubject.primary_disease_type LIKE "Lung%"').run(host=host)
 
 
 # df = r.to_dataframe()
