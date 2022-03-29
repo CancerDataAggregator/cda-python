@@ -35,7 +35,7 @@ setup(
         "tdparser",
         "numpy",
         "wheel",
-        "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git",
+        "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git@2.1.0",
         "python-dotenv",
     ],
     description="User friendly Python library to access CDA service.",
