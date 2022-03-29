@@ -31,3 +31,4 @@ typeReport
 *.Q
 *.tsv
 *.csv
+.tox

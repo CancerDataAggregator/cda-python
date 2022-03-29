@@ -222,8 +222,6 @@ class Q:
         cda_client_obj = ApiClient(
             configuration=builder_api_client(host=host, verify=verify), pool_threads=2
         )
-        data: List[Result] = []
-
         try:
 
             with cda_client_obj as api_client:
@@ -251,10 +249,10 @@ class Q:
 
             df = pd.DataFrame()
             with Progress() as progress:
-                download_task = progress.add_task("download",total=r.total_row_count)
+                download_task = progress.add_task("download", total=r.total_row_count)
                 for i in r.paginator(to_df=True):
                     df = pd.concat([df, i])
-                    progress.update(download_task,advance=len(i))
+                    progress.update(download_task, advance=len(i))
             return df
         except Exception as e:
             print(e)
@@ -372,7 +370,7 @@ class Q:
         verbose: Optional[bool] = True,
         filter: Optional[str] = None,
         flatten: Optional[bool] = False,
-        format: Optional[str] = "json",
+        format_type: Optional[str] = "json",
     ) -> Optional[Result]:
         """
 
@@ -428,7 +426,8 @@ class Q:
                 limit=limit,
                 async_req=async_call,
                 show_sql=True,
-                show_count=False,
+                show_count=True,
+                format_type=format_type
             )
 
         except ServiceException as httpError:
@@ -476,7 +475,7 @@ class Q:
         verbose: Optional[bool] = True,
         filter: Optional[str] = None,
         flatten: Optional[bool] = False,
-        format: Optional[str] = "json",
+        format_type: Optional[str] = "json",
     ) -> Optional[Result]:
         """
 
@@ -535,6 +534,7 @@ class Q:
                 async_req=async_call,
                 show_sql=True,
                 show_count=True,
+                format_type=format_type
             )
         except ServiceException as httpError:
             if httpError.body is not None:

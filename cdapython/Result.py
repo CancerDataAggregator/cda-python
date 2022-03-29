@@ -1,4 +1,5 @@
 import asyncio
+from http.client import NO_CONTENT
 from multiprocessing.pool import ApplyResult
 from typing import Counter, List, Union, Dict, Optional
 from time import sleep
@@ -22,6 +23,7 @@ class Result:
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
+        format_type:str = "json"
     ) -> None:
         self._api_response = api_response
         self._query_id = query_id
@@ -31,6 +33,7 @@ class Result:
         self.show_sql: bool = show_sql
         self._dataTmp: List = []
         self.show_count = show_count
+        self.format_type = format_type
         # add a if check to query output for counts to hide sql
 
     def __repr_value(self, show_value: bool, show_count: bool):
@@ -79,11 +82,15 @@ class Result:
 
     @property
     def count_result(self) -> str:
+        NO_COUNT = "No counts could be found"
+        if self.format_type.lower() == "tsv":
+            return NO_COUNT
+
         if self._api_response.result is None or len(self._api_response.result) == 0:
-            return "No counts could be found"
+            return NO_COUNT
 
         if "identifier" not in self._api_response.result[0]:
-            return "No counts could be found"
+            return NO_COUNT
 
         if "system" in self._api_response.result[0]:
             self.show_sql = False
@@ -206,6 +213,9 @@ def get_query_result(
     pre_stream: bool = True,
     show_sql: bool = True,
     show_count: bool = True,
+    flatten: Optional[bool] = False,
+    format_type: Optional[str] = "json",
+
 ) -> Optional[Result]:
     """[summary]
         This will call the next query and wait for the result then return a Result object to the user.
@@ -227,6 +237,8 @@ def get_query_result(
             limit=limit,
             async_req=async_req,
             _preload_content=pre_stream,
+            format=format_type.upper(),
+            _check_return_type=False
         )
 
         if isinstance(response, ApplyResult):
@@ -237,5 +249,5 @@ def get_query_result(
         sleep(2.5)
         if response.total_row_count is not None:
             return Result(
-                response, query_id, offset, limit, api_instance, show_sql, show_count
+                response, query_id, offset, limit, api_instance, show_sql, show_count,format_type
             )
