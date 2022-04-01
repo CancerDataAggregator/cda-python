@@ -1,6 +1,7 @@
 # Versioning Year Month Day of last push
 VERSION: str = "2022.3.22"
 DATABASETABLE_VERSION: str = "all_v3_0_subjects_meta"
+CLIENT_VERSION: str = "2.1.0"
 DATABASETABLE: str = "gdc-bq-sample.dev"
 CDA_API_URL_ENV: str = "https://cda.cda-dev.broadinstitute.org"
 DATABASETABLE_FOR_FILES: str = "gdc-bq-sample.dev"

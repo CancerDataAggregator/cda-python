@@ -16,4 +16,6 @@ flake8==4.0.1
 memory_profiler
 pytest-xdist
 ipython
+numpy==1.21.5
 rich==12.0.1
+matplotlib==3.5.1
