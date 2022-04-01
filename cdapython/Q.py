@@ -217,7 +217,7 @@ class Q:
             limit (int, optional): [description]. Defaults to 100.
 
         Returns:
-            [Result | None]: [This will return a Result class]
+            [DataFrame | None]: [This will return a Result class]
         """
         cda_client_obj = ApiClient(
             configuration=builder_api_client(host=host, verify=verify), pool_threads=2
