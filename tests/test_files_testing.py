@@ -1,4 +1,5 @@
 from cdapython import Q
+from tests.global_settings import host
 
-r = Q('id = "TCGA-E2-A10A"').run(host="http://35.192.60.10:8080/")
+r = Q('id = "TCGA-E2-A10A"').run(host=host)
 print(r.pretty_print())

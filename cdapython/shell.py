@@ -3,6 +3,8 @@ from tdparser.topdown import MissingTokensError
 
 from cdapython.Q import Q
 from cdapython.utility import query
+from rich import print
+from rich.console import Console
 
 try:
     import readline
@@ -15,6 +17,7 @@ except ImportError:
 """
 new = True
 setServer = None
+console = Console(record=True)
 
 
 def help() -> None:
@@ -50,7 +53,7 @@ while True:
         print("\n" * 100)
         continue
     if text == "server()":
-        setServer = input("Enter your server ")
+        setServer = console.input("Enter your server ")
         continue
     try:
         result: Q = query(text=text)

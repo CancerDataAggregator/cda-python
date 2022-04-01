@@ -1,12 +1,15 @@
 from cdapython import Q
-from tests.global_settings import host, localhost
+from tests.global_settings import localhost
 
 
 def test():
     q = Q('id = "TCGA-E2-A10A"')
 
-    q1 = q.run(verbose=True, host=localhost, format_type="tsv")
-    print(q1[0])
+    # q1 = q.run(verbose=True, host=localhost, format_type="tsv")
+    # check = q.run(verbose=True, host=localhost, format_type="tsv") == q.run(verbose=True, host=localhost, format_type="tsv")
+    q1 = q.run(verify=False, host=localhost, format_type="tsv")
+    # q1 = q.run(verbose=True, host=localhost, format_type="tsv")
+    print(q1)
 
 
 test()

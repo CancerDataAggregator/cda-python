@@ -1,4 +1,4 @@
-pytest-monitor
+pytest-monitor==1.6.3
 pytest==6.2.5
 pytest-cov==3.0.0
 mypy==0.910
@@ -6,14 +6,15 @@ mypy-extensions==0.4.3
 flake8==4.0.1
 black==21.9b0
 bandit==1.7.0
-git+https://github.com/CancerDataAggregator/cda-python.git
+git+https://github.com/CancerDataAggregator/cda-service-python-client.git@2.1.0
+git+https://github.com/CancerDataAggregator/cda-python.git@master
 python-dotenv==0.18.0
 wheel==0.36.2
 tdparser==1.1.6
 pandas==1.3.5
-pytest-cov
+pytest-cov==3.0.0
 flake8==4.0.1
 memory_profiler
-pytest-xdist
-ipython
+pytest-xdist==2.5.0
+ipython==8.1.1
 rich==12.0.1

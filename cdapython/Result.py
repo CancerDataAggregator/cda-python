@@ -6,9 +6,10 @@ from time import sleep
 import json
 from cda_client.model.query_response_data import QueryResponseData
 from cda_client.api.query_api import QueryApi
-from pandas import DataFrame, json_normalize
-
+from pandas import DataFrame, json_normalize, read_csv
+from io import StringIO
 from cdapython.Paginator import Paginator
+import rich.repr
 
 
 class Result:
@@ -23,7 +24,7 @@ class Result:
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
-        format_type:str = "json"
+        format_type: str = "json",
     ) -> None:
         self._api_response = api_response
         self._query_id = query_id
@@ -31,9 +32,24 @@ class Result:
         self._limit = limit
         self._api_instance = api_instance
         self.show_sql: bool = show_sql
-        self._dataTmp: List = []
         self.show_count = show_count
         self.format_type = format_type
+        self._df: DataFrame
+
+        if self.format_type == "tsv" and isinstance(self._api_response.result, list):
+            # data_text:str = ""
+            # header = ""
+
+            # for index, value in enumerate(self._api_response.result):
+            #     # if index == 0:
+            #     #     header += value
+            #     #     continue
+            #     data_text+=value
+
+            self._df = read_csv(
+                StringIO("\n".join(self._api_response.result)), sep="\t"
+            )
+
         # add a if check to query output for counts to hide sql
 
     def __repr_value(self, show_value: bool, show_count: bool):
@@ -47,14 +63,24 @@ class Result:
             More pages: {self.has_next_page}
         """
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> rich.repr.Result:
         return self.__repr_value(show_value=self.show_sql, show_count=self.show_count)
 
     def __str__(self) -> str:
         return self.__repr_value(show_value=self.show_sql, show_count=self.show_count)
 
     def __dict__(self):
-        return {key: value for (key, value) in self._api_response.results}
+        tmp = {key: value for (key, value) in self._api_response.result}
+        return tmp
+
+    def __eq__(self, __other: object):
+        return (
+            isinstance(__other, Result)
+            and self._api_response.result == __other._api_response.result
+        )
+
+    def __hash__(self):
+        return hash(tuple(self._api_response.result))
 
     # def __flatten_json(self, obj):
     #     ret = {}
@@ -84,7 +110,10 @@ class Result:
     def count_result(self) -> str:
         NO_COUNT = "No counts could be found"
         if self.format_type.lower() == "tsv":
-            return NO_COUNT
+
+            return f"""
+                {self._df["identifier.system"].dropna().value_counts().tojson()}
+               """
 
         if self._api_response.result is None or len(self._api_response.result) == 0:
             return NO_COUNT
@@ -140,6 +169,9 @@ class Result:
         Returns:
             DataFrame: [description]
         """
+        if self.format_type == "tsv":
+            return self._api_response.result
+
         if record_path is None:
             return json_normalize(self.__iter__())
 
@@ -149,11 +181,17 @@ class Result:
 
     def __len__(self):
         return self.count
-    def paginator(self,to_df:bool = False):
-        return Paginator(self,to_df=to_df)
+
+    def paginator(self, to_df: bool = False):
+        return Paginator(self, to_df=to_df)
+
     def __getitem__(
         self, idx: Union[int, slice]
     ) -> Union[Dict[str, Optional[str]], List[dict]]:
+
+        if isinstance(self._api_response.result, DataFrame):
+            return self._api_response.result.loc[idx]
+
         if isinstance(idx, int):
             if idx < 0:
                 idx = self.count + idx
@@ -214,8 +252,7 @@ def get_query_result(
     show_sql: bool = True,
     show_count: bool = True,
     flatten: Optional[bool] = False,
-    format_type: Optional[str] = "json",
-
+    format_type: str = "json",
 ) -> Optional[Result]:
     """[summary]
         This will call the next query and wait for the result then return a Result object to the user.
@@ -238,7 +275,7 @@ def get_query_result(
             async_req=async_req,
             _preload_content=pre_stream,
             format=format_type.upper(),
-            _check_return_type=False
+            _check_return_type=False,
         )
 
         if isinstance(response, ApplyResult):
@@ -249,5 +286,12 @@ def get_query_result(
         sleep(2.5)
         if response.total_row_count is not None:
             return Result(
-                response, query_id, offset, limit, api_instance, show_sql, show_count,format_type
+                response,
+                query_id,
+                offset,
+                limit,
+                api_instance,
+                show_sql,
+                show_count,
+                format_type,
             )

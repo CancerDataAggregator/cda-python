@@ -30,7 +30,8 @@ from cdapython.constantVariables import (
 from time import sleep
 import pandas as pd
 from rich.progress import Progress
-
+from rich.traceback import Traceback
+from rich import print
 
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 
@@ -370,7 +371,7 @@ class Q:
         verbose: Optional[bool] = True,
         filter: Optional[str] = None,
         flatten: Optional[bool] = False,
-        format_type: Optional[str] = "json",
+        format_type: str = "json",
     ) -> Optional[Result]:
         """
 
@@ -427,7 +428,7 @@ class Q:
                 async_req=async_call,
                 show_sql=True,
                 show_count=True,
-                format_type=format_type
+                format_type=format_type,
             )
 
         except ServiceException as httpError:
@@ -476,7 +477,7 @@ class Q:
         filter: Optional[str] = None,
         flatten: Optional[bool] = False,
         format_type: Optional[str] = "json",
-    ) -> Optional[Result]:
+    ) -> Union[Result, pd.DataFrame, None]:
         """
 
         Args:
@@ -534,7 +535,7 @@ class Q:
                 async_req=async_call,
                 show_sql=True,
                 show_count=True,
-                format_type=format_type
+                format_type=format_type,
             )
         except ServiceException as httpError:
             if httpError.body is not None:

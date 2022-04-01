@@ -16,8 +16,10 @@ bandit==1.7.0
     # via -r requirements-dev.in
 black==21.9b0
     # via -r requirements-dev.in
-cda-client @ git+https://github.com/CancerDataAggregator/cda-service-python-client.git
-    # via cdapython
+cda-client @ git+https://github.com/CancerDataAggregator/cda-service-python-client.git@2.1.0
+    # via
+    #   -r requirements-dev.in
+    #   cdapython
 cdapython @ git+https://github.com/CancerDataAggregator/cda-python.git
     # via -r requirements-dev.in
 certifi==2021.10.8
@@ -127,9 +129,7 @@ pytest-monitor==1.6.3
 pytest-xdist==2.5.0
     # via -r requirements-dev.in
 python-dateutil==2.8.2
-    # via
-    #   cda-client
-    #   pandas
+    # via pandas
 python-dotenv==0.18.0
     # via
     #   -r requirements-dev.in
@@ -176,9 +176,7 @@ typing-extensions==4.1.1
     #   black
     #   mypy
 urllib3==1.26.8
-    # via
-    #   cda-client
-    #   requests
+    # via requests
 wcwidth==0.2.5
     # via prompt-toolkit
 wheel==0.36.2

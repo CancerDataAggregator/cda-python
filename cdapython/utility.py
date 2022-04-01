@@ -16,6 +16,7 @@ from cdapython.constantVariables import table_version
 from cdapython.errorLogger import unverified_http
 from .decorators_cache import lru_cache_timed
 from .functions import backwards_comp, find_ssl_path
+from rich import print
 
 logging.captureWarnings(InsecureRequestWarning)
 
