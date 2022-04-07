@@ -1,5 +1,3 @@
-import asyncio
-from http.client import NO_CONTENT
 from multiprocessing.pool import ApplyResult
 from typing import Counter, List, Union, Dict, Optional
 from time import sleep
@@ -9,11 +7,13 @@ from cda_client.api.query_api import QueryApi
 from pandas import DataFrame, json_normalize, read_csv
 from io import StringIO
 from cdapython.Paginator import Paginator
-import rich.repr
+from rich import print
 
 
 class Result:
-    """A convenient wrapper around the response object from the CDA service."""
+    """
+    The Results Class is a convenient wrapper around the response object from the CDA service.
+    """
 
     def __init__(
         self,
@@ -37,18 +37,11 @@ class Result:
         self._df: DataFrame
 
         if self.format_type == "tsv" and isinstance(self._api_response.result, list):
-            # data_text:str = ""
-            # header = ""
-
-            # for index, value in enumerate(self._api_response.result):
-            #     # if index == 0:
-            #     #     header += value
-            #     #     continue
-            #     data_text+=value
-
-            self._df = read_csv(
-                StringIO("\n".join(self._api_response.result)), sep="\t"
+            data_text: str = ""
+            data_text = "\n".join(
+                map(lambda e: e.replace("\n", ""), self._api_response.result)
             )
+            self._df = read_csv(StringIO(data_text), sep="\t")
 
         # add a if check to query output for counts to hide sql
 
@@ -63,7 +56,7 @@ class Result:
             More pages: {self.has_next_page}
         """
 
-    def __repr__(self) -> rich.repr.Result:
+    def __repr__(self) -> str:
         return self.__repr_value(show_value=self.show_sql, show_count=self.show_count)
 
     def __str__(self) -> str:
@@ -110,10 +103,11 @@ class Result:
     def count_result(self) -> str:
         NO_COUNT = "No counts could be found"
         if self.format_type.lower() == "tsv":
+            df_dic = self._df["identifier.system"].dropna().value_counts().to_dict()
+            dic = {"GDC": 0, "PDC": 0, "IDC": 0}
+            dic.update(df_dic)
 
-            return f"""
-                {self._df["identifier.system"].dropna().value_counts().tojson()}
-               """
+            return f"GDC Count: {dic['GDC']}\n\tPDC Count: {dic['PDC']}\n\tIDC Count: {dic['IDC']}"
 
         if self._api_response.result is None or len(self._api_response.result) == 0:
             return NO_COUNT
@@ -170,7 +164,7 @@ class Result:
             DataFrame: [description]
         """
         if self.format_type == "tsv":
-            return self._api_response.result
+            return self._df
 
         if record_path is None:
             return json_normalize(self.__iter__())
@@ -183,7 +177,15 @@ class Result:
         return self.count
 
     def paginator(self, to_df: bool = False):
-        return Paginator(self, to_df=to_df)
+        """_summary_
+        paginator this will automatically page over results
+        Args:
+            to_df (bool, optional): _description_. Defaults to False.
+
+        Returns:
+            _type_: _description_
+        """
+        return Paginator(self, to_df=to_df, format_type=self.format_type)
 
     def __getitem__(
         self, idx: Union[int, slice]
@@ -206,6 +208,12 @@ class Result:
         return iter(self._api_response.result)
 
     def pretty_print(self, idx: Optional[int] = None):
+        """_summary_
+        pretty_print will print out a json object if you pass a index then i will print the object at that index without the index
+        it will automatically print alll results in the json object
+        Args:
+            idx (Optional[int], optional): _description_. Defaults to None.
+        """
         if idx is None:
             for i in range(self.count):
                 print(json.dumps(self[i], indent=4))
@@ -223,6 +231,19 @@ class Result:
         return self.prev_page()
 
     def next_page(self, limit: Optional[int] = None, async_req=False, pre_stream=True):
+        """_summary_
+         The next_page function will call the server for the next page using this limit to determine the next level of page results
+        Args:
+            limit (Optional[int], optional): _description_. Defaults to None.
+            async_req (bool, optional): _description_. Defaults to False.
+            pre_stream (bool, optional): _description_. Defaults to True.
+
+        Raises:
+            StopIteration: _description_
+
+        Returns:
+            _type_: _description_
+        """
         if not self.has_next_page:
             raise StopIteration
         if isinstance(self._offset, int) and isinstance(self._limit, int):
@@ -238,7 +259,13 @@ class Result:
 
     def _get_result(self, _offset: int, _limit: int, async_req=False, pre_stream=True):
         return get_query_result(
-            self._api_instance, self._query_id, _offset, _limit, async_req, pre_stream
+            self._api_instance,
+            self._query_id,
+            _offset,
+            _limit,
+            async_req,
+            pre_stream,
+            format_type=self.format_type,
         )
 
 

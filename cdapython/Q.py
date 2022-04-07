@@ -250,7 +250,7 @@ class Q:
 
             df = pd.DataFrame()
             with Progress() as progress:
-                download_task = progress.add_task("download", total=r.total_row_count)
+                download_task = progress.add_task("Download", total=r.total_row_count)
                 for i in r.paginator(to_df=True):
                     df = pd.concat([df, i])
                     progress.update(download_task, advance=len(i))
@@ -477,7 +477,7 @@ class Q:
         filter: Optional[str] = None,
         flatten: Optional[bool] = False,
         format_type: Optional[str] = "json",
-    ) -> Union[Result, pd.DataFrame, None]:
+    ) -> Optional[Result]:
         """
 
         Args:

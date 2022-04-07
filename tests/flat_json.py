@@ -7,8 +7,8 @@ def test():
 
     # q1 = q.run(verbose=True, host=localhost, format_type="tsv")
     # check = q.run(verbose=True, host=localhost, format_type="tsv") == q.run(verbose=True, host=localhost, format_type="tsv")
-    q1 = q.run(verify=False, host=localhost, format_type="tsv")
-    # q1 = q.run(verbose=True, host=localhost, format_type="tsv")
+    # q1 = q.run(verify=False, host=host)
+    q1 = q.run(verbose=True, host=localhost, format_type="tsv")
     print(q1)
 
 
