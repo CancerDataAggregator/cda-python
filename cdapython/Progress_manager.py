@@ -2,7 +2,7 @@ from rich.progress import Progress
 
 
 class ProgressManager:
-    def __init__(self, other, cls:) -> None:
+    def __init__(self, other, cls) -> None:
         self.count = other._limit
         self.total = other.total_row_count
         self.cls = cls
