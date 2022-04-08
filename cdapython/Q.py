@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from json import loads
 from logging import error as logError
 import logging
@@ -461,6 +462,10 @@ class Q:
         except Exception as e:
             print(e)
         return None
+
+    @dataclass
+    class test:
+        format_type: str = "json"
 
     @measure()
     def run(

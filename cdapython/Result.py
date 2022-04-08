@@ -63,7 +63,9 @@ class Result:
         return self.__repr_value(show_value=self.show_sql, show_count=self.show_count)
 
     def __dict__(self):
-        tmp = {key: value for (key, value) in self._api_response.result}
+        tmp = {
+            
+        }
         return tmp
 
     def __eq__(self, __other: object):
@@ -71,6 +73,14 @@ class Result:
             isinstance(__other, Result)
             and self._api_response.result == __other._api_response.result
         )
+
+    def __ne__(self, __o: object) -> bool:
+        result = self.__eq__(__o)
+
+        if result is NotImplemented:
+            return NotImplemented
+        else:
+            return not result
 
     def __hash__(self):
         return hash(tuple(self._api_response.result))
@@ -322,3 +332,6 @@ def get_query_result(
                 show_count,
                 format_type,
             )
+
+
+
