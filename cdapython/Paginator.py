@@ -25,14 +25,10 @@ class Paginator:
 
         if self.to_df:
             result_nx = self.result.to_dataframe()
-        
+
         if self.result.has_next_page:
             self.result = self.result.next_page()
             return result_nx
         else:
-            self.stopped = True  
+            self.stopped = True
             return result_nx
-
-    def __del__(self):
-        print('Destructor called, Employee deleted.')
-
