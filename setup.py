@@ -38,6 +38,7 @@ setup(
         "urllib3==1.26.8",
         "rich==12.0.1",
         "pandas==1.3.5",
+        "ipywidgets==7.7.0",
         "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git",
         "python-dotenv==0.18.0",
     ],
