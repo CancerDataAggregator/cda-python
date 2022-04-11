@@ -251,10 +251,10 @@ class Q:
 
             df = pd.DataFrame()
             with Progress() as progress:
-                download_task = progress.add_task("download",total=r.total_row_count)
+                download_task = progress.add_task("download", total=r.total_row_count)
                 for i in r.paginator(to_df=True):
                     df = pd.concat([df, i])
-                    progress.update(download_task,advance=len(i))
+                    progress.update(download_task, advance=len(i))
             return df
         except Exception as e:
             print(e)
@@ -582,16 +582,16 @@ class Q:
     def Not_EQ(self, right: "Q") -> "Q":
         return Q(self.query, "!=", right.query)
 
-    def Greater_Then_EQ(self, right: "Q"):
+    def Greater_Than_EQ(self, right: "Q"):
         return Q(self.query, ">=", right.query)
 
-    def Greater_Then(self, right: "Q"):
+    def Greater_Than(self, right: "Q"):
         return Q(self.query, ">", right.query)
 
-    def Less_Then_EQ(self, right: "Q"):
+    def Less_Than_EQ(self, right: "Q"):
         return Q(self.query, "<=", right.query)
 
-    def Less_Then(self, right: "Q"):
+    def Less_Than(self, right: "Q"):
         return Q(self.query, "<", right.query)
 
     def __select(self, fields: str):

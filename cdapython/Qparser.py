@@ -44,7 +44,7 @@ class NotEq(Token):
             return Q(left.strip() + " != " + right_side.strip())
 
 
-class Greatertheneq(Token):
+class Greaterthaneq(Token):
     lbp = 4  # Precedence
 
     def led(self, left: Union[str, Q], context: Parser) -> Q:
@@ -53,12 +53,12 @@ class Greatertheneq(Token):
         # of same precedence
         right_side = context.expression(self.lbp)
         if isinstance(left, Q):
-            return left.Greater_Then_EQ(right_side)
+            return left.Greater_Than_EQ(right_side)
         else:
             return Q(left.strip() + " >= " + right_side.strip())
 
 
-class Greaterthen(Token):
+class Greaterthan(Token):
     lbp = 4  # Precedence
 
     def led(self, left: str, context: Parser) -> Q:
@@ -67,12 +67,12 @@ class Greaterthen(Token):
         # of same precedence
         right_side = context.expression(self.lbp)
         if isinstance(left, Q):
-            return left.Greater_Then(right_side)
+            return left.Greater_Than(right_side)
         else:
             return Q(left.strip() + " > " + right_side.strip())
 
 
-class Lesstheneq(Token):
+class Lessthaneq(Token):
     lbp = 4  # Precedence
 
     def led(self, left: str, context: Parser) -> Q:
@@ -81,12 +81,12 @@ class Lesstheneq(Token):
         # of same precedence
         right_side = context.expression(self.lbp)
         if isinstance(left, Q):
-            return left.Less_Then_EQ(right_side)
+            return left.Less_Than_EQ(right_side)
         else:
             return Q(left.strip() + " <= " + right_side.strip())
 
 
-class Lessthen(Token):
+class Lessthan(Token):
     lbp = 4  # Precedence
 
     def led(self, left: str, context: Parser) -> Q:
@@ -95,7 +95,7 @@ class Lessthen(Token):
         # of same precedence
         right_side = context.expression(self.lbp)
         if isinstance(left, Q):
-            return left.Less_Then(right_side)
+            return left.Less_Than(right_side)
         else:
             return Q(left.strip() + " < " + right_side.strip())
 
@@ -215,10 +215,10 @@ lexer.register_token(
 lexer.register_token(Doublequotes, re.compile(r'(".*?")'))
 lexer.register_token(Singlequotes, re.compile(r"('.*?')"))
 lexer.register_token(ArrayType, re.compile(r"(\[.*?\])"))
-lexer.register_token(Greaterthen, re.compile(r"(\s+>+\s)"))
-lexer.register_token(Greatertheneq, re.compile(r"(\s+>=+\s)"))
-lexer.register_token(Lessthen, re.compile(r"(\s+<+\s)"))
-lexer.register_token(Lesstheneq, re.compile(r"(\s+<=+\s)"))
+lexer.register_token(Greaterthan, re.compile(r"(\s+>+\s)"))
+lexer.register_token(Greaterthaneq, re.compile(r"(\s+>=+\s)"))
+lexer.register_token(Lessthan, re.compile(r"(\s+<+\s)"))
+lexer.register_token(Lessthaneq, re.compile(r"(\s+<=+\s)"))
 lexer.register_token(NotEq, re.compile(r"(\s+!=+\s)"))
 lexer.register_token(Eq, re.compile(r"(\s+=+\s)"))
 lexer.register_token(And, re.compile(r"(AND)"))
