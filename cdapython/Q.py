@@ -293,7 +293,7 @@ class Q:
             dry_run (Optional[bool], optional): _description_. Defaults to False.
 
         Returns:
-            _type_: _description_
+            Result or Dataframe
         """
         cda_client_obj = ApiClient(
             configuration=builder_api_client(host=host, verify=verify)
@@ -588,16 +588,16 @@ class Q:
     def Not_EQ(self, right: "Q") -> "Q":
         return Q(self.query, "!=", right.query)
 
-    def Greater_Then_EQ(self, right: "Q"):
+    def Greater_Than_EQ(self, right: "Q"):
         return Q(self.query, ">=", right.query)
 
-    def Greater_Then(self, right: "Q"):
+    def Greater_Than(self, right: "Q"):
         return Q(self.query, ">", right.query)
 
-    def Less_Then_EQ(self, right: "Q"):
+    def Less_Than_EQ(self, right: "Q"):
         return Q(self.query, "<=", right.query)
 
-    def Less_Then(self, right: "Q"):
+    def Less_Than(self, right: "Q"):
         return Q(self.query, "<", right.query)
 
     def __select(self, fields: str):

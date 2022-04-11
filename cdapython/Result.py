@@ -63,9 +63,7 @@ class Result:
         return self.__repr_value(show_value=self.show_sql, show_count=self.show_count)
 
     def __dict__(self):
-        tmp = {
-            
-        }
+        tmp = {}
         return tmp
 
     def __eq__(self, __other: object):
@@ -332,6 +330,3 @@ def get_query_result(
                 show_count,
                 format_type,
             )
-
-
-
