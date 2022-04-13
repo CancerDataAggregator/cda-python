@@ -288,10 +288,11 @@ class Q:
             verify (Optional[bool], optional): _description_. Defaults to None.
             offset (int, optional): _description_. Defaults to 0.
             limit (int, optional): _description_. Defaults to 100.
-            version (Optional[str], optional): _description_. Defaults to table_version.
-            table (Optional[str], optional): _description_. Defaults to default_table.
+            version (Optional[str], optional): _description_. Defaults to file_table_version.
+            table (Optional[str], optional): _description_. Defaults to default_file_table.
             async_call (bool, optional): _description_. Defaults to False.
             dry_run (Optional[bool], optional): _description_. Defaults to False.
+            show_sql (bool, optional): _description_. Defaults to False.
 
         Returns:
             _type_: _description_
