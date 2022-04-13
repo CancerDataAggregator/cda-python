@@ -83,7 +83,7 @@ class Result:
             return "No counts could be found"
 
         if "identifier" not in self._api_response.result[0]:
-            return "No counts could be found"
+            return ""
 
         if "system" in self._api_response.result[0]:
             self.show_sql = False
@@ -102,7 +102,7 @@ class Result:
                 for file in rs["identifier"]
             ]
         )
-        msg = f"""GDC Count of current page: {dic['GDC']}\n\tPDC Count of current page: {dic['PDC']}\n\tIDC Count of current page: {dic['IDC']}""".expandtabs(
+        msg = f"""GDC Count in current page: {dic['GDC']}\n\tPDC Count in current page: {dic['PDC']}\n\tIDC Count in current page: {dic['IDC']}""".expandtabs(
             tabsize=12
         )
         return msg

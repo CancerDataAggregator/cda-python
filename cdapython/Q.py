@@ -275,10 +275,11 @@ class Q:
         verify: Optional[bool] = None,
         offset: int = 0,
         limit: int = 100,
-        version: Optional[str] = table_version,
-        table: Optional[str] = default_table,
+        version: Optional[str] = file_table_version,
+        table: Optional[str] = default_file_table,
         async_call: bool = False,
         dry_run: Optional[bool] = False,
+        show_sql: bool = False,
     ):
         """_summary_
 
@@ -319,7 +320,7 @@ class Q:
                 offset=offset,
                 limit=limit,
                 async_req=async_call,
-                show_sql=False,
+                show_sql=show_sql,
                 show_count=False,
             )
 
