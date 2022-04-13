@@ -42,7 +42,7 @@ class Result:
             Total Row Count: {self.total_row_count}
             {self.count_result if show_count is True else ""}
             More pages: {self.has_next_page}
-        """
+            """
 
     def __repr__(self) -> str:
         return self.__repr_value(show_value=self.show_sql, show_count=self.show_count)
@@ -98,10 +98,14 @@ class Result:
             [
                 file["system"]
                 for patient in self._api_response.result
-                for file in patient["identifier"]
+                for rs in patient["ResearchSubject"]
+                for file in rs["identifier"]
             ]
         )
-        return f"GDC Count: {dic['GDC']} \n \tPDC Count: {dic['PDC']} \n \tIDC Count: {dic['IDC']}"
+        msg = f"""GDC Count of current page: {dic['GDC']}\n\tPDC Count of current page: {dic['PDC']}\n\tIDC Count of current page: {dic['IDC']}""".expandtabs(
+            tabsize=12
+        )
+        return msg
 
     @property
     def sql(self) -> str:
@@ -142,8 +146,10 @@ class Result:
 
     def __len__(self):
         return self.count
-    def paginator(self,to_df:bool = False):
-        return Paginator(self,to_df=to_df)
+
+    def paginator(self, to_df: bool = False):
+        return Paginator(self, to_df=to_df)
+
     def __getitem__(
         self, idx: Union[int, slice]
     ) -> Union[Dict[str, Optional[str]], List[dict]]:
