@@ -615,7 +615,7 @@ class Q:
         return Q(tmp, "SELECT", self.query)
 
 
-def infer_quote(val: Union[str, "Q", Query]) -> Union[Q, Query]:
+def infer_quote(val: Union[str, "Q", Query]) -> Union[Q, Query, str]:
     """[summary]
     Handles Strings With quotes by checking the value type
     Args:

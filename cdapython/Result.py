@@ -94,15 +94,14 @@ class Result:
                     text += f"{key} Count: {value} \n \t"
             return f"Total Database Counts:\n\n\t{text}"
 
-        dic = Counter(
+        research_subject_count = Counter(
             [
                 file["system"]
                 for patient in self._api_response.result
-                for rs in patient["ResearchSubject"]
-                for file in rs["identifier"]
+                for file in patient["identifier"]
             ]
         )
-        msg = f"""GDC Count in current page: {dic['GDC']}\n\tPDC Count in current page: {dic['PDC']}\n\tIDC Count in current page: {dic['IDC']}""".expandtabs(
+        msg = f"""GDC Count in current page: {research_subject_count['GDC']}\n\tPDC Count in current page: {research_subject_count['PDC']}\n\tIDC Count in current page: {research_subject_count['IDC']}""".expandtabs(
             tabsize=12
         )
         return msg
@@ -160,8 +159,8 @@ class Result:
         else:
             # for slicing result
             start, stop, step = idx.indices(self.count)
-            rangeIndex = range(start, stop, step)
-            return [self._api_response.result[i] for i in rangeIndex]
+            range_index = range(start, stop, step)
+            return [self._api_response.result[i] for i in range_index]
 
     def __iter__(self):
         return iter(self._api_response.result)
