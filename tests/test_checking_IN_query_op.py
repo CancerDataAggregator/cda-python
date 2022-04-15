@@ -9,7 +9,6 @@ def checking_test():
     assert q1.query.to_dict()["node_type"] == "IN"
     r = q1.run(host=host)
     print(r)
-    assert r.count_result == "No counts could be found"
 
 
 checking_test()
