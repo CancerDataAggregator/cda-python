@@ -40,7 +40,6 @@ class Result:
             Offset: {self._offset}
             Count: {self.count}
             Total Row Count: {self.total_row_count}
-            {self.count_result if show_count is True else ""}
             More pages: {self.has_next_page}
             """
 
@@ -76,35 +75,6 @@ class Result:
                 exist = True
 
         return exist
-
-    @property
-    def count_result(self) -> str:
-        if self._api_response.result is None or len(self._api_response.result) == 0:
-            return "No counts could be found"
-
-        if "identifier" not in self._api_response.result[0]:
-            return ""
-
-        if "system" in self._api_response.result[0]:
-            self.show_sql = False
-            text = ""
-            data = self._api_response.result
-            for item in data:
-                for key, value in item.items():
-                    text += f"{key} Count: {value} \n \t"
-            return f"Total Database Counts:\n\n\t{text}"
-
-        research_subject_count = Counter(
-            [
-                file["system"]
-                for patient in self._api_response.result
-                for file in patient["identifier"]
-            ]
-        )
-        msg = f"""GDC Count in current page: {research_subject_count['GDC']}\n\tPDC Count in current page: {research_subject_count['PDC']}\n\tIDC Count in current page: {research_subject_count['IDC']}""".expandtabs(
-            tabsize=12
-        )
-        return msg
 
     @property
     def sql(self) -> str:
