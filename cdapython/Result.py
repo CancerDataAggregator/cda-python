@@ -52,9 +52,8 @@ class Result:
             Offset: {self._offset}
             Count: {self.count}
             Total Row Count: {self.total_row_count}
-            {self.count_result if show_count is True else ""}
             More pages: {self.has_next_page}
-        """
+            """
 
     def __repr__(self) -> str:
         return self.__repr_value(show_value=self.show_sql, show_count=self.show_count)
@@ -106,40 +105,6 @@ class Result:
                 exist = True
 
         return exist
-
-    @property
-    def count_result(self) -> str:
-        NO_COUNT = "No counts could be found"
-        if self.format_type.lower() == "tsv":
-            df_dic = self._df["identifier.system"].dropna().value_counts().to_dict()
-            dic = {"GDC": 0, "PDC": 0, "IDC": 0}
-            dic.update(df_dic)
-
-            return f"GDC Count: {dic['GDC']}\n\tPDC Count: {dic['PDC']}\n\tIDC Count: {dic['IDC']}"
-
-        if self._api_response.result is None or len(self._api_response.result) == 0:
-            return NO_COUNT
-
-        if "identifier" not in self._api_response.result[0]:
-            return NO_COUNT
-
-        if "system" in self._api_response.result[0]:
-            self.show_sql = False
-            text = ""
-            data = self._api_response.result
-            for item in data:
-                for key, value in item.items():
-                    text += f"{key} Count: {value} \n \t"
-            return f"Total Database Counts:\n\n\t{text}"
-
-        dic = Counter(
-            [
-                file["system"]
-                for patient in self._api_response.result
-                for file in patient["identifier"]
-            ]
-        )
-        return f"GDC Count: {dic['GDC']} \n \tPDC Count: {dic['PDC']} \n \tIDC Count: {dic['IDC']}"
 
     @property
     def sql(self) -> str:
@@ -209,8 +174,8 @@ class Result:
         else:
             # for slicing result
             start, stop, step = idx.indices(self.count)
-            rangeIndex = range(start, stop, step)
-            return [self._api_response.result[i] for i in rangeIndex]
+            range_index = range(start, stop, step)
+            return [self._api_response.result[i] for i in range_index]
 
     def __iter__(self):
         return iter(self._api_response.result)
