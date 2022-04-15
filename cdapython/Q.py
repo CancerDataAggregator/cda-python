@@ -251,10 +251,10 @@ class Q:
 
             df = pd.DataFrame()
             with Progress() as progress:
-                download_task = progress.add_task("download",total=r.total_row_count)
+                download_task = progress.add_task("download", total=r.total_row_count)
                 for i in r.paginator(to_df=True):
                     df = pd.concat([df, i])
-                    progress.update(download_task,advance=len(i))
+                    progress.update(download_task, advance=len(i))
             return df
         except Exception as e:
             print(e)
@@ -275,10 +275,11 @@ class Q:
         verify: Optional[bool] = None,
         offset: int = 0,
         limit: int = 100,
-        version: Optional[str] = table_version,
-        table: Optional[str] = default_table,
+        version: Optional[str] = file_table_version,
+        table: Optional[str] = default_file_table,
         async_call: bool = False,
         dry_run: Optional[bool] = False,
+        show_sql: bool = False,
     ):
         """_summary_
 
@@ -287,10 +288,11 @@ class Q:
             verify (Optional[bool], optional): _description_. Defaults to None.
             offset (int, optional): _description_. Defaults to 0.
             limit (int, optional): _description_. Defaults to 100.
-            version (Optional[str], optional): _description_. Defaults to table_version.
-            table (Optional[str], optional): _description_. Defaults to default_table.
+            version (Optional[str], optional): _description_. Defaults to file_table_version.
+            table (Optional[str], optional): _description_. Defaults to default_file_table.
             async_call (bool, optional): _description_. Defaults to False.
             dry_run (Optional[bool], optional): _description_. Defaults to False.
+            show_sql (bool, optional): _description_. Defaults to False.
 
         Returns:
             _type_: _description_
@@ -319,7 +321,7 @@ class Q:
                 offset=offset,
                 limit=limit,
                 async_req=async_call,
-                show_sql=False,
+                show_sql=show_sql,
                 show_count=False,
             )
 
@@ -582,16 +584,16 @@ class Q:
     def Not_EQ(self, right: "Q") -> "Q":
         return Q(self.query, "!=", right.query)
 
-    def Greater_Then_EQ(self, right: "Q"):
+    def Greater_Than_EQ(self, right: "Q"):
         return Q(self.query, ">=", right.query)
 
-    def Greater_Then(self, right: "Q"):
+    def Greater_Than(self, right: "Q"):
         return Q(self.query, ">", right.query)
 
-    def Less_Then_EQ(self, right: "Q"):
+    def Less_Than_EQ(self, right: "Q"):
         return Q(self.query, "<=", right.query)
 
-    def Less_Then(self, right: "Q"):
+    def Less_Than(self, right: "Q"):
         return Q(self.query, "<", right.query)
 
     def __select(self, fields: str):
@@ -613,7 +615,7 @@ class Q:
         return Q(tmp, "SELECT", self.query)
 
 
-def infer_quote(val: Union[str, "Q", Query]) -> Union[Q, Query]:
+def infer_quote(val: Union[str, "Q", Query]) -> Union[Q, Query, str]:
     """[summary]
     Handles Strings With quotes by checking the value type
     Args:

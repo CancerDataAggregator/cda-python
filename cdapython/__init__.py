@@ -14,5 +14,5 @@ __version__ = VERSION
 __about__ = f"Q {__version__}"
 
 
-def __repr__() -> Optional[str]:
+def __repr__() -> str:
     return __version__
