@@ -396,7 +396,13 @@ just add dependency to the requirements.in and run
 ```bash 
 pip-compile
 ```
-
+## cdapython local dev
+to install the cdapython Library when you are working on the package locally as a dev 
+make sure you are in the main cdapython folder from you git clone and in your terminal 
+navigate to the folder then use `ls` or `DIR` to see the files make sure you see the setup.py file.
+the setup.py file is used to tell pip
+-e editable install so yo can update files
+`pip install -e .`
 ## Note For runing pytest 
 there is a global_setting.py here you can change the host server 
 

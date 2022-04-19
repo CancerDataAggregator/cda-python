@@ -1,9 +1,10 @@
 from multiprocessing.pool import ApplyResult
-from typing import Counter, List, Union, Dict, Optional
+from typing import ChainMap, Counter, List, Union, Dict, Optional
 from time import sleep
 import json
 from cda_client.model.query_response_data import QueryResponseData
 from cda_client.api.query_api import QueryApi
+import numpy as np
 from pandas import DataFrame, json_normalize, read_csv
 from io import StringIO
 from cdapython.Paginator import Paginator
@@ -11,7 +12,7 @@ from rich import print
 
 
 class Result:
-    """
+    """_summary_
     The Results Class is a convenient wrapper around the response object from the CDA service.
     """
 
@@ -145,6 +146,22 @@ class Result:
         return json_normalize(
             self.__iter__(), record_path=record_path, meta=meta, meta_prefix=meta_prefix
         )
+
+    def to_list(self) -> list:
+        """_summary_
+
+        Returns:
+            list: _description_
+        """
+        return self._api_response.result
+
+    def to_dict(self) -> dict:
+        """_summary_
+
+        Returns:
+            dict: _description_
+        """
+        return dict(ChainMap(*self._api_response.result))
 
     def __len__(self):
         return self.count

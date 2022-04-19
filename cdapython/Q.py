@@ -465,10 +465,6 @@ class Q:
             print(e)
         return None
 
-    @dataclass
-    class test:
-        format_type: str = "json"
-
     @measure()
     def run(
         self,
@@ -601,6 +597,12 @@ class Q:
 
     def Less_Than(self, right: "Q"):
         return Q(self.query, "<", right.query)
+
+    def Select(self, fields):
+        return self.__select(fields=fields)
+
+    def Order_By(self, fields):
+        pass
 
     def __select(self, fields: str):
         """[summary]
