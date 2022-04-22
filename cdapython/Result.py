@@ -141,7 +141,7 @@ class Result:
         async def tmp():
             yield self.__result
 
-        return aiter(tmp())
+        return tmp()
 
     def pretty_print(self, idx: Optional[int] = None):
         if idx is None:
