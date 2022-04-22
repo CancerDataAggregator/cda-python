@@ -14,6 +14,24 @@ class Paginator:
     def __iter__(self):
         return self
 
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        if self.stopped:
+            raise StopAsyncIteration
+        result_nx = self.result
+
+        if self.to_df:
+            result_nx = self.result.to_dataframe()
+
+        if self.result.has_next_page:
+            self.result = self.result.next_page()
+            return result_nx
+        else:
+            self.stopped = True
+            return result_nx
+
     def __next__(self):
         if self.stopped:
             raise StopIteration

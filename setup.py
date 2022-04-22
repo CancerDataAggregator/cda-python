@@ -29,7 +29,12 @@ with open(desc_path, "r", encoding="utf-8", errors="surrogateescape") as fh:
 
 setup(
     name=NAME,
-    packages=find_packages(),
+    packages=find_packages(exclude=("tests",)),
+    classifiers=[
+        "cdapython",
+        "CancerDataAggregator",
+        "CancerDataAggregator python",
+    ],
     include_package_data=True,
     package_data={"cdapython": ["py.typed"], "": [".env"]},
     package_dir={"cdapython": "cdapython"},

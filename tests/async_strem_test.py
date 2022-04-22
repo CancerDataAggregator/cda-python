@@ -1,0 +1,17 @@
+import asyncio
+from cdapython import query
+from pandas import DataFrame, concat
+from tests.global_settings import host
+
+
+async def main():
+    q = query('ResearchSubject.primary_disease_type LIKE "Lung%"').run(host=host)
+
+    df = DataFrame()
+    async for i in q.paginator(to_df=True):
+        print(len(i))
+        df = concat([df, i])
+    print(df.head())
+
+
+asyncio.run(main())

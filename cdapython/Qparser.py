@@ -9,6 +9,8 @@ from cdapython.Q import Q
 if TYPE_CHECKING:
     from cdapython.Q import Q
 
+symbol_table = {}
+
 
 class Expression(Token):
     def __init__(self, text: str) -> None:
@@ -191,18 +193,19 @@ class LIKE(Token):
 
 
 class var(Token):
+    lbp = 5
+
     def __init__(self, text: str) -> None:
         self.value = str(text).strip()
-        self.symbol_table = {}
 
     def nud(self, context: Parser) -> str:
         """What the token evaluates to"""
         right_side = context.expression(self.lbp)
 
-        if right_side not in self.symbol_table:
-            self.symbol_table[right_side] = right_side
+        if right_side not in symbol_table:
+            symbol_table[self.value] = right_side
 
-        return self.symbol_table[right_side]
+        return symbol_table[self.value]
 
 
 lexer = Lexer(with_parens=True)
@@ -226,7 +229,7 @@ lexer.register_token(Or, re.compile(r"(OR)"))
 lexer.register_token(From, re.compile(r"(FROM)"))
 lexer.register_token(IN, re.compile(r"(IN)"))
 lexer.register_token(LIKE, re.compile(r"(LIKE)"))
-lexer.register_token(var, re.compile(r"(Var)"))
+lexer.register_token(var, re.compile(r"(Var\s\w+\s*?=(?!=))"))
 
 
 def parser(text: str) -> Q:

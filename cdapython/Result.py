@@ -1,6 +1,7 @@
 import asyncio
+from collections import ChainMap
 from multiprocessing.pool import ApplyResult
-from typing import Counter, List, Union, Dict, Optional
+from typing import Any, Counter, List, Union, Dict, Optional
 from time import sleep
 import json
 from cda_client.model.query_response_data import QueryResponseData
@@ -23,14 +24,15 @@ class Result:
         show_sql: bool,
         show_count: bool,
     ) -> None:
-        self._api_response = api_response
-        self._query_id = query_id
-        self._offset = offset
-        self._limit = limit
-        self._api_instance = api_instance
+        self._api_response: QueryResponseData = api_response
+        self.__result = self._api_response.result
+        self._query_id: str = query_id
+        self._offset: int = offset
+        self._limit: int = limit
+        self._api_instance: QueryApi = api_instance
         self.show_sql: bool = show_sql
         self._dataTmp: List = []
-        self.show_count = show_count
+        self.show_count: bool = show_count
         # add a if check to query output for counts to hide sql
 
     def __repr_value(self, show_value: bool, show_count: bool):
@@ -50,7 +52,7 @@ class Result:
         return self.__repr_value(show_value=self.show_sql, show_count=self.show_count)
 
     def __dict__(self):
-        return {key: value for (key, value) in self._api_response.results}
+        return dict(ChainMap(*self.__result))
 
     # def __flatten_json(self, obj):
     #     ret = {}
@@ -70,7 +72,7 @@ class Result:
 
     def __contains__(self, value):
         exist = False
-        for item in self._api_response.result:
+        for item in self.__result:
             if value in item.values():
                 exist = True
 
@@ -82,7 +84,7 @@ class Result:
 
     @property
     def count(self) -> int:
-        return len(self._api_response.result)
+        return len(self.__result)
 
     @property
     def total_row_count(self) -> int:
@@ -125,15 +127,21 @@ class Result:
         if isinstance(idx, int):
             if idx < 0:
                 idx = self.count + idx
-            return self._api_response.result[idx]
+            return self.__result[idx]
         else:
             # for slicing result
             start, stop, step = idx.indices(self.count)
             range_index = range(start, stop, step)
-            return [self._api_response.result[i] for i in range_index]
+            return [self.__result[i] for i in range_index]
 
     def __iter__(self):
-        return iter(self._api_response.result)
+        return iter(self.__result)
+
+    def __aiter__(self):
+        async def tmp():
+            yield self.__result
+
+        return aiter(tmp())
 
     def pretty_print(self, idx: Optional[int] = None):
         if idx is None:

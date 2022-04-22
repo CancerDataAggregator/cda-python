@@ -9,8 +9,7 @@ def run_file(path):
             line = line.strip()
             if not line or line[0] == "#":
                 continue
-            parts = line.split()
-            print(parts)
+            print(line.split())
             cdapython.query(line).run()
 
 

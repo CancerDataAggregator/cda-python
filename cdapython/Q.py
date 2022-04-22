@@ -21,6 +21,7 @@ from cda_client.api.query_api import QueryApi
 from cda_client import ApiClient, Configuration
 from cda_client.model.query_created_data import QueryCreatedData
 from cdapython.constantVariables import (
+    DATABASETABLE_VERSION_FOR_FILES,
     table_version,
     default_table,
     project_name,
@@ -37,6 +38,11 @@ logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 
 # constants
 WAITING_TEXT = "Waiting for results"
+if isinstance(const.default_file_table, str) and const.default_file_table is not None:
+    DEFAULT_TABLE_FILE: Optional[str] = const.default_file_table.split(".")[1]
+
+if isinstance(const.file_table_version, str) and const.file_table_version is not None:
+    DATABASETABLE_VERSION_FOR_FILES: Optional[str] = const.file_table_version
 
 
 def builder_api_client(host: Optional[str], verify: Optional[bool]) -> Configuration:
@@ -126,6 +132,22 @@ class Q:
     @staticmethod
     def get_host_url() -> Optional[str]:
         return const.CDA_API_URL
+
+    @staticmethod
+    def set_default_project_dataset(table: str) -> None:
+        const.default_table = table
+
+    @staticmethod
+    def get_default_project_dataset() -> Optional[str]:
+        return const.default_table
+
+    @staticmethod
+    def set_table_version(table_version: str) -> None:
+        const.table_version = table_version
+
+    @staticmethod
+    def get_table_version() -> Optional[str]:
+        return const.table_version
 
     @staticmethod
     def sql(
@@ -469,10 +491,10 @@ class Q:
         self,
         offset: int = 0,
         limit: int = 100,
-        version: Optional[str] = table_version,
+        version: Optional[str] = None,
         host: Optional[str] = None,
         dry_run: bool = False,
-        table: Optional[str] = default_table,
+        table: Optional[str] = None,
         async_call: bool = False,
         verify: Optional[bool] = None,
         verbose: Optional[bool] = True,
@@ -499,6 +521,11 @@ class Q:
         cda_client_obj = ApiClient(
             configuration=builder_api_client(host=host, verify=verify)
         )
+        if version is None:
+            version = const.table_version
+
+        if table is None:
+            table = const.default_file_table
 
         if filter is not None:
             self.query = Q.__select(self, fields=filter).query
