@@ -1,7 +1,6 @@
-import asyncio
 from collections import ChainMap
 from multiprocessing.pool import ApplyResult
-from typing import Any, Counter, List, Union, Dict, Optional
+from typing import TYPE_CHECKING, Any, List, Union, Dict, Optional
 from time import sleep
 import json
 from cda_client.model.query_response_data import QueryResponseData
@@ -26,16 +25,17 @@ class Result:
     ) -> None:
         self._api_response: QueryResponseData = api_response
         self.__result = self._api_response.result
-        self._query_id: str = query_id
-        self._offset: int = offset
-        self._limit: int = limit
+        self._query_id: Optional[str] = query_id
+        self._offset: Optional[int] = offset
+        self._limit: Optional[int] = limit
         self._api_instance: QueryApi = api_instance
-        self.show_sql: bool = show_sql
-        self._dataTmp: List = []
-        self.show_count: bool = show_count
+        self.show_sql: Optional[bool] = show_sql
+        self.show_count: Optional[bool] = show_count
         # add a if check to query output for counts to hide sql
 
-    def __repr_value(self, show_value: bool, show_count: bool):
+    def __repr_value(
+        self, show_value: Optional[bool], show_count: Optional[bool]
+    ) -> str:
         return f"""
             QueryID: {self._query_id}
             {"Query:"+self.sql if show_value is True else ""  }
@@ -51,7 +51,7 @@ class Result:
     def __str__(self) -> str:
         return self.__repr_value(show_value=self.show_sql, show_count=self.show_count)
 
-    def __dict__(self):
+    def __dict__(self) -> Dict[str, Any]:
         return dict(ChainMap(*self.__result))
 
     # def __flatten_json(self, obj):
@@ -70,7 +70,7 @@ class Result:
     #     flatten(obj)
     #     return ret
 
-    def __contains__(self, value):
+    def __contains__(self, value: str):
         exist = False
         for item in self.__result:
             if value in item.values():
@@ -174,7 +174,13 @@ class Result:
         _limit = limit or self._limit
         return self._get_result(_offset, _limit, async_req, pre_stream)
 
-    def _get_result(self, _offset: int, _limit: int, async_req=False, pre_stream=True):
+    def _get_result(
+        self,
+        _offset: Optional[int],
+        _limit: Optional[int],
+        async_req: Optional[bool] = False,
+        pre_stream: Optional[bool] = True,
+    ):
         return get_query_result(
             self._api_instance, self._query_id, _offset, _limit, async_req, pre_stream
         )
@@ -182,13 +188,13 @@ class Result:
 
 def get_query_result(
     api_instance: QueryApi,
-    query_id: str,
-    offset: int,
-    limit: int,
-    async_req: bool,
-    pre_stream: bool = True,
-    show_sql: bool = True,
-    show_count: bool = True,
+    query_id: Optional[str],
+    offset: Optional[int],
+    limit: Optional[int],
+    async_req: Optional[bool],
+    pre_stream: Optional[bool] = True,
+    show_sql: Optional[bool] = True,
+    show_count: Optional[bool] = True,
 ) -> Optional[Result]:
     """[summary]
         This will call the next query and wait for the result then return a Result object to the user.

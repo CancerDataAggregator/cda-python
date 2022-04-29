@@ -11,7 +11,7 @@ from urllib3.exceptions import InsecureRequestWarning
 
 import cdapython.constantVariables as const
 from cdapython.Qparser import parser
-from cdapython.Result import Result, get_query_result
+from cdapython.Result import get_query_result
 from cdapython.constantVariables import table_version
 from cdapython.errorLogger import unverified_http
 from .decorators_cache import lru_cache_timed

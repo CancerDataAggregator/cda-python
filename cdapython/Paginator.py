@@ -1,7 +1,8 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional, Union
 
 if TYPE_CHECKING:
     from cdapython.Result import Result
+    from pandas import DataFrame
 
 
 class Paginator:
@@ -11,13 +12,13 @@ class Paginator:
         self.count = 0
         self.stopped = False
 
-    def __iter__(self):
+    def __iter__(self) -> "Paginator":
         return self
 
-    def __aiter__(self):
+    def __aiter__(self) -> "Paginator":
         return self
 
-    async def __anext__(self):
+    async def __anext__(self) -> Optional[Union["DataFrame", "Result"]]:
         if self.stopped:
             raise StopAsyncIteration
         result_nx = self.result
@@ -26,6 +27,7 @@ class Paginator:
             result_nx = self.result.to_dataframe()
 
         if self.result.has_next_page:
+            assert self.result.next_page() is not None
             self.result = self.result.next_page()
             return result_nx
         else:

@@ -6,7 +6,6 @@ from cdapython.Q import Q
 from cdapython.utility import unique_terms, columns, query
 from cdapython._get_unnest_clause import _get_unnest_clause
 from cdapython.constantVariables import VERSION
-from typing import Optional
 
 
 __name__ = "cdapython"

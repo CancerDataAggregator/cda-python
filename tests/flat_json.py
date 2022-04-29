@@ -9,11 +9,11 @@ def test():
     # q1 = q.run(verbose=True, host=localhost, format_type="tsv")
     # check = q.run(verbose=True, host=localhost, format_type="tsv") == q.run(verbose=True, host=localhost, format_type="tsv")
     # q1 = q.run(verify=False, host=host)
-    q1 = q.run(verbose=True, host=localhost, format="tsv")
-    print(q1)
+    q1 = q.run(verbose=True, host=localhost)
     for i in q1:
         print(i)
     print(q1.to_dataframe().head())
+    print("id" in q1)
 
 
 test()

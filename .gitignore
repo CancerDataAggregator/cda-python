@@ -31,3 +31,10 @@ typeReport
 *.Q
 *.tsv
 *.csv
+.coverage.*
+.nox
+.pytype
+.mypy_cache
+.coverage
+.venv
+.ven3

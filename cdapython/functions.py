@@ -52,7 +52,10 @@ def backwards_comp(value: str) -> str:
     if value in conversionMap:
         tmp_l: str = conversionMap[value]
         print(
-            f" This Value {value} has been deprecated but will be converted it for you in the background please use the new value {tmp_l}"
+            f"""
+            This Value {value} has been deprecated but will be converted
+            it for you in the background please use the new value {tmp_l}
+            """
         )
         return tmp_l
     return value

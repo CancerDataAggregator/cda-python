@@ -1,8 +1,12 @@
+from copy import copy
 from json import loads
+import json
 from logging import error as logError
 import logging
 from multiprocessing.pool import ApplyResult
+from types import MappingProxyType
 from typing import Optional, List
+from pyrsistent import l
 from urllib3.exceptions import InsecureRequestWarning, SSLError
 from cdapython.Result import Result, get_query_result
 from cdapython.functions import backwards_comp, col, quoted, unquoted
@@ -21,14 +25,12 @@ from cda_client.api.query_api import QueryApi
 from cda_client import ApiClient, Configuration
 from cda_client.model.query_created_data import QueryCreatedData
 from cdapython.constantVariables import (
-    DATABASETABLE_VERSION_FOR_FILES,
     table_version,
     default_table,
     project_name,
     default_file_table,
     file_table_version,
 )
-from time import sleep
 import pandas as pd
 from rich.progress import Progress
 
@@ -86,6 +88,21 @@ def query_type_convertion(_op: str, _r: str):
     return (_op, _r)
 
 
+class _QEncoder(json.JSONEncoder):
+    def default(self, o):
+
+        if isinstance(o, MappingProxyType):
+            pass
+        else:
+            tmp_dict = o.__dict__
+            if "query" in tmp_dict:
+                return tmp_dict["query"]
+            if "_data_store" in tmp_dict:
+                return tmp_dict["_data_store"]
+
+            return tmp_dict
+
+
 class Q:
     """
     Q lang is Language used to send query to the cda service
@@ -124,6 +141,9 @@ class Q:
 
     def __repr__(self) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
+
+    def to_json(self):
+        return json.dumps(self, indent=4, cls=_QEncoder)
 
     @staticmethod
     def set_host_url(url: str) -> None:
@@ -502,21 +522,24 @@ class Q:
         flatten: Optional[bool] = False,
         format: Optional[str] = "json",
     ) -> Optional[Result]:
-        """
+        """_summary_
 
         Args:
-            offset (int, optional): [description]. Defaults to 0.
-            limit (int, optional): [description]. Defaults to 100.
-            version (Optional[str], optional): [description]. Defaults to table_version.
-            host (Optional[str], optional): [description]. Defaults to None.
-            dry_run (bool, optional): [description]. Defaults to False.
-            table (Optional[str], optional): [description]. Defaults to default_table.
-            async_call (bool, optional): [description]. Defaults to False.
-            verify (Optional[bool], optional): [description]. Defaults to None.
-            verbose (Optional[bool], optional): [Turn on logs]. Defaults to True.
+            offset (int, optional): _description_. Defaults to 0.
+            limit (int, optional): _description_. Defaults to 100.
+            version (Optional[str], optional): _description_. Defaults to None.
+            host (Optional[str], optional): _description_. Defaults to None.
+            dry_run (bool, optional): _description_. Defaults to False.
+            table (Optional[str], optional): _description_. Defaults to None.
+            async_call (bool, optional): _description_. Defaults to False.
+            verify (Optional[bool], optional): _description_. Defaults to None.
+            verbose (Optional[bool], optional): _description_. Defaults to True.
+            filter (Optional[str], optional): _description_. Defaults to None.
+            flatten (Optional[bool], optional): _description_. Defaults to False.
+            format (Optional[str], optional): _description_. Defaults to "json".
 
         Returns:
-            Optional[Result]: [description]
+            Optional[Result]: _description_
         """
         cda_client_obj = ApiClient(
             configuration=builder_api_client(host=host, verify=verify)
