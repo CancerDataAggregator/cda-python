@@ -1,4 +1,3 @@
-from copy import copy
 from json import loads
 import json
 from logging import error as logError
@@ -6,7 +5,6 @@ import logging
 from multiprocessing.pool import ApplyResult
 from types import MappingProxyType
 from typing import Optional, List
-from pyrsistent import l
 from urllib3.exceptions import InsecureRequestWarning, SSLError
 from cdapython.Result import Result, get_query_result
 from cdapython.functions import backwards_comp, col, quoted, unquoted
@@ -142,7 +140,12 @@ class Q:
     def __repr__(self) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
 
-    def to_json(self):
+    def to_json(self) -> str:
+        """Created for the creating boolean-query for testing
+
+        Returns:
+            str: returns a json str to the user
+        """
         return json.dumps(self, indent=4, cls=_QEncoder)
 
     @staticmethod
