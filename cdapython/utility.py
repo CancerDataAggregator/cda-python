@@ -1,7 +1,6 @@
 import json
 import logging
-from typing import Optional
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING, Any, List, Optional
 
 import cda_client
 import numpy as np
@@ -10,10 +9,11 @@ from cda_client.exceptions import ServiceException
 from urllib3.exceptions import InsecureRequestWarning
 
 import cdapython.constantVariables as const
-from cdapython.Qparser import parser
-from cdapython.Result import get_query_result
 from cdapython.constantVariables import table_version
 from cdapython.errorLogger import unverified_http
+from cdapython.Qparser import parser
+from cdapython.Result import get_query_result
+
 from .decorators_cache import lru_cache_timed
 from .functions import backwards_comp, find_ssl_path
 

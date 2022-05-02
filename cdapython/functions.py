@@ -1,7 +1,9 @@
-from typing import Optional, Union
-from cda_client.model.query import Query
 from os import path
 from ssl import get_default_verify_paths
+from typing import Optional, Union
+
+from cda_client.model.query import Query
+
 from cdapython.ConversionMap import conversionMap
 
 

@@ -1,13 +1,15 @@
+import json
 from collections import ChainMap
 from multiprocessing.pool import ApplyResult
-from typing import TYPE_CHECKING, Any, List, Union, Dict, Optional
 from time import sleep
-import json
-from cda_client.model.query_response_data import QueryResponseData
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+
 from cda_client.api.query_api import QueryApi
+from cda_client.model.query_response_data import QueryResponseData
 from pandas import DataFrame, json_normalize
 
 from cdapython.Paginator import Paginator
+from rich import print
 
 
 class Result:
@@ -123,7 +125,7 @@ class Result:
 
     def __getitem__(
         self, idx: Union[int, slice]
-    ) -> Union[Dict[str, Optional[str]], List[dict]]:
+    ) -> Union[Dict[str, Optional[str]], List[Dict[Any, Any]]]:
         if isinstance(idx, int):
             if idx < 0:
                 idx = self.count + idx

@@ -1,37 +1,35 @@
-from json import loads
 import json
-from logging import error as logError
 import logging
+from json import loads
+from logging import error as logError
 from multiprocessing.pool import ApplyResult
 from types import MappingProxyType
-from typing import Optional, List
-from urllib3.exceptions import InsecureRequestWarning, SSLError
-from cdapython.Result import Result, get_query_result
-from cdapython.functions import backwards_comp, col, quoted, unquoted
+from typing import Any, Dict, List, Optional, Tuple, Union
+from typing_extensions import Literal
+import pandas as pd
+from cda_client import ApiClient, Configuration
 from cda_client.api.meta_api import MetaApi
-from cdapython.decorators import measure
-from typing import Union
-import cdapython.constantVariables as const
-from cda_client.exceptions import ServiceException
-from cda_client.exceptions import ApiException
-from cdapython.functions import find_ssl_path
+from cda_client.api.query_api import QueryApi
+from cda_client.exceptions import ApiException, ServiceException
+from cda_client.model.query import Query
+from cda_client.model.query_created_data import QueryCreatedData
+from rich.progress import Progress
 from urllib3.connection import NewConnectionError  # type: ignore
 from urllib3.connectionpool import MaxRetryError
-from cdapython.errorLogger import unverified_http
-from cda_client.model.query import Query
-from cda_client.api.query_api import QueryApi
-from cda_client import ApiClient, Configuration
-from cda_client.model.query_created_data import QueryCreatedData
-from cdapython.constantVariables import (
-    table_version,
-    default_table,
-    project_name,
-    default_file_table,
-    file_table_version,
-)
-import pandas as pd
-from rich.progress import Progress
+from urllib3.exceptions import InsecureRequestWarning, SSLError
 
+import cdapython.constantVariables as const
+from cdapython.constantVariables import (
+    default_file_table,
+    default_table,
+    file_table_version,
+    project_name,
+    table_version,
+)
+from cdapython.decorators import measure
+from cdapython.errorLogger import unverified_http
+from cdapython.functions import backwards_comp, col, find_ssl_path, quoted, unquoted
+from cdapython.Result import Result, get_query_result
 
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 
@@ -61,7 +59,9 @@ def builder_api_client(host: Optional[str], verify: Optional[bool]) -> Configura
     return tmp_configuration
 
 
-def query_type_convertion(_op: str, _r: str):
+def query_type_convertion(
+    _op: str, _r: str
+) -> Union[Tuple[Literal["LIKE"], Query], Tuple[str, str]]:
     """_summary_
         This is for query type convertion in looking operator
     Args:
@@ -87,7 +87,22 @@ def query_type_convertion(_op: str, _r: str):
 
 
 class _QEncoder(json.JSONEncoder):
-    def default(self, o):
+    """_QEncoder this is a a class to help with json convetion
+        the standard json dump
+
+    Args:
+        json (_type_): _description_
+    """
+
+    def default(self, o: Union["Q", "Query"]) -> Union[Any, Dict[str, Any], None]:
+        """this will override the parent super class's default method
+
+        Args:
+            o (Union[&quot;Q&quot;, &quot;Query&quot;]): _description_
+
+        Returns:
+            Union[Any,dict[str, Any], None]: _description_
+        """
 
         if isinstance(o, MappingProxyType):
             pass
@@ -99,6 +114,7 @@ class _QEncoder(json.JSONEncoder):
                 return tmp_dict["_data_store"]
 
             return tmp_dict
+        return None
 
 
 class Q:
@@ -153,7 +169,7 @@ class Q:
         const.CDA_API_URL = url
 
     @staticmethod
-    def get_host_url() -> Optional[str]:
+    def get_host_url() -> str:
         return const.CDA_API_URL
 
     @staticmethod
@@ -161,7 +177,7 @@ class Q:
         const.default_table = table
 
     @staticmethod
-    def get_default_project_dataset() -> Optional[str]:
+    def get_default_project_dataset() -> str:
         return const.default_table
 
     @staticmethod
@@ -169,7 +185,7 @@ class Q:
         const.table_version = table_version
 
     @staticmethod
-    def get_table_version() -> Optional[str]:
+    def get_table_version() -> str:
         return const.table_version
 
     @staticmethod
@@ -248,7 +264,7 @@ class Q:
         offset: int = 0,
         limit: int = 100,
         verbose: Optional[bool] = True,
-    ):
+    ) -> Optional[pd.DataFrame]:
         """[summary]
 
         Args:
@@ -303,16 +319,19 @@ class Q:
             return df
         except Exception as e:
             print(e)
+        return None
 
     @staticmethod
-    def bigquery_status() -> str:
+    def bigquery_status() -> Union[str, Any]:
         """[summary]
         Uses the cda_client library's MetaClass to get status check on the cda
         BigQuery tablas
         Returns:
             str: status messages
         """
-        return MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
+        return str(
+            MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
+        )
 
     def counts(
         self,
@@ -325,7 +344,7 @@ class Q:
         async_call: bool = False,
         dry_run: Optional[bool] = False,
         show_sql: bool = False,
-    ):
+    ) -> Optional[Result]:
         """_summary_
 
         Args:
@@ -377,7 +396,7 @@ class Q:
     @staticmethod
     def query_job_status(
         id: str, host: Optional[str] = None, verify: Optional[bool] = None
-    ):
+    ) -> Optional[Any]:
         """[summary]
 
         Args:
@@ -405,6 +424,7 @@ class Q:
             print(e)
         except Exception as e:
             print(e)
+        return None
 
     def files(
         self,

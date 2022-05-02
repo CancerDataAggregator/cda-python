@@ -1,8 +1,9 @@
 from typing import TYPE_CHECKING, Optional, Union
 
 if TYPE_CHECKING:
-    from cdapython.Result import Result
     from pandas import DataFrame
+
+    from cdapython.Result import Result
 
 
 class Paginator:
