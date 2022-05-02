@@ -156,13 +156,13 @@ class Q:
     def __repr__(self) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
 
-    def to_json(self) -> str:
+    def to_json(self, indent: int = 4) -> str:
         """Created for the creating boolean-query for testing
 
         Returns:
             str: returns a json str to the user
         """
-        return json.dumps(self, indent=4, cls=_QEncoder)
+        return json.dumps(self, indent=indent, cls=_QEncoder)
 
     @staticmethod
     def set_host_url(url: str) -> None:
