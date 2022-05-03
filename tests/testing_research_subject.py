@@ -5,7 +5,7 @@ from tests.global_settings import localhost
 def testing():
     q = Q('id = "TCGA-E2-A10A"')
 
-    r = q.subjects(host=localhost)
+    r = q.research_subject(host=localhost)
     print(r.pretty_print())
 
 
