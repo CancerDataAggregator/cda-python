@@ -285,6 +285,7 @@ def get_query_result(
     pre_stream: Optional[bool] = True,
     show_sql: Optional[bool] = True,
     show_count: Optional[bool] = True,
+    format_type: str = "json",
 ) -> Optional[Result]:
     """[summary]
         This will call the next query and wait for the result then return a Result object to the user.
@@ -306,7 +307,6 @@ def get_query_result(
             limit=limit,
             async_req=async_req,
             _preload_content=pre_stream,
-            format=format_type.upper(),
             _check_return_type=False,
         )
 

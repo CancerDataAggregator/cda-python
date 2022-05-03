@@ -742,7 +742,7 @@ class Q:
                 async_req=async_call,
                 show_sql=True,
                 show_count=True,
-                format_type=format_type,
+                format_type=format,
             )
         except ServiceException as httpError:
             if httpError.body is not None:
