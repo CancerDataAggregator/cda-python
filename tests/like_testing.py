@@ -1,5 +1,5 @@
 from cdapython import Q, query
-from tests.global_settings import host
+from tests.global_settings import host, localhost
 
 
 def testing_like():
@@ -10,8 +10,9 @@ def testing_like():
     # r = q.run(host="http://localhost:8080")
     # c = q.counts(host="http://localhost:8080")
     v = Q('ResearchSubject.primary_disease_type = "Lung%"')
-    v.run(host=host)
-    print(v)
+    r = v.subjects(host=localhost)
+    print(r)
+    # print(r.pretty_print())
 
 
 testing_like()

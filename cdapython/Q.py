@@ -4,7 +4,7 @@ from json import loads
 from logging import error as logError
 from multiprocessing.pool import ApplyResult
 from types import MappingProxyType
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, overload
 from typing_extensions import Literal
 import pandas as pd
 from cda_client import ApiClient, Configuration
@@ -441,93 +441,217 @@ class Q:
         flatten: Optional[bool] = False,
         format: Optional[str] = "json",
     ) -> Optional[Result]:
-        """
-
-        Args:
-            offset (int, optional): [description]. Defaults to 0.
-            limit (int, optional): [description]. Defaults to 100.
-            version (Optional[str], optional): [description]. Defaults to table_version.
-            host (Optional[str], optional): [description]. Defaults to None.
-            dry_run (bool, optional): [description]. Defaults to False.
-            table (Optional[str], optional): [description]. Defaults to default_table.
-            async_call (bool, optional): [description]. Defaults to False.
-            verify (Optional[bool], optional): [description]. Defaults to None.
-            verbose (Optional[bool], optional): [Turn on logs]. Defaults to True.
-
-        Returns:
-            Optional[Result]: [description]
-        """
-        cda_client_obj = ApiClient(
-            configuration=builder_api_client(host=host, verify=verify)
+        return self.run(
+            offset,
+            limit,
+            version,
+            host,
+            dry_run,
+            table,
+            async_call,
+            verify,
+            verbose,
+            filter,
+            flatten,
+            format,
+            lambda api_instance, query, version, dry_run, table, async_req: api_instance.files(
+                query,
+                version=version,
+                dry_run=dry_run,
+                table=table,
+                async_req=async_req,
+            ),
         )
 
-        if filter is not None:
-            self.query = Q.__select(self, fields=filter).query
+    def subjects(
+        self,
+        offset: int = 0,
+        limit: int = 100,
+        version: Optional[str] = None,
+        host: Optional[str] = None,
+        dry_run: bool = False,
+        table: Optional[str] = None,
+        async_call: bool = False,
+        verify: Optional[bool] = None,
+        verbose: Optional[bool] = True,
+        filter: Optional[str] = None,
+        flatten: Optional[bool] = False,
+        format: Optional[str] = "json",
+    ):
+        return self.run(
+            offset,
+            limit,
+            version,
+            host,
+            dry_run,
+            table,
+            async_call,
+            verify,
+            verbose,
+            filter,
+            flatten,
+            format,
+            lambda api_instance, query, version, dry_run, table, async_req: api_instance.subject_query(
+                query,
+                version=version,
+                dry_run=dry_run,
+                table=table,
+                async_req=async_req,
+            ),
+        )
 
-        try:
-            with cda_client_obj as api_client:
-                api_instance = QueryApi(api_client)
-                # Execute boolean query
-                if verbose:
-                    print("Getting results from database", end="\n\n")
-                api_response: Union[QueryCreatedData, ApplyResult] = api_instance.files(
-                    self.query,
-                    version=version,
-                    dry_run=dry_run,
-                    table=table,
-                    async_req=async_call,
-                )
+    def research_subject(
+        self,
+        offset: int = 0,
+        limit: int = 100,
+        version: Optional[str] = None,
+        host: Optional[str] = None,
+        dry_run: bool = False,
+        table: Optional[str] = None,
+        async_call: bool = False,
+        verify: Optional[bool] = None,
+        verbose: Optional[bool] = True,
+        filter: Optional[str] = None,
+        flatten: Optional[bool] = False,
+        format: Optional[str] = "json",
+    ):
+        return self.run(
+            offset,
+            limit,
+            version,
+            host,
+            dry_run,
+            table,
+            async_call,
+            verify,
+            verbose,
+            filter,
+            flatten,
+            format,
+            lambda api_instance, query, version, dry_run, table, async_req: api_instance.research_subject_query(
+                query,
+                version=version,
+                dry_run=dry_run,
+                table=table,
+                async_req=async_req,
+            ),
+        )
 
-                if isinstance(api_response, ApplyResult):
-                    if verbose:
-                        print(WAITING_TEXT)
-                    while api_response.ready() is False:
-                        api_response.wait(10000)
-                    api_response = api_response.get()
+    def diagnosis(
+        self,
+        offset: int = 0,
+        limit: int = 100,
+        version: Optional[str] = None,
+        host: Optional[str] = None,
+        dry_run: bool = False,
+        table: Optional[str] = None,
+        async_call: bool = False,
+        verify: Optional[bool] = None,
+        verbose: Optional[bool] = True,
+        filter: Optional[str] = None,
+        flatten: Optional[bool] = False,
+        format: Optional[str] = "json",
+    ):
+        return self.run(
+            offset,
+            limit,
+            version,
+            host,
+            dry_run,
+            table,
+            async_call,
+            verify,
+            verbose,
+            filter,
+            flatten,
+            format,
+            lambda api_instance, query, version, dry_run, table, async_req: api_instance.diagnosis_query(
+                query,
+                version=version,
+                dry_run=dry_run,
+                table=table,
+                async_req=async_req,
+            ),
+        )
 
-                if dry_run is True:
-                    return api_response  # type: ignore
+    def specimen(
+        self,
+        offset: int = 0,
+        limit: int = 100,
+        version: Optional[str] = None,
+        host: Optional[str] = None,
+        dry_run: bool = False,
+        table: Optional[str] = None,
+        async_call: bool = False,
+        verify: Optional[bool] = None,
+        verbose: Optional[bool] = True,
+        filter: Optional[str] = None,
+        flatten: Optional[bool] = False,
+        format: Optional[str] = "json",
+    ):
+        return self.run(
+            offset,
+            limit,
+            version,
+            host,
+            dry_run,
+            table,
+            async_call,
+            verify,
+            verbose,
+            filter,
+            flatten,
+            format,
+            lambda api_instance, query, version, dry_run, table, async_req: api_instance.specimen_query(
+                query,
+                version=version,
+                dry_run=dry_run,
+                table=table,
+                async_req=async_req,
+            ),
+        )
 
-            return get_query_result(
-                api_instance=api_instance,
-                query_id=api_response.query_id,
-                offset=offset,
-                limit=limit,
-                async_req=async_call,
-                show_sql=True,
-                show_count=False,
-            )
+    def treatments(
+        self,
+        offset: int = 0,
+        limit: int = 100,
+        version: Optional[str] = None,
+        host: Optional[str] = None,
+        dry_run: bool = False,
+        table: Optional[str] = None,
+        async_call: bool = False,
+        verify: Optional[bool] = None,
+        verbose: Optional[bool] = True,
+        filter: Optional[str] = None,
+        flatten: Optional[bool] = False,
+        format: Optional[str] = "json",
+    ):
+        return self.run(
+            offset,
+            limit,
+            version,
+            host,
+            dry_run,
+            table,
+            async_call,
+            verify,
+            verbose,
+            filter,
+            flatten,
+            format,
+            lambda api_instance, query, version, dry_run, table, async_req: api_instance.treatments_query(
+                query,
+                version=version,
+                dry_run=dry_run,
+                table=table,
+                async_req=async_req,
+            ),
+        )
 
-        except ServiceException as httpError:
-            if httpError.body is not None:
-                logError(
-                    f"""
-                Http Status: {httpError.status}
-                Error Message: {loads(httpError.body)["message"]}
-                """
-                )
-
-        except NewConnectionError:
-            print("Connection error")
-
-        except SSLError as e:
-            print(e)
-
-        except InsecureRequestWarning:
-            print(
-                "Adding certificate verification pem is strongly advised please read our https://cda.readthedocs.io/en/latest/Installation.html "
-            )
-
-        except MaxRetryError as e:
-            print(
-                f"Connection error max retry limit of 3 hit please check url or local python ssl pem {e}"
-            )
-        except ApiException as e:
-            print(e.body)
-
-        except Exception as e:
-            print(e)
-        return None
+    def _boolean_query(api_instance, query, version, dry_run, table, async_req):
+        return api_instance.boolean_query(
+            query, version=version, dry_run=dry_run, table=table, async_req=async_req
+        )
 
     @measure()
     def run(
@@ -544,6 +668,12 @@ class Q:
         filter: Optional[str] = None,
         flatten: Optional[bool] = False,
         format: Optional[str] = "json",
+        callback: Optional[
+            Callable[
+                [QueryApi, Query, str, bool, str, bool],
+                Union[QueryCreatedData, ApplyResult],
+            ]
+        ] = _boolean_query,
     ) -> Optional[Result]:
         """_summary_
 
@@ -582,14 +712,13 @@ class Q:
                 # Execute boolean query
                 if verbose:
                     print("Getting results from database", end="\n\n")
-                api_response: Union[
-                    QueryCreatedData, ApplyResult
-                ] = api_instance.boolean_query(
+                api_response: Union[QueryCreatedData, ApplyResult] = callback(
+                    api_instance,
                     self.query,
-                    version=version,
-                    dry_run=dry_run,
-                    table=table,
-                    async_req=async_call,
+                    version,
+                    dry_run,
+                    table,
+                    async_call,
                 )
 
                 if isinstance(api_response, ApplyResult):
@@ -657,19 +786,22 @@ class Q:
     def Not_EQ(self, right: "Q") -> "Q":
         return Q(self.query, "!=", right.query)
 
-    def Greater_Than_EQ(self, right: "Q"):
+    def Greater_Than_EQ(self, right: "Q") -> "Q":
         return Q(self.query, ">=", right.query)
 
-    def Greater_Than(self, right: "Q"):
+    def Greater_Than(self, right: "Q") -> "Q":
         return Q(self.query, ">", right.query)
 
-    def Less_Than_EQ(self, right: "Q"):
+    def Less_Than_EQ(self, right: "Q") -> "Q":
         return Q(self.query, "<=", right.query)
 
-    def Less_Than(self, right: "Q"):
+    def Less_Than(self, right: "Q") -> "Q":
         return Q(self.query, "<", right.query)
 
-    def __select(self, fields: str):
+    def Select(self, fields):
+        return self.__select(fields=fields)
+
+    def __select(self, fields: str) -> "Q":
         """[summary]
 
         Args:
@@ -688,7 +820,22 @@ class Q:
         return Q(tmp, "SELECT", self.query)
 
 
-def infer_quote(val: Union[str, "Q", Query]) -> Union[Q, Query, str]:
+@overload
+def infer_quote(val: str) -> str:
+    pass
+
+
+@overload
+def infer_quote(val: "Q") -> "Q":
+    pass
+
+
+@overload
+def infer_quote(val: Query) -> Query:
+    pass
+
+
+def infer_quote(val):
     """[summary]
     Handles Strings With quotes by checking the value type
     Args:
