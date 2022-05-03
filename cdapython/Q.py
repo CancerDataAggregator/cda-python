@@ -855,4 +855,6 @@ def infer_quote(val):
         return val
     if isinstance(val, str) and val.startswith('"') and val.endswith('"'):
         return quoted(val[1:-1])
+    if isinstance(val, str) and val.startswith("'") and val.endswith("'"):
+        return quoted(val[1:-1])
     return unquoted(val)
