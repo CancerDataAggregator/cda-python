@@ -1,19 +1,23 @@
 import json
 from collections import ChainMap
 from multiprocessing.pool import ApplyResult
+from multiprocessing.pool import ApplyResult
+from typing import ChainMap, Counter, List, Union, Dict, Optional
 from time import sleep
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
-from pandas import DataFrame, json_normalize
-
+from pandas import DataFrame, json_normalize, read_csv
+from io import StringIO
 from cdapython.Paginator import Paginator
 from rich import print
 
 
 class Result:
-    """A convenient wrapper around the response object from the CDA service."""
+    """_summary_
+    The Results Class is a convenient wrapper around the response object from the CDA service.
+    """
 
     def __init__(
         self,
@@ -24,6 +28,7 @@ class Result:
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
+        format_type: str = "json",
     ) -> None:
         self._api_response: QueryResponseData = api_response
         self.__result = self._api_response.result
@@ -33,6 +38,16 @@ class Result:
         self._api_instance: QueryApi = api_instance
         self.show_sql: Optional[bool] = show_sql
         self.show_count: Optional[bool] = show_count
+        self.format_type = format_type
+        self._df: DataFrame
+
+        if self.format_type == "tsv" and isinstance(self._api_response.result, list):
+            data_text: str = ""
+            data_text = "\n".join(
+                map(lambda e: e.replace("\n", ""), self._api_response.result)
+            )
+            self._df = read_csv(StringIO(data_text), sep="\t")
+
         # add a if check to query output for counts to hide sql
 
     def __repr_value(
@@ -55,6 +70,23 @@ class Result:
 
     def __dict__(self) -> Dict[str, Any]:
         return dict(ChainMap(*self.__result))
+
+    def __eq__(self, __other: object):
+        return (
+            isinstance(__other, Result)
+            and self._api_response.result == __other._api_response.result
+        )
+
+    def __ne__(self, __o: object) -> bool:
+        result = self.__eq__(__o)
+
+        if result is NotImplemented:
+            return NotImplemented
+        else:
+            return not result
+
+    def __hash__(self):
+        return hash(tuple(self._api_response.result))
 
     # def __flatten_json(self, obj):
     #     ret = {}
@@ -110,6 +142,9 @@ class Result:
         Returns:
             DataFrame: [description]
         """
+        if self.format_type == "tsv":
+            return self._df
+
         if record_path is None:
             return json_normalize(self.__iter__())
 
@@ -117,15 +152,43 @@ class Result:
             self.__iter__(), record_path=record_path, meta=meta, meta_prefix=meta_prefix
         )
 
+    def to_list(self) -> list:
+        """_summary_
+
+        Returns:
+            list: _description_
+        """
+        return self._api_response.result
+
+    def to_dict(self) -> dict:
+        """_summary_
+
+        Returns:
+            dict: _description_
+        """
+        return dict(ChainMap(*self._api_response.result))
+
     def __len__(self):
         return self.count
 
     def paginator(self, to_df: bool = False):
-        return Paginator(self, to_df=to_df)
+        """_summary_
+        paginator this will automatically page over results
+        Args:
+            to_df (bool, optional): _description_. Defaults to False.
+
+        Returns:
+            _type_: _description_
+        """
+        return Paginator(self, to_df=to_df, format_type=self.format_type)
 
     def __getitem__(
         self, idx: Union[int, slice]
     ) -> Union[Dict[str, Optional[str]], List[Dict[Any, Any]]]:
+
+        if isinstance(self._api_response.result, DataFrame):
+            return self._api_response.result.loc[idx]
+
         if isinstance(idx, int):
             if idx < 0:
                 idx = self.count + idx
@@ -146,6 +209,12 @@ class Result:
         return tmp()
 
     def pretty_print(self, idx: Optional[int] = None):
+        """_summary_
+        pretty_print will print out a json object if you pass a index then i will print the object at that index without the index
+        it will automatically print alll results in the json object
+        Args:
+            idx (Optional[int], optional): _description_. Defaults to None.
+        """
         if idx is None:
             for i in range(self.count):
                 print(json.dumps(self[i], indent=4))
@@ -163,6 +232,19 @@ class Result:
         return self.prev_page()
 
     def next_page(self, limit: Optional[int] = None, async_req=False, pre_stream=True):
+        """_summary_
+         The next_page function will call the server for the next page using this limit to determine the next level of page results
+        Args:
+            limit (Optional[int], optional): _description_. Defaults to None.
+            async_req (bool, optional): _description_. Defaults to False.
+            pre_stream (bool, optional): _description_. Defaults to True.
+
+        Raises:
+            StopIteration: _description_
+
+        Returns:
+            _type_: _description_
+        """
         if not self.has_next_page:
             raise StopIteration
         if isinstance(self._offset, int) and isinstance(self._limit, int):
@@ -184,7 +266,13 @@ class Result:
         pre_stream: Optional[bool] = True,
     ):
         return get_query_result(
-            self._api_instance, self._query_id, _offset, _limit, async_req, pre_stream
+            self._api_instance,
+            self._query_id,
+            _offset,
+            _limit,
+            async_req,
+            pre_stream,
+            format_type=self.format_type,
         )
 
 
@@ -218,6 +306,8 @@ def get_query_result(
             limit=limit,
             async_req=async_req,
             _preload_content=pre_stream,
+            format=format_type.upper(),
+            _check_return_type=False,
         )
 
         if isinstance(response, ApplyResult):
@@ -228,5 +318,12 @@ def get_query_result(
         sleep(2.5)
         if response.total_row_count is not None:
             return Result(
-                response, query_id, offset, limit, api_instance, show_sql, show_count
+                response,
+                query_id,
+                offset,
+                limit,
+                api_instance,
+                show_sql,
+                show_count,
+                format_type,
             )

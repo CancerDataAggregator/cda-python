@@ -1,6 +1,18 @@
 from functools import wraps
 from time import time
 
+import asyncio
+
+
+def create_async_func(f):
+    def wrapper(*args, **kwargs):
+        coro = asyncio.coroutine(f)
+        future = coro(*args, **kwargs)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(future)
+
+    return wrapper
+
 
 class measure:
     def __init__(self) -> None:

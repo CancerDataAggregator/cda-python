@@ -7,11 +7,14 @@ if TYPE_CHECKING:
 
 
 class Paginator:
-    def __init__(self, result: "Result", to_df: bool) -> None:
+    def __init__(
+        self, result: "Result", to_df: bool, format_type: str = "JSON"
+    ) -> None:
         self.result = result
         self.to_df = to_df
         self.count = 0
         self.stopped = False
+        self.format_type = format_type
 
     def __iter__(self) -> "Paginator":
         return self
@@ -39,6 +42,7 @@ class Paginator:
         if self.stopped:
             raise StopIteration
         self.count += self.result.count
+
         # print(
         #     f"Row {self.count} out of {self.result.total_row_count} {int((self.count/self.result.total_row_count)*100)}%"
         # )

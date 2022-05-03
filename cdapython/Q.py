@@ -30,6 +30,11 @@ from cdapython.decorators import measure
 from cdapython.errorLogger import unverified_http
 from cdapython.functions import backwards_comp, col, find_ssl_path, quoted, unquoted
 from cdapython.Result import Result, get_query_result
+from time import sleep
+import pandas as pd
+from rich.progress import Progress
+from rich.traceback import Traceback
+from rich import print
 
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 
@@ -283,8 +288,6 @@ class Q:
         cda_client_obj = ApiClient(
             configuration=builder_api_client(host=host, verify=verify), pool_threads=2
         )
-        data: List[Result] = []
-
         try:
 
             with cda_client_obj as api_client:
@@ -312,7 +315,7 @@ class Q:
 
             df = pd.DataFrame()
             with Progress() as progress:
-                download_task = progress.add_task("download", total=r.total_row_count)
+                download_task = progress.add_task("Download", total=r.total_row_count)
                 for i in r.paginator(to_df=True):
                     df = pd.concat([df, i])
                     progress.update(download_task, advance=len(i))
@@ -359,7 +362,7 @@ class Q:
             show_sql (bool, optional): _description_. Defaults to False.
 
         Returns:
-            _type_: _description_
+            Result or Dataframe
         """
         cda_client_obj = ApiClient(
             configuration=builder_api_client(host=host, verify=verify)
@@ -439,7 +442,7 @@ class Q:
         verbose: Optional[bool] = True,
         filter: Optional[str] = None,
         flatten: Optional[bool] = False,
-        format: Optional[str] = "json",
+        format_type: str = "json",
     ) -> Optional[Result]:
         return self.run(
             offset,
@@ -739,6 +742,7 @@ class Q:
                 async_req=async_call,
                 show_sql=True,
                 show_count=True,
+                format_type=format_type,
             )
         except ServiceException as httpError:
             if httpError.body is not None:
@@ -800,6 +804,9 @@ class Q:
 
     def Select(self, fields):
         return self.__select(fields=fields)
+
+    def Order_By(self, fields):
+        pass
 
     def __select(self, fields: str) -> "Q":
         """[summary]

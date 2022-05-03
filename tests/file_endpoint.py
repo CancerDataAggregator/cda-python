@@ -12,8 +12,8 @@ r1 = q1.run(async_call=True)
 
 tmp = r1[0]
 # sleep(11)
-print("cache")
-r2 = q1.run(async_call=True)
+
+r2 = q1.run(async_call=True, format_type="tsv")
 
 
 print(sys.getsizeof(r2))

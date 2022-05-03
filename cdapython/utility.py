@@ -16,6 +16,8 @@ from cdapython.Result import get_query_result
 
 from .decorators_cache import lru_cache_timed
 from .functions import backwards_comp, find_ssl_path
+from rich import print
+
 
 logging.captureWarnings(InsecureRequestWarning)
 
