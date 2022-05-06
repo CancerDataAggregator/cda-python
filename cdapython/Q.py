@@ -27,13 +27,23 @@ from cdapython.constantVariables import (
     table_version,
 )
 from cdapython.decorators import measure
+from cdapython.endpoints import (
+    _boolean_query,
+    _counts_query,
+    _diagnosis_query,
+    _files_query,
+    _research_subject_query,
+    _specimen_query,
+    _subject_query,
+    _treatments_query,
+)
 from cdapython.errorLogger import unverified_http
 from cdapython.functions import backwards_comp, col, find_ssl_path, quoted, unquoted
 from cdapython.Result import Result, get_query_result
 from time import sleep
 import pandas as pd
 from rich.progress import Progress
-from rich.traceback import Traceback
+
 from rich import print
 
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
@@ -126,6 +136,31 @@ class Q:
     """
     Q lang is Language used to send query to the cda service
     """
+
+    # q1 = Q('test = "A"')
+    # r = q1.subject.run()
+    # r1 = q1.files.run()
+    # q1.files
+    # r1 = q1.run()
+    # q1.researchsubject
+    # r1 = q1.run()
+
+    entity_type = ""
+    task = ""
+    api_tasks = {
+        "subject": _subject_query,
+        "researchsubject": _research_subject_query,
+        "specimen": _specimen_query,
+        "diagnosis": _diagnosis_query,
+        "treatments": _treatments_query,
+        "files": _files_query,
+        "counts": _counts_query,
+        "diagnosis.files": _files_query,
+        # "subject.files": _subject_files_query,
+        # "subject.counts": _subject_counts_query,
+        # "researchsubject.files": _research_subject_files_query
+    }
+    current_endpoint = _boolean_query
 
     def __init__(self, *args: Union[str, Query]) -> None:
         """
@@ -429,232 +464,68 @@ class Q:
             print(e)
         return None
 
-    def files(
-        self,
-        offset: int = 0,
-        limit: int = 100,
-        version: Optional[str] = file_table_version,
-        host: Optional[str] = None,
-        dry_run: bool = False,
-        table: Optional[str] = default_file_table,
-        async_call: bool = False,
-        verify: Optional[bool] = None,
-        verbose: Optional[bool] = True,
-        filter: Optional[str] = None,
-        flatten: Optional[bool] = False,
-        format_type: str = "json",
-    ) -> Optional[Result]:
-        return self.run(
-            offset,
-            limit,
-            version,
-            host,
-            dry_run,
-            table,
-            async_call,
-            verify,
-            verbose,
-            filter,
-            flatten,
-            format,
-            lambda api_instance, query, version, dry_run, table, async_req: api_instance.files(
-                query,
-                version=version,
-                dry_run=dry_run,
-                table=table,
-                async_req=async_req,
-            ),
-        )
+    def _get_func(self):
+        full_string = ""
+        if self.entity_type != "":
+            full_string = self.entity_type
 
-    def subjects(
-        self,
-        offset: int = 0,
-        limit: int = 100,
-        version: Optional[str] = None,
-        host: Optional[str] = None,
-        dry_run: bool = False,
-        table: Optional[str] = None,
-        async_call: bool = False,
-        verify: Optional[bool] = None,
-        verbose: Optional[bool] = True,
-        filter: Optional[str] = None,
-        flatten: Optional[bool] = False,
-        format: Optional[str] = "json",
-    ):
-        return self.run(
-            offset,
-            limit,
-            version,
-            host,
-            dry_run,
-            table,
-            async_call,
-            verify,
-            verbose,
-            filter,
-            flatten,
-            format,
-            lambda api_instance, query, version, dry_run, table, async_req: api_instance.subject_query(
-                query,
-                version=version,
-                dry_run=dry_run,
-                table=table,
-                async_req=async_req,
-            ),
-        )
+        if self.task != "":
+            full_string = (
+                f"{full_string}.{self.task}" if full_string != "" else self.task
+            )
 
-    def research_subject(
-        self,
-        offset: int = 0,
-        limit: int = 100,
-        version: Optional[str] = None,
-        host: Optional[str] = None,
-        dry_run: bool = False,
-        table: Optional[str] = None,
-        async_call: bool = False,
-        verify: Optional[bool] = None,
-        verbose: Optional[bool] = True,
-        filter: Optional[str] = None,
-        flatten: Optional[bool] = False,
-        format: Optional[str] = "json",
-    ):
-        return self.run(
-            offset,
-            limit,
-            version,
-            host,
-            dry_run,
-            table,
-            async_call,
-            verify,
-            verbose,
-            filter,
-            flatten,
-            format,
-            lambda api_instance, query, version, dry_run, table, async_req: api_instance.research_subject_query(
-                query,
-                version=version,
-                dry_run=dry_run,
-                table=table,
-                async_req=async_req,
-            ),
-        )
+        if full_string == "":
+            self.current_endpoint = _boolean_query
+        else:
+            self.current_endpoint = self.api_tasks[full_string]
 
-    def diagnosis(
-        self,
-        offset: int = 0,
-        limit: int = 100,
-        version: Optional[str] = None,
-        host: Optional[str] = None,
-        dry_run: bool = False,
-        table: Optional[str] = None,
-        async_call: bool = False,
-        verify: Optional[bool] = None,
-        verbose: Optional[bool] = True,
-        filter: Optional[str] = None,
-        flatten: Optional[bool] = False,
-        format: Optional[str] = "json",
-    ):
-        return self.run(
-            offset,
-            limit,
-            version,
-            host,
-            dry_run,
-            table,
-            async_call,
-            verify,
-            verbose,
-            filter,
-            flatten,
-            format,
-            lambda api_instance, query, version, dry_run, table, async_req: api_instance.diagnosis_query(
-                query,
-                version=version,
-                dry_run=dry_run,
-                table=table,
-                async_req=async_req,
-            ),
-        )
+    @property
+    def files(self):
+        self.task = "files"
+        self._get_func()
+        return self
 
-    def specimen(
-        self,
-        offset: int = 0,
-        limit: int = 100,
-        version: Optional[str] = None,
-        host: Optional[str] = None,
-        dry_run: bool = False,
-        table: Optional[str] = None,
-        async_call: bool = False,
-        verify: Optional[bool] = None,
-        verbose: Optional[bool] = True,
-        filter: Optional[str] = None,
-        flatten: Optional[bool] = False,
-        format: Optional[str] = "json",
-    ):
-        return self.run(
-            offset,
-            limit,
-            version,
-            host,
-            dry_run,
-            table,
-            async_call,
-            verify,
-            verbose,
-            filter,
-            flatten,
-            format,
-            lambda api_instance, query, version, dry_run, table, async_req: api_instance.specimen_query(
-                query,
-                version=version,
-                dry_run=dry_run,
-                table=table,
-                async_req=async_req,
-            ),
-        )
+    @property
+    def counts(self):
+        self.task = "counts"
+        self._get_func()
+        return self
 
-    def treatments(
-        self,
-        offset: int = 0,
-        limit: int = 100,
-        version: Optional[str] = None,
-        host: Optional[str] = None,
-        dry_run: bool = False,
-        table: Optional[str] = None,
-        async_call: bool = False,
-        verify: Optional[bool] = None,
-        verbose: Optional[bool] = True,
-        filter: Optional[str] = None,
-        flatten: Optional[bool] = False,
-        format: Optional[str] = "json",
-    ):
-        return self.run(
-            offset,
-            limit,
-            version,
-            host,
-            dry_run,
-            table,
-            async_call,
-            verify,
-            verbose,
-            filter,
-            flatten,
-            format,
-            lambda api_instance, query, version, dry_run, table, async_req: api_instance.treatments_query(
-                query,
-                version=version,
-                dry_run=dry_run,
-                table=table,
-                async_req=async_req,
-            ),
-        )
+    @property
+    def list(self):
+        self.task = ""
+        self._get_func()
+        return self
 
-    def _boolean_query(api_instance, query, version, dry_run, table, async_req):
-        return api_instance.boolean_query(
-            query, version=version, dry_run=dry_run, table=table, async_req=async_req
-        )
+    @property
+    def subjects(self):
+        self.entity_type = "subject"
+        self._get_func()
+        return self
+
+    @property
+    def research_subject(self):
+        self.entity_type = "researchsubject"
+        self._get_func()
+        return self
+
+    @property
+    def diagnosis(self):
+        self.entity_type = "diagnosis"
+        self._get_func()
+        return self
+
+    @property
+    def specimen(self):
+        self.entity_type = "specimen"
+        self._get_func()
+        return self
+
+    @property
+    def treatments(self):
+        self.entity_type = "treatments"
+        self._get_func()
+        return self
 
     @measure()
     def run(
@@ -671,12 +542,6 @@ class Q:
         filter: Optional[str] = None,
         flatten: Optional[bool] = False,
         format: Optional[str] = "json",
-        callback: Optional[
-            Callable[
-                [QueryApi, Query, str, bool, str, bool],
-                Union[QueryCreatedData, ApplyResult],
-            ]
-        ] = _boolean_query,
     ) -> Optional[Result]:
         """_summary_
 
@@ -715,13 +580,15 @@ class Q:
                 # Execute boolean query
                 if verbose:
                     print("Getting results from database", end="\n\n")
-                api_response: Union[QueryCreatedData, ApplyResult] = callback(
-                    api_instance,
-                    self.query,
-                    version,
-                    dry_run,
-                    table,
-                    async_call,
+                api_response: Union[
+                    QueryCreatedData, ApplyResult
+                ] = self.current_endpoint(
+                    api_instance=api_instance,
+                    query=self.query,
+                    version=version,
+                    dry_run=dry_run,
+                    table=table,
+                    async_req=async_call,
                 )
 
                 if isinstance(api_response, ApplyResult):
