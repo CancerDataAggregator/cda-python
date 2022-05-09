@@ -1,3 +1,4 @@
+from copy import copy, deepcopy
 import json
 import logging
 from json import loads
@@ -156,8 +157,8 @@ class Q:
         "specimen": _specimen_query,
         "diagnosis": _diagnosis_query,
         "treatments": _treatments_query,
-        "file": _files_query,
-        "count": _counts_query,
+        "files": _files_query,
+        "counts": _counts_query,
         "diagnosis.files": _files_query,
         "subject.files": _subject_files_query,
         "researchsubject.files": _research_files_query,
@@ -376,166 +377,166 @@ class Q:
             MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
         )
 
-    def files(
-        self,
-        offset: int = 0,
-        limit: int = 100,
-        version: Optional[str] = file_table_version,
-        host: Optional[str] = None,
-        dry_run: bool = False,
-        table: Optional[str] = default_file_table,
-        async_call: bool = False,
-        verify: Optional[bool] = None,
-        verbose: Optional[bool] = True,
-        filter: Optional[str] = None,
-        flatten: Optional[bool] = False,
-        format: Optional[str] = "json",
-    ) -> Optional[Result]:
-        """
-        Args:
-            offset (int, optional): [description]. Defaults to 0.
-            limit (int, optional): [description]. Defaults to 100.
-            version (Optional[str], optional): [description]. Defaults to table_version.
-            host (Optional[str], optional): [description]. Defaults to None.
-            dry_run (bool, optional): [description]. Defaults to False.
-            table (Optional[str], optional): [description]. Defaults to default_table.
-            async_call (bool, optional): [description]. Defaults to False.
-            verify (Optional[bool], optional): [description]. Defaults to None.
-            verbose (Optional[bool], optional): [Turn on logs]. Defaults to True.
-        Returns:
-            Optional[Result]: [description]
-        """
-        cda_client_obj = ApiClient(
-            configuration=builder_api_client(host=host, verify=verify)
-        )
+    # def files(
+    #     self,
+    #     offset: int = 0,
+    #     limit: int = 100,
+    #     version: Optional[str] = file_table_version,
+    #     host: Optional[str] = None,
+    #     dry_run: bool = False,
+    #     table: Optional[str] = default_file_table,
+    #     async_call: bool = False,
+    #     verify: Optional[bool] = None,
+    #     verbose: Optional[bool] = True,
+    #     filter: Optional[str] = None,
+    #     flatten: Optional[bool] = False,
+    #     format: Optional[str] = "json",
+    # ) -> Optional[Result]:
+    #     """
+    #     Args:
+    #         offset (int, optional): [description]. Defaults to 0.
+    #         limit (int, optional): [description]. Defaults to 100.
+    #         version (Optional[str], optional): [description]. Defaults to table_version.
+    #         host (Optional[str], optional): [description]. Defaults to None.
+    #         dry_run (bool, optional): [description]. Defaults to False.
+    #         table (Optional[str], optional): [description]. Defaults to default_table.
+    #         async_call (bool, optional): [description]. Defaults to False.
+    #         verify (Optional[bool], optional): [description]. Defaults to None.
+    #         verbose (Optional[bool], optional): [Turn on logs]. Defaults to True.
+    #     Returns:
+    #         Optional[Result]: [description]
+    #     """
+    #     cda_client_obj = ApiClient(
+    #         configuration=builder_api_client(host=host, verify=verify)
+    #     )
 
-        if filter is not None:
-            self.query = Q.__select(self, fields=filter).query
+    #     if filter is not None:
+    #         self.query = Q.__select(self, fields=filter).query
 
-        try:
-            with cda_client_obj as api_client:
-                api_instance = QueryApi(api_client)
-                # Execute boolean query
-                if verbose:
-                    print("Getting results from database", end="\n\n")
-                api_response: Union[QueryCreatedData, ApplyResult] = api_instance.files(
-                    self.query,
-                    version=version,
-                    dry_run=dry_run,
-                    table=table,
-                    async_req=async_call,
-                )
+    #     try:
+    #         with cda_client_obj as api_client:
+    #             api_instance = QueryApi(api_client)
+    #             # Execute boolean query
+    #             if verbose:
+    #                 print("Getting results from database", end="\n\n")
+    #             api_response: Union[QueryCreatedData, ApplyResult] = api_instance.files(
+    #                 self.query,
+    #                 version=version,
+    #                 dry_run=dry_run,
+    #                 table=table,
+    #                 async_req=async_call,
+    #             )
 
-                if isinstance(api_response, ApplyResult):
-                    if verbose:
-                        print(WAITING_TEXT)
-                    while api_response.ready() is False:
-                        api_response.wait(10000)
-                    api_response = api_response.get()
+    #             if isinstance(api_response, ApplyResult):
+    #                 if verbose:
+    #                     print(WAITING_TEXT)
+    #                 while api_response.ready() is False:
+    #                     api_response.wait(10000)
+    #                 api_response = api_response.get()
 
-                if dry_run is True:
-                    return api_response  # type: ignore
+    #             if dry_run is True:
+    #                 return api_response  # type: ignore
 
-            return get_query_result(
-                api_instance=api_instance,
-                query_id=api_response.query_id,
-                offset=offset,
-                limit=limit,
-                async_req=async_call,
-                show_sql=True,
-                show_count=False,
-            )
+    #         return get_query_result(
+    #             api_instance=api_instance,
+    #             query_id=api_response.query_id,
+    #             offset=offset,
+    #             limit=limit,
+    #             async_req=async_call,
+    #             show_sql=True,
+    #             show_count=False,
+    #         )
 
-        except ServiceException as httpError:
-            if httpError.body is not None:
-                logError(
-                    f"""
-                Http Status: {httpError.status}
-                Error Message: {loads(httpError.body)["message"]}
-                """
-                )
+    #     except ServiceException as httpError:
+    #         if httpError.body is not None:
+    #             logError(
+    #                 f"""
+    #             Http Status: {httpError.status}
+    #             Error Message: {loads(httpError.body)["message"]}
+    #             """
+    #             )
 
-        except NewConnectionError:
-            print("Connection error")
+    #     except NewConnectionError:
+    #         print("Connection error")
 
-        except SSLError as e:
-            print(e)
+    #     except SSLError as e:
+    #         print(e)
 
-        except InsecureRequestWarning:
-            print(
-                "Adding certificate verification pem is strongly advised please read our https://cda.readthedocs.io/en/latest/Installation.html "
-            )
+    #     except InsecureRequestWarning:
+    #         print(
+    #             "Adding certificate verification pem is strongly advised please read our https://cda.readthedocs.io/en/latest/Installation.html "
+    #         )
 
-        except MaxRetryError as e:
-            print(
-                f"Connection error max retry limit of 3 hit please check url or local python ssl pem {e}"
-            )
-        except ApiException as e:
-            print(e.body)
+    #     except MaxRetryError as e:
+    #         print(
+    #             f"Connection error max retry limit of 3 hit please check url or local python ssl pem {e}"
+    #         )
+    #     except ApiException as e:
+    #         print(e.body)
 
-        except Exception as e:
-            print(e)
-        return None
+    #     except Exception as e:
+    #         print(e)
+    #     return None
 
-    def counts(
-        self,
-        host: Optional[str] = None,
-        verify: Optional[bool] = None,
-        offset: int = 0,
-        limit: int = 100,
-        version: Optional[str] = file_table_version,
-        table: Optional[str] = default_file_table,
-        async_call: bool = False,
-        dry_run: Optional[bool] = False,
-        show_sql: bool = False,
-    ) -> Optional[Result]:
-        """_summary_
+    # def counts(
+    #     self,
+    #     host: Optional[str] = None,
+    #     verify: Optional[bool] = None,
+    #     offset: int = 0,
+    #     limit: int = 100,
+    #     version: Optional[str] = file_table_version,
+    #     table: Optional[str] = default_file_table,
+    #     async_call: bool = False,
+    #     dry_run: Optional[bool] = False,
+    #     show_sql: bool = False,
+    # ) -> Optional[Result]:
+    #     """_summary_
 
-        Args:
-            host (Optional[str], optional): _description_. Defaults to None.
-            verify (Optional[bool], optional): _description_. Defaults to None.
-            offset (int, optional): _description_. Defaults to 0.
-            limit (int, optional): _description_. Defaults to 100.
-            version (Optional[str], optional): _description_. Defaults to file_table_version.
-            table (Optional[str], optional): _description_. Defaults to default_file_table.
-            async_call (bool, optional): _description_. Defaults to False.
-            dry_run (Optional[bool], optional): _description_. Defaults to False.
-            show_sql (bool, optional): _description_. Defaults to False.
+    #     Args:
+    #         host (Optional[str], optional): _description_. Defaults to None.
+    #         verify (Optional[bool], optional): _description_. Defaults to None.
+    #         offset (int, optional): _description_. Defaults to 0.
+    #         limit (int, optional): _description_. Defaults to 100.
+    #         version (Optional[str], optional): _description_. Defaults to file_table_version.
+    #         table (Optional[str], optional): _description_. Defaults to default_file_table.
+    #         async_call (bool, optional): _description_. Defaults to False.
+    #         dry_run (Optional[bool], optional): _description_. Defaults to False.
+    #         show_sql (bool, optional): _description_. Defaults to False.
 
-        Returns:
-            Result or Dataframe
-        """
-        cda_client_obj = ApiClient(
-            configuration=builder_api_client(host=host, verify=verify)
-        )
-        try:
+    #     Returns:
+    #         Result or Dataframe
+    #     """
+    #     cda_client_obj = ApiClient(
+    #         configuration=builder_api_client(host=host, verify=verify)
+    #     )
+    #     try:
 
-            with cda_client_obj as api_client:
-                api_instance = QueryApi(api_client)
-                api_response = api_instance.global_counts(
-                    self.query,
-                    version=version,
-                    dry_run=dry_run,
-                    table=table,
-                    async_req=async_call,
-                )
+    #         with cda_client_obj as api_client:
+    #             api_instance = QueryApi(api_client)
+    #             api_response = api_instance.global_counts(
+    #                 self.query,
+    #                 version=version,
+    #                 dry_run=dry_run,
+    #                 table=table,
+    #                 async_req=async_call,
+    #             )
 
-            if dry_run is True:
-                return api_response
+    #         if dry_run is True:
+    #             return api_response
 
-            return get_query_result(
-                api_instance=api_instance,
-                query_id=api_response.query_id,
-                offset=offset,
-                limit=limit,
-                async_req=async_call,
-                show_sql=show_sql,
-                show_count=False,
-            )
+    #         return get_query_result(
+    #             api_instance=api_instance,
+    #             query_id=api_response.query_id,
+    #             offset=offset,
+    #             limit=limit,
+    #             async_req=async_call,
+    #             show_sql=show_sql,
+    #             show_count=False,
+    #         )
 
-        except Exception as e:
-            print(e)
-        return None
+    #     except Exception as e:
+    #         print(e)
+    #     return None
 
     @staticmethod
     def query_job_status(
@@ -586,62 +587,63 @@ class Q:
             self.current_endpoint = self.api_tasks[full_string]
 
     @property
-    def file(self):
+    def files(self):
         """_summary_
         this is a chaining method used to get files
         Returns:
             _type_: _description_
         """
-        self.task = "file"
-        self._get_func()
-        return self
+        newQ = copy(self)
+        newQ.task = "files"
+        return newQ
 
     @property
-    def count(self):
+    def counts(self):
         """_summary_
         this is a chaining method used to get counts
         Returns:
             _type_: _description_
         """
-        self.task = "count"
-        self._get_func()
-        return self
+        newQ = copy(self)
+        newQ.task = "counts"
+        return newQ
 
-    @property
-    def list(self):
-        self.task = ""
-        self._get_func()
-        return self
+    # @property
+    # def list(self):
+    #     self.task = ""
+    #     self._get_func()
+    #     return copy(self)
 
     @property
     def subject(self):
-        self.entity_type = "subject"
-        self._get_func()
-        return self
+
+        newQ = copy(self)
+        newQ.entity_type = "subject"
+        return copy(self)
 
     @property
     def research_subject(self):
-        self.entity_type = "researchsubject"
-        self._get_func()
-        return self
+        newQ = copy(self)
+        newQ.entity_type = "researchsubject"
+        return newQ
 
     @property
     def diagnosis(self):
-        self.entity_type = "diagnosis"
-        self._get_func()
-        return self
+        newQ = copy(self)
+        newQ.entity_type = "diagnosis"
+        return newQ
 
     @property
     def specimen(self):
-        self.entity_type = "specimen"
-        self._get_func()
-        return self
+        newQ = copy(self)
+        newQ.entity_type = "specimen"
+        return newQ
 
     @property
     def treatment(self):
-        self.entity_type = "treatments"
-        self._get_func()
-        return self
+        newQ = copy(self)
+        newQ.entity_type = "treatments"
+        return newQ
 
     @measure()
     def run(
