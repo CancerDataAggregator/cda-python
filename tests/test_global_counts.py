@@ -4,7 +4,7 @@ from tests.global_settings import host
 
 def test_glb_count() -> None:
     r = query('sex = "male" OR sex = "female"')
-    q1 = r.counts(host=host, limit=100)
+    q1 = r.counts.run(host=host, limit=100)
     print(q1)
 
 
