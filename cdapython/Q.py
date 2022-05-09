@@ -156,8 +156,8 @@ class Q:
         "specimen": _specimen_query,
         "diagnosis": _diagnosis_query,
         "treatments": _treatments_query,
-        "files": _files_query,
-        "counts": _counts_query,
+        "file": _files_query,
+        "count": _counts_query,
         "diagnosis.files": _files_query,
         "subject.files": _subject_files_query,
         "researchsubject.files": _research_files_query,
@@ -376,6 +376,107 @@ class Q:
             MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
         )
 
+    def files(
+        self,
+        offset: int = 0,
+        limit: int = 100,
+        version: Optional[str] = file_table_version,
+        host: Optional[str] = None,
+        dry_run: bool = False,
+        table: Optional[str] = default_file_table,
+        async_call: bool = False,
+        verify: Optional[bool] = None,
+        verbose: Optional[bool] = True,
+        filter: Optional[str] = None,
+        flatten: Optional[bool] = False,
+        format: Optional[str] = "json",
+    ) -> Optional[Result]:
+        """
+        Args:
+            offset (int, optional): [description]. Defaults to 0.
+            limit (int, optional): [description]. Defaults to 100.
+            version (Optional[str], optional): [description]. Defaults to table_version.
+            host (Optional[str], optional): [description]. Defaults to None.
+            dry_run (bool, optional): [description]. Defaults to False.
+            table (Optional[str], optional): [description]. Defaults to default_table.
+            async_call (bool, optional): [description]. Defaults to False.
+            verify (Optional[bool], optional): [description]. Defaults to None.
+            verbose (Optional[bool], optional): [Turn on logs]. Defaults to True.
+        Returns:
+            Optional[Result]: [description]
+        """
+        cda_client_obj = ApiClient(
+            configuration=builder_api_client(host=host, verify=verify)
+        )
+
+        if filter is not None:
+            self.query = Q.__select(self, fields=filter).query
+
+        try:
+            with cda_client_obj as api_client:
+                api_instance = QueryApi(api_client)
+                # Execute boolean query
+                if verbose:
+                    print("Getting results from database", end="\n\n")
+                api_response: Union[QueryCreatedData, ApplyResult] = api_instance.files(
+                    self.query,
+                    version=version,
+                    dry_run=dry_run,
+                    table=table,
+                    async_req=async_call,
+                )
+
+                if isinstance(api_response, ApplyResult):
+                    if verbose:
+                        print(WAITING_TEXT)
+                    while api_response.ready() is False:
+                        api_response.wait(10000)
+                    api_response = api_response.get()
+
+                if dry_run is True:
+                    return api_response  # type: ignore
+
+            return get_query_result(
+                api_instance=api_instance,
+                query_id=api_response.query_id,
+                offset=offset,
+                limit=limit,
+                async_req=async_call,
+                show_sql=True,
+                show_count=False,
+            )
+
+        except ServiceException as httpError:
+            if httpError.body is not None:
+                logError(
+                    f"""
+                Http Status: {httpError.status}
+                Error Message: {loads(httpError.body)["message"]}
+                """
+                )
+
+        except NewConnectionError:
+            print("Connection error")
+
+        except SSLError as e:
+            print(e)
+
+        except InsecureRequestWarning:
+            print(
+                "Adding certificate verification pem is strongly advised please read our https://cda.readthedocs.io/en/latest/Installation.html "
+            )
+
+        except MaxRetryError as e:
+            print(
+                f"Connection error max retry limit of 3 hit please check url or local python ssl pem {e}"
+            )
+        except ApiException as e:
+            print(e.body)
+
+        except Exception as e:
+            print(e)
+        return None
+
     def counts(
         self,
         host: Optional[str] = None,
@@ -485,14 +586,24 @@ class Q:
             self.current_endpoint = self.api_tasks[full_string]
 
     @property
-    def files(self):
-        self.task = "files"
+    def file(self):
+        """_summary_
+        this is a chaining method used to get files
+        Returns:
+            _type_: _description_
+        """
+        self.task = "file"
         self._get_func()
         return self
 
     @property
-    def counts(self):
-        self.task = "counts"
+    def count(self):
+        """_summary_
+        this is a chaining method used to get counts
+        Returns:
+            _type_: _description_
+        """
+        self.task = "count"
         self._get_func()
         return self
 
@@ -503,7 +614,7 @@ class Q:
         return self
 
     @property
-    def subjects(self):
+    def subject(self):
         self.entity_type = "subject"
         self._get_func()
         return self
@@ -527,7 +638,7 @@ class Q:
         return self
 
     @property
-    def treatments(self):
+    def treatment(self):
         self.entity_type = "treatments"
         self._get_func()
         return self
@@ -547,6 +658,7 @@ class Q:
         filter: Optional[str] = None,
         flatten: Optional[bool] = False,
         format: Optional[str] = "json",
+        show_sql: Optional[bool] = None,
     ) -> Optional[Result]:
         """_summary_
 
@@ -567,6 +679,7 @@ class Q:
         Returns:
             Optional[Result]: _description_
         """
+
         cda_client_obj = ApiClient(
             configuration=builder_api_client(host=host, verify=verify)
         )
@@ -578,6 +691,10 @@ class Q:
 
         if filter is not None:
             self.query = Q.__select(self, fields=filter).query
+        self._get_func()
+
+        if show_sql is None:
+            show_sql = self.task != "counts"
 
         try:
             with cda_client_obj as api_client:
@@ -612,7 +729,7 @@ class Q:
                 offset=offset,
                 limit=limit,
                 async_req=async_call,
-                show_sql=True,
+                show_sql=show_sql,
                 show_count=True,
                 format_type=format,
             )
