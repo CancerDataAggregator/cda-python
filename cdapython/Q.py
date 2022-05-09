@@ -32,8 +32,11 @@ from cdapython.endpoints import (
     _counts_query,
     _diagnosis_query,
     _files_query,
+    _research_files_query,
     _research_subject_query,
+    _specimen_files_query,
     _specimen_query,
+    _subject_files_query,
     _subject_query,
     _treatments_query,
 )
@@ -156,7 +159,9 @@ class Q:
         "files": _files_query,
         "counts": _counts_query,
         "diagnosis.files": _files_query,
-        # "subject.files": _subject_files_query,
+        "subject.files": _subject_files_query,
+        "researchsubject.files": _research_files_query,
+        "specimen.files": _specimen_files_query
         # "subject.counts": _subject_counts_query,
         # "researchsubject.files": _research_subject_files_query
     }
