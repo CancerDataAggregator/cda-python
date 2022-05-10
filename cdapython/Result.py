@@ -32,7 +32,6 @@ class Result:
         show_sql: bool,
         show_count: bool,
         format_type: str = "json",
-        Q_object: Optional["Q"] = None,
     ) -> None:
         self._api_response: QueryResponseData = api_response
         self.__result = self._api_response.result
@@ -44,7 +43,6 @@ class Result:
         self.show_count: Optional[bool] = show_count
         self.format_type = format_type
         self._df: DataFrame
-        self.Q_object: "Q" = Q_object
 
         if self.format_type == "tsv" and isinstance(self._api_response.result, list):
             data_text: str = ""
@@ -134,17 +132,6 @@ class Result:
         if isinstance(self._offset, int) and isinstance(self._limit, int):
             return (self._offset + self._limit) <= self.total_row_count
         return False
-
-    def counts(self):
-        """calls Q counts
-
-        Returns:
-            _type_: _description_
-        """
-        return self.Q_object.counts(
-            host=self.Q_object._CURRENT_HOST,
-            version=self.Q_object._CURRENT_TABLE_VERSION,
-        )
 
     def to_dataframe(
         self,
@@ -302,7 +289,6 @@ def get_query_result(
     show_sql: Optional[bool] = True,
     show_count: Optional[bool] = True,
     format_type: str = "json",
-    Q_object: Optional["Q"] = None,
 ) -> Optional[Result]:
     """[summary]
         This will call the next query and wait for the result then return a Result object to the user.
@@ -343,5 +329,4 @@ def get_query_result(
                 show_sql,
                 show_count,
                 format_type,
-                Q_object,
             )

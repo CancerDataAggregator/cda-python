@@ -10,7 +10,7 @@ def test_ssl_sql():
         assert qr[0]["table_schema"] == "cda_mvp"
 
 
-def test_ssl_Q():
+def test_ssl_q():
     q = Q('id = "TCGA-13-1409"')
     r = q.run(verify=False)
     assert r.count == 1

@@ -11,13 +11,4 @@ conversionMap: Dict[str, str] = {
     "ResearchSubject.Diagnosis.tumor_grade": "ResearchSubject.Diagnosis.grade",
     "ResearchSubject.Diagnosis.Treatment.type": "ResearchSubject.Diagnosis.Treatment.treatment_type",
     "ResearchSubject.Diagnosis.Treatment.outcome": "ResearchSubject.Diagnosis.Treatment.treatment_outcome",
-    "File.data_category": "data_category",
-    "File.id": "id",
-    "File.label": "label",
-    "File.data_type": "data_type",
-    "File.file_format": "file_format",
-    "File.associated_project": "associated_project",
-    "File.drs_uri": "drs_uri",
-    "File.byte_size": "byte_size",
-    "File.checksum": "checksum",
 }

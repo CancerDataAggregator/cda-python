@@ -9,6 +9,7 @@ def checking_test():
     print(q1)
     assert q1.query.to_dict()["l"]["node_type"] == "IN"
     r = q1.run(host=host)
+    print(r)
 
 
 checking_test()

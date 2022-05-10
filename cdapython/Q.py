@@ -27,6 +27,7 @@ from cdapython.constantVariables import (
     project_name,
     table_version,
 )
+from cdapython.customException import QSQLError, WRONGDATABASEError
 from cdapython.decorators import measure
 from cdapython.endpoints import (
     _boolean_query,
@@ -124,7 +125,7 @@ class _QEncoder(json.JSONEncoder):
         """
 
         if isinstance(o, MappingProxyType):
-            pass
+            return
         else:
             tmp_dict = o.__dict__
             if "query" in tmp_dict:
@@ -133,21 +134,12 @@ class _QEncoder(json.JSONEncoder):
                 return tmp_dict["_data_store"]
 
             return tmp_dict
-        return None
 
 
 class Q:
     """
     Q lang is Language used to send query to the cda service
     """
-
-    # q1 = Q('test = "A"')
-    # r = q1.subject.run()
-    # r1 = q1.files.run()
-    # q1.files
-    # r1 = q1.run()
-    # q1.researchsubject
-    # r1 = q1.run()
 
     entity_type = ""
     task = ""
@@ -272,10 +264,10 @@ class Q:
             or "update" in sql.lower()
             or "alter table" in sql.lower()
         ):
-            raise Exception("Those actions are not available in Q.sql")
+            raise QSQLError("Those actions are not available in Q.sql")
 
         if project_name is not None and sql.find(project_name) == -1:
-            raise Exception("Your database is outside of the project")
+            raise WRONGDATABASEError("Your database is outside of the project")
 
         cda_client_obj = ApiClient(configuration=builder_api_client(host, verify))
         try:
@@ -377,167 +369,6 @@ class Q:
             MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
         )
 
-    # def files(
-    #     self,
-    #     offset: int = 0,
-    #     limit: int = 100,
-    #     version: Optional[str] = file_table_version,
-    #     host: Optional[str] = None,
-    #     dry_run: bool = False,
-    #     table: Optional[str] = default_file_table,
-    #     async_call: bool = False,
-    #     verify: Optional[bool] = None,
-    #     verbose: Optional[bool] = True,
-    #     filter: Optional[str] = None,
-    #     flatten: Optional[bool] = False,
-    #     format: Optional[str] = "json",
-    # ) -> Optional[Result]:
-    #     """
-    #     Args:
-    #         offset (int, optional): [description]. Defaults to 0.
-    #         limit (int, optional): [description]. Defaults to 100.
-    #         version (Optional[str], optional): [description]. Defaults to table_version.
-    #         host (Optional[str], optional): [description]. Defaults to None.
-    #         dry_run (bool, optional): [description]. Defaults to False.
-    #         table (Optional[str], optional): [description]. Defaults to default_table.
-    #         async_call (bool, optional): [description]. Defaults to False.
-    #         verify (Optional[bool], optional): [description]. Defaults to None.
-    #         verbose (Optional[bool], optional): [Turn on logs]. Defaults to True.
-    #     Returns:
-    #         Optional[Result]: [description]
-    #     """
-    #     cda_client_obj = ApiClient(
-    #         configuration=builder_api_client(host=host, verify=verify)
-    #     )
-
-    #     if filter is not None:
-    #         self.query = Q.__select(self, fields=filter).query
-
-    #     try:
-    #         with cda_client_obj as api_client:
-    #             api_instance = QueryApi(api_client)
-    #             # Execute boolean query
-    #             if verbose:
-    #                 print("Getting results from database", end="\n\n")
-    #             api_response: Union[QueryCreatedData, ApplyResult] = api_instance.files(
-    #                 self.query,
-    #                 version=version,
-    #                 dry_run=dry_run,
-    #                 table=table,
-    #                 async_req=async_call,
-    #             )
-
-    #             if isinstance(api_response, ApplyResult):
-    #                 if verbose:
-    #                     print(WAITING_TEXT)
-    #                 while api_response.ready() is False:
-    #                     api_response.wait(10000)
-    #                 api_response = api_response.get()
-
-    #             if dry_run is True:
-    #                 return api_response  # type: ignore
-
-    #         return get_query_result(
-    #             api_instance=api_instance,
-    #             query_id=api_response.query_id,
-    #             offset=offset,
-    #             limit=limit,
-    #             async_req=async_call,
-    #             show_sql=True,
-    #             show_count=False,
-    #         )
-
-    #     except ServiceException as httpError:
-    #         if httpError.body is not None:
-    #             logError(
-    #                 f"""
-    #             Http Status: {httpError.status}
-    #             Error Message: {loads(httpError.body)["message"]}
-    #             """
-    #             )
-
-    #     except NewConnectionError:
-    #         print("Connection error")
-
-    #     except SSLError as e:
-    #         print(e)
-
-    #     except InsecureRequestWarning:
-    #         print(
-    #             "Adding certificate verification pem is strongly advised please read our https://cda.readthedocs.io/en/latest/Installation.html "
-    #         )
-
-    #     except MaxRetryError as e:
-    #         print(
-    #             f"Connection error max retry limit of 3 hit please check url or local python ssl pem {e}"
-    #         )
-    #     except ApiException as e:
-    #         print(e.body)
-
-    #     except Exception as e:
-    #         print(e)
-    #     return None
-
-    # def counts(
-    #     self,
-    #     host: Optional[str] = None,
-    #     verify: Optional[bool] = None,
-    #     offset: int = 0,
-    #     limit: int = 100,
-    #     version: Optional[str] = file_table_version,
-    #     table: Optional[str] = default_file_table,
-    #     async_call: bool = False,
-    #     dry_run: Optional[bool] = False,
-    #     show_sql: bool = False,
-    # ) -> Optional[Result]:
-    #     """_summary_
-
-    #     Args:
-    #         host (Optional[str], optional): _description_. Defaults to None.
-    #         verify (Optional[bool], optional): _description_. Defaults to None.
-    #         offset (int, optional): _description_. Defaults to 0.
-    #         limit (int, optional): _description_. Defaults to 100.
-    #         version (Optional[str], optional): _description_. Defaults to file_table_version.
-    #         table (Optional[str], optional): _description_. Defaults to default_file_table.
-    #         async_call (bool, optional): _description_. Defaults to False.
-    #         dry_run (Optional[bool], optional): _description_. Defaults to False.
-    #         show_sql (bool, optional): _description_. Defaults to False.
-
-    #     Returns:
-    #         Result or Dataframe
-    #     """
-    #     cda_client_obj = ApiClient(
-    #         configuration=builder_api_client(host=host, verify=verify)
-    #     )
-    #     try:
-
-    #         with cda_client_obj as api_client:
-    #             api_instance = QueryApi(api_client)
-    #             api_response = api_instance.global_counts(
-    #                 self.query,
-    #                 version=version,
-    #                 dry_run=dry_run,
-    #                 table=table,
-    #                 async_req=async_call,
-    #             )
-
-    #         if dry_run is True:
-    #             return api_response
-
-    #         return get_query_result(
-    #             api_instance=api_instance,
-    #             query_id=api_response.query_id,
-    #             offset=offset,
-    #             limit=limit,
-    #             async_req=async_call,
-    #             show_sql=show_sql,
-    #             show_count=False,
-    #         )
-
-    #     except Exception as e:
-    #         print(e)
-    #     return None
-
     @staticmethod
     def query_job_status(
         id: str, host: Optional[str] = None, verify: Optional[bool] = None
@@ -593,9 +424,9 @@ class Q:
         Returns:
             _type_: _description_
         """
-        newQ = copy(self)
-        newQ.task = "files"
-        return newQ
+        new_q_class = copy(self)
+        new_q_class.task = "files"
+        return new_q_class
 
     @property
     def counts(self):
@@ -604,46 +435,40 @@ class Q:
         Returns:
             _type_: _description_
         """
-        newQ = copy(self)
-        newQ.task = "counts"
-        return newQ
-
-    # @property
-    # def list(self):
-    #     self.task = ""
-    #     self._get_func()
-    #     return copy(self)
+        new_q_class = copy(self)
+        new_q_class.task = "counts"
+        return new_q_class
 
     @property
     def subject(self):
 
-        newQ = copy(self)
-        newQ.entity_type = "subject"
+        new_q_class = copy(self)
+        new_q_class.entity_type = "subject"
         return copy(self)
 
     @property
     def research_subject(self):
-        newQ = copy(self)
-        newQ.entity_type = "researchsubject"
-        return newQ
+        new_q_class = copy(self)
+        new_q_class.entity_type = "researchsubject"
+        return new_q_class
 
     @property
     def diagnosis(self):
-        newQ = copy(self)
-        newQ.entity_type = "diagnosis"
-        return newQ
+        new_q_class = copy(self)
+        new_q_class.entity_type = "diagnosis"
+        return new_q_class
 
     @property
     def specimen(self):
-        newQ = copy(self)
-        newQ.entity_type = "specimen"
-        return newQ
+        new_q_class = copy(self)
+        new_q_class.entity_type = "specimen"
+        return new_q_class
 
     @property
     def treatment(self):
-        newQ = copy(self)
-        newQ.entity_type = "treatments"
-        return newQ
+        new_q_class = copy(self)
+        new_q_class.entity_type = "treatments"
+        return new_q_class
 
     @measure()
     def run(

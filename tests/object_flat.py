@@ -12,16 +12,6 @@ q3 = Q('identifier.system = "IDC"')
 q = q3.From(q1.From(q2))
 r = q.run(host=localhost, limit=100)
 
-# df = DataFrame()
-# for i:Result in r.paginator(to_df=True):
-#     df.concat(df,i)
-
-# tmp = []
-# for i in r.paginator():
-#     tmp.extend(i.to_list())
-#     print(i)
-
-# print(len(tmp))
 
 tmp = {}
 for i in r.paginator():
