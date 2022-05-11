@@ -133,7 +133,7 @@ class _QEncoder(json.JSONEncoder):
         """
 
         if isinstance(o, MappingProxyType):
-            return
+            return None
         else:
             tmp_dict = o.__dict__
             if "query" in tmp_dict:
@@ -526,7 +526,7 @@ class Q:
 
         self._get_func()
 
-        if show_sql:
+        if show_sql is None:
             show_sql = self.task != "counts"
 
         try:
