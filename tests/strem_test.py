@@ -4,10 +4,8 @@ from tests.global_settings import host, localhost
 
 q = query('ResearchSubject.primary_disease_type LIKE "Lung%"').run(host=host)
 
-df = DataFrame()
-for i in q.paginator(to_df=True):
-    df = concat([df, i])
+box = []
+for i in q.paginator(to_list=True):
+    box.extend(i)
 
-print(df.head())
-# print(len(df))
-# df.to_csv("test_data.tsv", sep="\t")
+print(len(box))

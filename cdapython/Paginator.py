@@ -8,10 +8,17 @@ if TYPE_CHECKING:
 
 class Paginator:
     def __init__(
-        self, result: "Result", to_df: bool, format_type: str = "JSON"
+        self,
+        result: "Result",
+        to_df: bool,
+        to_list: bool,
+        to_dict: bool,
+        format_type: str = "JSON",
     ) -> None:
         self.result = result
         self.to_df = to_df
+        self.to_list = to_list
+        self.to_dict = to_dict
         self.count = 0
         self.stopped = False
         self.format_type = format_type
@@ -29,7 +36,10 @@ class Paginator:
 
         if self.to_df:
             result_nx = self.result.to_dataframe()
-
+        if self.to_list:
+            result_nx = self.result.to_list()
+        if self.to_dict:
+            result_nx = self.result.to_dict()
         if self.result.has_next_page:
             assert self.result.next_page() is not None
             self.result = self.result.next_page()

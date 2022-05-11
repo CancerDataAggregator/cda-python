@@ -91,22 +91,6 @@ class Result:
     def __hash__(self):
         return hash(tuple(self._api_response.result))
 
-    # def __flatten_json(self, obj):
-    #     ret = {}
-
-    #     def flatten(x, flatten_key=""):
-    #         if isinstance(x, dict):
-    #             for current_key in x:
-    #                 flatten(x[current_key], flatten_key + current_key + "_")
-    #         elif isinstance(x, list):
-    #             for index, elem in enumerate(x):
-    #                 flatten(elem, flatten_key + str(index) + "_")
-    #         else:
-    #             ret[flatten_key[:-1]] = x
-
-    #     flatten(obj)
-    #     return ret
-
     def __contains__(self, value: str):
         exist = False
         for item in self.__result:
@@ -174,7 +158,9 @@ class Result:
     def __len__(self):
         return self.count
 
-    def paginator(self, to_df: bool = False):
+    def paginator(
+        self, to_df: bool = False, to_list: bool = False, to_dict: bool = False
+    ):
         """_summary_
         paginator this will automatically page over results
         Args:
@@ -183,7 +169,13 @@ class Result:
         Returns:
             _type_: _description_
         """
-        return Paginator(self, to_df=to_df, format_type=self.format_type)
+        return Paginator(
+            self,
+            to_df=to_df,
+            to_list=to_list,
+            to_dict=to_dict,
+            format_type=self.format_type,
+        )
 
     def __getitem__(
         self, idx: Union[int, slice]
@@ -288,7 +280,7 @@ def get_query_result(
     pre_stream: Optional[bool] = True,
     show_sql: Optional[bool] = True,
     show_count: Optional[bool] = True,
-    format_type: str = "json",
+    format_type: Optional[str] = "json",
 ) -> Optional[Result]:
     """[summary]
         This will call the next query and wait for the result then return a Result object to the user.
@@ -315,8 +307,6 @@ def get_query_result(
 
         if isinstance(response, ApplyResult):
             response = response.get()
-            # for chunk in response.stream(32):
-            #     print(bytes(chunk).decode("utf-8"))
 
         sleep(2.5)
         if response.total_row_count is not None:

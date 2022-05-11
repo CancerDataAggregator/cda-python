@@ -1,11 +1,11 @@
-from copy import copy, deepcopy
+from copy import copy
 import json
 import logging
 from json import loads
 from logging import error as logError
 from multiprocessing.pool import ApplyResult
 from types import MappingProxyType
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, overload
+from typing import Any, Dict, Optional, Tuple, Union, overload
 from typing_extensions import Literal
 import pandas as pd
 from cda_client import ApiClient, Configuration
@@ -21,9 +21,7 @@ from urllib3.exceptions import InsecureRequestWarning, SSLError
 
 import cdapython.constantVariables as const
 from cdapython.constantVariables import (
-    default_file_table,
     default_table,
-    file_table_version,
     project_name,
     table_version,
 )
@@ -45,9 +43,7 @@ from cdapython.endpoints import (
 from cdapython.errorLogger import unverified_http
 from cdapython.functions import backwards_comp, col, find_ssl_path, quoted, unquoted
 from cdapython.Result import Result, get_query_result
-from time import sleep
-import pandas as pd
-from rich.progress import Progress
+
 
 from rich import print
 
@@ -77,6 +73,18 @@ def builder_api_client(host: Optional[str], verify: Optional[bool]) -> Configura
         tmp_configuration.verify_ssl = False
 
     return tmp_configuration
+
+
+def check_version_and_table(
+    version: Optional[str], table: Optional[str]
+) -> Tuple[str, str]:
+
+    if version is None:
+        version = const.table_version
+
+    if table is None:
+        table = const.default_file_table
+    return (version, table)
 
 
 def query_type_convertion(
@@ -510,17 +518,15 @@ class Q:
         cda_client_obj = ApiClient(
             configuration=builder_api_client(host=host, verify=verify)
         )
-        if version is None:
-            version = const.table_version
 
-        if table is None:
-            table = const.default_file_table
+        version, table = check_version_and_table(version, table)
 
         if filter is not None:
             self.query = Q.__select(self, fields=filter).query
+
         self._get_func()
 
-        if show_sql is None:
+        if show_sql:
             show_sql = self.task != "counts"
 
         try:
