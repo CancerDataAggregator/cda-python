@@ -83,6 +83,7 @@ def table_white_list(table: Optional[str], version: Optional[str]):
 def unique_terms(
     col_name: str,
     system: str = "",
+    offset: int = 0,
     limit: int = 100,
     host: Optional[str] = None,
     table: Optional[str] = None,
@@ -143,12 +144,13 @@ def unique_terms(
 
             # Execute query
             query_result = get_query_result(
-                api_instance,
-                api_response.query_id,
-                0,
-                limit,
-                async_req,
+                api_instance=api_instance,
+                query_id=api_response.query_id,
+                offset=offset,
+                limit=limit,
+                async_req=async_req,
                 show_sql=show_sql,
+                show_count=True,
             )
 
             if query_result is None:
@@ -176,12 +178,15 @@ def unique_terms(
 def columns(
     version: Optional[str] = table_version,
     host: Optional[str] = None,
+    offset: int = 0,
     limit: int = 100,
     table: Optional[str] = None,
     verify: Optional[bool] = None,
     async_req: Optional[bool] = None,
     pre_stream: bool = True,
     files: Optional[bool] = False,
+    async_call: bool = False,
+    show_sql: Optional[bool] = None,
 ):
     """[summary]
 
@@ -229,7 +234,13 @@ def columns(
             api_instance = QueryApi(api_client)
             api_response = api_instance.columns(version=version, table=table)
             query_result = get_query_result(
-                api_instance, api_response.query_id, 0, limit, async_req
+                api_instance=api_instance,
+                query_id=api_response.query_id,
+                offset=offset,
+                limit=limit,
+                async_req=async_call,
+                show_sql=show_sql,
+                show_count=True,
             )
 
             if query_result is None:
