@@ -1,8 +1,6 @@
 import json
 import logging
-from telnetlib import SE
 from typing import TYPE_CHECKING, Any, List, Optional
-
 import cda_client
 import numpy as np
 from cda_client.api.query_api import QueryApi
