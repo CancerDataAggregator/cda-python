@@ -6,7 +6,7 @@ from tests.global_settings import localhost
 # print(q.to_list())  # note the double quotes for the string value
 # print(q.to_dataframe())
 # print(columns(host=localhost))
-# print(columns(host=localhost).to_list())
+print(columns(host=localhost).to_dataframe())
 print(unique_terms("ResearchSubject.Diagnosis.stage", host=localhost, show_sql=True))
 # print(columns(host=localhost))
 # r = q.run(host=localhost, verbose=False)

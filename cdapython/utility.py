@@ -69,6 +69,8 @@ def table_white_list(table: Optional[str], version: Optional[str]):
         str: [description]
     """
     if table is not None and version is not None:
+        if table.find(".") == -1:
+            raise ValueError("Table not in allowlist list")
         check_table = table.split(".")[1]
         if check_table not in ["cda_mvp", "integration", "dev", "cda_dev"]:
             raise ValueError("Table not in allowlist list")
