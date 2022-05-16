@@ -145,7 +145,7 @@ class Result:
         Returns:
             list: _description_
         """
-        return self._api_response.result
+        return [list(i.values())[0] for i in self._api_response.result]
 
     def to_dict(self) -> dict:
         """_summary_
