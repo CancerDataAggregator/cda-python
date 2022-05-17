@@ -122,6 +122,7 @@ class Result:
         record_path: Optional[Union[str, list]] = None,
         meta: Optional[Union[str, List[Union[str, List[str]]]]] = None,
         meta_prefix: Optional[str] = None,
+        max_level: Optional[int] = None,
     ) -> Optional[DataFrame]:
         """[summary]
         Creates a pandas DataFrame for the Results
@@ -136,7 +137,11 @@ class Result:
             return json_normalize(self.__iter__())
 
         return json_normalize(
-            self.__iter__(), record_path=record_path, meta=meta, meta_prefix=meta_prefix
+            self.__iter__(),
+            max_level=max_level,
+            record_path=record_path,
+            meta=meta,
+            meta_prefix=meta_prefix,
         )
 
     def to_list(self) -> list:
