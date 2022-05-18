@@ -1,5 +1,6 @@
-from cdapython import columns
 import pytest
+
+from cdapython import columns
 
 
 def test_basic_integration():

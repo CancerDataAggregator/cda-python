@@ -1,12 +1,12 @@
-from copy import copy
 import json
 import logging
+from copy import copy
 from json import loads
 from logging import error as logError
 from multiprocessing.pool import ApplyResult
 from types import MappingProxyType
 from typing import Any, Dict, Optional, Tuple, Union, overload
-from typing_extensions import Literal
+
 import pandas as pd
 from cda_client import ApiClient, Configuration
 from cda_client.api.meta_api import MetaApi
@@ -14,17 +14,15 @@ from cda_client.api.query_api import QueryApi
 from cda_client.exceptions import ApiException, ServiceException
 from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
+from rich import print
 from rich.progress import Progress
+from typing_extensions import Literal
 from urllib3.connection import NewConnectionError  # type: ignore
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, SSLError
 
 import cdapython.constantVariables as const
-from cdapython.constantVariables import (
-    default_table,
-    project_name,
-    table_version,
-)
+from cdapython.constantVariables import default_table, project_name, table_version
 from cdapython.customException import QSQLError, WRONGDATABASEError
 from cdapython.decorators import measure
 from cdapython.endpoints import (
@@ -43,9 +41,6 @@ from cdapython.endpoints import (
 from cdapython.errorLogger import unverified_http
 from cdapython.functions import backwards_comp, col, find_ssl_path, quoted, unquoted
 from cdapython.Result import Result, get_query_result
-
-
-from rich import print
 
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 
@@ -87,11 +82,11 @@ def check_version_and_table(
     return (version, table)
 
 
-def query_type_convertion(
+def query_type_conversion(
     _op: str, _r: str
 ) -> Union[Tuple[Literal["LIKE"], Query], Tuple[str, str]]:
     """_summary_
-        This is for query type convertion in looking operator
+        This is for query type conversion in looking operator
     Args:
         _op (str): _description_
         _r (str): _description_
@@ -115,7 +110,7 @@ def query_type_convertion(
 
 
 class _QEncoder(json.JSONEncoder):
-    """_QEncoder this is a a class to help with json convetion
+    """_QEncoder this is a a class to help with json conversion
         the standard json dump
 
     Args:
@@ -155,14 +150,12 @@ class Q:
         "subject": _subject_query,
         "researchsubject": _research_subject_query,
         "specimen": _specimen_query,
-        "diagnosis": _diagnosis_query,
-        "treatments": _treatments_query,
-        "files": _files_query,
-        "counts": _counts_query,
-        "diagnosis.files": _files_query,
-        "subject.files": _subject_files_query,
-        "researchsubject.files": _research_files_query,
-        "specimen.files": _specimen_files_query
+        "file": _files_query,
+        "count": _counts_query,
+        "diagnosis.file": _files_query,
+        "subject.file": _subject_files_query,
+        "researchsubject.file": _research_files_query,
+        "specimen.file": _specimen_files_query
         # "subject.counts": _subject_counts_query,
         # "researchsubject.files": _research_subject_files_query
     }
@@ -184,7 +177,7 @@ class Q:
             _l, _op, _r = str(args[0]).strip().replace("\n", "").split(" ", 2)
             _l = backwards_comp(_l)
             _l = col(_l)
-            _op, _r = query_type_convertion(_op, _r)
+            _op, _r = query_type_conversion(_op, _r)
             _r = infer_quote(_r)
         elif len(args) != 3:
             raise RuntimeError(
@@ -426,25 +419,25 @@ class Q:
             self.current_endpoint = self.api_tasks[full_string]
 
     @property
-    def files(self):
+    def file(self):
         """_summary_
         this is a chaining method used to get files
         Returns:
             _type_: _description_
         """
         new_q_class = copy(self)
-        new_q_class.task = "files"
+        new_q_class.task = "file"
         return new_q_class
 
     @property
-    def counts(self):
+    def count(self):
         """_summary_
         this is a chaining method used to get counts
         Returns:
             _type_: _description_
         """
         new_q_class = copy(self)
-        new_q_class.task = "counts"
+        new_q_class.task = "count"
         return new_q_class
 
     @property
@@ -461,21 +454,9 @@ class Q:
         return new_q_class
 
     @property
-    def diagnosis(self):
-        new_q_class = copy(self)
-        new_q_class.entity_type = "diagnosis"
-        return new_q_class
-
-    @property
     def specimen(self):
         new_q_class = copy(self)
         new_q_class.entity_type = "specimen"
-        return new_q_class
-
-    @property
-    def treatment(self):
-        new_q_class = copy(self)
-        new_q_class.entity_type = "treatments"
         return new_q_class
 
     @measure()

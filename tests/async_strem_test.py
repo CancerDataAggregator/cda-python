@@ -1,6 +1,8 @@
 import asyncio
-from cdapython import query
+
 from pandas import DataFrame, concat
+
+from cdapython import query
 from tests.global_settings import host
 
 

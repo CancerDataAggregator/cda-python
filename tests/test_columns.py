@@ -1,4 +1,4 @@
-from cdapython import columns, Q
+from cdapython import Q, columns
 from tests.global_settings import host
 
 

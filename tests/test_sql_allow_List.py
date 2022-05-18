@@ -1,5 +1,6 @@
-from cdapython import Q
 import pytest
+
+from cdapython import Q
 from tests.global_settings import host
 
 

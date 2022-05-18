@@ -333,12 +333,12 @@ UNNEST(_ResearchSubject.Specimen) AS _Specimen
 ```
 
 # Developer setup
-Python 3.7 or higher installed 
+Python 3.7 or higher installed
 
 git clone the repo
 
 ``` bash
-git clone https://github.com/CancerDataAggregator/cda-python.git 
+git clone https://github.com/CancerDataAggregator/cda-python.git
 ```
 
 
@@ -351,7 +351,7 @@ cd cda-python
 ````
 
 in the cda-python folder create a virtual environment
-using 
+using
 
 ```python
 python3 -m venv venv
@@ -359,18 +359,18 @@ python3 -m venv venv
 
 and activate the environment by using
 for the mac and push enter
-```bash 
-source ./venv/bin/activate  
+```bash
+source ./venv/bin/activate
 ```
 and for windows in powershell and push enter
-``` 
+```
 .\venv\Scripts\activate
 ```
-note to stop using venv type 
+note to stop using venv type
 ```bash
 deactivate
 ```
-### Project dependencies 
+### Project dependencies
 In your virtual environment install  project requirements
 Use pip to install the Python dependencies:
 ```
@@ -378,7 +378,7 @@ pip install -r requirements.txt
 pip install -r requirements-dev.txt
 ```
 
-### Using pip-tools 
+### Using pip-tools
 In your virtual environment install
 ```bash
 pip install pip-tools
@@ -386,25 +386,25 @@ pip install pip-tools
 we will use pip-tools to keep track of our dependencies and our requirements.in
 
 Commands
-```bash 
-pip-compile 
+```bash
+pip-compile
  ```
 will build requirements.txt from our setup.py and requirements.in and lockdown the requirements.txt
 
 ### Update requirements
-just add dependency to the requirements.in and run 
-```bash 
+just add dependency to the requirements.in and run
+```bash
 pip-compile
 ```
 ## cdapython local dev
-to install the cdapython Library when you are working on the package locally as a dev 
-make sure you are in the main cdapython folder from you git clone and in your terminal 
+to install the cdapython Library when you are working on the package locally as a dev
+make sure you are in the main cdapython folder from you git clone and in your terminal
 navigate to the folder then use `ls` or `DIR` to see the files make sure you see the setup.py file.
 the setup.py file is used to tell pip
 -e editable install so yo can update files
 `pip install -e .`
-## Note For runing pytest 
-there is a global_setting.py here you can change the host server 
+## Note For runing pytest
+there is a global_setting.py here you can change the host server
 
 
 

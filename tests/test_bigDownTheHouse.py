@@ -7,7 +7,7 @@ q3 = Q("Subject.days_to_birth < -50*365")
 q4 = Q('File.data_category = "Imaging"')
 q = q4.And(q3.And(q1.Or(q2)))
 print(q)
-t = q.files.run(host=host)
+t = q.file.run(host=host)
 
 print(t)
 # print(t.to_dataframe().head())

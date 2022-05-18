@@ -1,6 +1,7 @@
+import json
+
 from cdapython import Q
 from cdapython.Result import Result
-import json
 
 q1 = Q("ResearchSubject.Diagnosis.age_at_diagnosis > 50*365")
 q2 = Q('ResearchSubject.associated_project = "TCGA-OV"')

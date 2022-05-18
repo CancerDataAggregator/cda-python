@@ -1,7 +1,8 @@
 from copy import copy
-from numpy import sort
 
+from numpy import sort
 from pandas import DataFrame
+
 from cdapython import Q, Result
 from tests.global_settings import localhost
 

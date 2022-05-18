@@ -41,7 +41,6 @@ class Paginator:
         if self.to_dict:
             result_nx = self.result.to_dict()
         if self.result.has_next_page:
-            assert self.result.next_page() is not None
             self.result = self.result.next_page()
             return result_nx
         else:

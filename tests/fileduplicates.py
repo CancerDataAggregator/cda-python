@@ -1,5 +1,6 @@
-from cdapython import Q
 import json
+
+from cdapython import Q
 
 querystring = """ select * from gdc-bq-sample.cda_mvp.v3
 where id in

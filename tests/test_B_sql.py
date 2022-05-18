@@ -1,5 +1,6 @@
-from cdapython import Q
 from time import sleep
+
+from cdapython import Q
 
 
 def test_q_sql():

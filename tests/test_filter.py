@@ -1,6 +1,6 @@
 from cdapython import Q, columns
 from cdapython.utility import unique_terms
-from tests.global_settings import localhost, host
+from tests.global_settings import host, localhost
 
 # q = Q('id != "TCGA-13-1409"').run()
 # print(q.to_list())  # note the double quotes for the string value

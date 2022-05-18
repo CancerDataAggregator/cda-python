@@ -1,5 +1,6 @@
-from cdapython.constantVariables import CDA_API_URL
 from rich import print
+
+from cdapython.constantVariables import CDA_API_URL
 
 
 def unverified_http() -> None:

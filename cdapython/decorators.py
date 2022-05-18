@@ -1,7 +1,6 @@
+import asyncio
 from functools import wraps
 from time import time
-
-import asyncio
 
 
 def create_async_func(f):

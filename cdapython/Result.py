@@ -1,17 +1,17 @@
 import json
 from collections import ChainMap
+from io import StringIO
 from multiprocessing.pool import ApplyResult
-from multiprocessing.pool import ApplyResult
-from typing import ChainMap, Counter, List, Union, Dict, Optional
 from time import sleep
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, ChainMap, Counter, Dict, List, Optional, Union
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
+from libcst import Return
 from pandas import DataFrame, json_normalize, read_csv
-from io import StringIO
-from cdapython.Paginator import Paginator
 from rich import print
+
+from cdapython.Paginator import Paginator
 
 if TYPE_CHECKING:
     from cdapython.Q import Q
@@ -150,7 +150,8 @@ class Result:
         Returns:
             list: _description_
         """
-        return [list(i.values())[0] for i in self._api_response.result]
+
+        return [self._api_response.result]
 
     def to_dict(self) -> dict:
         """_summary_

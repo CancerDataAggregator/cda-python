@@ -1,31 +1,29 @@
 import json
 import logging
 from typing import TYPE_CHECKING, Any, List, Optional
+
 import cda_client
 import numpy as np
 from cda_client.api.query_api import QueryApi
 from cda_client.exceptions import ServiceException
+from rich import print
 from urllib3.exceptions import InsecureRequestWarning
-
 
 import cdapython.constantVariables as const
 from cdapython.constantVariables import table_version
-from cdapython.errorLogger import unverified_http
-from cdapython.Qparser import parser
-from cdapython.Result import get_query_result
-
 from cdapython.decorators_cache import lru_cache_timed
+from cdapython.errorLogger import unverified_http
 from cdapython.functions import backwards_comp, find_ssl_path
-from rich import print
-
+from cdapython.Qparser import parser
+from cdapython.String_result import get_query_string_result
 
 logging.captureWarnings(InsecureRequestWarning)
 
 
-# This is added for Type Checking classs to remove a circular import)
+# This is added for Type Checking class to remove a circular import)
 if TYPE_CHECKING:
-    from cdapython.Q import Q
     from cdapython import Result
+    from cdapython.Q import Q
 
 # Creating constant
 if isinstance(const.default_table, str) and const.default_table is not None:
@@ -145,7 +143,7 @@ def unique_terms(
             )
 
             # Execute query
-            query_result = get_query_result(
+            query_result = get_query_string_result(
                 api_instance=api_instance,
                 query_id=api_response.query_id,
                 offset=offset,
@@ -235,7 +233,7 @@ def columns(
         with cda_client_obj as api_client:
             api_instance = QueryApi(api_client)
             api_response = api_instance.columns(version=version, table=table)
-            query_result = get_query_result(
+            query_result = get_query_string_result(
                 api_instance=api_instance,
                 query_id=api_response.query_id,
                 offset=offset,

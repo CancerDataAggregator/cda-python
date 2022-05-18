@@ -38,6 +38,8 @@ certifi==2021.10.8
     # via requests
 cffi==1.15.0
     # via argon2-cffi-bindings
+cfgv==3.3.1
+    # via pre-commit
 charset-normalizer==2.0.12
     # via requests
 click==8.1.2
@@ -95,6 +97,8 @@ gitdb==4.0.9
     # via gitpython
 gitpython==3.1.27
     # via bandit
+identify==2.5.0
+    # via pre-commit
 idna==3.3
     # via requests
 importlab==0.7
@@ -107,6 +111,7 @@ importlib-metadata==4.2.0
     #   jsonschema
     #   nox
     #   pluggy
+    #   pre-commit
     #   pytest
     #   stevedore
     #   virtualenv
@@ -206,6 +211,8 @@ networkx==2.6.2
     #   importlab
 ninja==1.10.2.3
     # via pytype
+nodeenv==1.6.0
+    # via pre-commit
 notebook==6.4.11
     # via widgetsnbextension
 nox==2022.1.7
@@ -246,6 +253,8 @@ platformdirs==2.5.2
     #   virtualenv
 pluggy==1.0.0
     # via pytest
+pre-commit==2.19.0
+    # via -r requirements-dev.in
 prometheus-client==0.14.1
     # via notebook
 prompt-toolkit==3.0.29
@@ -315,6 +324,7 @@ pyyaml==6.0
     #   bandit
     #   dparse
     #   libcst
+    #   pre-commit
 pyzmq==22.3.0
     # via
     #   jupyter-client
@@ -351,6 +361,7 @@ tinycss2==1.1.1
 toml==0.10.2
     # via
     #   dparse
+    #   pre-commit
     #   pytype
 tomli==2.0.1
     # via
@@ -402,7 +413,9 @@ urllib3==1.26.8
     #   -r requirements-dev.in
     #   requests
 virtualenv==20.14.1
-    # via nox
+    # via
+    #   nox
+    #   pre-commit
 wcwidth==0.2.5
     # via prompt-toolkit
 webencodings==0.5.1

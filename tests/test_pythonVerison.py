@@ -1,6 +1,5 @@
 from cdapython import __version__
 
-
 version = "2022.5.9"
 
 

@@ -1,5 +1,6 @@
-from cdapython import Q
 import sys
+
+from cdapython import Q
 
 sex = Q('sex = "female"')
 cancer = Q('ResearchSubject.primary_diagnosis_condition = "Breast Invasive Carcinoma"')
