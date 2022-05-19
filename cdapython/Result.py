@@ -7,8 +7,7 @@ from typing import TYPE_CHECKING, Any, ChainMap, Counter, Dict, List, Optional, 
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
-from libcst import Return
-from pandas import DataFrame, json_normalize, read_csv
+from pandas import DataFrame, Series, json_normalize, read_csv
 from rich import print
 
 from cdapython.Paginator import Paginator
@@ -35,7 +34,7 @@ class Result:
     ) -> None:
         self._api_response: QueryResponseData = api_response
         self.__result = self._api_response.result
-        self._query_id: Optional[str] = query_id
+        self._query_id: str = query_id
         self._offset: Optional[int] = offset
         self._limit: Optional[int] = limit
         self._api_instance: QueryApi = api_instance
@@ -47,7 +46,7 @@ class Result:
         if self.format_type == "tsv" and isinstance(self._api_response.result, list):
             data_text: str = ""
             data_text = "\n".join(
-                map(lambda e: e.replace("\n", ""), self._api_response.result)
+                map(lambda e: str(e).replace("\n", ""), self._api_response.result)
             )
             self._df = read_csv(StringIO(data_text), sep="\t")
 
@@ -71,7 +70,7 @@ class Result:
     def __str__(self) -> str:
         return self.__repr_value(show_value=self.show_sql, show_count=self.show_count)
 
-    def __dict__(self) -> Dict[str, Any]:
+    def __dict__(self) -> Dict[str, Any]:  # type: ignore
         return dict(ChainMap(*self.__result))
 
     def __eq__(self, __other: object):
@@ -101,7 +100,7 @@ class Result:
 
     @property
     def sql(self) -> str:
-        return self._api_response.query_sql
+        return str(self._api_response.query_sql)
 
     @property
     def count(self) -> int:
@@ -109,7 +108,7 @@ class Result:
 
     @property
     def total_row_count(self) -> int:
-        return self._api_response.total_row_count
+        return int(self._api_response.total_row_count)
 
     @property
     def has_next_page(self) -> bool:
@@ -185,7 +184,7 @@ class Result:
 
     def __getitem__(
         self, idx: Union[int, slice]
-    ) -> Union[Dict[str, Optional[str]], List[Dict[Any, Any]]]:
+    ) -> Union[Series, DataFrame, Any, list]:
 
         if isinstance(self._api_response.result, DataFrame):
             return self._api_response.result.loc[idx]
@@ -263,8 +262,8 @@ class Result:
         self,
         _offset: Optional[int],
         _limit: Optional[int],
-        async_req: Optional[bool] = False,
-        pre_stream: Optional[bool] = True,
+        async_req: bool = False,
+        pre_stream: bool = True,
     ):
         return get_query_result(
             self._api_instance,
@@ -279,14 +278,14 @@ class Result:
 
 def get_query_result(
     api_instance: QueryApi,
-    query_id: Optional[str],
+    query_id: str,
     offset: Optional[int],
     limit: Optional[int],
     async_req: Optional[bool],
-    pre_stream: Optional[bool] = True,
-    show_sql: Optional[bool] = True,
-    show_count: Optional[bool] = True,
-    format_type: Optional[str] = "json",
+    pre_stream: bool = True,
+    show_sql: bool = True,
+    show_count: bool = True,
+    format_type: str = "json",
 ) -> Optional[Result]:
     """[summary]
         This will call the next query and wait for the result then return a Result object to the user.
