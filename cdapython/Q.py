@@ -158,7 +158,7 @@ class Q:
         "file": _files_query,
         "count": _counts_query,
         "diagnosis.file": None,
-        "treatment.count": None,
+        "treatment.file": None,
         "subject.file": _subject_files_query,
         "researchsubject.file": _research_files_query,
         "specimen.file": _specimen_files_query,
