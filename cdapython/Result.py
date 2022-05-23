@@ -8,14 +8,13 @@ from typing import (
     Any,
     AsyncGenerator,
     ChainMap,
-    Counter,
     Dict,
-    Generator,
     List,
-    Literal,
     Optional,
     Union,
 )
+
+from typing_extensions import Literal
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
