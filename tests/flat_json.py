@@ -1,7 +1,7 @@
 from cdapython import query
 from cdapython.utility import columns
 
-from tests.global_settings import localhost
+from tests.global_settings import host
 
 
 def test() -> None:
@@ -10,7 +10,7 @@ def test() -> None:
     # print(q2.to_json())
     q3 = q2.subject
 
-    s = q3.run(host=localhost)
+    s = q3.run(host=host)
     # se = q3.run(host=localhost).to_dataframe()
     # d = q3.file.run(host=localhost).to_dataframe()
     # c = q2.run(host=localhost).to_dataframe()

@@ -1,5 +1,5 @@
 from cdapython import Q
-from tests.global_settings import localhost
+from tests.global_settings import localhost, host
 
 r = (
     Q("File.file_format = 'tsv'")
@@ -11,8 +11,8 @@ r = (
 q = r.research_subject
 a = r.subject
 
-x = q.run(host=localhost)
-q2 = q.files.run(host=localhost)
+x = q.run(host=host)
+q2 = q.files.run(host=host)
 
 
 print(x)
