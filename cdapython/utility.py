@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, Optional
 
 import cda_client
 from cda_client.api.query_api import QueryApi
@@ -38,7 +38,7 @@ if isinstance(const.CDA_API_URL, str):
     URL_TABLE: str = const.CDA_API_URL
 
 
-def http_error_logger(http_error: ServiceException):
+def http_error_logger(http_error: ServiceException) -> None:
     logging.error(
         f"""
             Http Status: {http_error.status}
@@ -51,7 +51,7 @@ def query(text: str) -> "Q":
     return parser(text)
 
 
-def table_white_list(table: Optional[str], version: Optional[str]):
+def table_white_list(table: Optional[str], version: Optional[str]) -> Optional[str]:
     """[summary]
     This checks the allowed list List and Throws a error if there is a table
     not allowed
