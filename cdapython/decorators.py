@@ -1,25 +1,20 @@
-import asyncio
 from functools import wraps
 from time import time
+from typing import Any, Callable, Dict, Tuple, TypeVar, Union, cast
 
 
-def create_async_func(f):
-    def wrapper(*args, **kwargs):
-        coro = asyncio.coroutine(f)
-        future = coro(*args, **kwargs)
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(future)
+F = TypeVar("F", bound=Callable[..., Any])
 
-    return wrapper
+FUNCTION_ANY = Union[F, Any]
 
 
 class measure:
     def __init__(self) -> None:
-        self.kwargs = None
+        self.kwargs: Dict[str, Any] = {}
 
-    def __call__(self, func):
+    def __call__(self, func: F) -> F:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Tuple, **kwargs: Dict[str, Any]) -> FUNCTION_ANY:
             start_time = int(round(time() * 1000))
             self.kwargs = kwargs
             try:

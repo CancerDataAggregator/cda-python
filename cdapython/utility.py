@@ -3,7 +3,6 @@ import logging
 from typing import TYPE_CHECKING, Any, List, Optional
 
 import cda_client
-import numpy as np
 from cda_client.api.query_api import QueryApi
 from cda_client.exceptions import ServiceException
 from rich import print
@@ -91,7 +90,7 @@ def unique_terms(
     async_req: Optional[bool] = None,
     version: Optional[str] = table_version,
     files: Optional[bool] = False,
-    show_sql: Optional[bool] = False,
+    show_sql: bool = False,
 ):
     """[summary]
 
@@ -186,7 +185,7 @@ def columns(
     pre_stream: bool = True,
     files: Optional[bool] = False,
     async_call: bool = False,
-    show_sql: Optional[bool] = None,
+    show_sql: bool = False,
 ):
     """[summary]
 

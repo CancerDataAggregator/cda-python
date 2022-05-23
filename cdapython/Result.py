@@ -3,7 +3,19 @@ from collections import ChainMap
 from io import StringIO
 from multiprocessing.pool import ApplyResult
 from time import sleep
-from typing import TYPE_CHECKING, Any, ChainMap, Counter, Dict, List, Optional, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    AsyncGenerator,
+    ChainMap,
+    Counter,
+    Dict,
+    Generator,
+    List,
+    Literal,
+    Optional,
+    Union,
+)
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
@@ -73,7 +85,7 @@ class Result:
     def __dict__(self) -> Dict[str, Any]:  # type: ignore
         return dict(ChainMap(*self.__result))
 
-    def __eq__(self, __other: object):
+    def __eq__(self, __other: object) -> Union[Any, Literal[False]]:
         return (
             isinstance(__other, Result)
             and self._api_response.result == __other._api_response.result
@@ -87,10 +99,10 @@ class Result:
         else:
             return not result
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(tuple(self._api_response.result))
 
-    def __contains__(self, value: str):
+    def __contains__(self, value: str) -> bool:
         exist = False
         for item in self.__result:
             if value in item.values():
@@ -160,12 +172,12 @@ class Result:
         """
         return dict(ChainMap(*self._api_response.result))
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self.count
 
     def paginator(
         self, to_df: bool = False, to_list: bool = False, to_dict: bool = False
-    ):
+    ) -> Paginator:
         """_summary_
         paginator this will automatically page over results
         Args:
@@ -202,13 +214,13 @@ class Result:
     def __iter__(self):
         return iter(self.__result)
 
-    def __aiter__(self):
-        async def tmp():
+    def __aiter__(self) -> AsyncGenerator[Any, None]:
+        async def tmp() -> AsyncGenerator[Any, None]:
             yield self.__result
 
         return tmp()
 
-    def pretty_print(self, idx: Optional[int] = None):
+    def pretty_print(self, idx: Optional[int] = None) -> None:
         """_summary_
         pretty_print will print out a json object if you pass a index then i will print the object at that index without the index
         it will automatically print alll results in the json object
@@ -222,18 +234,29 @@ class Result:
             print(json.dumps(self[idx], indent=4))
 
     async def async_next_page(
-        self, limit: Optional[int] = None, async_req=False, pre_stream=True
-    ):
-        return self.next_page()
+        self,
+        limit: Optional[int] = None,
+        async_req: bool = False,
+        pre_stream: bool = True,
+    ) -> Optional["Result"]:
+        return self.next_page(limit=limit, async_req=async_req, pre_stream=pre_stream)
 
     async def async_prev_page(
-        self, limit: Optional[int] = None, async_req=False, pre_stream=True
-    ):
-        return self.prev_page()
+        self,
+        limit: Optional[int] = None,
+        async_req: bool = False,
+        pre_stream: bool = True,
+    ) -> Optional["Result"]:
+        return self.prev_page(limit=limit, async_req=async_req, pre_stream=pre_stream)
 
-    def next_page(self, limit: Optional[int] = None, async_req=False, pre_stream=True):
+    def next_page(
+        self,
+        limit: Optional[int] = None,
+        async_req: bool = False,
+        pre_stream: bool = True,
+    ) -> Optional["Result"]:
         """_summary_
-         The next_page function will call the server for the next page using this limit to determine the next level of page results
+        The next_page function will call the server for the next page using this limit to determine the next level of page results
         Args:
             limit (Optional[int], optional): _description_. Defaults to None.
             async_req (bool, optional): _description_. Defaults to False.
@@ -251,12 +274,20 @@ class Result:
             _offset = self._offset + self._limit
             _limit = limit or self._limit
             return self._get_result(_offset, _limit, async_req, pre_stream)
+        return None
 
-    def prev_page(self, limit=None, async_req=False, pre_stream=True):
-        _offset = self._offset - self._limit
-        _offset = max(0, _offset)
-        _limit = limit or self._limit
-        return self._get_result(_offset, _limit, async_req, pre_stream)
+    def prev_page(
+        self,
+        limit: Optional[int] = None,
+        async_req: bool = False,
+        pre_stream: bool = True,
+    ) -> Optional["Result"]:
+        if isinstance(self._offset, int) and isinstance(self._limit, int):
+            _offset = self._offset - self._limit
+            _offset = max(0, _offset)
+            _limit = limit or self._limit
+            return self._get_result(_offset, _limit, async_req, pre_stream)
+        return None
 
     def _get_result(
         self,
@@ -264,7 +295,7 @@ class Result:
         _limit: Optional[int],
         async_req: bool = False,
         pre_stream: bool = True,
-    ):
+    ) -> Optional["Result"]:
         return get_query_result(
             self._api_instance,
             self._query_id,

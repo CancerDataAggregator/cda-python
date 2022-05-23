@@ -1,8 +1,16 @@
+from typing import TYPE_CHECKING, TypeVar
 from rich.progress import Progress
+from __future__ import annotations
+
+if TYPE_CHECKING:
+    from cdapython.Result import Result
+
+
+TypeVar
 
 
 class ProgressManager:
-    def __init__(self, other, cls) -> None:
+    def __init__(self, other: "Result", cls) -> None:
         self.count = other._limit
         self.total = other.total_row_count
         self.cls = cls

@@ -110,7 +110,7 @@ class Doublequotes(Token):
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
         value = self
-        return value.text
+        return str(value.text)
 
 
 class ArrayType(Token):
@@ -122,7 +122,7 @@ class ArrayType(Token):
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
         value = self
-        return value.text
+        return str(value.text)
 
 
 class Singlequotes(Token):
@@ -133,7 +133,7 @@ class Singlequotes(Token):
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
         value = self
-        return value.text
+        return str(value.text)
 
 
 class And(Token):
@@ -205,7 +205,7 @@ class var(Token):
         if right_side not in symbol_table:
             symbol_table[self.value] = right_side
 
-        return symbol_table[self.value]
+        return str(symbol_table[self.value])
 
 
 lexer = Lexer(with_parens=True)
@@ -232,5 +232,5 @@ lexer.register_token(LIKE, re.compile(r"(LIKE)"))
 lexer.register_token(var, re.compile(r"(Var\s\w+\s*?=(?!=))"))
 
 
-def parser(text: str) -> Q:
+def parser(text: str) -> "Q":
     return lexer.parse(text)

@@ -28,14 +28,19 @@ from cdapython.decorators import measure
 from cdapython.endpoints import (
     _boolean_query,
     _counts_query,
+    _diagnosis_counts_query,
     _diagnosis_query,
     _files_query,
     _research_files_query,
     _research_subject_query,
+    _researchsubject_counts_query,
+    _specimen_counts_query,
     _specimen_files_query,
     _specimen_query,
+    _subject_counts_query,
     _subject_files_query,
     _subject_query,
+    _treatment_counts_query,
     _treatments_query,
 )
 from cdapython.errorLogger import unverified_http
@@ -152,12 +157,16 @@ class Q:
         "specimen": _specimen_query,
         "file": _files_query,
         "count": _counts_query,
-        "diagnosis.file": _files_query,
+        "diagnosis.file": None,
+        "treatment.count": None,
         "subject.file": _subject_files_query,
         "researchsubject.file": _research_files_query,
-        "specimen.file": _specimen_files_query
-        # "subject.counts": _subject_counts_query,
-        # "researchsubject.files": _research_subject_files_query
+        "specimen.file": _specimen_files_query,
+        "researchsubject.count": _researchsubject_counts_query,
+        "diagnosis.count": _diagnosis_counts_query,
+        "subject.count": _subject_counts_query,
+        "specimen.count": _specimen_counts_query,
+        "treatment.count": _treatment_counts_query,
     }
     current_endpoint = _boolean_query
 
@@ -276,6 +285,7 @@ class Q:
             with cda_client_obj as api_client:
                 api_instance = QueryApi(api_client)
                 api_response = api_instance.sql_query(sql)
+
             if dry_run is True:
                 return api_response
 
@@ -394,7 +404,6 @@ class Q:
             with cda_client_obj as api_client:
                 api_instance = QueryApi(api_client)
                 api_response = api_instance.job_status(id)
-                print(type(api_response))
                 return api_response["status"]
 
         except InsecureRequestWarning as e:
@@ -403,7 +412,7 @@ class Q:
             print(e)
         return None
 
-    def _get_func(self):
+    def _get_func(self) -> None:
         full_string = ""
         if self.entity_type != "":
             full_string = self.entity_type
@@ -419,7 +428,7 @@ class Q:
             self.current_endpoint = self.api_tasks[full_string]
 
     @property
-    def file(self):
+    def file(self) -> "Q":
         """_summary_
         this is a chaining method used to get files
         Returns:
@@ -430,7 +439,7 @@ class Q:
         return new_q_class
 
     @property
-    def count(self):
+    def count(self) -> "Q":
         """_summary_
         this is a chaining method used to get counts
         Returns:
@@ -441,20 +450,20 @@ class Q:
         return new_q_class
 
     @property
-    def subject(self):
+    def subject(self) -> "Q":
 
         new_q_class = copy(self)
         new_q_class.entity_type = "subject"
         return new_q_class
 
     @property
-    def research_subject(self):
+    def research_subject(self) -> "Q":
         new_q_class = copy(self)
         new_q_class.entity_type = "researchsubject"
         return new_q_class
 
     @property
-    def specimen(self):
+    def specimen(self) -> "Q":
         new_q_class = copy(self)
         new_q_class.entity_type = "specimen"
         return new_q_class
@@ -473,9 +482,9 @@ class Q:
         verbose: Optional[bool] = True,
         filter: Optional[str] = None,
         flatten: Optional[bool] = False,
-        format: Optional[str] = "json",
+        format: str = "json",
         show_sql: Optional[bool] = None,
-    ) -> Optional[Result]:
+    ) -> Union[Result, QueryCreatedData, ApplyResult]:
         """_summary_
 
         Args:
@@ -514,6 +523,7 @@ class Q:
             with cda_client_obj as api_client:
                 api_instance = QueryApi(api_client)
                 # Execute boolean query
+
                 if verbose:
                     print("Getting results from database", end="\n\n")
                 api_response: Union[
@@ -526,7 +536,6 @@ class Q:
                     table=table,
                     async_req=async_call,
                 )
-
                 if isinstance(api_response, ApplyResult):
                     if verbose:
                         print(WAITING_TEXT)
@@ -605,11 +614,14 @@ class Q:
     def Less_Than(self, right: "Q") -> "Q":
         return Q(self.query, "<", right.query)
 
-    def Select(self, fields):
+    def Select(self, fields) -> "Q":
         return self.__select(fields=fields)
 
-    def Order_By(self, fields):
+    def Order_By(self, fields) -> None:
         pass
+
+    def Is(self, fields: str) -> "Q":
+        return Q(self.query, "IS", fields)
 
     def __select(self, fields: str) -> "Q":
         """[summary]
@@ -645,7 +657,7 @@ def infer_quote(val: Query) -> Query:
     pass
 
 
-def infer_quote(val):
+def infer_quote(val: Any) -> Union["Q", Query]:
     """[summary]
     Handles Strings With quotes by checking the value type
     Args:
@@ -656,8 +668,10 @@ def infer_quote(val):
     """
     if isinstance(val, (Q, Query)):
         return val
+
     if isinstance(val, str) and val.startswith('"') and val.endswith('"'):
         return quoted(val[1:-1])
+
     if isinstance(val, str) and val.startswith("'") and val.endswith("'"):
         return quoted(val[1:-1])
     return unquoted(val)

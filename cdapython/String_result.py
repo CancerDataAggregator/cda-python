@@ -36,21 +36,23 @@ class StringResult(Result):
             values = [list(i.values())[0] for i in self._api_response.result]
             values = list(filter(None, values))
             return list(
-                filter(lambda items: (str(items).lower().find(filters) != -1), values)
+                filter(
+                    lambda items: (str(items).lower().find(str(filters)) != -1), values
+                )
             )
         return [list(i.values())[0] for i in self._api_response.result]
 
 
 def get_query_string_result(
     api_instance: QueryApi,
-    query_id: Optional[str],
+    query_id: str,
     offset: Optional[int],
     limit: Optional[int],
     async_req: Optional[bool],
-    pre_stream: Optional[bool] = True,
-    show_sql: Optional[bool] = True,
-    show_count: Optional[bool] = True,
-    format_type: Optional[str] = "json",
+    pre_stream: bool = True,
+    show_sql: bool = True,
+    show_count: bool = True,
+    format_type: str = "json",
 ) -> Optional[StringResult]:
     """[summary]
         This will call the next query and wait for the result then return a Result object to the user.

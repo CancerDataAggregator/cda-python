@@ -1,4 +1,6 @@
+from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Union
+
 
 if TYPE_CHECKING:
     from pandas import DataFrame
@@ -34,11 +36,12 @@ class Paginator:
             raise StopAsyncIteration
         result_nx = self.result
 
-        if self.to_df:
-            result_nx = self.result.to_dataframe()
-        if self.to_list:
+        if self.to_df and self.result is not None:
+            if self.result is not None:
+                result_nx = self.result.to_dataframe()
+        if self.to_list and self.result is not None:
             result_nx = self.result.to_list()
-        if self.to_dict:
+        if self.to_dict and self.result is not None:
             result_nx = self.result.to_dict()
         if self.result.has_next_page:
             self.result = self.result.next_page()

@@ -6,8 +6,15 @@ requires = ["setuptools", "wheel"]
 ignore_missing_imports = true
 strict = false
 warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_decorators = true
+warn_redundant_casts = true
+warn_unreachable = true
+warn_unused_ignores = true
+show_column_numbers = true
 follow_imports = "silent"
-
 
 [tool.black]
 line-length = 88
