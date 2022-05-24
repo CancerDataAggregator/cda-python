@@ -5,7 +5,7 @@ from json import loads
 from logging import error as logError
 from multiprocessing.pool import ApplyResult
 from types import MappingProxyType
-from typing import Any, Dict, Optional, Tuple, Union, overload
+from typing import Any, Dict, Optional, Tuple, TypeVar, Union, overload
 
 import pandas as pd
 from cda_client import ApiClient, Configuration
@@ -46,6 +46,7 @@ from cdapython.endpoints import (
 from cdapython.errorLogger import unverified_http
 from cdapython.functions import backwards_comp, col, find_ssl_path, quoted, unquoted
 from cdapython.Result import Result, get_query_result
+from cdapython.simple_parser import simple_parser
 
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 
@@ -144,6 +145,9 @@ class _QEncoder(json.JSONEncoder):
             return tmp_dict
 
 
+TQ = TypeVar("TQ", bound="Q")
+
+
 class Q:
     """
     Q lang is Language used to send query to the cda service
@@ -170,7 +174,7 @@ class Q:
     }
     current_endpoint = _boolean_query
 
-    def __init__(self, *args: Union[str, Query]) -> None:
+    def __init__(self: TQ, *args: Union[str, Query]) -> None:
         """
 
         Args:
@@ -184,6 +188,7 @@ class Q:
                 raise RuntimeError("Q statement parse error")
 
             _l, _op, _r = str(args[0]).strip().replace("\n", "").split(" ", 2)
+            # simple_parser(args[0])
             _l = backwards_comp(_l)
             _l = col(_l)
             _op, _r = query_type_conversion(_op, _r)
@@ -201,7 +206,7 @@ class Q:
         self.query.l = _l
         self.query.r = _r
 
-    def __repr__(self) -> str:
+    def __repr__(self: TQ) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
 
     def to_json(self, indent: int = 4) -> str:
@@ -470,7 +475,7 @@ class Q:
 
     @measure()
     def run(
-        self,
+        self: TQ,
         offset: int = 0,
         limit: int = 100,
         version: Optional[str] = None,

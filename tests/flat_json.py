@@ -5,12 +5,10 @@ from tests.global_settings import host
 
 
 def test() -> None:
-    q2 = query("id = sex")
+    q2 = query("sex = 'male'")
     print(type(q2), q2)
     # print(q2.to_json())
-    q3 = q2.subject
-
-    s = q3.run(host=host)
+    q3 = q2.subject.run(host=host).to_dataframe()
     # se = q3.run(host=localhost).to_dataframe()
     # d = q3.file.run(host=localhost).to_dataframe()
     # c = q2.run(host=localhost).to_dataframe()

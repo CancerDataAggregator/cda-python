@@ -3,7 +3,7 @@ import sys
 import cdapython
 
 
-def run_file(path):
+def run_file(path: str) -> None:
     with open(path, "r") as file:
         for line in file:
             line = line.strip()

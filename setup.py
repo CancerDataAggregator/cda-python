@@ -52,7 +52,7 @@ setup(
         "rich>=12.0.1",
         "matplotlib>=3.5.1",
         "typing-extensions==4.2.0",
-        "pandas>=1.3.5",
+        "pandas==1.3.5",
         "ipywidgets>=7.7.0",
         "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git@3.0.0-beta",
         "python-dotenv>=0.18.0",

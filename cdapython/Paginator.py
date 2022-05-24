@@ -1,6 +1,6 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Union
 
+from typing import TYPE_CHECKING, Optional, TypeVar, Union
 
 if TYPE_CHECKING:
     from pandas import DataFrame
@@ -8,9 +8,12 @@ if TYPE_CHECKING:
     from cdapython.Result import Result
 
 
+TPaginator = TypeVar("TPaginator", bound="Paginator")
+
+
 class Paginator:
     def __init__(
-        self,
+        self: TPaginator,
         result: "Result",
         to_df: bool,
         to_list: bool,
@@ -36,9 +39,8 @@ class Paginator:
             raise StopAsyncIteration
         result_nx = self.result
 
-        if self.to_df and self.result is not None:
-            if self.result is not None:
-                result_nx = self.result.to_dataframe()
+        if self.to_df:
+            result_nx = self.result.to_dataframe()
         if self.to_list and self.result is not None:
             result_nx = self.result.to_list()
         if self.to_dict and self.result is not None:
@@ -50,7 +52,7 @@ class Paginator:
             self.stopped = True
             return result_nx
 
-    def __next__(self):
+    def __next__(self) -> Optional[Union[DataFrame, Result]]:
         if self.stopped:
             raise StopIteration
         self.count += self.result.count

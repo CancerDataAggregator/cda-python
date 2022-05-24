@@ -2,7 +2,6 @@ from functools import wraps
 from time import time
 from typing import Any, Callable, Dict, Tuple, TypeVar, Union, cast
 
-
 F = TypeVar("F", bound=Callable[..., Any])
 
 FUNCTION_ANY = Union[F, Any]

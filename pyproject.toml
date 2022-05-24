@@ -1,3 +1,25 @@
+[tool.poetry]
+name = "cdapython"
+version = "2022.5.23"
+authors = ["Dion Boles","Frederick Kaufman","Richard Fricke","Kaushik Ghose","Phil Shapiro"]
+description = ""
+
+[tool.poetry.dependencies]
+python = "^3.7"
+tdparser="1.1.6"
+numpy ="1.21.5"
+wheel ="0.36.2"
+urllib3="1.26.8"
+rich="12.0.1"
+matplotlib="3.5.1"
+typing-extensions="4.2.0"
+pandas="1.3.5"
+ipywidgets="7.7.0"
+python-dotenv="0.18.0"
+
+
+
+
 [build-system]
 # Minimum requirements for the build system to execute.
 requires = ["setuptools", "wheel"]
@@ -32,3 +54,5 @@ line_length = 88
 targets = ["cdapython"]
 exclude = ["venv", "ven3", "tests"]
 skips = ["B101", "B601"]
+
+

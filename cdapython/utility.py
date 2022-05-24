@@ -1,3 +1,4 @@
+from __future__ import annotations
 import json
 import logging
 from typing import TYPE_CHECKING, Optional
@@ -21,8 +22,8 @@ logging.captureWarnings(InsecureRequestWarning)
 
 # This is added for Type Checking class to remove a circular import)
 if TYPE_CHECKING:
-    from cdapython import Result
     from cdapython.Q import Q
+    from cdapython.String_result import StringResult
 
 # Creating constant
 if isinstance(const.default_table, str) and const.default_table is not None:
@@ -76,6 +77,7 @@ def table_white_list(table: Optional[str], version: Optional[str]) -> Optional[s
             version = "v3"
 
         return version
+    return version
 
 
 @lru_cache_timed(seconds=10)
@@ -91,7 +93,7 @@ def unique_terms(
     version: Optional[str] = table_version,
     files: Optional[bool] = False,
     show_sql: bool = False,
-):
+) -> Optional["StringResult"]:
     """[summary]
 
     Args:
@@ -186,7 +188,7 @@ def columns(
     files: Optional[bool] = False,
     async_call: bool = False,
     show_sql: bool = False,
-):
+) -> Optional["StringResult"]:
     """[summary]
 
     Args:

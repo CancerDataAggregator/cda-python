@@ -14,12 +14,11 @@ from typing import (
     Union,
 )
 
-from typing_extensions import Literal
-
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
 from pandas import DataFrame, Series, json_normalize, read_csv
 from rich import print
+from typing_extensions import Literal
 
 from cdapython.Paginator import Paginator
 
