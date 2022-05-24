@@ -1,10 +1,10 @@
-from __future__ import annotations
 import re
 from typing import TYPE_CHECKING, Union
 
 from tdparser import Lexer, Token
 from tdparser.topdown import Parser
 
+from cdapython.Q import Q
 
 if TYPE_CHECKING:
     from cdapython.Q import Q
