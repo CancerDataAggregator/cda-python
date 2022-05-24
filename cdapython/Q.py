@@ -44,9 +44,19 @@ from cdapython.endpoints import (
     _treatments_query,
 )
 from cdapython.errorLogger import unverified_http
-from cdapython.functions import backwards_comp, col, find_ssl_path, quoted, unquoted
+
+from cdapython.functions import (
+    backwards_comp,
+    col,
+    find_ssl_path,
+    query_type_conversion,
+    quoted,
+    unquoted,
+    infer_quote,
+)
 from cdapython.Result import Result, get_query_result
-from cdapython.simple_parser import simple_parser
+
+# from cdapython.simple_parser import simple_parser
 
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 
@@ -86,33 +96,6 @@ def check_version_and_table(
     if table is None:
         table = const.default_file_table
     return (version, table)
-
-
-def query_type_conversion(
-    _op: str, _r: str
-) -> Union[Tuple[Literal["LIKE"], Query], Tuple[str, str]]:
-    """_summary_
-        This is for query type conversion in looking operator
-    Args:
-        _op (str): _description_
-        _r (str): _description_
-
-    Returns:
-        (tuple[Literal['LIKE'], Query] | tuple[str, str])
-    """
-    if _r.find("%") != -1:
-        tmp = Query()
-        tmp.node_type = "quoted"
-        tmp.value = _r
-        return ("LIKE", tmp)
-
-    if _r.find("LIKE") != -1:
-        tmp = Query()
-        tmp.node_type = "quoted"
-        tmp.value = _r
-        return ("LIKE", tmp)
-
-    return (_op, _r)
 
 
 class _QEncoder(json.JSONEncoder):
@@ -188,7 +171,7 @@ class Q:
                 raise RuntimeError("Q statement parse error")
 
             _l, _op, _r = str(args[0]).strip().replace("\n", "").split(" ", 2)
-            # simple_parser(args[0])
+            # self.query = simple_parser(args[0])
             _l = backwards_comp(_l)
             _l = col(_l)
             _op, _r = query_type_conversion(_op, _r)
@@ -645,38 +628,3 @@ class Q:
         tmp.node_type = "SELECTVALUES"
         tmp.value = fields
         return Q(tmp, "SELECT", self.query)
-
-
-@overload
-def infer_quote(val: str) -> str:
-    pass
-
-
-@overload
-def infer_quote(val: "Q") -> "Q":
-    pass
-
-
-@overload
-def infer_quote(val: Query) -> Query:
-    pass
-
-
-def infer_quote(val: Any) -> Union["Q", Query]:
-    """[summary]
-    Handles Strings With quotes by checking the value type
-    Args:
-        val (Union[str,"Q",Query): [description]
-
-    Returns:
-        Query: [description]
-    """
-    if isinstance(val, (Q, Query)):
-        return val
-
-    if isinstance(val, str) and val.startswith('"') and val.endswith('"'):
-        return quoted(val[1:-1])
-
-    if isinstance(val, str) and val.startswith("'") and val.endswith("'"):
-        return quoted(val[1:-1])
-    return unquoted(val)
