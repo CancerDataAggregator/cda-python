@@ -9,3 +9,6 @@ def test_parser() -> None:
 
     assert isinstance(qc2, Q)
     assert qc2.query.to_dict()["node_type"] == "OR"
+
+
+test_parser()

@@ -7,6 +7,7 @@ from rich.table import Table
 console = Table()
 q1 = Q("sex = 'male'")
 r = q1.subject.count.run(host=host)
+print(r)
 result = r[0]
 html_string = ""
 

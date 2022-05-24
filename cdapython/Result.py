@@ -53,10 +53,10 @@ class Result:
         self.format_type = format_type
         self._df: DataFrame
 
-        if self.format_type == "tsv" and isinstance(self._api_response.result, list):
+        if self.format_type == "tsv" and isinstance(self.__result, list):
             data_text: str = ""
             data_text = "\n".join(
-                map(lambda e: str(e).replace("\n", ""), self._api_response.result)
+                map(lambda e: str(e).replace("\n", ""), self.__result)
             )
             self._df = read_csv(StringIO(data_text), sep="\t")
 
@@ -72,6 +72,7 @@ class Result:
             Count: {self.count}
             Total Row Count: {self.total_row_count}
             More pages: {self.has_next_page}
+            {self.to_html_table()}
             """
 
     def __repr__(self) -> str:
@@ -84,10 +85,7 @@ class Result:
         return dict(ChainMap(*self.__result))
 
     def __eq__(self, __other: object) -> Union[Any, Literal[False]]:
-        return (
-            isinstance(__other, Result)
-            and self._api_response.result == __other._api_response.result
-        )
+        return isinstance(__other, Result) and self.__result == __other.__result
 
     def __ne__(self, __o: object) -> bool:
         result = self.__eq__(__o)
@@ -98,7 +96,7 @@ class Result:
             return not result
 
     def __hash__(self) -> int:
-        return hash(tuple(self._api_response.result))
+        return hash(tuple(self.__result))
 
     def __contains__(self, value: str) -> bool:
         exist = False
@@ -160,7 +158,7 @@ class Result:
             list: _description_
         """
 
-        return [self._api_response.result]
+        return [self._result]
 
     def to_dict(self) -> dict:
         """_summary_
@@ -168,7 +166,11 @@ class Result:
         Returns:
             dict: _description_
         """
-        return dict(ChainMap(*self._api_response.result))
+        return dict(ChainMap(*self.__result))
+
+    def to_html_table(self):
+        html_string = ""
+        self.__result[0]
 
     def __len__(self) -> int:
         return self.count
@@ -196,8 +198,8 @@ class Result:
         self, idx: Union[int, slice]
     ) -> Union[Series, DataFrame, Any, list]:
 
-        if isinstance(self._api_response.result, DataFrame):
-            return self._api_response.result.loc[idx]
+        if isinstance(self.__result, DataFrame):
+            return self.__result.loc[idx]
 
         if isinstance(idx, int):
             if idx < 0:

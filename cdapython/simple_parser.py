@@ -5,7 +5,9 @@ from tdparser import Lexer, Token
 from tdparser.topdown import Parser
 from cda_client.model.query import Query
 
-from cdapython.utility import query
+
+from cdapython.functions import backwards_comp, col, infer_quote, query_type_conversion
+
 
 if TYPE_CHECKING:
     from cdapython.Q import Q
@@ -36,8 +38,12 @@ class Eq(Token):
         # of same precedence
         right_side = context.expression(self.lbp)
         self.query.node_type = "="
-        self.query.l = left.strip()
-        self.query.r = right_side.strip()
+        self.query.node_type, right_side = query_type_conversion(
+            self.query.node_type, right_side
+        )
+
+        self.query.l = col(backwards_comp(left.strip()))
+        self.query.r = infer_quote(right_side.strip())
 
         return self.query
 
@@ -52,9 +58,9 @@ class NotEq(Token):
         # of same precedence
         right_side = context.expression(self.lbp)
         self.query.node_type = "!="
-        self.query.l = left.strip()
-        self.query.r = right_side.strip()
-        return query
+        self.query.l = col(backwards_comp(left.strip()))
+        self.query.r = infer_quote(right_side.strip())
+        return self.query
 
 
 class Greaterthaneq(Token):
@@ -67,9 +73,9 @@ class Greaterthaneq(Token):
         # of same precedence
         right_side = context.expression(self.lbp)
         self.query.node_type = ">="
-        self.query.l = left.strip()
-        self.query.r = right_side.strip()
-        return query
+        self.query.l = col(backwards_comp(left.strip()))
+        self.query.r = infer_quote(right_side.strip())
+        return self.query
 
 
 class Greaterthan(Token):
@@ -81,9 +87,9 @@ class Greaterthan(Token):
         # of same precedence
         right_side = context.expression(self.lbp)
         self.query.node_type = ">"
-        self.query.l = left.strip()
-        self.query.r = right_side.strip()
-        return query
+        self.query.l = col(backwards_comp(left.strip()))
+        self.query.r = infer_quote(right_side.strip())
+        return self.query
 
 
 class Lessthaneq(Token):
@@ -96,9 +102,9 @@ class Lessthaneq(Token):
         # of same precedence
         right_side = context.expression(self.lbp)
         self.query.node_type = "<="
-        self.query.l = left.strip()
-        self.query.r = right_side.strip()
-        return query
+        self.query.l = col(backwards_comp(left.strip()))
+        self.query.r = infer_quote(right_side.strip())
+        return self.query
 
 
 class Lessthan(Token):
@@ -111,10 +117,10 @@ class Lessthan(Token):
         # of same precedence
         right_side = context.expression(self.lbp)
         self.query.node_type = "<"
-        self.query.l = left.strip()
-        self.query.r = right_side.strip()
+        self.query.l = col(backwards_comp(left.strip()))
+        self.query.r = infer_quote(right_side.strip())
 
-        return query
+        return self.query
 
 
 class Doublequotes(Token):
@@ -161,9 +167,9 @@ class IN(Token):
         # of same precedence
         right_side = context.expression(self.lbp)
         self.query.node_type = "IN"
-        self.query.l = left.strip()
-        self.query.r = right_side.strip()
-        return query
+        self.query.l = col(backwards_comp(left.strip()))
+        self.query.r = infer_quote(right_side.strip())
+        return self.query
 
 
 class LIKE(Token):
@@ -177,9 +183,9 @@ class LIKE(Token):
 
         right_side = context.expression(self.lbp)
         self.query.node_type = "LIKE"
-        self.query.l = left.strip()
-        self.query.r = right_side.strip()
-        return query
+        self.query.l = col(backwards_comp(left.strip()))
+        self.query.r = infer_quote(right_side.strip())
+        return self.query
 
 
 class NOT(Token):
@@ -190,8 +196,8 @@ class NOT(Token):
         right_side = context.expression(self.lbp)
         self.query.node_type = "NOT"
         self.query.l = None
-        self.query.r = right_side.strip()
-        return query
+        self.query.r = infer_quote(right_side.strip())
+        return self.query
 
     def led(self, left: str, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
@@ -201,8 +207,8 @@ class NOT(Token):
         right_side = context.expression(self.lbp)
         self.query.node_type = "NOT"
         self.query.l = None
-        self.query.r = right_side.strip()
-        return query
+        self.query.r = infer_quote(right_side.strip())
+        return self.query
 
 
 class IS(Token):
@@ -213,8 +219,8 @@ class IS(Token):
         right_side = context.expression(self.lbp)
         self.query.node_type = "IS"
         self.query.l = None
-        self.query.r = right_side.strip()
-        return query
+        self.query.r = infer_quote(right_side.strip())
+        return self.query
 
     def led(self, left: str, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
@@ -224,8 +230,8 @@ class IS(Token):
         right_side = context.expression(self.lbp)
         self.query.node_type = "IS"
         self.query.l = None
-        self.query.r = right_side.strip()
-        return query
+        self.query.r = infer_quote(right_side.strip())
+        return self.query
 
 
 lexer = Lexer(with_parens=True)
@@ -244,7 +250,7 @@ lexer.register_token(Greaterthaneq, re.compile(r"(\s+>=+\s)"))
 lexer.register_token(Lessthan, re.compile(r"(\s+<+\s)"))
 lexer.register_token(Lessthaneq, re.compile(r"(\s+<=+\s)"))
 lexer.register_token(NotEq, re.compile(r"(\s+!=+\s)"))
-lexer.register_token(Eq, re.compile(r"(\s+=+\s)"))
+lexer.register_token(Eq, re.compile(r"(=)"))
 lexer.register_token(IN, re.compile(r"(IN)"))
 lexer.register_token(LIKE, re.compile(r"(LIKE)"))
 lexer.register_token(NOT, re.compile(r"(NOT)"))
