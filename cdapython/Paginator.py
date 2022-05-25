@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Optional, TypeVar, Union
 if TYPE_CHECKING:
     from pandas import DataFrame
 
-    from cdapython.Result import Result
+    from cdapython.results.Result import Result
 
 
 TPaginator = TypeVar("TPaginator", bound="Paginator")

@@ -20,32 +20,32 @@ from typing_extensions import Literal
 from urllib3.connection import NewConnectionError  # type: ignore
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, SSLError
+from cdapython.services import (
+    SubjectQueryService,
+    SubjectFilesService,
+    SubjectCountsService,
+    ResearchSubjectCountsService,
+    ResearchSubjectFilesService,
+    ResearchSubjectQueryService,
+    SpecimenCountsService,
+    SpecimenFilesService,
+    SpecimenQueryService,
+    TreatmentCountsService,
+    TreatmentQueryService,
+    DiagnosisCountsService,
+    DiagnosisQueryService,
+    FilesApiService,
+    CountsApiService,
+    ApiService
+)
 
 import cdapython.constantVariables as const
 from cdapython.constantVariables import default_table, project_name, table_version
 from cdapython.customException import QSQLError, WRONGDATABASEError
 from cdapython.decorators import measure
-from cdapython.endpoints import (
-    _boolean_query,
-    _counts_query,
-    _diagnosis_counts_query,
-    _diagnosis_query,
-    _files_query,
-    _research_files_query,
-    _research_subject_query,
-    _researchsubject_counts_query,
-    _specimen_counts_query,
-    _specimen_files_query,
-    _specimen_query,
-    _subject_counts_query,
-    _subject_files_query,
-    _subject_query,
-    _treatment_counts_query,
-    _treatments_query,
-)
 from cdapython.errorLogger import unverified_http
 from cdapython.functions import backwards_comp, col, find_ssl_path, quoted, unquoted
-from cdapython.Result import Result, get_query_result
+from cdapython.results.Result import Result, get_query_result
 from cdapython.simple_parser import simple_parser
 
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
@@ -156,23 +156,24 @@ class Q:
     entity_type = ""
     task = ""
     api_tasks = {
-        "subject": _subject_query,
-        "researchsubject": _research_subject_query,
-        "specimen": _specimen_query,
-        "file": _files_query,
-        "count": _counts_query,
+        "": ApiService,
+        "subject": SubjectQueryService,
+        "researchsubject": ResearchSubjectQueryService,
+        "specimen": SpecimenQueryService,
+        "file": FilesApiService,
+        "count": CountsApiService,
         "diagnosis.file": None,
         "treatment.file": None,
-        "subject.file": _subject_files_query,
-        "researchsubject.file": _research_files_query,
-        "specimen.file": _specimen_files_query,
-        "researchsubject.count": _researchsubject_counts_query,
-        "diagnosis.count": _diagnosis_counts_query,
-        "subject.count": _subject_counts_query,
-        "specimen.count": _specimen_counts_query,
-        "treatment.count": _treatment_counts_query,
+        "subject.file": SubjectCountsService,
+        "researchsubject.file": ResearchSubjectFilesService,
+        "specimen.file": SpecimenFilesService,
+        "researchsubject.count": ResearchSubjectCountsService,
+        "diagnosis.count": DiagnosisCountsService,
+        "subject.count": SubjectCountsService,
+        "specimen.count": SpecimenCountsService,
+        "treatment.count": TreatmentCountsService,
     }
-    current_endpoint = _boolean_query
+    api_service = api_tasks[""]
 
     def __init__(self: TQ, *args: Union[str, Query]) -> None:
         """
@@ -427,10 +428,7 @@ class Q:
                 f"{full_string}.{self.task}" if full_string != "" else self.task
             )
 
-        if full_string == "":
-            self.current_endpoint = _boolean_query
-        else:
-            self.current_endpoint = self.api_tasks[full_string]
+        self.api_service = self.api_tasks[full_string]
 
     @property
     def file(self) -> "Q":
@@ -533,7 +531,7 @@ class Q:
                     print("Getting results from database", end="\n\n")
                 api_response: Union[
                     QueryCreatedData, ApplyResult
-                ] = self.current_endpoint(
+                ] = self.api_service.call_endpoint(
                     api_instance=api_instance,
                     query=self.query,
                     version=version,
@@ -551,9 +549,9 @@ class Q:
                 if dry_run is True:
                     return api_response
 
-            return get_query_result(
+            return self.api_service.get_query_result(
                 api_instance=api_instance,
-                query_id=api_response.query_id,
+                query_id=api_response.query_id,  # type: ignore
                 offset=offset,
                 limit=limit,
                 async_req=async_call,

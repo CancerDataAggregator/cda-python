@@ -62,7 +62,7 @@ class Result:
 
         # add a if check to query output for counts to hide sql
 
-    def __repr_value(
+    def _repr_value(
         self, show_value: Optional[bool], show_count: Optional[bool]
     ) -> str:
         return f"""
@@ -75,10 +75,10 @@ class Result:
             """
 
     def __repr__(self) -> str:
-        return self.__repr_value(show_value=self.show_sql, show_count=self.show_count)
+        return self._repr_value(show_value=self.show_sql, show_count=self.show_count)
 
     def __str__(self) -> str:
-        return self.__repr_value(show_value=self.show_sql, show_count=self.show_count)
+        return self._repr_value(show_value=self.show_sql, show_count=self.show_count)
 
     def __dict__(self) -> Dict[str, Any]:  # type: ignore
         return dict(ChainMap(*self.__result))
