@@ -1,10 +1,15 @@
 from os import path
 from ssl import get_default_verify_paths
-from typing import Optional, Union
+from typing import Any, Optional, Tuple, Union, overload
+from typing_extensions import Literal
 
 from cda_client.model.query import Query
+from typing import TYPE_CHECKING
 
 from cdapython.ConversionMap import conversionMap
+
+if TYPE_CHECKING:
+    from cdapython.Q import Q
 
 
 def col(col_name: Optional[str]) -> Query:
@@ -61,3 +66,60 @@ def backwards_comp(value: str) -> str:
         )
         return tmp_l
     return value
+
+
+@overload
+def infer_quote(val: str) -> str:
+    pass
+
+
+@overload
+def infer_quote(val: Query) -> Query:
+    pass
+
+
+def infer_quote(val: Any) -> Query:
+    """[summary]
+    Handles Strings With quotes by checking the value type
+    Args:
+        val (Union[str,"Q",Query): [description]
+
+    Returns:
+        Query: [description]
+    """
+    if isinstance(val, Query):
+        return val
+
+    if isinstance(val, str) and val.startswith('"') and val.endswith('"'):
+        return quoted(val[1:-1])
+
+    if isinstance(val, str) and val.startswith("'") and val.endswith("'"):
+        return quoted(val[1:-1])
+    return unquoted(val)
+
+
+def query_type_conversion(
+    _op: str, _r: str
+) -> Union[Tuple[Literal["LIKE"], Query], Tuple[str, str]]:
+    """_summary_
+        This is for query type conversion in looking operator
+    Args:
+        _op (str): _description_
+        _r (str): _description_
+
+    Returns:
+        (tuple[Literal['LIKE'], Query] | tuple[str, str])
+    """
+    if _r.find("%") != -1:
+        tmp = Query()
+        tmp.node_type = "quoted"
+        tmp.value = _r
+        return ("LIKE", tmp)
+
+    if _r.find("LIKE") != -1:
+        tmp = Query()
+        tmp.node_type = "quoted"
+        tmp.value = _r
+        return ("LIKE", tmp)
+
+    return (_op, _r)
