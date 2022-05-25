@@ -72,7 +72,6 @@ class Result:
             Count: {self.count}
             Total Row Count: {self.total_row_count}
             More pages: {self.has_next_page}
-            {self.to_html_table()}
             """
 
     def __repr__(self) -> str:
