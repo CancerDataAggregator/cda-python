@@ -168,10 +168,6 @@ class Result:
         """
         return dict(ChainMap(*self.__result))
 
-    def to_html_table(self):
-        html_string = ""
-        self.__result[0]
-
     def __len__(self) -> int:
         return self.count
 

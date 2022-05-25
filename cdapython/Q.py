@@ -44,19 +44,17 @@ from cdapython.endpoints import (
     _treatments_query,
 )
 from cdapython.errorLogger import unverified_http
-
 from cdapython.functions import (
     backwards_comp,
     col,
     find_ssl_path,
+    infer_quote,
     query_type_conversion,
     quoted,
     unquoted,
-    infer_quote,
 )
 from cdapython.Result import Result, get_query_result
-
-# from cdapython.simple_parser import simple_parser
+from cdapython.simple_parser import simple_parser
 
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 
@@ -169,25 +167,23 @@ class Q:
 
             if args[0] is None:
                 raise RuntimeError("Q statement parse error")
+            query_parsed = simple_parser(args[0])
+            self.query = query_parsed
 
-            _l, _op, _r = str(args[0]).strip().replace("\n", "").split(" ", 2)
-            # self.query = simple_parser(args[0])
-            _l = backwards_comp(_l)
-            _l = col(_l)
-            _op, _r = query_type_conversion(_op, _r)
-            _r = infer_quote(_r)
         elif len(args) != 3:
             raise RuntimeError(
                 "Require one or three arguments. Please see documentation."
             )
         else:
-            _l = infer_quote(args[0])
+            """_summary_
+            this is for Q operators support
+            """
+            _l = args[0]
             _op = args[1]
-            _r = infer_quote(args[2])
-
-        self.query.node_type = _op
-        self.query.l = _l
-        self.query.r = _r
+            _r = args[2]
+            self.query.node_type = _op
+            self.query.l = _l
+            self.query.r = _r
 
     def __repr__(self: TQ) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
@@ -602,10 +598,10 @@ class Q:
     def Less_Than(self, right: "Q") -> "Q":
         return Q(self.query, "<", right.query)
 
-    def Select(self, fields) -> "Q":
+    def Select(self, fields: str) -> "Q":
         return self.__select(fields=fields)
 
-    def Order_By(self, fields) -> None:
+    def Order_By(self, fields: str) -> None:
         pass
 
     def Is(self, fields: str) -> "Q":

@@ -1,10 +1,9 @@
 from os import path
 from ssl import get_default_verify_paths
-from typing import Any, Optional, Tuple, Union, overload
-from typing_extensions import Literal
+from typing import TYPE_CHECKING, Any, Optional, Tuple, Union, overload
 
 from cda_client.model.query import Query
-from typing import TYPE_CHECKING
+from typing_extensions import Literal
 
 from cdapython.ConversionMap import conversionMap
 

@@ -1,13 +1,11 @@
 import re
 from typing import TYPE_CHECKING, Union
 
+from cda_client.model.query import Query
 from tdparser import Lexer, Token
 from tdparser.topdown import Parser
-from cda_client.model.query import Query
-
 
 from cdapython.functions import backwards_comp, col, infer_quote, query_type_conversion
-
 
 if TYPE_CHECKING:
     from cdapython.Q import Q
@@ -36,14 +34,14 @@ class Eq(Token):
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
-        right_side = context.expression(self.lbp)
+        right_side = context.expression(self.lbp).strip()
         self.query.node_type = "="
         self.query.node_type, right_side = query_type_conversion(
             self.query.node_type, right_side
         )
 
         self.query.l = col(backwards_comp(left.strip()))
-        self.query.r = infer_quote(right_side.strip())
+        self.query.r = infer_quote(right_side)
 
         return self.query
 
@@ -80,6 +78,7 @@ class Greaterthaneq(Token):
 
 class Greaterthan(Token):
     lbp = 4  # Precedence
+    query = Query()
 
     def led(self, left: Union[str, Query], context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
@@ -181,10 +180,13 @@ class LIKE(Token):
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
 
-        right_side = context.expression(self.lbp)
+        right_side = context.expression(self.lbp).strip()
         self.query.node_type = "LIKE"
+        self.query.node_type, right_side = query_type_conversion(
+            self.query.node_type, right_side
+        )
         self.query.l = col(backwards_comp(left.strip()))
-        self.query.r = infer_quote(right_side.strip())
+        self.query.r = infer_quote(right_side)
         return self.query
 
 

@@ -188,7 +188,7 @@ class LIKE(Token):
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
 
-        right_side = context.expression(self.lbp)
+        right_side = context.expression(self.lbp).strip()
         return Q(left.strip() + " LIKE " + right_side)
 
 

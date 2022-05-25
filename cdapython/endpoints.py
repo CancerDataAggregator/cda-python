@@ -1,3 +1,4 @@
+from typing import Any, Callable
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
 from cda_client.model.query import Query
@@ -114,7 +115,7 @@ def _boolean_query(
     dry_run: bool,
     table: str,
     async_req: bool,
-) -> Endpoint:
+) -> Callable[..., Endpoint]:
     return api_instance.boolean_query(
         query, version=version, dry_run=dry_run, table=table, async_req=async_req
     )
