@@ -7,7 +7,7 @@ from tests.global_settings import host, localhost
 
 
 async def main():
-    q = query("ResearchSubject.primary_disease_type LIKE 'Lung%'").run(host=localhost)
+    q = query("ResearchSubject.primary_disease_type LIKE 'Lung%'").run(host=host)
 
     df = DataFrame()
     async for i in q.paginator(to_df=True):
