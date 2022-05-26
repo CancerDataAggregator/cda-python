@@ -16,7 +16,7 @@ from cdapython.decorators_cache import lru_cache_timed
 from cdapython.errorLogger import unverified_http
 from cdapython.functions import backwards_comp, find_ssl_path
 from cdapython.Qparser import parser
-from cdapython.String_result import get_query_string_result
+from cdapython.results.String_result import get_query_string_result
 
 logging.captureWarnings(InsecureRequestWarning)
 
@@ -24,7 +24,7 @@ logging.captureWarnings(InsecureRequestWarning)
 # This is added for Type Checking class to remove a circular import)
 if TYPE_CHECKING:
     from cdapython.Q import Q
-    from cdapython.String_result import StringResult
+    from cdapython.results.String_result import StringResult
 
 # Creating constant
 if isinstance(const.default_table, str) and const.default_table is not None:

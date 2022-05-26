@@ -8,3 +8,4 @@ numpy>=1.21.5
 typing-extensions==4.2.0
 rich>=11.2.0
 matplotlib>=3.5.1
+ipython>=7.32.0
