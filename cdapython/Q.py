@@ -601,7 +601,7 @@ class Q:
     def Select(self, fields: str) -> "Q":
         return self.__select(fields=fields)
 
-    def Order_By(self, fields: str) -> None:
+    def __Order_By(self, fields: str) -> None:
         pass
 
     def Is(self, fields: str) -> "Q":
