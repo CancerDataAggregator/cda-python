@@ -2,9 +2,9 @@ from typing import Optional, overload
 
 from pandas import json_normalize
 from cdapython.results.Result import Result
-from cdapython.utility import isnotebook
 
 from IPython.display import display_html, display
+from IPython import get_ipython
 
 
 class CountResult(Result):
@@ -45,12 +45,25 @@ class CountResult(Result):
           html_string = html_string + s._repr_html_()
       else:
           key_string = f"{key}: {value}"
-          if isnotebook():
+          if self.isnotebook():
             print(key_string)
           count_string = count_string + "\n\n" + key_string
 
-    if isnotebook():
+    if self.isnotebook():
       display_html(html_string, raw=True)
       return ""
     else:
       return count_string
+
+
+  def isnotebook(self):
+    try:
+        shell = get_ipython().__class__.__name__
+        if shell == 'ZMQInteractiveShell':
+            return True   # Jupyter notebook or qtconsole
+        elif shell == 'TerminalInteractiveShell':
+            return False  # Terminal running IPython
+        else:
+            return False  # Other type (?)
+    except NameError:
+        return False      # Probably standard Python interpreter
