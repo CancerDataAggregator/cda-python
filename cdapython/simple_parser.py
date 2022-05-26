@@ -26,6 +26,22 @@ class Expression(Token):
         return self.value.strip()
 
 
+class And(Token):
+    lbp = 4  # Precedence
+    query = Query()
+
+    def led(self, left: str, context: Parser) -> Query:
+        """Compute the value of this token when between two expressions."""
+        # Fetch the expression to the right, stopping at the next boundary
+        # of same precedence
+        right_side = context.expression(self.lbp)
+        self.query.node_type = "AND"
+        self.query.l = infer_quote(left)
+        self.query.r = infer_quote(right_side)
+
+        return self.query
+
+
 class Eq(Token):
     lbp = 10  # Precedence
     query = Query()
@@ -34,13 +50,13 @@ class Eq(Token):
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
-        right_side = context.expression(self.lbp).strip()
+        right_side = context.expression(self.lbp)
         self.query.node_type = "="
         self.query.node_type, right_side = query_type_conversion(
             self.query.node_type, right_side
         )
 
-        self.query.l = col(backwards_comp(left.strip()))
+        self.query.l = col(backwards_comp(left))
         self.query.r = infer_quote(right_side)
 
         return self.query
@@ -170,6 +186,15 @@ class IN(Token):
         self.query.r = infer_quote(right_side.strip())
         return self.query
 
+    # def nud(self, context: Parser) -> Query:
+    #     right_side = context.expression(self.lbp)
+    #     print(context.current_token)
+    #     print(type(right_side))
+    #     self.query.node_type = "IN"
+    #     self.query.l = infer_quote("")
+    #     self.query.r = infer_quote(right_side.strip())
+    #     return self.query
+
 
 class LIKE(Token):
     lbp = 4
@@ -191,48 +216,80 @@ class LIKE(Token):
 
 
 class NOT(Token):
-    lbp = 20
+    lbp = 18
     query = Query()
 
     def nud(self, context: Parser) -> Query:
         right_side = context.expression(self.lbp)
         self.query.node_type = "NOT"
-        self.query.l = None
-        self.query.r = infer_quote(right_side.strip())
-        return self.query
-
-    def led(self, left: str, context: Parser) -> Query:
-        """Compute the value of this token when between two expressions."""
-        # Fetch the expression to the right, stopping at the next boundary
-        # of same precedence
-
-        right_side = context.expression(self.lbp)
-        self.query.node_type = "NOT"
-        self.query.l = None
-        self.query.r = infer_quote(right_side.strip())
+        self.query.l = infer_quote(right_side)
+        self.query.r = infer_quote("")
         return self.query
 
 
 class IS(Token):
-    lbp = 20
+    lbp = 19
     query = Query()
 
-    def nud(self, context: Parser) -> Query:
+    def led(self, left: Union[str, Query], context: Parser) -> Query:
+        """Compute the value of this token when between two expressions."""
+        # Fetch the expression to the right, stopping at the next boundary
+        # of same precedence
+        print(context.current_token)
         right_side = context.expression(self.lbp)
+        print(context.current_token)
         self.query.node_type = "IS"
-        self.query.l = None
-        self.query.r = infer_quote(right_side.strip())
+        print(type(right_side), type(left))
+        if isinstance(left, Query):
+            self.query.l = left
+        else:
+            self.query.l = col(backwards_comp(left))
+            self.query.r = infer_quote(right_side)
         return self.query
+
+
+class IS_NOT(Token):
+    lbp = 19
+    query = Query()
 
     def led(self, left: str, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
-
         right_side = context.expression(self.lbp)
-        self.query.node_type = "IS"
-        self.query.l = None
-        self.query.r = infer_quote(right_side.strip())
+        self.query.node_type = "IS NOT"
+        self.query.l = col(backwards_comp(left.strip()))
+        self.query.r = infer_quote(right_side)
+        return self.query
+
+
+class NOT_IN(Token):
+    lbp = 19
+    query = Query()
+
+    def led(self, left: str, context: Parser) -> Query:
+        """Compute the value of this token when between two expressions."""
+        # Fetch the expression to the right, stopping at the next boundary
+        # of same precedence
+        right_side = context.expression(self.lbp)
+        self.query.node_type = "NOT IN"
+        self.query.l = col(backwards_comp(left.strip()))
+        self.query.r = infer_quote(right_side)
+        return self.query
+
+
+class NOT_LIKE:
+    lbp = 19
+    query = Query()
+
+    def led(self, left: str, context: Parser) -> Query:
+        """Compute the value of this token when between two expressions."""
+        # Fetch the expression to the right, stopping at the next boundary
+        # of same precedence
+        right_side = context.expression(self.lbp)
+        self.query.node_type = "NOT LIKE"
+        self.query.l = col(backwards_comp(left.strip()))
+        self.query.r = infer_quote(right_side)
         return self.query
 
 
@@ -240,7 +297,7 @@ lexer = Lexer(with_parens=True)
 lexer.register_token(
     Expression,
     re.compile(
-        r"(\-[\S]+)|(\"[\w\s]+\")|(\b(?!\bAND\b)(?!\bOR\b)(?!\bNOT\b)(?!\bFROM\b)(?!\bIN\b)(?!\bLIKE\b)(?!\bIS\b)[\w.\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
+        r"(\-[\S]+)|(\"[\w\s]+\")|(\b(?!\bAND\b|\band\b)(?!\bOR\b|\bor\b)(?!\bNOT\b|\bnot\b)(?!\bFROM\b|\bfrom\b)(?!\bIN\b|\bin\b)(?!\bLIKE\b|\blike\b)(?!\bIS\b|\bis\b)[\w.\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
     ),
 )
 lexer.register_token(Doublequotes, re.compile(r'(".*?")'))
@@ -252,11 +309,16 @@ lexer.register_token(Greaterthaneq, re.compile(r"(\s+>=+\s)"))
 lexer.register_token(Lessthan, re.compile(r"(\s+<+\s)"))
 lexer.register_token(Lessthaneq, re.compile(r"(\s+<=+\s)"))
 lexer.register_token(NotEq, re.compile(r"(\s+!=+\s)"))
+lexer.register_token(NotEq, re.compile(r"(\s+<>+\s)"))
+lexer.register_token(And, re.compile(r"(AND|and)"))
 lexer.register_token(Eq, re.compile(r"(=)"))
-lexer.register_token(IN, re.compile(r"(IN)"))
-lexer.register_token(LIKE, re.compile(r"(LIKE)"))
-lexer.register_token(NOT, re.compile(r"(NOT)"))
-lexer.register_token(IS, re.compile(r"(IS)"))
+lexer.register_token(IN, re.compile(r"(IN|in)"))
+lexer.register_token(LIKE, re.compile(r"(LIKE|like)"))
+lexer.register_token(NOT, re.compile(r"(NOT|not)"))
+lexer.register_token(IS_NOT, re.compile(r"((IS|is)\s+(NOT|not))"))
+lexer.register_token(NOT_IN, re.compile(r"((NOT|not)\s+(IN|in))"))
+lexer.register_token(NOT_IN, re.compile(r"((NOT|not)\s+(LIKE|like))"))
+lexer.register_token(IS, re.compile(r"(IS|is)"))
 
 
 def simple_parser(text: str) -> "Query":

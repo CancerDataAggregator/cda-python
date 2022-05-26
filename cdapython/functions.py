@@ -11,11 +11,11 @@ if TYPE_CHECKING:
     from cdapython.Q import Q
 
 
-def col(col_name: Optional[str]) -> Query:
+def col(col_name: Optional[Union[str, Query]]) -> Query:
     return Query(node_type="column", value=col_name)
 
 
-def quoted(quoted_val: Optional[str]) -> Query:
+def quoted(quoted_val: Optional[Union[str, Query]]) -> Query:
     return Query(node_type="quoted", value=quoted_val)
 
 
@@ -55,13 +55,13 @@ def backwards_comp(value: str) -> str:
     Returns:
         str: _description_
     """
-    if value in conversionMap:
+    if isinstance(value, str) and value in conversionMap:
         tmp_l: str = conversionMap[value]
         print(
             f"""
-            This Value {value} has been deprecated but will be converted
-            it for you in the background please use the new value {tmp_l}
-            """
+                This Value {value} has been deprecated but will be converted
+                it for you in the background please use the new value {tmp_l}
+                """
         )
         return tmp_l
     return value

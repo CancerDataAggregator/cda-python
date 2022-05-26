@@ -157,16 +157,7 @@ def unique_terms(
 
             if query_result is None:
                 return None
-            # values = []
 
-            # def stream():
-            #     for i in query_result.paginator():
-            #         for t in i:
-            #             yield list(t.values())[0]
-            #     # values.extend()
-
-            # for i in stream():
-            #     values.append(i)
             return query_result
     except ServiceException as http_error:
         http_error_logger(http_error)
