@@ -27,7 +27,7 @@ class Expression(Token):
 
 
 class And(Token):
-    # Precedence
+    lbp = 9  # Precedence
     query = Query()
 
     def led(self, left: str, context: Parser) -> Query:
@@ -38,7 +38,6 @@ class And(Token):
         self.query.node_type = "AND"
         self.query.l = infer_quote(left)
         self.query.r = infer_quote(right_side)
-
         return self.query
 
 
@@ -291,6 +290,10 @@ class NOT_LIKE:
         self.query.l = col(backwards_comp(left.strip()))
         self.query.r = infer_quote(right_side)
         return self.query
+
+
+class end_token:
+    lbp = 0
 
 
 lexer = Lexer(with_parens=True)
