@@ -445,7 +445,7 @@ class Q:
         return new_q_class
 
     @property
-    def research_subject(self) -> "Q":
+    def researchsubject(self) -> "Q":
         new_q_class = copy(self)
         new_q_class.entity_type = "researchsubject"
         return new_q_class
