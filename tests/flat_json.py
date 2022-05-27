@@ -9,7 +9,7 @@ def test() -> None:
     print(type(q2), q2)
     # print(q2.to_json())
     q3 = q2.researchsubject.run(host=host).to_dataframe()
-    print(d3)
+    print(q3)
     # se = q3.run(host=localhost).to_dataframe()
     # d = q3.file.run(host=localhost).to_dataframe()
     # c = q2.run(host=localhost).to_dataframe()
