@@ -27,7 +27,7 @@ class Expression(Token):
 
 
 class And(Token):
-    lbp = 4  # Precedence
+    # Precedence
     query = Query()
 
     def led(self, left: str, context: Parser) -> Query:
