@@ -455,8 +455,8 @@ class Q:
         new_q_class = copy(self)
         new_q_class.entity_type = "specimen"
         return new_q_class
-    
-     @property
+
+    @property
     def diagnosis(self) -> "Q":
         new_q_class = copy(self)
         new_q_class.entity_type = "diagnosis"
