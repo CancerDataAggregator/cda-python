@@ -48,8 +48,8 @@ class CountResult(Result):
                 if self.isnotebook():
                     print(key_string)
                 count_string = count_string + "\n\n" + key_string
-        if self.show_count is True:
-            count_string += self.sql
+        if self.show_sql is True:
+            count_string = f"{count_string}\n\n{self.sql}"
         if self.isnotebook():
             display_html(html_string, raw=True)
             return ""
