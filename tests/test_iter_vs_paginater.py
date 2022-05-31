@@ -13,8 +13,11 @@ def iter_pages(result):
         df = concat([df, result.to_dataframe()])
     return df
 
+
+dataTmp = DataFrame()
 for i in files_of_interest.paginator(to_df=True):
-    
+
+    df_type = concat([dataTmp, i])
 
 files_df = iter_pages(files_of_interest)
 convert_dict = {
@@ -28,7 +31,5 @@ files_df = files_df.astype(convert_dict)
 
 print(files_df.info)
 
-dataTmp = DataFrame()
-df_type = concat([dataTmp, files_of_interest.paginator(to_df=True)])
 
 print(df_type.info)
