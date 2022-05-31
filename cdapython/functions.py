@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Optional, Tuple, Union, overload
 from cda_client.model.query import Query
 from typing_extensions import Literal
 
-from cdapython.ConversionMap import conversionMap
+from cdapython.utils.ConversionMap import CONVERSIONMAP
 
 if TYPE_CHECKING:
     from cdapython.Q import Q
@@ -55,8 +55,8 @@ def backwards_comp(value: str) -> str:
     Returns:
         str: _description_
     """
-    if isinstance(value, str) and value in conversionMap:
-        tmp_l: str = conversionMap[value]
+    if isinstance(value, str) and value in CONVERSIONMAP:
+        tmp_l: str = CONVERSIONMAP[value]
         print(
             f"""
                 This Value {value} has been deprecated but will be converted

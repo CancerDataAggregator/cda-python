@@ -1,11 +1,14 @@
-from time import sleep
 from multiprocessing.pool import ApplyResult
+from time import sleep
 from typing import Optional
+
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query import Query
-from cdapython.results.CountResult import CountResult
+
+from cdapython.results.count_result import CountResult
+from cdapython.results.result import Result
 from cdapython.services.api_service import ApiService
-from cdapython.results.Result import Result
+from cda_client.api_client import Endpoint
 
 
 class CountsApiService(ApiService):
@@ -17,7 +20,7 @@ class CountsApiService(ApiService):
         dry_run: bool,
         table: str,
         async_req: bool,
-    ):
+    ) -> Endpoint:
         return api_instance.global_counts(
             query, version=version, dry_run=dry_run, table=table, async_req=async_req
         )
@@ -33,7 +36,7 @@ class CountsApiService(ApiService):
         show_sql: bool = True,
         show_count: bool = True,
         format_type: str = "json",
-    ):
+    ) -> Endpoint:
         while True:
             response = api_instance.query(
                 id=query_id,

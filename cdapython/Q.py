@@ -39,11 +39,11 @@ from cdapython.services import (
     ApiService,
 )
 
-import cdapython.constantVariables as const
-from cdapython.constantVariables import default_table, project_name, table_version
-from cdapython.customException import QSQLError, WRONGDATABASEError
-from cdapython.decorators import measure
-from cdapython.errorLogger import unverified_http
+import cdapython.constant_variables as const
+from cdapython.constant_variables import default_table, project_name, table_version
+from cdapython.exceptions.custom_exception import QSQLError, WRONGDATABASEError
+from cdapython.decorators.measure import Measure
+from cdapython.error_logger import unverified_http
 from cdapython.functions import (
     backwards_comp,
     col,
@@ -54,7 +54,7 @@ from cdapython.functions import (
     unquoted,
 )
 from cdapython.simple_parser import simple_parser
-from cdapython.results.Result import Result, get_query_result
+from cdapython.results.result import Result, get_query_result
 
 # from cdapython.simple_parser import simple_parser
 
@@ -466,7 +466,7 @@ class Q:
         new_q_class.entity_type = "treatment"
         return new_q_class
 
-    @measure()
+    @Measure()
     def run(
         self: TQ,
         offset: int = 0,

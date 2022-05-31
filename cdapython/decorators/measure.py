@@ -7,7 +7,7 @@ F = TypeVar("F", bound=Callable[..., Any])
 FUNCTION_ANY = Union[F, Any]
 
 
-class measure:
+class Measure:
     def __init__(self) -> None:
         self.kwargs: Dict[str, Any] = {}
 

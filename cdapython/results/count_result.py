@@ -1,12 +1,12 @@
 from typing import Optional, overload
 
+from IPython import get_ipython
+from IPython.display import display, display_html
 from pandas import json_normalize
 from rich.console import Console
-from cdapython.results.Result import Result
-
-from IPython.display import display_html, display
-from IPython import get_ipython
 from rich.table import Table
+
+from cdapython.results.result import Result
 
 
 class CountResult(Result):

@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional, TypeVar, Union
 
-from cdapython.Progress_manager import ProgressManager
+from cdapython.progress_manager import ProgressManager
 
 if TYPE_CHECKING:
     from pandas import DataFrame
 
-    from cdapython.results.Result import Result
+    from cdapython.results.result import Result
 
 
 TPaginator = TypeVar("TPaginator", bound="Paginator")

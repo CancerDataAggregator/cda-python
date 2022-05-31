@@ -1,4 +1,4 @@
-from cdapython.constantVariables import CDA_API_URL
+from cdapython.constant_variables import CDA_API_URL
 
 localhost = "http://localhost:8080"
 production_host = CDA_API_URL
