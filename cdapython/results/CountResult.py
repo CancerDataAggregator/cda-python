@@ -5,6 +5,7 @@ from cdapython.results.Result import Result
 
 from IPython.display import display_html, display
 from IPython import get_ipython
+from rich import print
 
 
 class CountResult(Result):
@@ -52,6 +53,8 @@ class CountResult(Result):
             count_string = f"{count_string}\n\n{self.sql}"
         if self.isnotebook():
             display_html(html_string, raw=True)
+            if self.show_sql is True:
+                print(self.sql)
             return ""
         else:
             return count_string
