@@ -145,6 +145,8 @@ class Q:
         "specimen": SpecimenQueryService,
         "file": FilesApiService,
         "count": CountsApiService,
+        "diagnosis": DiagnosisQueryService,
+        "treatment": TreatmentQueryService,
         "diagnosis.file": None,
         "treatment.file": None,
         "subject.file": SubjectCountsService,
@@ -441,7 +443,7 @@ class Q:
         return new_q_class
 
     @property
-    def research_subject(self) -> "Q":
+    def researchsubject(self) -> "Q":
         new_q_class = copy(self)
         new_q_class.entity_type = "researchsubject"
         return new_q_class
@@ -450,6 +452,18 @@ class Q:
     def specimen(self) -> "Q":
         new_q_class = copy(self)
         new_q_class.entity_type = "specimen"
+        return new_q_class
+
+    @property
+    def diagnosis(self) -> "Q":
+        new_q_class = copy(self)
+        new_q_class.entity_type = "diagnosis"
+        return new_q_class
+
+    @property
+    def treatment(self) -> "Q":
+        new_q_class = copy(self)
+        new_q_class.entity_type = "treatment"
         return new_q_class
 
     @measure()
