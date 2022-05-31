@@ -312,7 +312,7 @@ def get_query_result(
     limit: Optional[int],
     async_req: Optional[bool],
     pre_stream: bool = True,
-    show_sql: bool = True,
+    show_sql: bool = False,
     show_count: bool = True,
     format_type: str = "json",
 ) -> Optional[Result]:
