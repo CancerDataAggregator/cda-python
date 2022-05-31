@@ -20,7 +20,7 @@ from pandas import DataFrame, Series, json_normalize, read_csv
 from rich import print
 from typing_extensions import Literal
 
-from cdapython.paginator import Paginator
+from cdapython.Paginator import Paginator
 
 if TYPE_CHECKING:
     from cdapython.Q import Q

@@ -5,8 +5,8 @@ from IPython.display import display, display_html
 from pandas import json_normalize
 from rich.console import Console
 from rich.table import Table
-
-from cdapython.results.result import Result
+from rich.syntax import Syntax
+from cdapython.results.Result import Result
 
 
 class CountResult(Result):
@@ -59,11 +59,24 @@ class CountResult(Result):
                 console.print(key_string)
                 if self.isnotebook():
                     print(key_string)
+                if self.show_sql is True:
+                    syntax = Syntax(
+                        code=self.sql,
+                        lexer="SQL",
+                        indent_guides=True,
+                        word_wrap=True,
+                    )
+                console.print(syntax, overflow="fold")
                 count_string = count_string + "\n\n" + key_string
             console.print(table)
         if self.isnotebook():
             display_html(html_string, raw=True)
-        return ""
+            if self.show_sql is True:
+                syntax = Syntax(code=self.sql, lexer="SQL")
+                console.print(syntax)
+            return ""
+        else:
+            return count_string
 
     def isnotebook(self) -> bool:
         try:
