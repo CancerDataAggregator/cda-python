@@ -193,6 +193,7 @@ class Q:
     def __repr__(self: TQ) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
 
+    # region helper methods
     def to_json(self, indent: int = 4) -> str:
         """Created for the creating boolean-query for testing
 
@@ -200,6 +201,25 @@ class Q:
             str: returns a json str to the user
         """
         return json.dumps(self, indent=indent, cls=_QEncoder)
+
+    def _get_func(self) -> None:
+        full_string = ""
+        if self.entity_type != "":
+            full_string = self.entity_type
+
+        if self.task != "":
+            full_string = (
+                f"{full_string}.{self.task}" if full_string != "" else self.task
+            )
+
+        self.api_service = self.api_tasks[full_string]
+
+    # endregion
+
+    # region staticmethods
+    @staticmethod
+    def get_version() -> str:
+        return const.VERSION
 
     @staticmethod
     def set_host_url(url: str) -> None:
@@ -401,17 +421,7 @@ class Q:
             print(e)
         return None
 
-    def _get_func(self) -> None:
-        full_string = ""
-        if self.entity_type != "":
-            full_string = self.entity_type
-
-        if self.task != "":
-            full_string = (
-                f"{full_string}.{self.task}" if full_string != "" else self.task
-            )
-
-        self.api_service = self.api_tasks[full_string]
+    # endregion
 
     @property
     def file(self) -> "Q":
@@ -481,7 +491,7 @@ class Q:
         filter: Optional[str] = None,
         flatten: Optional[bool] = False,
         format: str = "json",
-        show_sql: Optional[bool] = None,
+        show_sql: Optional[bool] = False,
     ) -> Union[Result, QueryCreatedData, ApplyResult]:
         """_summary_
 
