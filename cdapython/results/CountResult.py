@@ -51,22 +51,28 @@ class CountResult(Result):
                 if self.isnotebook():
                     print(key_string)
                 count_string = count_string + "\n\n" + key_string
-        if self.show_sql is True:
-            # count_string = f"{count_string}\n\n{self.sql}"
-            syntax = Syntax(
-                code=self.sql,
-                lexer="SQL",
-                indent_guides=True,
-                word_wrap=True,
-            )
-            console.print(syntax, overflow="fold")
+
         if self.isnotebook():
             display_html(html_string, raw=True)
             if self.show_sql is True:
-                syntax = Syntax(code=self.sql, lexer="SQL")
-                console.print(syntax)
+                syntax = Syntax(
+                    code=self.sql,
+                    lexer="SQL",
+                    indent_guides=True,
+                    word_wrap=True,
+                )
+                console.print(syntax, overflow="fold")
             return ""
         else:
+            if self.show_sql is True:
+                # count_string = f"{count_string}\n\n{self.sql}"
+                syntax = Syntax(
+                    code=self.sql,
+                    lexer="SQL",
+                    indent_guides=True,
+                    word_wrap=True,
+                )
+                console.print(syntax, overflow="fold")
             return count_string
 
     def isnotebook(self) -> bool:
