@@ -493,7 +493,7 @@ class Q:
         filter: Optional[str] = None,
         flatten: Optional[bool] = False,
         format: str = "json",
-        show_sql: Optional[bool] = None,
+        show_sql: Optional[bool] = False,
     ) -> Union[Result, QueryCreatedData, ApplyResult]:
         """_summary_
 
