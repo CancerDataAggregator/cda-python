@@ -4,8 +4,9 @@ from IPython import get_ipython
 from IPython.display import display, display_html
 from pandas import json_normalize
 from rich.console import Console
-from rich.table import Table
 from rich.syntax import Syntax
+from rich.table import Table
+
 from cdapython.results.result import Result
 
 

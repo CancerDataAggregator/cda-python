@@ -1,5 +1,5 @@
-from copy import copy
 import re
+from copy import copy
 from typing import TYPE_CHECKING, Optional, Union
 
 from cda_client.model.query import Query

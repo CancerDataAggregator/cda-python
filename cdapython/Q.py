@@ -20,30 +20,12 @@ from typing_extensions import Literal
 from urllib3.connection import NewConnectionError  # type: ignore
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, SSLError
-from cdapython.services import (
-    SubjectQueryService,
-    SubjectFilesService,
-    SubjectCountsService,
-    ResearchSubjectCountsService,
-    ResearchSubjectFilesService,
-    ResearchSubjectQueryService,
-    SpecimenCountsService,
-    SpecimenFilesService,
-    SpecimenQueryService,
-    TreatmentCountsService,
-    TreatmentQueryService,
-    DiagnosisCountsService,
-    DiagnosisQueryService,
-    FilesApiService,
-    CountsApiService,
-    ApiService,
-)
 
 import cdapython.constant_variables as const
 from cdapython.constant_variables import default_table, project_name, table_version
-from cdapython.exceptions.custom_exception import QSQLError, WRONGDATABASEError
 from cdapython.decorators.measure import Measure
 from cdapython.error_logger import unverified_http
+from cdapython.exceptions.custom_exception import QSQLError, WRONGDATABASEError
 from cdapython.functions import (
     backwards_comp,
     col,
@@ -53,8 +35,26 @@ from cdapython.functions import (
     quoted,
     unquoted,
 )
-from cdapython.simple_parser import simple_parser
 from cdapython.results.result import Result, get_query_result
+from cdapython.services import (
+    ApiService,
+    CountsApiService,
+    DiagnosisCountsService,
+    DiagnosisQueryService,
+    FilesApiService,
+    ResearchSubjectCountsService,
+    ResearchSubjectFilesService,
+    ResearchSubjectQueryService,
+    SpecimenCountsService,
+    SpecimenFilesService,
+    SpecimenQueryService,
+    SubjectCountsService,
+    SubjectFilesService,
+    SubjectQueryService,
+    TreatmentCountsService,
+    TreatmentQueryService,
+)
+from cdapython.simple_parser import simple_parser
 
 # from cdapython.simple_parser import simple_parser
 
