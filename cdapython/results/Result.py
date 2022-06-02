@@ -157,7 +157,7 @@ class Result:
             list: _description_
         """
 
-        return [self.__result]
+        return self.__result
 
     def to_dict(self) -> dict:
         """_summary_

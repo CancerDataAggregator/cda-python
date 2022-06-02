@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, TypeVar
 from rich.progress import Progress
 
 if TYPE_CHECKING:
-    from cdapython.results.Result import Result
+    from cdapython.results import Result
 
 
 TProgressManager = TypeVar("TProgressManager", bound="ProgressManager")

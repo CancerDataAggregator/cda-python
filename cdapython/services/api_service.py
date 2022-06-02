@@ -6,7 +6,7 @@ from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
 from cda_client.model.query import Query
 
-from cdapython.results.result import Result
+from cdapython.results import Result
 
 
 class ApiService:

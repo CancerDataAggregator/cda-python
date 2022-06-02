@@ -35,7 +35,7 @@ from cdapython.functions import (
     quoted,
     unquoted,
 )
-from cdapython.results.result import Result, get_query_result
+from cdapython.results import Result, get_query_result
 from cdapython.services import (
     ApiService,
     CountsApiService,
