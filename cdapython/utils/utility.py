@@ -16,7 +16,7 @@ from cdapython.decorators.cache import lru_cache_timed
 from cdapython.error_logger import unverified_http
 from cdapython.functions import backwards_comp, find_ssl_path
 from cdapython.Qparser import parser
-from cdapython.results import get_query_string_result
+from cdapython.results.string_result import get_query_string_result
 
 logging.captureWarnings(InsecureRequestWarning)
 

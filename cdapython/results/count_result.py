@@ -7,7 +7,7 @@ from rich.console import Console
 from rich.syntax import Syntax
 from rich.table import Table
 
-from . import Result
+from cdapython.results.result import Result
 
 
 class CountResult(Result):
