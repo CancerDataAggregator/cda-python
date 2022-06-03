@@ -6,7 +6,7 @@ from cdapython import query, Q
 from tests.global_settings import host, localhost
 
 
-async def main():
+async def main() -> None:
     q = Q("ResearchSubject.primary_disease_type LIKE 'Lung%'").run(host=host)
 
     df = DataFrame()

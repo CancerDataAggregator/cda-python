@@ -118,7 +118,7 @@ class NotEq(Token):
     lbp = 5  # Precedence
     query = Query()
 
-    def led(self, left: Union[str, Query], context: Parser) -> Query:
+    def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
@@ -133,7 +133,7 @@ class Greaterthaneq(Token):
     lbp = 5  # Precedence
     query = Query()
 
-    def led(self, left: Union[str, Query], context: Parser) -> Query:
+    def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
@@ -148,7 +148,7 @@ class Greaterthan(Token):
     lbp = 5  # Precedence
     query = Query()
 
-    def led(self, left: Union[str, Query], context: Parser) -> Query:
+    def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
@@ -163,7 +163,7 @@ class Lessthaneq(Token):
     lbp = 5  # Precedence
     query = Query()
 
-    def led(self, left: Union[str, Query], context: Parser) -> Query:
+    def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
@@ -178,7 +178,7 @@ class Lessthan(Token):
     lbp = 5  # Precedence
     query = Query()
 
-    def led(self, left: Union[str, Query], context: Parser) -> Query:
+    def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
@@ -225,7 +225,7 @@ class IN(Token):
     lbp = 5
     query = Query()
 
-    def led(self, left: str, context: Parser) -> Query:
+    def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
@@ -249,7 +249,7 @@ class LIKE(Token):
     lbp = 5
     query = Query()
 
-    def led(self, left: str, context: Parser) -> Query:
+    def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
@@ -292,7 +292,7 @@ class IS(Token):
     lbp = 19
     query = Query()
 
-    def led(self, left: Union[str, Query], context: Parser) -> Query:
+    def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
@@ -313,7 +313,7 @@ class IS_NOT(Token):
     lbp = 19
     query = Query()
 
-    def led(self, left: str, context: Parser) -> Query:
+    def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
@@ -328,7 +328,7 @@ class NOT_IN(Token):
     lbp = 19
     query = Query()
 
-    def led(self, left: str, context: Parser) -> Query:
+    def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
@@ -343,7 +343,7 @@ class NOT_LIKE:
     lbp = 19
     query = Query()
 
-    def led(self, left: str, context: Parser) -> Query:
+    def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence

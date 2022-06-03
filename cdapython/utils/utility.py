@@ -24,7 +24,7 @@ logging.captureWarnings(InsecureRequestWarning)
 # This is added for Type Checking class to remove a circular import)
 if TYPE_CHECKING:
     from cdapython.Q import Q
-    from cdapython.results import StringResult
+    from cdapython.results.string_result import StringResult
 
 # Creating constant
 if isinstance(const.default_table, str) and const.default_table is not None:

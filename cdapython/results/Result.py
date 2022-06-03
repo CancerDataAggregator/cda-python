@@ -9,6 +9,7 @@ from typing import (
     AsyncGenerator,
     ChainMap,
     Dict,
+    Iterator,
     List,
     Optional,
     Union,
@@ -43,7 +44,7 @@ class Result:
         format_type: str = "json",
     ) -> None:
         self._api_response: QueryResponseData = api_response
-        self.__result = self._api_response.result
+        self.__result: List[Any] = self._api_response.result
         self._query_id: str = query_id
         self._offset: Optional[int] = offset
         self._limit: Optional[int] = limit
@@ -150,7 +151,7 @@ class Result:
             meta_prefix=meta_prefix,
         )
 
-    def to_list(self) -> list:
+    def to_list(self) -> List[Any]:
         """_summary_
 
         Returns:
@@ -206,7 +207,7 @@ class Result:
             range_index = range(start, stop, step)
             return [self.__result[i] for i in range_index]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator:
         return iter(self.__result)
 
     def __aiter__(self) -> AsyncGenerator[Any, None]:
