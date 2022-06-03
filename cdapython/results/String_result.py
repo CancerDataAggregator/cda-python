@@ -5,7 +5,7 @@ from typing import Optional
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
 
-from results import Result
+from . import Result
 
 
 class StringResult(Result):

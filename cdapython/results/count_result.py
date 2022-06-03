@@ -7,7 +7,7 @@ from rich.console import Console
 from rich.syntax import Syntax
 from rich.table import Table
 
-from results import Result
+from . import Result
 
 
 class CountResult(Result):
