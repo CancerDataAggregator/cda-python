@@ -41,7 +41,8 @@ class CountResult(Result):
                 for item in value:
                     if item[key] is None:
                         item[key] = "null"
-                    table.add_row(item[key], item["count"])
+
+                    table.add_row(item[key], str(item["count"]))
 
                 headers = {
                     "selector": "th",
