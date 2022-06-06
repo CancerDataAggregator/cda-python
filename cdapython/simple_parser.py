@@ -57,15 +57,14 @@ class And(Token):
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
 
-        print(left)
         l_copy_query = build_query_copy(left)
 
         self.query.node_type = "AND"
         self.query.l = l_copy_query
-        print(self.query)
+
         right_side = context.expression(self.lbp)
         r_copy_query = build_query_copy(right_side)
-        print(right_side)
+
         self.query.r = r_copy_query
         return self.query
 
@@ -79,15 +78,14 @@ class Or(And):
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
 
-        print(left)
         l_copy_query = build_query_copy(left)
 
         self.query.node_type = "OR"
         self.query.l = l_copy_query
-        print(self.query)
+
         right_side = context.expression(self.lbp)
         r_copy_query = build_query_copy(right_side)
-        print(right_side)
+
         self.query.r = r_copy_query
         return self.query
 
@@ -101,9 +99,7 @@ class Eq(Token):
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
         right_side = context.expression(self.lbp)
-        print(right_side)
-        print()
-        print(left)
+
         self.query.node_type = "="
         # self.query.node_type, right_side = query_type_conversion(
         #     self.query.node_type, right_side
@@ -235,15 +231,6 @@ class IN(Token):
         self.query.r = infer_quote(right_side.value.strip())
         return self.query
 
-    # def nud(self, context: Parser) -> Query:
-    #     right_side = context.expression(self.lbp)
-    #     print(context.current_token)
-    #     print(type(right_side))
-    #     self.query.node_type = "IN"
-    #     self.query.l = infer_quote("")
-    #     self.query.r = infer_quote(right_side.value.strip())
-    #     return self.query
-
 
 class LIKE(Token):
     lbp = 5
@@ -296,11 +283,11 @@ class IS(Token):
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
-        print(context.current_token)
+
         right_side = context.expression(self.lbp)
-        print(context.current_token)
+
         self.query.node_type = "IS"
-        print(type(right_side), type(left))
+
         if isinstance(left, Query):
             self.query.l = left
         else:
