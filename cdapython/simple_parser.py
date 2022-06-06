@@ -251,18 +251,6 @@ class LIKE(Token):
         return self.query
 
 
-class NULL(Token):
-    lbp = 4
-    query = Query()
-
-    def nud(self, context: Parser) -> Query:
-        right_side = context.expression(self.lbp)
-        self.query.node_type = "NOT"
-        self.query.l = right_side
-        self.query.r = infer_quote("")
-        return self.query
-
-
 class NOT(Token):
     lbp = 4
     query = Query()
