@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import json
 import logging
 from typing import TYPE_CHECKING, Optional
@@ -9,13 +10,13 @@ from cda_client.exceptions import ServiceException
 from rich import print
 from urllib3.exceptions import InsecureRequestWarning
 
-import cdapython.constantVariables as const
-from cdapython.constantVariables import table_version
-from cdapython.decorators_cache import lru_cache_timed
-from cdapython.errorLogger import unverified_http
+import cdapython.constant_variables as const
+from cdapython.constant_variables import table_version
+from cdapython.decorators.cache import lru_cache_timed
+from cdapython.error_logger import unverified_http
 from cdapython.functions import backwards_comp, find_ssl_path
 from cdapython.Qparser import parser
-from cdapython.results.String_result import get_query_string_result
+from cdapython.results.string_result import get_query_string_result
 
 logging.captureWarnings(InsecureRequestWarning)
 
@@ -23,7 +24,7 @@ logging.captureWarnings(InsecureRequestWarning)
 # This is added for Type Checking class to remove a circular import)
 if TYPE_CHECKING:
     from cdapython.Q import Q
-    from cdapython.results.String_result import StringResult
+    from cdapython.results.string_result import StringResult
 
 # Creating constant
 if isinstance(const.default_table, str) and const.default_table is not None:
@@ -156,16 +157,7 @@ def unique_terms(
 
             if query_result is None:
                 return None
-            # values = []
 
-            # def stream():
-            #     for i in query_result.paginator():
-            #         for t in i:
-            #             yield list(t.values())[0]
-            #     # values.extend()
-
-            # for i in stream():
-            #     values.append(i)
             return query_result
     except ServiceException as http_error:
         http_error_logger(http_error)

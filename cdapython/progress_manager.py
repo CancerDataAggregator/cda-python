@@ -1,18 +1,21 @@
 from __future__ import annotations
+from re import I
 
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from rich.progress import Progress
 
 if TYPE_CHECKING:
-    from cdapython.results.Result import Result
+    from cdapython.results.result import Result
+    from cdapython.Paginator import Paginator
 
 
 TProgressManager = TypeVar("TProgressManager", bound="ProgressManager")
+T = TypeVar("T", bound="Paginator")
 
 
 class ProgressManager:
-    def __init__(self: TProgressManager, other: "Result", cls) -> None:
+    def __init__(self: TProgressManager, other: "Result", cls: T) -> None:
         self.count = other._limit
         self.total = other.total_row_count
         self.cls = cls

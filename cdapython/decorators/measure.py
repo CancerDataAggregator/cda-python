@@ -7,11 +7,11 @@ F = TypeVar("F", bound=Callable[..., Any])
 FUNCTION_ANY = Union[F, Any]
 
 
-class measure:
+class Measure:
     def __init__(self) -> None:
         self.kwargs: Dict[str, Any] = {}
 
-    def __call__(self, func: F) -> F:
+    def __call__(self, func: F) -> FUNCTION_ANY:
         @wraps(func)
         def wrapper(*args: Tuple, **kwargs: Dict[str, Any]) -> FUNCTION_ANY:
             start_time = int(round(time() * 1000))

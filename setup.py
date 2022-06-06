@@ -16,7 +16,7 @@ def get_version(filepath: str):
     return (version, version_client)
 
 
-__version__, version_client = get_version("cdapython/constantVariables.py")
+__version__, version_client = get_version("cdapython/constant_variables.py")
 print(__version__)
 
 current_path = Path(__file__).parent
@@ -56,7 +56,7 @@ setup(
         "ipywidgets>=7.7.0",
         "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git@3.0.0-beta",
         "python-dotenv>=0.18.0",
-        "ipython>=7.32.0"
+        "ipython>=7.32.0",
     ],
     description="User friendly Python library to access CDA service.",
     long_description=long_description,

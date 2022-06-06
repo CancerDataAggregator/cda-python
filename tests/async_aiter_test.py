@@ -6,7 +6,7 @@ from tests.global_settings import integration_host
 v = Q('ResearchSubject.primary_disease_type = "Lung%"').run(host=integration_host)
 
 
-async def main():
+async def main() -> None:
     async for i in v:
         print(i)
 

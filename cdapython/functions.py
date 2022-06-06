@@ -1,22 +1,21 @@
 from os import path
 from ssl import get_default_verify_paths
-from typing import Any, Optional, Tuple, Union, overload
-from typing_extensions import Literal
+from typing import TYPE_CHECKING, Any, Optional, Tuple, Union, overload
 
 from cda_client.model.query import Query
-from typing import TYPE_CHECKING
+from typing_extensions import Literal
 
-from cdapython.ConversionMap import conversionMap
+from cdapython.utils.ConversionMap import CONVERSIONMAP
 
 if TYPE_CHECKING:
     from cdapython.Q import Q
 
 
-def col(col_name: Optional[str]) -> Query:
+def col(col_name: Optional[Union[str, Query]]) -> Query:
     return Query(node_type="column", value=col_name)
 
 
-def quoted(quoted_val: Optional[str]) -> Query:
+def quoted(quoted_val: Optional[Union[str, Query]]) -> Query:
     return Query(node_type="quoted", value=quoted_val)
 
 
@@ -56,13 +55,13 @@ def backwards_comp(value: str) -> str:
     Returns:
         str: _description_
     """
-    if value in conversionMap:
-        tmp_l: str = conversionMap[value]
+    if isinstance(value, str) and value in CONVERSIONMAP:
+        tmp_l: str = CONVERSIONMAP[value]
         print(
             f"""
-            This Value {value} has been deprecated but will be converted
-            it for you in the background please use the new value {tmp_l}
-            """
+                This Value {value} has been deprecated but will be converted
+                it for you in the background please use the new value {tmp_l}
+                """
         )
         return tmp_l
     return value

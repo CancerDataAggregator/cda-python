@@ -1,13 +1,13 @@
 from typing import Optional, overload
 
-from pandas import json_normalize
-from cdapython.results.Result import Result
-
-from IPython.display import display_html, display
 from IPython import get_ipython
-from rich import print
-from rich.syntax import Syntax
+from IPython.display import display, display_html
+from pandas import json_normalize
 from rich.console import Console
+from rich.syntax import Syntax
+from rich.table import Table
+
+from cdapython.results.result import Result
 
 
 class CountResult(Result):
@@ -25,16 +25,25 @@ class CountResult(Result):
             str: _description_
         """
         result = self[0]
-        html_string = ""
-        count_string = ""
+        html_string: str = ""
+        count_string: str = ""
         console = Console()
         for key in result:
+            table = Table(title=key)
             value = result[key]
             if type(value) is list:
                 df = json_normalize(value)
-                count_string = count_string + "\n\n" + str(df)
-
                 s = df.style.hide_index()
+                count_string = f"{count_string}\n\n{str(df).center(20)}"
+                table.add_column(key)
+                table.add_column("count")
+
+                for item in value:
+                    if item[key] is None:
+                        item[key] = "null"
+
+                    table.add_row(item[key], str(item["count"]))
+
                 headers = {
                     "selector": "th",
                     "props": "background-color: #000066; color: white; text-align: left",
@@ -46,12 +55,16 @@ class CountResult(Result):
                 s.set_table_styles([headers, columns])
                 s.set_table_attributes("style='display:inline'")
                 html_string = html_string + s._repr_html_()
+
             else:
-                key_string = f"{key}: {value}"
+                key_string = f"{key} : {value}".center(20)
+                console.print(key_string)
                 if self.isnotebook():
                     print(key_string)
+
                 count_string = count_string + "\n\n" + key_string
 
+            console.print(table)
         if self.isnotebook():
             display_html(html_string, raw=True)
             if self.show_sql is True:
