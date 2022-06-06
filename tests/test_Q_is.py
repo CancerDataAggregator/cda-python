@@ -1,4 +1,5 @@
 from cdapython import Q
+from tests.global_settings import host
 
 # print(Q("sex is not null").to_json())
 
@@ -10,4 +11,6 @@ from cdapython import Q
 #         0   10  4     40    10  4     0
 # print(Q('sex = "male" and sex = "female" AND NOT sex = "unknown"').to_json())
 
-print(Q('sex = "male" or sex = "female" AND NOT sex = "unknown"').to_json())
+print(
+    Q('sex = "male" or sex = "female" AND NOT sex = "unknown"').run(host=host).to_list()
+)
