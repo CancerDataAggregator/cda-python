@@ -370,7 +370,7 @@ lexer.register_token(LIKE, re.compile(r"(LIKE|like)"))
 lexer.register_token(NOT, re.compile(r"(NOT|not)"))
 lexer.register_token(IS_NOT, re.compile(r"((IS|is)\s+(NOT|not))"))
 lexer.register_token(NOT_IN, re.compile(r"((NOT|not)\s+(IN|in))"))
-lexer.register_token(NOT_IN, re.compile(r"((NOT|not)\s+(LIKE|like))"))
+lexer.register_token(NOT_LIKE, re.compile(r"((NOT|not)\s+(LIKE|like))"))
 lexer.register_token(IS, re.compile(r"(IS|is)"))
 
 

@@ -1,7 +1,10 @@
 from cdapython import Q
 from tests.global_settings import host
 
-# print(Q("sex is not null").to_json())
+
+def test_not() -> None:
+    assert Q("not sex = 'male'").__dict__["query"]["node_type"] == "NOT"
+
 
 # print(
 #     Q(
@@ -11,6 +14,4 @@ from tests.global_settings import host
 #         0   10  4     40    10  4     0
 # print(Q('sex = "male" and sex = "female" AND NOT sex = "unknown"').to_json())
 
-print(
-    Q('sex = "male" or sex = "female" AND NOT sex = "unknown"').run(host=host).to_list()
-)
+# print(Q('sex = "male" or sex = "female" AND NOT sex = "unknown"').to_json())
