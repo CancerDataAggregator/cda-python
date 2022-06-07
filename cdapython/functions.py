@@ -98,7 +98,7 @@ def infer_quote(val: Any) -> Query:
 
 
 def query_type_conversion(
-    _op: str, _r: str
+    _op: str, _r: Union[str, Query]
 ) -> Union[Tuple[Literal["LIKE"], Query], Tuple[str, str]]:
     """_summary_
         This is for query type conversion in looking operator

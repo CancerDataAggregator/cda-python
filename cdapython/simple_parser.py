@@ -101,9 +101,14 @@ class Eq(Token):
         right_side = context.expression(self.lbp)
 
         self.query.node_type = "="
-        # self.query.node_type, right_side = query_type_conversion(
-        #     self.query.node_type, right_side
-        # )
+        if isinstance(right_side.value, str) and right_side.value.find("%") != -1:
+            returned_node, returned_right = query_type_conversion(
+                self.query.node_type, right_side.value
+            )
+            self.query.node_type = returned_node
+            self.query.l = col(backwards_comp(left.value))
+            self.query.r = infer_quote(returned_right.value.strip())
+            return self.query
 
         self.query.l = col(backwards_comp(left.value))
         self.query.r = infer_quote(right_side.value)
@@ -275,12 +280,9 @@ class IS(Token):
         right_side = context.expression(self.lbp)
 
         self.query.node_type = "IS"
+        self.query.l = col(backwards_comp(left.value))
+        self.query.r = infer_quote(right_side.value)
 
-        if isinstance(left, Query):
-            self.query.l = left
-        else:
-            self.query.l = col(backwards_comp(left.value))
-            self.query.r = infer_quote(right_side.value)
         return self.query
 
 

@@ -26,15 +26,7 @@ from cdapython.constant_variables import default_table, project_name, table_vers
 from cdapython.decorators.measure import Measure
 from cdapython.error_logger import unverified_http
 from cdapython.exceptions.custom_exception import QSQLError, WRONGDATABASEError
-from cdapython.functions import (
-    backwards_comp,
-    col,
-    find_ssl_path,
-    infer_quote,
-    query_type_conversion,
-    quoted,
-    unquoted,
-)
+from cdapython.functions import find_ssl_path
 from cdapython.results.result import Result, get_query_result
 from cdapython.services import (
     ApiService,
@@ -547,8 +539,6 @@ class Q:
                 if isinstance(api_response, ApplyResult):
                     if verbose:
                         print(WAITING_TEXT)
-                    while api_response.ready() is False:
-                        api_response.wait(10000)
                     api_response = api_response.get()
 
                 if dry_run is True:
