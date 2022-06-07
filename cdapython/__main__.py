@@ -2,6 +2,8 @@ import sys
 
 import cdapython
 
+host = "http://35.192.60.10:8080/"
+
 
 def run_file(path: str) -> None:
     with open(path, "r") as file:
@@ -9,8 +11,7 @@ def run_file(path: str) -> None:
             line = line.strip()
             if not line or line[0] == "#":
                 continue
-            print(line.split())
-            cdapython.query(line).run()
+            print(cdapython.Q(line.rstrip()).run(host=host).to_dataframe())
 
 
 if __name__ == "__main__":

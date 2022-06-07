@@ -17,6 +17,7 @@ except ImportError:
 """
 new = True
 setServer = None
+setDataFrame = None
 console = Console(record=True)
 
 
@@ -33,6 +34,7 @@ def help() -> None:
         exit()
         clear()
         server() set the server
+        DataFrame()
         \n
         """
     )
@@ -47,7 +49,7 @@ while True:
         help()
         continue
 
-    if text == "exit()":
+    if text == "exit()" or text == "exit":
         break
     if text == "clear()":
         print("\n" * 100)
@@ -55,12 +57,18 @@ while True:
     if text == "server()":
         setServer = console.input("Enter your server ")
         continue
+    if text == "DataFrame()":
+        setDataFrame = True
+        continue
     try:
-        result: Q = query(text=text)
+        result: Q = Q(text)
         if setServer == None:
             queryResult = result.run()
         else:
             queryResult = result.run(host=setServer)
+
+        if setDataFrame:
+            queryResult = queryResult.to_dataframe()
         print(type(result), queryResult)
     except AttributeError as e:
         print(e)
