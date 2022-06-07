@@ -7,7 +7,9 @@ from tests.global_settings import host, localhost
 
 
 async def main() -> None:
-    q = Q("ResearchSubject.primary_disease_type LIKE 'Lung%'").run(host=host)
+    q = Q("ResearchSubject.primary_disease_type = 'Lung%' and sex = 'male'")
+    print(q.to_json())
+    q = q.run(host=host, async_call=True)
 
     df = DataFrame()
     async for i in q.paginator(to_df=True):
