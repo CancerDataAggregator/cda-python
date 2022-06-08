@@ -30,8 +30,8 @@ class Paginator:
         self.stopped = False
         self.format_type = format_type
 
-    def _do_next(self) -> Union[dict, list, DataFrame, Result]:
-        result_nx = self.result
+    def _do_next(self: Paginator) -> Union[dict, list, DataFrame, Result]:
+        result_nx: "Result" = self.result
 
         if self.to_df:
             result_nx = self.result.to_dataframe()

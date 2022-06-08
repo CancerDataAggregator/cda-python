@@ -1,13 +1,13 @@
 from __future__ import annotations
-from re import I
 
+from re import I
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from rich.progress import Progress
 
 if TYPE_CHECKING:
-    from cdapython.results.result import Result
     from cdapython.Paginator import Paginator
+    from cdapython.results.result import Result
 
 
 TProgressManager = TypeVar("TProgressManager", bound="ProgressManager")

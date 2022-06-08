@@ -523,7 +523,6 @@ class Q:
             with cda_client_obj as api_client:
                 api_instance = QueryApi(api_client)
                 # Execute boolean query
-
                 if verbose:
                     print("Getting results from database", end="\n\n")
                 api_response: Union[

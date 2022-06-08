@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, Optional, Tuple, Union, overload
 from cda_client.model.query import Query
 from typing_extensions import Literal
 
+from cdapython.dataclasses.querystr import QueryStr
 from cdapython.utils.ConversionMap import CONVERSIONMAP
 
 if TYPE_CHECKING:
@@ -77,7 +78,7 @@ def infer_quote(val: Query) -> Query:
     pass
 
 
-def infer_quote(val: Any) -> Query:
+def infer_quote(val: Any) -> Union[Query, QueryStr]:
     """[summary]
     Handles Strings With quotes by checking the value type
     Args:
@@ -86,6 +87,8 @@ def infer_quote(val: Any) -> Query:
     Returns:
         Query: [description]
     """
+    if isinstance(val, QueryStr):
+        return val
     if isinstance(val, Query):
         return val
 
@@ -98,8 +101,10 @@ def infer_quote(val: Any) -> Query:
 
 
 def query_type_conversion(
-    _op: str, _r: Union[str, Query]
-) -> Union[Tuple[Literal["LIKE"], Query], Tuple[str, str]]:
+    _op: str, _r: Union[str, Query, QueryStr]
+) -> Union[
+    Tuple[Literal["LIKE"], QueryStr], Tuple[Literal["LIKE"], Query], Tuple[str, str]
+]:
     """_summary_
         This is for query type conversion in looking operator
     Args:
