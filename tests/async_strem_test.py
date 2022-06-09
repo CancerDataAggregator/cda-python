@@ -2,7 +2,7 @@ import asyncio
 
 from pandas import DataFrame, concat
 
-from cdapython import query, Q
+from cdapython import Q
 from tests.global_settings import host, localhost
 
 
