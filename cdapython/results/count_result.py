@@ -86,7 +86,7 @@ class CountResult(Result):
                     word_wrap=True,
                 )
                 console.print(syntax, overflow="fold")
-            return count_string
+            return ""
 
     def isnotebook(self) -> bool:
         try:

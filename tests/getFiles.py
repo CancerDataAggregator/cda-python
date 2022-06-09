@@ -9,5 +9,5 @@ normals = Q('ResearchSubject.Specimen.source_material_type = "Blood Derived Norm
 tumors = Q('ResearchSubject.Specimen.source_material_type = "Primary Tumor"')
 
 q = normals.From(tumors.And(brca.And(female.And(age1.And(age2)))))
-r = q.research_subject.count.run(host=host)
+r = q.researchsubject.count.run(host=host)
 print(r)

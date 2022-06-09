@@ -7,9 +7,13 @@ def test_in_parser_testing():
         "File.id IN ('256f12f9-f1f8-11e9-9a07-0a80fada099c','256f1b60-f1f8-11e9-9a07-0a80fada099c','256f2c22-f1f8-11e9-9a07-0a80fada099c','256f14ca-f1f8-11e9-9a07-0a80fada099c')"
     ).file.run(host=host)
 
-    q2 = Q(
-        'age_at_death is null OR age_at_death = 0 and sex = "male" or sex = "female" '
-    ).run(host=host)
+    q2 = (
+        Q(
+            'age_at_death is null OR age_at_death = 0 and sex = "male" or sex = "female" '
+        )
+        .run(host=host)
+        .to_dataframe()
+    )
 
 
 test_in_parser_testing()
