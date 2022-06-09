@@ -141,7 +141,7 @@ class Q:
         "treatment": TreatmentQueryService,
         "diagnosis.file": None,
         "treatment.file": None,
-        "subject.file": SubjectCountsService,
+        "subject.file": SubjectFilesService,
         "researchsubject.file": ResearchSubjectFilesService,
         "specimen.file": SpecimenFilesService,
         "researchsubject.count": ResearchSubjectCountsService,
