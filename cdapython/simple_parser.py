@@ -345,7 +345,7 @@ class NOT_IN(Token):
         return self.query
 
 
-class NOT_LIKE:
+class NOT_LIKE(Token):
     lbp = 19
     query = Query()
 
@@ -363,7 +363,7 @@ class NOT_LIKE:
 class RightParen(Token):
     """A right parenthesis."""
 
-    def __repr__(self):  # pragma: no cover
+    def __repr__(self) -> str:  # pragma: no cover
         return "<)>"
 
 
