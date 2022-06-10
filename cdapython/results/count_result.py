@@ -31,7 +31,7 @@ class CountResult(Result):
         for key in result:
             table = Table(title=key)
             value = result[key]
-            if type(value) is list:
+            if isinstance(value, list):
                 df = json_normalize(value)
                 s = df.style.hide_index()
                 count_string = f"{count_string}\n\n{str(df).center(20)}"

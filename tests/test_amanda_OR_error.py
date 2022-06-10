@@ -1,15 +1,17 @@
+import json
 from cdapython import Q
 
-# print(
-#     Q(
-#         'ResearchSubject.primary_diagnosis_site = "uterus" OR ResearchSubject.primary_diagnosis_condition = "Uterine Corpus Endometrial Carcinoma"'
-#     ).researchsubject.count.to_json()
-# )
 
+def test_json_check() -> None:
+    json1 = Q(
+        'ResearchSubject.primary_diagnosis_site = "uterus" OR ResearchSubject.primary_diagnosis_condition = "Uterine Corpus Endometrial Carcinoma"'
+    ).researchsubject.count.to_json()
 
-Query1 = Q('ResearchSubject.primary_diagnosis_site = "uterus"')
-Query2 = Q(
-    'ResearchSubject.primary_diagnosis_condition = "Uterine Corpus Endometrial Carcinoma"'
-)
+    Query1 = Q('ResearchSubject.primary_diagnosis_site = "uterus"')
+    Query2 = Q(
+        'ResearchSubject.primary_diagnosis_condition = "Uterine Corpus Endometrial Carcinoma"'
+    )
 
-print(Query1.OR(Query2).researchsubject.count.to_json())
+    json2 = Query1.OR(Query2).researchsubject.count.to_json()
+
+    assert json.loads(json1) == json.loads(json2)
