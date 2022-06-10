@@ -402,7 +402,7 @@ lexer = Lexer(with_parens=False)
 lexer.register_token(
     Expression,
     re.compile(
-        r"(\-[\S]+)|(\"[\w\s]+\")|(\b(?!((?i)\band\b))(?!((?i)\bor\b))(?!((?i)\bnot\b))(?!((?i)\bfrom\b))(?!((?i)\bin\b))(?!((?i)\blike\b))(?!((?i)\bis\b))[\w.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
+        r"(\-[\S]+)|(\"[\w\s]+\")|(\b(?!(\bAND\b))(?!(\bOR\b))(?!(\bNOT\b))(?!(\bFROM\b))(?!(\bIN\b))(?!(\bLIKE\b))(?!(\bIS\b))[\w.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
     ),
 )
 
