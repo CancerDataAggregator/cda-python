@@ -8,7 +8,7 @@ from tests.global_settings import host
 
 # print(
 #     Q(
-#         'ResearchSubject.primary_diagnosis_site = "uterus" or ResearchSubject.primary_diagnosis_condition = "Uterine Corpus Endometrial Carcinoma"'
+#         'ResearchSubject.primary_diagnosis_site = "uterus" OR ResearchSubject.primary_diagnosis_condition = "Uterine Corpus Endometrial Carcinoma"'
 #     ).researchsubject.count.to_json()
 # )
 
