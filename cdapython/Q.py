@@ -5,7 +5,7 @@ from json import loads
 from logging import error as logError
 from multiprocessing.pool import ApplyResult
 from types import MappingProxyType
-from typing import Any, Dict, Optional, Tuple, TypeVar, Union, overload
+from typing import Any, Dict, Optional, Tuple, TypeVar, TypedDict, Union, overload
 
 import pandas as pd
 from cda_client import ApiClient, Configuration
@@ -121,6 +121,26 @@ class _QEncoder(json.JSONEncoder):
 
 
 TQ = TypeVar("TQ", bound="Q")
+
+# class type_dict_api_task(TypedDict,total=False):
+#         "": ApiService
+#         subject: SubjectQueryService
+#         researchsubject: ResearchSubjectQueryService
+#         specimen: SpecimenQueryService
+#         file: FilesApiService
+#         count: CountsApiService
+#         diagnosis: DiagnosisQueryService
+#         treatment: TreatmentQueryService
+#         diagnosis.file: None
+#         treatment.file: None
+#         subject.file: SubjectFilesService
+#         researchsubject.file: ResearchSubjectFilesService
+#         specimen.file: SpecimenFilesService
+#         researchsubject.count: ResearchSubjectCountsService
+#         diagnosis.count: DiagnosisCountsService
+#         subject.count: SubjectCountsService
+#         specimen.count: SpecimenCountsService
+#         treatment.count: TreatmentCountsService
 
 
 class Q:
