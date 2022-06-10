@@ -42,6 +42,7 @@ def like_converter(query: Query, right_side: Query, left: Query) -> Query:
     returned_node, returned_right = query_type_conversion(
         query.node_type, right_side.value
     )
+
     query.node_type = returned_node
     query.l = col(backwards_comp(left.value))
     query.r = infer_quote(returned_right.value.strip())

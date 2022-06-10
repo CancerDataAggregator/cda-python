@@ -118,7 +118,8 @@ def query_type_conversion(
         tmp = Query()
         tmp.node_type = "quoted"
         tmp.value = _r
-        return ("LIKE", tmp)
+        tmp_str = "NOT " if _op == "!=" or _op == "<>" else ""
+        return (f"{tmp_str}LIKE", tmp)
 
     if _r.find("LIKE") != -1:
         tmp = Query()
