@@ -5,8 +5,8 @@ from json import loads
 from logging import error as logError
 from multiprocessing.pool import ApplyResult
 from types import MappingProxyType
-from typing import Any, Dict, Optional, Tuple, TypeVar, TypedDict, Union, overload
-
+from typing import Any, Dict, Optional, Tuple, TypeVar, Union, overload
+from typing_extensions import TypedDict
 import pandas as pd
 from cda_client import ApiClient, Configuration
 from cda_client.api.meta_api import MetaApi
