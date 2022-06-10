@@ -5,7 +5,6 @@ from cda_client.model.query import Query
 
 from tdparser import Lexer, Token
 from tdparser.topdown import Parser
-
 from cdapython.functions import backwards_comp, col, infer_quote, query_type_conversion
 
 if TYPE_CHECKING:
@@ -64,26 +63,25 @@ class Expression(Token):
 
 class And(Token):
     lbp = 3  # Precedence
-    query = Query()
 
     def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
-
+        query = Query()
         l_copy_query = build_query_copy(left)
 
-        self.query.node_type = "AND"
-        self.query.l = l_copy_query
+        query.node_type = "AND"
+        query.l = l_copy_query
 
         right_side: Query = context.expression(self.lbp)
         r_copy_query = build_query_copy(right_side)
 
-        self.query.r = r_copy_query
-        return self.query
+        query.r = r_copy_query
+        return query
 
 
-class Or(And):
+class Or(Token):
     lbp = 3  # Precedence
     query = Query()
 
@@ -91,113 +89,113 @@ class Or(And):
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
-
+        query = Query()
         l_copy_query = build_query_copy(left)
 
-        self.query.node_type = "OR"
-        self.query.l = l_copy_query
+        query.node_type = "OR"
+        query.l = l_copy_query
 
         right_side: Query = context.expression(self.lbp)
         r_copy_query = build_query_copy(right_side)
 
-        self.query.r = r_copy_query
-        return self.query
+        query.r = r_copy_query
+        return query
 
 
 class Eq(Token):
     lbp = 10  # Precedence
-    query = Query()
 
     def led(self, left: Query, context: Parser) -> Query:
+        query = Query()
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
-        self.query.node_type = "="
+        query.node_type = "="
         right_side: Query = context.expression(self.lbp)
         if isinstance(right_side.value, str) and right_side.value.find("%") != -1:
-            return like_converter(query=self.query, right_side=right_side, left=left)
+            return like_converter(query=query, right_side=right_side, left=left)
 
-        self.query.l = col(backwards_comp(left.value))
-        self.query.r = infer_quote(right_side.value)
-        return self.query
+        query.l = col(backwards_comp(left.value))
+        query.r = infer_quote(right_side.value)
+        return query
 
 
 class NotEq(Token):
     lbp = 5  # Precedence
-    query = Query()
 
     def led(self, left: Query, context: Parser) -> Query:
+        query = Query()
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
         right_side: Query = context.expression(self.lbp)
-        self.query.node_type = "!="
+        query.node_type = "!="
         if isinstance(right_side.value, str) and right_side.value.find("%") != -1:
-            return like_converter(query=self.query, right_side=right_side, left=left)
-        self.query.l = col(backwards_comp(left.value.strip()))
-        self.query.r = infer_quote(right_side.value.strip())
-        return self.query
+            return like_converter(query=query, right_side=right_side, left=left)
+        query.l = col(backwards_comp(left.value.strip()))
+        query.r = infer_quote(right_side.value.strip())
+        return query
 
 
 class Greaterthaneq(Token):
     lbp = 5  # Precedence
-    query = Query()
 
     def led(self, left: Query, context: Parser) -> Query:
+        query = Query()
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
         right_side: Query = context.expression(self.lbp)
-        self.query.node_type = ">="
-        self.query.l = col(backwards_comp(left.value.strip()))
-        self.query.r = infer_quote(right_side.value.strip())
-        return self.query
+        query.node_type = ">="
+        query.l = col(backwards_comp(left.value.strip()))
+        query.r = infer_quote(right_side.value.strip())
+        return query
 
 
 class Greaterthan(Token):
     lbp = 5  # Precedence
-    query = Query()
 
     def led(self, left: Query, context: Parser) -> Query:
+        query = Query()
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
         right_side: Query = context.expression(self.lbp)
-        self.query.node_type = ">"
-        self.query.l = col(backwards_comp(left.value.strip()))
-        self.query.r = infer_quote(right_side.value.strip())
-        return self.query
+        query.node_type = ">"
+        query.l = col(backwards_comp(left.value.strip()))
+        query.r = infer_quote(right_side.value.strip())
+        return query
 
 
 class Lessthaneq(Token):
     lbp = 5  # Precedence
-    query = Query()
 
     def led(self, left: Query, context: Parser) -> Query:
+        query = Query()
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
         right_side: Query = context.expression(self.lbp)
-        self.query.node_type = "<="
-        self.query.l = col(backwards_comp(left.value.strip()))
-        self.query.r = infer_quote(right_side.value.strip())
-        return self.query
+        query.node_type = "<="
+        query.l = col(backwards_comp(left.value.strip()))
+        query.r = infer_quote(right_side.value.strip())
+        return query
 
 
 class Lessthan(Token):
     lbp = 5  # Precedence
-    query = Query()
 
     def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
+        query = Query()
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
         right_side: Query = context.expression(self.lbp)
-        self.query.node_type = "<"
-        self.query.l = col(backwards_comp(left.value.strip()))
-        self.query.r = infer_quote(right_side.value.strip())
+        query.node_type = "<"
+        query.l = col(backwards_comp(left.value.strip()))
+        query.r = infer_quote(right_side.value.strip())
 
-        return self.query
+        return query
 
 
 class Doublequotes(Token):
@@ -259,111 +257,110 @@ class Singlequotes(Token):
 
 class IN(Token):
     lbp = 5
-    query = Query()
 
     def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
+        query = Query()
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
         right_side: Query = context.expression(self.lbp)
-        self.query.node_type = "IN"
-        self.query.l = col(backwards_comp(left.value.strip()))
-        self.query.r = infer_quote(right_side.value.strip())
-        return self.query
+        query.node_type = "IN"
+        query.l = col(backwards_comp(left.value.strip()))
+        query.r = infer_quote(right_side.value.strip())
+        return query
 
 
 class LIKE(Token):
     lbp = 5
-    query = Query()
 
     def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
+        query = Query()
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
 
         right_side: Query = context.expression(self.lbp)
-        self.query.node_type = "LIKE"
-        self.query.node_type, right_side = query_type_conversion(
-            self.query.node_type, right_side.value
+        query.node_type = "LIKE"
+        query.node_type, right_side = query_type_conversion(
+            query.node_type, right_side.value
         )
-        self.query.l = col(backwards_comp(left.value.strip()))
-        self.query.r = infer_quote(right_side.value.strip())
-        return self.query
+        query.l = col(backwards_comp(left.value.strip()))
+        query.r = infer_quote(right_side.value.strip())
+        return query
 
 
 class NOT(Token):
     lbp = 4
-    query = Query()
 
     def nud(self, context: Parser) -> Query:
+        query = Query()
         right_side: Query = context.expression(self.lbp)
-        self.query.node_type = "NOT"
-        self.query.l = right_side
-        self.query.r = infer_quote("")
-        return self.query
+        query.node_type = "NOT"
+        query.l = right_side
+        query.r = infer_quote("")
+        return query
 
 
 class IS(Token):
     lbp = 19
-    query = Query()
 
     def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
-
+        query = Query()
         right_side: Query = context.expression(self.lbp)
 
-        self.query.node_type = "IS"
-        self.query.l = col(backwards_comp(left.value))
-        self.query.r = infer_quote(right_side.value)
+        query.node_type = "IS"
+        query.l = col(backwards_comp(left.value))
+        query.r = infer_quote(right_side.value)
 
-        return self.query
+        return query
 
 
 class IS_NOT(Token):
     lbp = 19
-    query = Query()
 
     def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
+        query = Query()
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
         right_side: Query = context.expression(self.lbp)
-        self.query.node_type = "IS NOT"
-        self.query.l = col(backwards_comp(left.value.strip()))
-        self.query.r = infer_quote(right_side.value)
-        return self.query
+        query.node_type = "IS NOT"
+        query.l = col(backwards_comp(left.value.strip()))
+        query.r = infer_quote(right_side.value)
+        return query
 
 
 class NOT_IN(Token):
     lbp = 19
-    query = Query()
 
     def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
+        query = Query()
         right_side: Query = context.expression(self.lbp)
-        self.query.node_type = "NOT IN"
-        self.query.l = col(backwards_comp(left.value.strip()))
-        self.query.r = infer_quote(right_side.value)
-        return self.query
+        query.node_type = "NOT IN"
+        query.l = col(backwards_comp(left.value.strip()))
+        query.r = infer_quote(right_side.value)
+        return query
 
 
 class NOT_LIKE(Token):
     lbp = 19
-    query = Query()
 
     def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
+        query = Query()
         right_side: Query = context.expression(self.lbp)
-        self.query.node_type = "NOT LIKE"
-        self.query.l = col(backwards_comp(left.value.strip()))
-        self.query.r = infer_quote(right_side.value)
-        return self.query
+        query.node_type = "NOT LIKE"
+        query.l = col(backwards_comp(left.value.strip()))
+        query.r = infer_quote(right_side.value)
+        return query
 
 
 class RightParen(Token):
