@@ -4,8 +4,8 @@ from tests.global_settings import host, localhost
 q1 = Q('ResearchSubject.primary_diagnosis_site = "Kidney"')
 q2 = Q("ResearchSubject.Diagnosis.stage = 'Stage I'")
 q3 = Q("ResearchSubject.Diagnosis.stage = 'Stage II'")
-diag = q2.Or(q3)
-myquery = diag.And(q1)
+diag = q2.OR(q3)
+myquery = diag.AND(q1)
 
 count = myquery.count
 file = myquery.file

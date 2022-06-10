@@ -3,9 +3,9 @@ from tests.global_settings import localhost, host
 
 r = (
     Q("File.file_format = 'tsv'")
-    .And(Q("ResearchSubject.Diagnosis.stage = 'Stage I' "))
-    .Or(Q("ResearchSubject.Diagnosis.stage = 'Stage II'"))
-    .And(Q("ResearchSubject.primary_diagnosis_site = 'Kidney'"))
+    .AND(Q("ResearchSubject.Diagnosis.stage = 'Stage I' "))
+    .OR(Q("ResearchSubject.Diagnosis.stage = 'Stage II'"))
+    .AND(Q("ResearchSubject.primary_diagnosis_site = 'Kidney'"))
 )
 
 q = r.research_subject

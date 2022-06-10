@@ -9,7 +9,7 @@ try:
     q2 = Q(GDC)
     q3 = Q(IDC)
 
-    q = q3.From(q1.From(q2))
+    q = q3.FROM(q1.FROM(q2))
 
     r = q.run(host=host, async_call=True)
     print(r)
@@ -18,7 +18,7 @@ try:
     q2 = Q(GDC)
     q3 = Q(IDC)
 
-    q = q3.From(q1.From(q2))
+    q = q3.FROM(q1.FROM(q2))
 
     r = q.run(host=host, async_call=True)
     print(r)
@@ -26,7 +26,7 @@ try:
     q2 = Q(GDC)
     q3 = Q(IDC)
 
-    q = q3.From(q1.From(q2))
+    q = q3.FROM(q1.FROM(q2))
 
     r = q.run(host=host, async_call=True)
     print(r)

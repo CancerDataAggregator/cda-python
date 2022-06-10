@@ -396,7 +396,7 @@ lexer = Lexer(with_parens=False)
 lexer.register_token(
     Expression,
     re.compile(
-        r"(\-[\S]+)|(\"[\w\s]+\")|(\b(?!\bAND\b|\band\b)(?!\bOR\b|\bor\b)(?!\bNOT\b|\bnot\b)(?!\bFROM\b|\bfrom\b)(?!\bIN\b|\bin\b)(?!\bLIKE\b|\blike\b)(?!\bIS\b|\bis\b)[\w.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
+        r"(\-[\S]+)|(\"[\w\s]+\")|(\b(?!((?i)\band\b))(?!((?i)\bor\b))(?!((?i)\bnot\b))(?!((?i)\bfrom\b))(?!((?i)\bin\b))(?!((?i)\blike\b))(?!((?i)\bis\b))[\w.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
     ),
 )
 
@@ -413,16 +413,16 @@ lexer.register_token(Lessthan, re.compile(r"(\s+<+\s)"))
 lexer.register_token(Lessthaneq, re.compile(r"(\s+<=+\s)"))
 lexer.register_token(NotEq, re.compile(r"(\s+!=+\s)"))
 lexer.register_token(NotEq, re.compile(r"(\s+<>+\s)"))
-lexer.register_token(And, re.compile(r"(AND|and)"))
-lexer.register_token(Or, re.compile(r"(OR|or)"))
+lexer.register_token(And, re.compile(r"((?i)and)"))
+lexer.register_token(Or, re.compile(r"((?i)or)"))
 lexer.register_token(Eq, re.compile(r"(=)"))
-lexer.register_token(IN, re.compile(r"(IN|in)"))
-lexer.register_token(LIKE, re.compile(r"(LIKE|like)"))
-lexer.register_token(NOT, re.compile(r"(NOT|not)"))
-lexer.register_token(IS_NOT, re.compile(r"((IS|is)\s+(NOT|not))"))
-lexer.register_token(NOT_IN, re.compile(r"((NOT|not)\s+(IN|in))"))
-lexer.register_token(NOT_LIKE, re.compile(r"((NOT|not)\s+(LIKE|like))"))
-lexer.register_token(IS, re.compile(r"(IS|is)"))
+lexer.register_token(IN, re.compile(r"((?i)in)"))
+lexer.register_token(LIKE, re.compile(r"((?i)like)"))
+lexer.register_token(NOT, re.compile(r"((?i)not)"))
+lexer.register_token(IS_NOT, re.compile(r"(((?i)is)\s+((?i)not))"))
+lexer.register_token(NOT_IN, re.compile(r"(((?i)not)\s+((?i)in))"))
+lexer.register_token(NOT_LIKE, re.compile(r"(((?i)is)\s+((?i)like))"))
+lexer.register_token(IS, re.compile(r"((?i)is)"))
 
 
 def simple_parser(text: str) -> "Query":

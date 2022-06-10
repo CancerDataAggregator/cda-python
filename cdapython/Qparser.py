@@ -144,7 +144,7 @@ class And(Token):
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
         right_side = context.expression(self.lbp)
-        return left.And(right_side)
+        return left.AND(right_side)
 
 
 class Or(Token):
@@ -155,7 +155,7 @@ class Or(Token):
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
         right_side = context.expression(self.lbp)
-        return left.Or(right_side)
+        return left.OR(right_side)
 
 
 class From(Token):
@@ -166,7 +166,7 @@ class From(Token):
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
         right_side = context.expression(self.lbp)
-        return left.From(right_side)
+        return left.FROM(right_side)
 
 
 class IN(Token):

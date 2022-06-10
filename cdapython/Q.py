@@ -584,13 +584,13 @@ class Q:
             print(e)
         return None
 
-    def And(self, right: "Q") -> "Q":
+    def AND(self, right: "Q") -> "Q":
         return Q(self.query, "AND", right.query)
 
-    def Or(self, right: "Q") -> "Q":
+    def OR(self, right: "Q") -> "Q":
         return Q(self.query, "OR", right.query)
 
-    def From(self, right: "Q") -> "Q":
+    def FROM(self, right: "Q") -> "Q":
         return Q(self.query, "SUBQUERY", right.query)
 
     def Not(self) -> "Q":

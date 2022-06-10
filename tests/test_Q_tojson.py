@@ -9,6 +9,6 @@ def test_to_json_check() -> None:
     ageL = Q("days_to_birth <= -30*365")
     ageU = Q("days_to_birth >= -45*365")
 
-    q1 = sex.And(cancer.And(ageL.And(ageU)))
+    q1 = sex.AND(cancer.AND(ageL.AND(ageU)))
 
     assert q1.to_json().find("AND") != -1
