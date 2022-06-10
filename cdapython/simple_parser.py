@@ -35,6 +35,19 @@ def build_query_copy(q: Query) -> Optional[Query]:
     return query_value
 
 
+def like_converter(query: Query, right_side: Query, left: Query) -> Query:
+    returned_node: str
+    returned_right: Query
+
+    returned_node, returned_right = query_type_conversion(
+        query.node_type, right_side.value
+    )
+    query.node_type = returned_node
+    query.l = col(backwards_comp(left.value))
+    query.r = infer_quote(returned_right.value.strip())
+    return query
+
+
 class Expression(Token):
     lbp = 0
 
@@ -98,20 +111,10 @@ class Eq(Token):
         """Compute the value of this token when between two expressions."""
         # Fetch the expression to the right, stopping at the next boundary
         # of same precedence
-        right_side: Query = context.expression(self.lbp)
-
         self.query.node_type = "="
+        right_side: Query = context.expression(self.lbp)
         if isinstance(right_side.value, str) and right_side.value.find("%") != -1:
-            returned_node: str
-            returned_right: Query
-
-            returned_node, returned_right = query_type_conversion(
-                self.query.node_type, right_side.value
-            )
-            self.query.node_type = returned_node
-            self.query.l = col(backwards_comp(left.value))
-            self.query.r = infer_quote(returned_right.value.strip())
-            return self.query
+            return like_converter(query=self.query, right_side=right_side, left=left)
 
         self.query.l = col(backwards_comp(left.value))
         self.query.r = infer_quote(right_side.value)
@@ -128,6 +131,8 @@ class NotEq(Token):
         # of same precedence
         right_side: Query = context.expression(self.lbp)
         self.query.node_type = "!="
+        if isinstance(right_side.value, str) and right_side.value.find("%") != -1:
+            return like_converter(query=self.query, right_side=right_side, left=left)
         self.query.l = col(backwards_comp(left.value.strip()))
         self.query.r = infer_quote(right_side.value.strip())
         return self.query
