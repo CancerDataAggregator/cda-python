@@ -39,39 +39,33 @@ from cdapython.factories import (
     SUBJECT_FILE_COUNT,
     TREATMENT,
     TREATMENT_COUNT,
-    QFactory
+    QFactory,
 )
 from cdapython.factories.q_factory import QFactory
 from cdapython.factories.subject import (
     Subject,
     SubjectCount,
     SubjectFiles,
-    SubjectFileCount
+    SubjectFileCount,
 )
 
 from cdapython.factories.research_subject import (
     ResearchSubject,
     ResearchSubjectCount,
     ResearchSubjectFiles,
-    ResearchSubjectFileCount
+    ResearchSubjectFileCount,
 )
 
 from cdapython.factories.specimen import (
     Specimen,
     SpecimenCount,
     SpecimenFiles,
-    SpecimenFileCount
+    SpecimenFileCount,
 )
 
-from cdapython.factories.diagnosis import (
-    Diagnosis,
-    DiagnosisCount
-)
+from cdapython.factories.diagnosis import Diagnosis, DiagnosisCount
 
-from cdapython.factories.treatment import (
-    Treatment,
-    TreatmentCount
-)
+from cdapython.factories.treatment import Treatment, TreatmentCount
 
 from cdapython.factories.file import File
 from cdapython.factories.file_count import FileCount

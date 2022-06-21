@@ -26,7 +26,7 @@ class ResearchSubject(Entity):
         version: str,
         dry_run: bool,
         table: str,
-        async_req: bool
+        async_req: bool,
     ) -> Endpoint:
         return api_instance.research_subject_query(
             query, version=version, dry_run=dry_run, table=table, async_req=async_req
