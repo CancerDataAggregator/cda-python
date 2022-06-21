@@ -3,7 +3,7 @@ from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
 from cda_client.model.query import Query
 from cdapython.factories import SUBJECT_FILE_COUNT
-from cdapython.factories.q_factory import QFactory
+from cdapython.factories.q_factory import AbstractFactory, QFactory
 from cdapython.factories.subject.subject import Subject
 
 if TYPE_CHECKING:
@@ -32,7 +32,7 @@ class SubjectFiles(Subject):
             query, version=version, dry_run=dry_run, table=table, async_req=async_req
         )
 
-    class Factory:
+    class Factory(AbstractFactory):
         @staticmethod
         def create(q_object):
             return SubjectFiles(q_object.query)

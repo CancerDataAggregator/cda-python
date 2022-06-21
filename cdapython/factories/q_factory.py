@@ -1,13 +1,22 @@
-from typing import Any, Dict
+from typing import TYPE_CHECKING, Any, Dict
+
+if TYPE_CHECKING:
+    from cdapython.Q import Q
+
+
+class AbstractFactory:
+    @staticmethod
+    def create(q_object):
+        raise NotImplementedError
 
 
 class QFactory:
-    factories: Dict[str, Any] = {}
+    factories: Dict[str, AbstractFactory] = {}
 
     @staticmethod
-    def add_factory(id, q_factory):
+    def add_factory(id: str, q_factory: Any) -> None:
         QFactory.factories[id] = q_factory
 
     @staticmethod
-    def create_entity(id, q_object):
+    def create_entity(id: str, q_object: "Q") -> "Q":
         return QFactory.factories[id].create(q_object)

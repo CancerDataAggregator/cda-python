@@ -4,7 +4,7 @@ from cda_client.api_client import Endpoint
 from cda_client.model.query import Query
 from cdapython.factories.entity import Entity
 from cdapython.factories import SPECIMEN_COUNT, SPECIMEN_FILE
-from cdapython.factories.q_factory import QFactory
+from cdapython.factories.q_factory import AbstractFactory, QFactory
 
 if TYPE_CHECKING:
     from cdapython.Q import Q
@@ -32,7 +32,7 @@ class Specimen(Entity):
             query, version=version, dry_run=dry_run, table=table, async_req=async_req
         )
 
-    class Factory:
+    class Factory(AbstractFactory):
         @staticmethod
         def create(q_object):
             return Specimen(q_object.query)

@@ -3,7 +3,7 @@ from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
 from cda_client.model.query import Query
 from cdapython.factories import SPECIMEN_FILE_COUNT
-from cdapython.factories.q_factory import QFactory
+from cdapython.factories.q_factory import AbstractFactory, QFactory
 from cdapython.factories.specimen.specimen import Specimen
 
 if TYPE_CHECKING:
@@ -32,7 +32,7 @@ class SpecimenFiles(Specimen):
             query, version=version, dry_run=dry_run, table=table, async_req=async_req
         )
 
-    class Factory:
+    class Factory(AbstractFactory):
         @staticmethod
         def create(q_object):
             return SpecimenFiles(q_object.query)

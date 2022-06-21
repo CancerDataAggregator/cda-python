@@ -1,5 +1,5 @@
 # Versioning Year Month Day of last push
-VERSION: str = "2022.6.9"
+VERSION: str = "2022.6.21"
 DATABASETABLE_VERSION: str = "all_Subjects_v3_0_w_RS"
 CLIENT_VERSION: str = "3.0.0"
 DATABASETABLE: str = "gdc-bq-sample.dev"

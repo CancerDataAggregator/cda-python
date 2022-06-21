@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Optional
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
 from cda_client.model.query import Query
+from cdapython.factories.q_factory import AbstractFactory
 from cdapython.factories.research_subject.file import ResearchSubjectFiles
 from cdapython.results.result import Result
 from cdapython.results.count_result import CountResult
@@ -55,7 +56,7 @@ class ResearchSubjectFileCount(ResearchSubjectFiles):
             format_type,
         )
 
-    class Factory:
+    class Factory(AbstractFactory):
         @staticmethod
         def create(q_object):
             return ResearchSubjectFileCount(q_object.query)

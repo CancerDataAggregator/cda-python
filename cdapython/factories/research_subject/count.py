@@ -3,7 +3,7 @@ from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
 from cda_client.model.query import Query
 from cdapython.factories import RESEARCH_SUBJECT_FILE_COUNT
-from cdapython.factories.q_factory import QFactory
+from cdapython.factories.q_factory import AbstractFactory, QFactory
 from cdapython.factories.research_subject.research_subject import ResearchSubject
 from cdapython.results.count_result import CountResult
 from cdapython.results.result import Result
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class ResearchSubjectCount(ResearchSubject):
     @property
     def file(self) -> "Q":
-        return QFactory.create_entity(RESEARCH_SUBJECT_FILE_COUNT, self.query)
+        return QFactory.create_entity(RESEARCH_SUBJECT_FILE_COUNT, self)
 
     def _call_endpoint(
         self,
@@ -53,7 +53,7 @@ class ResearchSubjectCount(ResearchSubject):
             format_type,
         )
 
-    class Factory:
+    class Factory(AbstractFactory):
         @staticmethod
         def create(q_object):
             return ResearchSubjectCount(q_object.query)

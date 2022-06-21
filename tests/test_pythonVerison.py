@@ -1,6 +1,6 @@
 from cdapython import __version__
 
-version = "2022.6.9"
+version = "2022.6.21"
 
 
 def test_python_version() -> None:

@@ -3,7 +3,7 @@ from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
 from cda_client.model.query import Query
 from cdapython.factories import SPECIMEN_FILE_COUNT
-from cdapython.factories.q_factory import QFactory
+from cdapython.factories.q_factory import AbstractFactory, QFactory
 from cdapython.factories.specimen.specimen import Specimen
 from cdapython.results.count_result import CountResult
 from cdapython.results.result import Result
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class SpecimenCount(Specimen):
     @property
     def file(self) -> "Q":
-        return QFactory.create_entity(SPECIMEN_FILE_COUNT, self.query)
+        return QFactory.create_entity(SPECIMEN_FILE_COUNT, self)
 
     def _call_endpoint(
         self,
@@ -53,7 +53,7 @@ class SpecimenCount(Specimen):
             format_type,
         )
 
-    class Factory:
+    class Factory(AbstractFactory):
         @staticmethod
         def create(q_object):
             return SpecimenCount(q_object.query)

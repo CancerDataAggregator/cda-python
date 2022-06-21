@@ -3,6 +3,7 @@ from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
 from cda_client.model.query import Query
 from cdapython.factories.diagnosis.diagnosis import Diagnosis
+from cdapython.factories.q_factory import AbstractFactory
 from cdapython.results.count_result import CountResult
 from cdapython.results.result import Result
 from cda_client.model.query_response_data import QueryResponseData
@@ -44,7 +45,7 @@ class DiagnosisCount(Diagnosis):
             format_type,
         )
 
-    class Factory:
+    class Factory(AbstractFactory):
         @staticmethod
         def create(q_object):
             return DiagnosisCount(q_object.query)
