@@ -11,7 +11,15 @@ from cda_client import ApiClient, Configuration
 from cda_client.api.meta_api import MetaApi
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
-from cdapython.factories import COUNT, DIAGNOSIS, FILE, RESEARCH_SUBJECT, SPECIMEN, SUBJECT, TREATMENT
+from cdapython.factories import (
+    COUNT,
+    DIAGNOSIS,
+    FILE,
+    RESEARCH_SUBJECT,
+    SPECIMEN,
+    SUBJECT,
+    TREATMENT,
+)
 from cdapython.factories.q_factory import QFactory
 
 from cdapython.results.result import Result
@@ -131,7 +139,7 @@ class Q:
             if type(args[0]) is Query:
                 self.query = args[0]
             else:
-                query_parsed = simple_parser(args[0])
+                query_parsed = simple_parser(args[0].strip().replace("\n", " "))
                 self.query = query_parsed
 
         elif len(args) != 3:
