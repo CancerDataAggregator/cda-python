@@ -184,7 +184,7 @@ class Q:
 
             if args[0] is None:
                 raise RuntimeError("Q statement parse error")
-            query_parsed = simple_parser(args[0])
+            query_parsed = simple_parser(args[0].strip().replace("\n", " "))
             self.query = query_parsed
 
         elif len(args) != 3:
