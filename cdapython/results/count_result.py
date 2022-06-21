@@ -28,6 +28,7 @@ class CountResult(Result):
         html_string: str = ""
         count_string: str = ""
         console = Console()
+        tables: list[Table] = []
         for key in result:
             table = Table(title=key)
             value = result[key]
@@ -59,12 +60,10 @@ class CountResult(Result):
             else:
                 key_string = f"{key} : {value}".center(20)
                 console.print(key_string)
-                if self.isnotebook():
-                    print(key_string)
 
                 count_string = count_string + "\n\n" + key_string
 
-            console.print(table)
+            tables.append(table)
         if self.isnotebook():
             display_html(html_string, raw=True)
             if self.show_sql is True:
@@ -86,6 +85,8 @@ class CountResult(Result):
                     word_wrap=True,
                 )
                 console.print(syntax, overflow="fold")
+            for t in tables:
+                console.print(t)
             return ""
 
     def isnotebook(self) -> bool:
