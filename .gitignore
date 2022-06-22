@@ -21,6 +21,7 @@ venv
 
 monkeytype.*
 
+dist
 #sonrqube scanner
 .scannerwork
 /notebooks/example-dev.ipynb
