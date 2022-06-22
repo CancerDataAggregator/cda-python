@@ -23,6 +23,7 @@ from typing_extensions import Literal
 
 from cdapython.Paginator import Paginator
 
+
 if TYPE_CHECKING:
     from cdapython.Q import Q
 
@@ -159,14 +160,6 @@ class Result:
         """
 
         return self.__result
-
-    def to_dict(self) -> dict:
-        """_summary_
-
-        Returns:
-            dict: _description_
-        """
-        return dict(ChainMap(*self.__result))
 
     def __len__(self) -> int:
         return self.count
@@ -341,6 +334,7 @@ def get_query_result(
             response = response.get()
 
         sleep(2.5)
+        response.to_dict()
         if response.total_row_count is not None:
             return Result(
                 response,

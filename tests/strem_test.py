@@ -10,5 +10,3 @@ for i in q.paginator(to_list=True):
     box.extend(i)
 
 print(len(box))
-
-q

@@ -19,17 +19,17 @@ from tests.global_settings import localhost, host
 # ).to_dict()
 
 
+# d = Q(
+#     """
+#     ResearchSubject.primary_diagnosis_site = "uterus, NOS" OR
+#     ResearchSubject.primary_diagnosis_site = "uterus" OR
+#     ResearchSubject.primary_diagnosis_site = "Cervix" OR
+#     ResearchSubject.primary_diagnosis_site = "Cervix uteri"
+# """
+# ).researchsubject.count.run(host=host)
+
+
 d = Q(
-    """
-    ResearchSubject.primary_diagnosis_site = "uterus, NOS" OR 
-    ResearchSubject.primary_diagnosis_site = "uterus" OR 
-    ResearchSubject.primary_diagnosis_site = "Cervix" OR 
-    ResearchSubject.primary_diagnosis_site = "Cervix uteri"
-"""
-).researchsubject.count.run(host=host)
-
-
-Q(
     """
       ResearchSubject.primary_diagnosis_site = "uterus, NOS" OR 
       ResearchSubject.primary_diagnosis_site = "uterus" OR 
@@ -37,8 +37,8 @@ Q(
       ResearchSubject.primary_diagnosis_site = "Cervix uteri
       "
 """
-).researchsubject.count.run(show_sql=True)
-print(d)
+).researchsubject.run(show_sql=True, host=host, limit=1000)
+print(d.to_list())
 # print(a.researchsubject.count.run(host=localhost))
 # q = q1.AND(q2)
 

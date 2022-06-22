@@ -70,11 +70,27 @@ def backwards_comp(value: str) -> str:
 
 @overload
 def infer_quote(val: str) -> str:
+    """_summary_
+    this is a overload for a str typechecking
+    Args:
+        val (str): _description_
+
+    Returns:
+        str: _description_
+    """
     pass
 
 
 @overload
 def infer_quote(val: Query) -> Query:
+    """_summary_
+    this is a overload for a Query for typechecking
+    Args:
+        val (Query): _description_
+
+    Returns:
+        Query: _description_
+    """
     pass
 
 

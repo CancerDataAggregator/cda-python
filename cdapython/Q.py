@@ -48,7 +48,6 @@ from cdapython.services import (
 )
 from cdapython.simple_parser import simple_parser
 
-# from cdapython.simple_parser import simple_parser
 
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 
@@ -121,26 +120,6 @@ class _QEncoder(json.JSONEncoder):
 
 
 TQ = TypeVar("TQ", bound="Q")
-
-# class type_dict_api_task(TypedDict,total=False):
-#         "": ApiService
-#         subject: SubjectQueryService
-#         researchsubject: ResearchSubjectQueryService
-#         specimen: SpecimenQueryService
-#         file: FilesApiService
-#         count: CountsApiService
-#         diagnosis: DiagnosisQueryService
-#         treatment: TreatmentQueryService
-#         diagnosis.file: None
-#         treatment.file: None
-#         subject.file: SubjectFilesService
-#         researchsubject.file: ResearchSubjectFilesService
-#         specimen.file: SpecimenFilesService
-#         researchsubject.count: ResearchSubjectCountsService
-#         diagnosis.count: DiagnosisCountsService
-#         subject.count: SubjectCountsService
-#         specimen.count: SpecimenCountsService
-#         treatment.count: TreatmentCountsService
 
 
 class Q:
