@@ -165,7 +165,9 @@ class Result:
         return self.count
 
     def paginator(
-        self, to_df: bool = False, to_list: bool = False, to_dict: bool = False
+        self,
+        to_df: bool = False,
+        to_list: bool = False,
     ) -> Paginator:
         """_summary_
         paginator this will automatically page over results
@@ -179,7 +181,6 @@ class Result:
             self,
             to_df=to_df,
             to_list=to_list,
-            to_dict=to_dict,
             format_type=self.format_type,
         )
 
@@ -334,7 +335,6 @@ def get_query_result(
             response = response.get()
 
         sleep(2.5)
-        response.to_dict()
         if response.total_row_count is not None:
             return Result(
                 response,

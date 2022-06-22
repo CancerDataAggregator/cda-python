@@ -19,13 +19,11 @@ class Paginator:
         result: "Result",
         to_df: bool,
         to_list: bool,
-        to_dict: bool,
         format_type: str = "JSON",
     ) -> None:
         self.result = result
         self.to_df = to_df
         self.to_list = to_list
-        self.to_dict = to_dict
         self.count = 0
         self.stopped = False
         self.format_type = format_type
@@ -37,8 +35,6 @@ class Paginator:
             result_nx = self.result.to_dataframe()
         if self.to_list and self.result is not None:
             result_nx = self.result.to_list()
-        if self.to_dict and self.result is not None:
-            result_nx = self.result.to_dict()
         if self.result.has_next_page:
             self.result = self.result.next_page()
             return result_nx
