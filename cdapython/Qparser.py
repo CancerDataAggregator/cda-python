@@ -233,4 +233,5 @@ lexer.register_token(var, re.compile(r"(Var\s\w+\s*?=(?!=))"))
 
 
 def parser(text: str) -> "Q":
+
     return lexer.parse(text)

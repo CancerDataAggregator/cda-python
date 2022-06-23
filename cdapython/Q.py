@@ -6,7 +6,6 @@ from logging import error as logError
 from multiprocessing.pool import ApplyResult
 from types import MappingProxyType
 from typing import Any, Dict, Optional, Tuple, TypeVar, Union, overload
-from typing_extensions import TypedDict
 import pandas as pd
 from cda_client import ApiClient, Configuration
 from cda_client.api.meta_api import MetaApi
@@ -16,11 +15,9 @@ from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
 from rich import print
 from rich.progress import Progress
-from typing_extensions import Literal
 from urllib3.connection import NewConnectionError  # type: ignore
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, SSLError
-
 import cdapython.constant_variables as const
 from cdapython.constant_variables import default_table, project_name, table_version
 from cdapython.decorators.measure import Measure

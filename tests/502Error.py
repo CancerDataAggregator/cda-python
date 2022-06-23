@@ -16,7 +16,7 @@ from tests.global_settings import localhost, host
 # print(a.to_json())
 # Q("ResearchSubject.Diagnosis.morphology = '84%'").researchsubject.run(
 #     host="http://localhost:8080"
-# ).to_dict()
+# )
 
 
 # d = Q(

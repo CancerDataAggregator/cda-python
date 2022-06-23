@@ -215,13 +215,15 @@ The following comparsion operators can be used with the `Q` command:
 | operator | Description                                        | Q.sql required? |
 | -------- | -------------------------------------------------- | --------------- |
 | =        | condition equals                                   | no              |
-| !=       | condition is not equal                             | no              |
+| !=, <>   | condition is not equal                             | no              |
 | <        | condition is less than                             | no              |
 | >        | condition is greater than                          | no              |
 | <=       | condition is less than or equal to                 | no              |
 | >=       | condition is less than or equal to                 | no              |
-| like     | similar to = but always wildcards ('%', '\_', etc) | yes             |
-| in       | compares to a set                                  | yes             |
+| like     | similar to = but always wildcards ('%', '\_', etc) | no              |
+| in       | compares to a set                                  | no              |
+| not      | condition is not true                              | no              |
+| is       | 
 
 additionally, more complex SQL can be used with the `Q.sql` command.
 
