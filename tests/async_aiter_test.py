@@ -1,11 +1,9 @@
 import asyncio
 
 from cdapython import Q
-from tests.global_settings import integration_host
+from tests.global_settings import host
 
-v = Q('ResearchSubject.primary_disease_type = "Lung%"').run(
-    host=integration_host, async_call=True
-)
+v = Q('ResearchSubject.primary_disease_type = "Lung%"').run(host=host, async_call=True)
 print(v)
 
 

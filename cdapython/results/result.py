@@ -23,7 +23,6 @@ from typing_extensions import Literal
 
 from cdapython.Paginator import Paginator
 
-
 if TYPE_CHECKING:
     from cdapython.Q import Q
 

@@ -19,12 +19,10 @@ class WRONGDATABASEError(Exception):
 
 
 class QSyntaxError(SyntaxError):
-    def __init__(self, keyword, message="Q Syntax Error") -> None:
+    def __init__(self, keyword: str, message: str = "Q Syntax Error") -> None:
         self.message = message
         self.keyword = keyword
         super().__init__(self.message)
 
     def __str__(self) -> str:
-        return (
-            f"{self.message} -> lowercase {self.keyword} in Q statement is not allowed"
-        )
+        return f"{self.message} -> {self.keyword} in Q statement is not allowed only uppercase operators"

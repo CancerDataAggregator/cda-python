@@ -1,13 +1,12 @@
-from ast import keyword
 import re
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional
 
 from cda_client.model.query import Query
 
 from tdparser import Lexer, Token
 from tdparser.topdown import Parser
-from cdapython.exceptions.custom_exception import QSyntaxError
 from cdapython.functions import backwards_comp, col, infer_quote, query_type_conversion
+from cdapython.utils.check_case import check_keyword
 
 if TYPE_CHECKING:
     from cdapython.Q import Q
@@ -52,12 +51,10 @@ def like_converter(query: Query, right_side: Query, left: Query) -> Query:
 
 class Expression(Token):
     lbp = 0
-    keywords = ["AND", "OR", "NOT", "FROM", "IN", "LIKE", "IS"]
 
     def __init__(self, text: str) -> None:
         self.value = str(text).strip()
-        if self.value in [str(i).lower() for i in self.keywords]:
-            raise QSyntaxError(keyword=self.value)
+        check_keyword(self.value)
 
     def nud(self, context: Parser) -> Query:
         """What the token evaluates to"""

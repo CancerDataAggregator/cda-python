@@ -5,6 +5,7 @@ from tdparser import Lexer, Token
 from tdparser.topdown import Parser
 
 from cdapython.Q import Q
+from cdapython.utils.check_case import check_keyword
 
 if TYPE_CHECKING:
     from cdapython.Q import Q
@@ -15,6 +16,7 @@ symbol_table = {}
 class Expression(Token):
     def __init__(self, text: str) -> None:
         self.value = str(text).strip()
+        check_keyword(self.value)
 
     def nud(self, context: Parser) -> str:
         """What the token evaluates to"""
@@ -41,7 +43,7 @@ class NotEq(Token):
         # of same precedence
         right_side = context.expression(self.lbp)
         if isinstance(left, Q):
-            return left.Not_EQ(right_side)
+            return left._Not_EQ(right_side)
         else:
             return Q(left.strip() + " != " + right_side.strip())
 
@@ -55,7 +57,7 @@ class Greaterthaneq(Token):
         # of same precedence
         right_side = context.expression(self.lbp)
         if isinstance(left, Q):
-            return left.Greater_Than_EQ(right_side)
+            return left._Greater_Than_EQ(right_side)
         else:
             return Q(left.strip() + " >= " + right_side.strip())
 
@@ -69,7 +71,7 @@ class Greaterthan(Token):
         # of same precedence
         right_side = context.expression(self.lbp)
         if isinstance(left, Q):
-            return left.Greater_Than(right_side)
+            return left._Greater_Than(right_side)
         else:
             return Q(left.strip() + " > " + right_side.strip())
 
@@ -83,7 +85,7 @@ class Lessthaneq(Token):
         # of same precedence
         right_side = context.expression(self.lbp)
         if isinstance(left, Q):
-            return left.Less_Than_EQ(right_side)
+            return left._Less_Than_EQ(right_side)
         else:
             return Q(left.strip() + " <= " + right_side.strip())
 
@@ -97,7 +99,7 @@ class Lessthan(Token):
         # of same precedence
         right_side = context.expression(self.lbp)
         if isinstance(left, Q):
-            return left.Less_Than(right_side)
+            return left._Less_Than(right_side)
         else:
             return Q(left.strip() + " < " + right_side.strip())
 

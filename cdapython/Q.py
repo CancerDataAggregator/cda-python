@@ -1,11 +1,11 @@
-import json
 import logging
 from copy import copy
-from json import loads
+from json import JSONEncoder, dumps, loads
 from logging import error as logError
 from multiprocessing.pool import ApplyResult
 from types import MappingProxyType
 from typing import Any, Dict, Optional, Tuple, TypeVar, Union, overload
+
 import pandas as pd
 from cda_client import ApiClient, Configuration
 from cda_client.api.meta_api import MetaApi
@@ -18,11 +18,11 @@ from rich.progress import Progress
 from urllib3.connection import NewConnectionError  # type: ignore
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, SSLError
+
 import cdapython.constant_variables as const
-from cdapython.constant_variables import default_table, project_name, table_version
+from cdapython.constant_variables import default_table, table_version
 from cdapython.decorators.measure import Measure
 from cdapython.error_logger import unverified_http
-from cdapython.exceptions.custom_exception import QSQLError, WRONGDATABASEError
 from cdapython.functions import find_ssl_path
 from cdapython.results.result import Result, get_query_result
 from cdapython.services import (
@@ -45,7 +45,6 @@ from cdapython.services import (
 )
 from cdapython.simple_parser import simple_parser
 
-
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 
 
@@ -53,9 +52,6 @@ logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 WAITING_TEXT = "Waiting for results"
 if isinstance(const.default_file_table, str) and const.default_file_table is not None:
     DEFAULT_TABLE_FILE: Optional[str] = const.default_file_table.split(".")[1]
-
-if isinstance(const.file_table_version, str) and const.file_table_version is not None:
-    DATABASETABLE_VERSION_FOR_FILES: Optional[str] = const.file_table_version
 
 
 def builder_api_client(host: Optional[str], verify: Optional[bool]) -> Configuration:
@@ -86,7 +82,7 @@ def check_version_and_table(
     return (version, table)
 
 
-class _QEncoder(json.JSONEncoder):
+class _QEncoder(JSONEncoder):
     """_QEncoder this is a a class to help with json conversion
         the standard json dump
 
@@ -188,7 +184,7 @@ class Q:
         Returns:
             str: returns a json str to the user
         """
-        return json.dumps(self, indent=indent, cls=_QEncoder)
+        return dumps(self, indent=indent, cls=_QEncoder)
 
     def _get_func(self) -> None:
         full_string = ""
@@ -232,72 +228,6 @@ class Q:
     @staticmethod
     def get_table_version() -> str:
         return const.table_version
-
-    @staticmethod
-    def sql(
-        sql: str,
-        host: Optional[str] = None,
-        dry_run: bool = False,
-        offset: int = 0,
-        limit: int = 100,
-        async_call: bool = False,
-        verify: Optional[bool] = None,
-        verbose: Optional[bool] = True,
-    ) -> Optional[Result]:
-        """[summary]
-        This function will let you write sql instead creating a Q statement
-        Args:
-            sql (str): [description]
-            host (Optional[str], optional): [description]. Defaults to None.
-            dry_run (bool, optional): [description]. Defaults to False.
-            offset (int, optional): [description]. Defaults to 0.
-            limit (int, optional): [description]. Defaults to 100.
-            async_call (bool, optional): [description]. Defaults to False.
-            verify (Optional[bool], optional): [description]. Defaults to None.
-            verbose (Optional[bool], optional): [description]. Defaults to True.
-
-        Raises:
-            Exception: [description]
-            Exception: [description]
-
-        Returns:
-            Optional[Result]: [description]
-        """
-
-        if (
-            "create table" in sql.lower()
-            or "delete from" in sql.lower()
-            or "drop table" in sql.lower()
-            or "update" in sql.lower()
-            or "alter table" in sql.lower()
-        ):
-            raise QSQLError("Those actions are not available in Q.sql")
-
-        if project_name is not None and sql.find(project_name) == -1:
-            raise WRONGDATABASEError("Your database is outside of the project")
-
-        cda_client_obj = ApiClient(configuration=builder_api_client(host, verify))
-        try:
-
-            with cda_client_obj as api_client:
-                api_instance = QueryApi(api_client)
-                api_response = api_instance.sql_query(sql)
-
-            if dry_run is True:
-                return api_response
-
-            return get_query_result(
-                api_instance=api_instance,
-                query_id=api_response.query_id,
-                offset=offset,
-                limit=limit,
-                async_req=async_call,
-                show_sql=True,
-            )
-
-        except Exception as e:
-            print(e)
-        return None
 
     @staticmethod
     def bulk_download(
@@ -592,19 +522,19 @@ class Q:
     def Not(self) -> "Q":
         return Q(self.query, "NOT", None)
 
-    def Not_EQ(self, right: "Q") -> "Q":
+    def _Not_EQ(self, right: "Q") -> "Q":
         return Q(self.query, "!=", right.query)
 
-    def Greater_Than_EQ(self, right: "Q") -> "Q":
+    def _Greater_Than_EQ(self, right: "Q") -> "Q":
         return Q(self.query, ">=", right.query)
 
-    def Greater_Than(self, right: "Q") -> "Q":
+    def _Greater_Than(self, right: "Q") -> "Q":
         return Q(self.query, ">", right.query)
 
-    def Less_Than_EQ(self, right: "Q") -> "Q":
+    def _Less_Than_EQ(self, right: "Q") -> "Q":
         return Q(self.query, "<=", right.query)
 
-    def Less_Than(self, right: "Q") -> "Q":
+    def _Less_Than(self, right: "Q") -> "Q":
         return Q(self.query, "<", right.query)
 
     def Select(self, fields: str) -> "Q":
