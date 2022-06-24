@@ -1,10 +1,11 @@
 # Versioning Year Month Day of last push
 VERSION: str = "2022.6.22"
-DATABASETABLE_VERSION: str = "all_v3_0_Subjects"
+DATABASETABLE_VERSION: str = "all_Subjects_v3_0_w_RS"
 CLIENT_VERSION: str = "3.0.0"
-DATABASETABLE: str = "broad-dsde-prod.cda_prod"
-CDA_API_URL_ENV: str = "https://cancerdata.dsde-prod.broadinstitute.org/"
-DATABASETABLE_FOR_FILES: str = "broad-dsde-prod.cda_prod"
+DATABASETABLE: str = "gdc-bq-sample.dev"
+CDA_API_URL_ENV: str = "https://cda.cda-dev.broadinstitute.org"
+DATABASETABLE_FOR_FILES: str = "gdc-bq-sample.dev"
+DATABASETABLE_VERSION_FOR_FILES: str = "all_Files_v3_0_w_RS"
 
 
 __version__: str = VERSION
