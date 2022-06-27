@@ -1,7 +1,7 @@
-from typing import Optional, overload
+from typing import Optional
 
 from IPython import get_ipython
-from IPython.display import display, display_html
+from IPython.display import display_html
 from pandas import json_normalize
 from rich.console import Console
 from rich.syntax import Syntax

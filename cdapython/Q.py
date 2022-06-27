@@ -3,16 +3,30 @@ from copy import copy
 from json import JSONEncoder, dumps, loads
 from logging import error as logError
 from multiprocessing.pool import ApplyResult
+from time import sleep
 from types import MappingProxyType
-from typing import Any, Dict, Optional, Tuple, TypeVar, Union, overload
-
+from typing import Any, Dict, Optional, Tuple, TypeVar, Union
 import pandas as pd
 from cda_client import ApiClient, Configuration
 from cda_client.api.meta_api import MetaApi
 from cda_client.api.query_api import QueryApi
+from cda_client.api_client import Endpoint
+from cdapython.factories import (
+    COUNT,
+    DIAGNOSIS,
+    FILE,
+    RESEARCH_SUBJECT,
+    SPECIMEN,
+    SUBJECT,
+    TREATMENT,
+)
+from cdapython.factories.q_factory import QFactory
+
+from cdapython.results.result import Result
 from cda_client.exceptions import ApiException, ServiceException
 from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
+from cda_client.model.query_response_data import QueryResponseData
 from rich import print
 from rich.progress import Progress
 from urllib3.connection import NewConnectionError  # type: ignore
@@ -25,24 +39,6 @@ from cdapython.decorators.measure import Measure
 from cdapython.error_logger import unverified_http
 from cdapython.functions import find_ssl_path
 from cdapython.results.result import Result, get_query_result
-from cdapython.services import (
-    ApiService,
-    CountsApiService,
-    DiagnosisCountsService,
-    DiagnosisQueryService,
-    FilesApiService,
-    ResearchSubjectCountsService,
-    ResearchSubjectFilesService,
-    ResearchSubjectQueryService,
-    SpecimenCountsService,
-    SpecimenFilesService,
-    SpecimenQueryService,
-    SubjectCountsService,
-    SubjectFilesService,
-    SubjectQueryService,
-    TreatmentCountsService,
-    TreatmentQueryService,
-)
 from cdapython.simple_parser import simple_parser
 
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
@@ -120,30 +116,6 @@ class Q:
     Q lang is Language used to send query to the cda service
     """
 
-    entity_type = ""
-    task = ""
-    api_tasks = {
-        "": ApiService,
-        "subject": SubjectQueryService,
-        "researchsubject": ResearchSubjectQueryService,
-        "specimen": SpecimenQueryService,
-        "file": FilesApiService,
-        "count": CountsApiService,
-        "diagnosis": DiagnosisQueryService,
-        "treatment": TreatmentQueryService,
-        "diagnosis.file": None,
-        "treatment.file": None,
-        "subject.file": SubjectFilesService,
-        "researchsubject.file": ResearchSubjectFilesService,
-        "specimen.file": SpecimenFilesService,
-        "researchsubject.count": ResearchSubjectCountsService,
-        "diagnosis.count": DiagnosisCountsService,
-        "subject.count": SubjectCountsService,
-        "specimen.count": SpecimenCountsService,
-        "treatment.count": TreatmentCountsService,
-    }
-    api_service = api_tasks[""]
-
     def __init__(self: TQ, *args: Union[str, Query]) -> None:
         """
 
@@ -156,8 +128,12 @@ class Q:
 
             if args[0] is None:
                 raise RuntimeError("Q statement parse error")
-            query_parsed = simple_parser(args[0].strip().replace("\n", " "))
-            self.query = query_parsed
+
+            if type(args[0]) is Query:
+                self.query = args[0]
+            else:
+                query_parsed = simple_parser(args[0].strip().replace("\n", " "))
+                self.query = query_parsed
 
         elif len(args) != 3:
             raise RuntimeError(
@@ -185,18 +161,6 @@ class Q:
             str: returns a json str to the user
         """
         return dumps(self, indent=indent, cls=_QEncoder)
-
-    def _get_func(self) -> None:
-        full_string = ""
-        if self.entity_type != "":
-            full_string = self.entity_type
-
-        if self.task != "":
-            full_string = (
-                f"{full_string}.{self.task}" if full_string != "" else self.task
-            )
-
-        self.api_service = self.api_tasks[full_string]
 
     # endregion
 
@@ -348,9 +312,7 @@ class Q:
         Returns:
             _type_: _description_
         """
-        new_q_class = copy(self)
-        new_q_class.task = "file"
-        return new_q_class
+        return QFactory.create_entity(FILE, self)
 
     @property
     def count(self) -> "Q":
@@ -359,40 +321,126 @@ class Q:
         Returns:
             _type_: _description_
         """
-        new_q_class = copy(self)
-        new_q_class.task = "count"
-        return new_q_class
+        return QFactory.create_entity(COUNT, self)
 
     @property
     def subject(self) -> "Q":
-
-        new_q_class = copy(self)
-        new_q_class.entity_type = "subject"
-        return new_q_class
+        return QFactory.create_entity(SUBJECT, self)
 
     @property
     def researchsubject(self) -> "Q":
-        new_q_class = copy(self)
-        new_q_class.entity_type = "researchsubject"
-        return new_q_class
+        return QFactory.create_entity(RESEARCH_SUBJECT, self)
 
     @property
     def specimen(self) -> "Q":
-        new_q_class = copy(self)
-        new_q_class.entity_type = "specimen"
-        return new_q_class
+        return QFactory.create_entity(SPECIMEN, self)
 
     @property
     def diagnosis(self) -> "Q":
-        new_q_class = copy(self)
-        new_q_class.entity_type = "diagnosis"
-        return new_q_class
+        return QFactory.create_entity(DIAGNOSIS, self)
 
     @property
     def treatment(self) -> "Q":
-        new_q_class = copy(self)
-        new_q_class.entity_type = "treatment"
-        return new_q_class
+        return QFactory.create_entity(TREATMENT, self)
+
+    def _call_endpoint(
+        self,
+        api_instance: QueryApi,
+        query: Query,
+        version: str,
+        dry_run: bool,
+        table: str,
+        async_req: bool,
+    ) -> Endpoint:
+        """_summary_
+            Call the endpoint to start the job for data collection.
+        Args:
+            api_instance (QueryApi): Api instance to use for the query
+            query (Query): Query object that has been compiled
+            version (str): Version to use for query
+            dry_run (bool): Specify whether this is a dry run
+            tabel (str): Table to perform the query on
+            async_req (bool): Async request
+
+        Returns:
+            (Union[QueryCreatedData, ApplyResult])
+        """
+        return api_instance.boolean_query(
+            query, version=version, dry_run=dry_run, table=table, async_req=async_req
+        )
+
+    def _build_result_object(
+        self,
+        api_response: QueryResponseData,
+        query_id: str,
+        offset: Optional[int],
+        limit: Optional[int],
+        api_instance: QueryApi,
+        show_sql: bool,
+        show_count: bool,
+        format_type: str = "json",
+    ) -> Result:
+        return Result(
+            api_response,
+            query_id,
+            offset,
+            limit,
+            api_instance,
+            show_sql,
+            show_count,
+            format_type,
+        )
+
+    def __get_query_result(
+        self,
+        api_instance: QueryApi,
+        query_id: str,
+        offset: Optional[int],
+        limit: Optional[int],
+        async_req: Optional[bool],
+        pre_stream: bool = True,
+        show_sql: bool = True,
+        show_count: bool = True,
+        format_type: str = "json",
+    ) -> Result:
+        """[summary]
+            This will call the next query and wait for the result then return a Result object to the user.
+        Args:
+            api_instance (QueryApi): [description]
+            query_id (str): [description]
+            offset (int): [description]
+            limit (int): [description]
+            async_req (bool): [description]
+            pre_stream (bool, optional): [description]. Defaults to True.
+
+        Returns:
+            Optional[Result]: [returns a class Result Object]
+        """
+        while True:
+            response = api_instance.query(
+                id=query_id,
+                offset=offset,
+                limit=limit,
+                async_req=async_req,
+                _preload_content=pre_stream,
+                _check_return_type=False,
+            )
+
+            if isinstance(response, ApplyResult):
+                response = response.get()
+
+            sleep(2.5)
+            if response.total_row_count is not None:
+                return self._build_result_object(
+                    response,
+                    query_id,
+                    offset,
+                    limit,
+                    api_instance,
+                    show_sql,
+                    show_count,
+                    format_type,
+                )
 
     @Measure()
     def run(
@@ -440,10 +488,8 @@ class Q:
         if filter is not None:
             self.query = Q.__select(self, fields=filter).query
 
-        self._get_func()
-
         if show_sql is None:
-            show_sql = self.task != "counts"
+            show_sql = False
 
         try:
             with cda_client_obj as api_client:
@@ -453,14 +499,14 @@ class Q:
                     print("Getting results from database", end="\n\n")
                 api_response: Union[
                     QueryCreatedData, ApplyResult
-                ] = self.api_service.call_endpoint(
+                ] = self._call_endpoint(
                     api_instance=api_instance,
                     query=self.query,
                     version=version,
                     dry_run=dry_run,
                     table=table,
                     async_req=async_call,
-                )
+                )  # type: ignore
                 if isinstance(api_response, ApplyResult):
                     if verbose:
                         print(WAITING_TEXT)
@@ -469,7 +515,7 @@ class Q:
                 if dry_run is True:
                     return api_response
 
-            return self.api_service.get_query_result(
+            return self.__get_query_result(
                 api_instance=api_instance,
                 query_id=api_response.query_id,  # type: ignore
                 offset=offset,
@@ -511,40 +557,40 @@ class Q:
         return None
 
     def AND(self, right: "Q") -> "Q":
-        return Q(self.query, "AND", right.query)
+        return self.__class__(self.query, "AND", right.query)
 
     def OR(self, right: "Q") -> "Q":
-        return Q(self.query, "OR", right.query)
+        return self.__class__(self.query, "OR", right.query)
 
     def FROM(self, right: "Q") -> "Q":
-        return Q(self.query, "SUBQUERY", right.query)
+        return self.__class__(self.query, "SUBQUERY", right.query)
 
-    def Not(self) -> "Q":
-        return Q(self.query, "NOT", None)
+    def NOT(self) -> "Q":
+        return self.__class__(self.query, "NOT", None)
 
     def _Not_EQ(self, right: "Q") -> "Q":
-        return Q(self.query, "!=", right.query)
+        return self.__class__(self.query, "!=", right.query)
 
     def _Greater_Than_EQ(self, right: "Q") -> "Q":
-        return Q(self.query, ">=", right.query)
+        return self.__class__(self.query, ">=", right.query)
 
     def _Greater_Than(self, right: "Q") -> "Q":
-        return Q(self.query, ">", right.query)
+        return self.__class__(self.query, ">", right.query)
 
     def _Less_Than_EQ(self, right: "Q") -> "Q":
-        return Q(self.query, "<=", right.query)
+        return self.__class__(self.query, "<=", right.query)
 
     def _Less_Than(self, right: "Q") -> "Q":
-        return Q(self.query, "<", right.query)
+        return self.__class__(self.query, "<", right.query)
 
-    def Select(self, fields: str) -> "Q":
+    def SELECT(self, fields: str) -> "Q":
         return self.__select(fields=fields)
 
     def __Order_By(self, fields: str) -> None:
         pass
 
-    def Is(self, fields: str) -> "Q":
-        return Q(self.query, "IS", fields)
+    def IS(self, fields: str) -> "Q":
+        return self.__class__(self.query, "IS", fields)
 
     def __select(self, fields: str) -> "Q":
         """[summary]
@@ -562,4 +608,4 @@ class Q:
         tmp = Query()
         tmp.node_type = "SELECTVALUES"
         tmp.value = fields
-        return Q(tmp, "SELECT", self.query)
+        return self.__class__(tmp, "SELECT", self.query)
