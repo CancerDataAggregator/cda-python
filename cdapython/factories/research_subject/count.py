@@ -28,7 +28,11 @@ class ResearchSubjectCount(ResearchSubject):
         async_req: bool,
     ) -> Endpoint:
         return api_instance.research_subject_counts_query(
-            query, version=version, dry_run=dry_run, table=table, async_req=async_req
+            query=query,
+            version=version,
+            dry_run=dry_run,
+            table=table,
+            async_req=async_req,
         )
 
     def _build_result_object(

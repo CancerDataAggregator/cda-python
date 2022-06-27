@@ -25,7 +25,11 @@ class Treatment(Entity):
         async_req: bool,
     ) -> Endpoint:
         return api_instance.treatments_query(
-            query, version=version, dry_run=dry_run, table=table, async_req=async_req
+            query=query,
+            version=version,
+            dry_run=dry_run,
+            table=table,
+            async_req=async_req,
         )
 
     class Factory(AbstractFactory):

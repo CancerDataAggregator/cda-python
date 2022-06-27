@@ -260,15 +260,20 @@ class Q:
         return None
 
     @staticmethod
-    def bigquery_status() -> Union[str, Any]:
+    def bigquery_status(host=None, verify=None) -> Union[str, Any]:
         """[summary]
         Uses the cda_client library's MetaClass to get status check on the cda
         BigQuery tablas
         Returns:
             str: status messages
         """
+        cda_client_obj = ApiClient(
+            configuration=builder_api_client(host=host, verify=verify)
+        )
         return str(
-            MetaApi().service_status()["systems"]["BigQueryStatus"]["messages"][0]
+            MetaApi(api_client=cda_client_obj).service_status()["systems"][
+                "BigQueryStatus"
+            ]["messages"][0]
         )
 
     @staticmethod
@@ -366,7 +371,11 @@ class Q:
             (Union[QueryCreatedData, ApplyResult])
         """
         return api_instance.boolean_query(
-            query, version=version, dry_run=dry_run, table=table, async_req=async_req
+            query=query,
+            version=version,
+            dry_run=dry_run,
+            table=table,
+            async_req=async_req,
         )
 
     def _build_result_object(
