@@ -40,3 +40,8 @@ typeReport
 .venv
 .ven3
 ven3
+.nox
+.pytype
+ven3
+.coverage
+.coverage.*
