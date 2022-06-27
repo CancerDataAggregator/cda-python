@@ -30,5 +30,5 @@ class Diagnosis(Entity):
 
     class Factory(AbstractFactory):
         @staticmethod
-        def create(q_object):
+        def create(q_object: "Q") -> "Diagnosis":
             return Diagnosis(q_object.query)

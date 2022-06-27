@@ -30,6 +30,6 @@ class Count(Entity):
 
     class Factory(AbstractFactory):
         @staticmethod
-        def create(q_object):
+        def create(q_object: "Q") -> "Count":
             subject = Count(q_object.query)
             return subject

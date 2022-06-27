@@ -34,5 +34,5 @@ class Subject(Entity):
 
     class Factory(AbstractFactory):
         @staticmethod
-        def create(q_object):
+        def create(q_object: "Q") -> "Subject":
             return Subject(q_object.query)

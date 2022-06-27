@@ -30,5 +30,5 @@ class Treatment(Entity):
 
     class Factory(AbstractFactory):
         @staticmethod
-        def create(q_object):
+        def create(q_object: "Q") -> "Treatment":
             return Treatment(q_object.query)

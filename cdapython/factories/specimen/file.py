@@ -34,5 +34,5 @@ class SpecimenFiles(Specimen):
 
     class Factory(AbstractFactory):
         @staticmethod
-        def create(q_object):
+        def create(q_object: "Q") -> "SpecimenFiles":
             return SpecimenFiles(q_object.query)

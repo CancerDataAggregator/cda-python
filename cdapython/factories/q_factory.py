@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any, Dict, Union
 
 if TYPE_CHECKING:
     from cdapython.Q import Q
@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 
 class AbstractFactory:
     @staticmethod
-    def create(q_object):
+    def create(q_object: "Q") -> Union[Any, "Q"]:
         raise NotImplementedError
 
 

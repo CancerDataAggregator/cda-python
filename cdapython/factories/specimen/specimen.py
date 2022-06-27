@@ -34,5 +34,5 @@ class Specimen(Entity):
 
     class Factory(AbstractFactory):
         @staticmethod
-        def create(q_object):
+        def create(q_object: "Q") -> "Specimen":
             return Specimen(q_object.query)

@@ -34,5 +34,5 @@ class SubjectFiles(Subject):
 
     class Factory(AbstractFactory):
         @staticmethod
-        def create(q_object):
+        def create(q_object: "Q") -> "SubjectFiles":
             return SubjectFiles(q_object.query)

@@ -34,5 +34,5 @@ class ResearchSubjectFiles(ResearchSubject):
 
     class Factory(AbstractFactory):
         @staticmethod
-        def create(q_object):
+        def create(q_object: "Q") -> "ResearchSubjectFiles":
             return ResearchSubjectFiles(q_object.query)

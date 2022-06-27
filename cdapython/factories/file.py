@@ -30,6 +30,6 @@ class File(Entity):
 
     class Factory(AbstractFactory):
         @staticmethod
-        def create(q_object):
+        def create(q_object: "Q") -> "File":
             subject = File(q_object.query)
             return subject

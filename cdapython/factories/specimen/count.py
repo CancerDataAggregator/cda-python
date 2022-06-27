@@ -55,5 +55,5 @@ class SpecimenCount(Specimen):
 
     class Factory(AbstractFactory):
         @staticmethod
-        def create(q_object):
+        def create(q_object: "Q") -> "SpecimenCount":
             return SpecimenCount(q_object.query)

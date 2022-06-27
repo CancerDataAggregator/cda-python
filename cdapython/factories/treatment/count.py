@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
 from cda_client.model.query import Query
@@ -7,6 +7,9 @@ from cdapython.factories.treatment.treatment import Treatment
 from cdapython.results.count_result import CountResult
 from cdapython.results.result import Result
 from cda_client.model.query_response_data import QueryResponseData
+
+if TYPE_CHECKING:
+    from cdapython.Q import Q
 
 
 class TreatmentCount(Treatment):
@@ -47,5 +50,5 @@ class TreatmentCount(Treatment):
 
     class Factory(AbstractFactory):
         @staticmethod
-        def create(q_object):
+        def create(q_object: "Q") -> "TreatmentCount":
             return TreatmentCount(q_object.query)

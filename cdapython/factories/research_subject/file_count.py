@@ -58,5 +58,5 @@ class ResearchSubjectFileCount(ResearchSubjectFiles):
 
     class Factory(AbstractFactory):
         @staticmethod
-        def create(q_object):
+        def create(q_object: "Q") -> "ResearchSubjectFileCount":
             return ResearchSubjectFileCount(q_object.query)
