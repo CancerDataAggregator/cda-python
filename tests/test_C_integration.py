@@ -1,5 +1,4 @@
-from cdapython import columns
-from cdapython import unique_terms
+from cdapython import columns, unique_terms
 
 
 def test_basic_integration():

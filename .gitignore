@@ -21,6 +21,7 @@ venv
 
 monkeytype.*
 
+dist
 #sonrqube scanner
 .scannerwork
 /notebooks/example-dev.ipynb
@@ -31,6 +32,14 @@ typeReport
 *.Q
 *.tsv
 *.csv
+.coverage.*
+.nox
+.pytype
+.mypy_cache
+.coverage
+.venv
+.ven3
+ven3
 .nox
 .pytype
 ven3

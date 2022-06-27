@@ -3,10 +3,9 @@ from tests.global_settings import host
 
 
 def test_call_api():
-    # sleep(1)
     q = Q('id = "TCGA-E2-A10A"')
     r = q.run(verify=False, host=host)
-    # assert isinstance(r.sql, str) is True
+    assert isinstance(r.sql, str) is True
     print(r)
 
 
