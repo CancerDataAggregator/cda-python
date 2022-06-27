@@ -1,5 +1,5 @@
 from cdapython import Q
-from tests.global_settings import host
+from tests.global_settings import host, localhost
 
 
 def test_in_parser_testing() -> None:

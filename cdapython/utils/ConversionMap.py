@@ -11,4 +11,6 @@ CONVERSIONMAP: Dict[str, str] = {
     "ResearchSubject.Diagnosis.tumor_grade": "ResearchSubject.Diagnosis.grade",
     "ResearchSubject.Diagnosis.Treatment.type": "ResearchSubject.Diagnosis.Treatment.treatment_type",
     "ResearchSubject.Diagnosis.Treatment.outcome": "ResearchSubject.Diagnosis.Treatment.treatment_outcome",
+    "ResearchSubject.Specimen.age_at_collection": "ResearchSubject.Specimen.days_to_collection",
+    "age_at_death": "days_to_death",
 }
