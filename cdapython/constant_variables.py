@@ -2,9 +2,9 @@
 VERSION: str = "2022.6.28"
 DATABASETABLE_VERSION: str = "all_Subjects_v3_0_final"
 CLIENT_VERSION: str = "3.0.0"
-DATABASETABLE: str = "broad-dsde-dev.cda_dev"
-CDA_API_URL_ENV: str = "https://cancerdata.dsde-dev.broadinstitute.org/"
-DATABASETABLE_FOR_FILES: str = "broad-dsde-dev.cda_dev"
+DATABASETABLE: str = "broad-dsde-prod.cda_prod"
+CDA_API_URL_ENV: str = "https://cancerdata.dsde-prod.broadinstitute.org/"
+DATABASETABLE_FOR_FILES: str = "broad-dsde-prod.cda_prod"
 DATABASETABLE_VERSION_FOR_FILES: str = "all_Files_v3_0_final"
 
 

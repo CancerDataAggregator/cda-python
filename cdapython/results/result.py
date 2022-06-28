@@ -7,7 +7,6 @@ from typing import (
     TYPE_CHECKING,
     Any,
     AsyncGenerator,
-    ChainMap,
     Dict,
     Iterator,
     List,
@@ -92,8 +91,6 @@ class Result:
 
         if result is NotImplemented:
             return NotImplemented
-        else:
-            return not result
 
     def __hash__(self) -> int:
         return hash(tuple(self.__result))
@@ -108,14 +105,31 @@ class Result:
 
     @property
     def sql(self) -> str:
+        """
+        Return the results sql back in a property
+
+        Returns:
+            str: sql query
+        """
         return str(self._api_response.query_sql)
 
     @property
     def count(self) -> int:
+        """
+        gets the count of the current list of results
+        Returns:
+            int
+        """
         return len(self.__result)
 
     @property
     def total_row_count(self) -> int:
+        """
+        get the total count for the query
+
+        Returns:
+            int
+        """
         return int(self._api_response.total_row_count)
 
     @property
@@ -141,10 +155,10 @@ class Result:
             return self._df
 
         if record_path is None:
-            return json_normalize(self.__iter__())
+            return json_normalize(iter(self))
 
         return json_normalize(
-            self.__iter__(),
+            iter(self),
             max_level=max_level,
             record_path=record_path,
             meta=meta,
@@ -211,7 +225,8 @@ class Result:
 
     def pretty_print(self, idx: Optional[int] = None) -> None:
         """_summary_
-        pretty_print will print out a json object if you pass a index then i will print the object at that index without the index
+        pretty_print will print out a json object if you pass a index then it will print \
+        the object at that index without the index
         it will automatically print alll results in the json object
         Args:
             idx (Optional[int], optional): _description_. Defaults to None.
@@ -245,7 +260,8 @@ class Result:
         pre_stream: bool = True,
     ) -> Optional["Result"]:
         """_summary_
-        The next_page function will call the server for the next page using this limit to determine the next level of page results
+        The next_page function will call the server for the next page using this \
+        limit to determine the next level of page results
         Args:
             limit (Optional[int], optional): _description_. Defaults to None.
             async_req (bool, optional): _description_. Defaults to False.
@@ -308,7 +324,8 @@ def get_query_result(
     format_type: str = "json",
 ) -> Optional[Result]:
     """[summary]
-        This will call the next query and wait for the result then return a Result object to the user.
+        This will call the next query and wait for the result \
+        then return a Result object to the user.
     Args:
         api_instance (QueryApi): [description]
         query_id (str): [description]
