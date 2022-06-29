@@ -37,7 +37,7 @@ setup(
         "CancerDataAggregator python",
     ],
     include_package_data=True,
-    package_data={"cdapython": ["py.typed"], "": [".env"]},
+    package_data={"cdapython": ["py.typed"], "": [".env", "cdapython/config.ini"]},
     package_dir={"cdapython": "cdapython"},
     version=VERSION,
     py_modules=["cdapython"],
