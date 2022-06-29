@@ -170,15 +170,6 @@ class Q:
         return const.VERSION
 
     @staticmethod
-    def setDev(check: bool = False) -> None:
-        if check is True:
-            const.table_version = "all_Subjects_v3_0_final"
-            const.default_table = "broad-dsde-dev.cda_dev"
-            const.CDA_API_URL = "https://cancerdata.dsde-dev.broadinstitute.org/"
-            const.default_file_table = "broad-dsde-prod.cda_dev"
-            const.DATABASETABLE_VERSION_FOR_FILES = "all_Files_v3_0_final"
-
-    @staticmethod
     def set_host_url(url: str) -> None:
         const.CDA_API_URL = url
 
