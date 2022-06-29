@@ -3,7 +3,7 @@
 import configparser
 
 config = configparser.RawConfigParser()
-config.read("cdapython/config.ini")
+config.read("config.ini")
 (
     databasetable_version,
     databasetable,

@@ -3,6 +3,30 @@ from pathlib import Path
 
 from setuptools import find_packages, setup
 
+import configparser
+
+# CREATE OBJECT
+config_file = configparser.ConfigParser()
+
+config_file.add_section("CDA_URLS_PROD")
+config_file.set("CDA_URLS_PROD", "DATABASETABLE_VERSION", "all_Subjects_v3_0_final")
+config_file.set("CDA_URLS_PROD", "DATABASETABLE", "broad-dsde-prod.cda_prod")
+config_file.set(
+    "CDA_URLS_PROD",
+    "CDA_API_URL_ENV",
+    "https://cancerdata.dsde-prod.broadinstitute.org/",
+)
+config_file.set("CDA_URLS_PROD", "DATABASETABLE_FOR_FILES", "broad-dsde-prod.cda_prod")
+config_file.set(
+    "CDA_URLS_PROD", "DATABASETABLE_VERSION_FOR_FILES", "all_Files_v3_0_final"
+)
+
+
+with open(r"config.ini", "w") as config_file_obj:
+    config_file.write(config_file_obj)
+    config_file_obj.flush()
+    config_file_obj.close()
+
 
 def get_version(filepath: str):
     version = None
@@ -36,9 +60,8 @@ setup(
         "CancerDataAggregator",
         "CancerDataAggregator python",
     ],
+    package_data={"": ["config.ini"]},
     include_package_data=True,
-    package_data={"cdapython": ["py.typed", "cdapython/config.ini"], "": [".env"]},
-    package_dir={"cdapython": "cdapython"},
     version=VERSION,
     py_modules=["cdapython"],
     platforms=["POSIX", "MacOS", "Windows"],
