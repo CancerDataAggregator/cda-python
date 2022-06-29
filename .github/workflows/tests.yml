@@ -32,7 +32,7 @@ jobs:
 
       - name: Unit tests
         run: |
-          ls
+          ls cdapython
           pip install pytest
           cd tests
           py.test
