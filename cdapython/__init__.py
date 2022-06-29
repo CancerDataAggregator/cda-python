@@ -3,7 +3,7 @@ cdapython is a library used to interact with the machine generated CDA Python Cl
 """
 
 from cdapython._get_unnest_clause import _get_unnest_clause
-from cdapython.constant_variables import VERSION
+from cdapython.constant_variables import Constants
 from cdapython.Q import Q
 from cdapython.factories.count import Count
 
@@ -11,7 +11,7 @@ from cdapython.factories.count import Count
 from cdapython.utils.utility import columns, query, unique_terms
 
 __name__ = "cdapython"
-__version__ = VERSION
+__version__ = Constants._VERSION
 __about__ = f"Q {__version__}"
 
 

@@ -32,9 +32,7 @@ from rich.progress import Progress
 from urllib3.connection import NewConnectionError  # type: ignore
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, SSLError
-
-import cdapython.constant_variables as const
-from cdapython.constant_variables import default_table, table_version
+from cdapython.constant_variables import Constants
 from cdapython.decorators.measure import Measure
 from cdapython.error_logger import unverified_http
 from cdapython.functions import find_ssl_path
@@ -46,13 +44,16 @@ logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 
 # constants
 WAITING_TEXT = "Waiting for results"
-if isinstance(const.default_file_table, str) and const.default_file_table is not None:
-    DEFAULT_TABLE_FILE: Optional[str] = const.default_file_table.split(".")[1]
+if (
+    isinstance(Constants.default_file_table, str)
+    and Constants.default_file_table is not None
+):
+    DEFAULT_TABLE_FILE: Optional[str] = Constants.default_file_table.split(".")[1]
 
 
 def builder_api_client(host: Optional[str], verify: Optional[bool]) -> Configuration:
     if host is None:
-        host = const.CDA_API_URL
+        host = Constants.CDA_API_URL
 
     tmp_configuration: Configuration = Configuration(host=host)
 
@@ -167,38 +168,38 @@ class Q:
     # region staticmethods
     @staticmethod
     def get_version() -> str:
-        return const.VERSION
+        return Constants.VERSION
 
     @staticmethod
     def set_host_url(url: str) -> None:
-        const.CDA_API_URL = url
+        Constants.CDA_API_URL = url
 
     @staticmethod
     def get_host_url() -> str:
-        return const.CDA_API_URL
+        return Constants.CDA_API_URL
 
     @staticmethod
     def set_default_project_dataset(table: str) -> None:
-        const.default_table = table
+        Constants.default_table = table
 
     @staticmethod
     def get_default_project_dataset() -> str:
-        return const.default_table
+        return Constants.default_table
 
     @staticmethod
     def set_table_version(table_version: str) -> None:
-        const.table_version = table_version
+        Constants.table_version = table_version
 
     @staticmethod
     def get_table_version() -> str:
-        return const.table_version
+        return Constants.table_version
 
     @staticmethod
     def bulk_download(
-        version: Optional[str] = table_version,
+        version: Optional[str] = Constants.table_version,
         host: Optional[str] = None,
         dry_run: bool = False,
-        table: Optional[str] = default_table,
+        table: Optional[str] = Constants.default_table,
         async_call: bool = False,
         verify: Optional[bool] = None,
         offset: int = 0,

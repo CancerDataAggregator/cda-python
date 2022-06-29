@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+from re import I
 from typing import TYPE_CHECKING, Optional
 
 import cda_client
@@ -10,8 +11,7 @@ from cda_client.exceptions import ServiceException
 from rich import print
 from urllib3.exceptions import InsecureRequestWarning
 
-import cdapython.constant_variables as const
-from cdapython.constant_variables import table_version
+from cdapython.constant_variables import Constants
 from cdapython.decorators.cache import lru_cache_timed
 from cdapython.error_logger import unverified_http
 from cdapython.functions import backwards_comp, find_ssl_path
@@ -27,15 +27,18 @@ if TYPE_CHECKING:
     from cdapython.results.string_result import StringResult
 
 # Creating constant
-if isinstance(const.default_table, str) and const.default_table is not None:
-    DEFAULT_TABLE: Optional[str] = const.default_table
+if isinstance(Constants.default_table, str) and Constants.default_table is not None:
+    DEFAULT_TABLE: Optional[str] = Constants.default_table
 
-if isinstance(const.default_file_table, str) and const.default_file_table is not None:
-    DEFAULT_TABLE_FILE: Optional[str] = const.default_file_table.split(".")[1]
+if (
+    isinstance(Constants.default_file_table, str)
+    and Constants.default_file_table is not None
+):
+    DEFAULT_TABLE_FILE: Optional[str] = Constants.default_file_table.split(".")[1]
 
 
-if isinstance(const.CDA_API_URL, str):
-    URL_TABLE: str = const.CDA_API_URL
+if isinstance(Constants.CDA_API_URL, str):
+    URL_TABLE: str = Constants.CDA_API_URL
 
 
 def http_error_logger(http_error: ServiceException) -> None:
@@ -97,7 +100,7 @@ def unique_terms(
     table: Optional[str] = None,
     verify: Optional[bool] = None,
     async_req: Optional[bool] = None,
-    version: Optional[str] = table_version,
+    version: Optional[str] = Constants.table_version,
     files: Optional[bool] = False,
     show_sql: bool = False,
 ) -> Optional["StringResult"]:
@@ -118,7 +121,7 @@ def unique_terms(
     """
 
     if host is None:
-        host = const.CDA_API_URL
+        host = Constants.CDA_API_URL
 
     tmp_configuration: cda_client.Configuration = cda_client.Configuration(host=host)
 
@@ -129,7 +132,7 @@ def unique_terms(
         unverified_http()
         tmp_configuration.verify_ssl = False
 
-    if table is None and isinstance(const.default_table, str):
+    if table is None and isinstance(Constants.default_table, str):
         table = DEFAULT_TABLE
 
     if async_req is None:
@@ -172,7 +175,7 @@ def unique_terms(
 
 @lru_cache_timed(seconds=60)
 def columns(
-    version: Optional[str] = table_version,
+    version: Optional[str] = Constants.table_version,
     host: Optional[str] = None,
     offset: int = 0,
     limit: int = 100,
@@ -201,7 +204,7 @@ def columns(
 
     # Execute query
     if host is None:
-        host = const.CDA_API_URL
+        host = Constants.CDA_API_URL
 
     tmp_configuration: cda_client.Configuration = cda_client.Configuration(host=host)
 
@@ -211,8 +214,8 @@ def columns(
     if verify is False:
         unverified_http()
         tmp_configuration.verify_ssl = False
-    if table is None and isinstance(const.default_table, str):
-        table = DEFAULT_TABLE
+    if table is None and isinstance(Constants.default_table, str):
+        table = Constants.default_table
 
     if async_req is None:
         async_req = False
