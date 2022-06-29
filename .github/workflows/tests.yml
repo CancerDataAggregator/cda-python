@@ -32,6 +32,7 @@ jobs:
 
       - name: Unit tests
         run: |
+          ls
           pip install pytest
           cd tests
           py.test
