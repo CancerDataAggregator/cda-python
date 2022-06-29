@@ -1,9 +1,9 @@
 from cdapython import Q
 from pandas import DataFrame, concat
-from tests.global_settings import host
+from tests.global_settings import host, table
 
 q = Q('identifier.value = "TCGA-E2-A10A"')
-files_of_interest = q.file.run(host=host)
+files_of_interest = q.file.run(host=host, table=table)
 
 
 def iter_pages(result):

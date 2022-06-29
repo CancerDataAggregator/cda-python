@@ -1,9 +1,9 @@
 from pandas import DataFrame, concat
 
 from cdapython import Q
-from tests.global_settings import host, localhost
+from tests.global_settings import host, localhost,table
 
-q = Q('ResearchSubject.primary_disease_type LIKE "Lung%"').run(host=host).to_dataframe()
+q = Q('ResearchSubject.primary_disease_type LIKE "Lung%"').run(host=host,table=table).to_dataframe()
 
 print(q)
 # box = []

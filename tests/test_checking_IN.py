@@ -1,5 +1,5 @@
 from cdapython import Q
-from tests.global_settings import host
+from tests.global_settings import host, table
 
 
 def checking_test():
@@ -8,7 +8,7 @@ def checking_test():
     ).AND(Q('sex = "male"'))
     print(q1)
     assert q1.query.to_dict()["l"]["node_type"] == "IN"
-    r = q1.run(host=host)
+    r = q1.run(host=host, table=table)
     print(r)
 
 
