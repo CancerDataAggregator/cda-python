@@ -1,8 +1,9 @@
 from cdapython import columns, unique_terms
+from tests.global_settings import host, table
 
 
 def test_basic_integration():
-    cols = columns()
+    cols = columns(host=host, table=table)
     assert "race" in cols
 
 
