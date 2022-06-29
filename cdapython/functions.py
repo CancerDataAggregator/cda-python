@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Optional, Tuple, Union, overload
 from cda_client.model.query import Query
 from typing_extensions import Literal
 
-from cdapython.dataclasses.querystr import QueryStr
+from cdapython.dataclasses_Q.querystr import QueryStr
 from cdapython.utils.ConversionMap import CONVERSIONMAP
 
 if TYPE_CHECKING:
