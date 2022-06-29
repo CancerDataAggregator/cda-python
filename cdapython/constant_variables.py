@@ -1,11 +1,24 @@
 # Versioning Year Month Day of last push
+
+import configparser
+
+config = configparser.RawConfigParser()
+config.read("cdapython/config.ini")
+(
+    databasetable_version,
+    databasetable,
+    cda_api_url_env,
+    databasetable_for_files,
+    databasetable_version_for_files,
+) = dict(config.items("CDA_URLS_PROD")).values()
+
 VERSION: str = "2022.6.28"
-DATABASETABLE_VERSION: str = "all_Subjects_v3_0_final"
+DATABASETABLE_VERSION: str = databasetable_version
 CLIENT_VERSION: str = "3.0.0"
-DATABASETABLE: str = "broad-dsde-prod.cda_prod"
-CDA_API_URL_ENV: str = "https://cancerdata.dsde-prod.broadinstitute.org/"
-DATABASETABLE_FOR_FILES: str = "broad-dsde-prod.cda_prod"
-DATABASETABLE_VERSION_FOR_FILES: str = "all_Files_v3_0_final"
+DATABASETABLE: str = databasetable
+CDA_API_URL_ENV: str = cda_api_url_env
+DATABASETABLE_FOR_FILES: str = databasetable_for_files
+DATABASETABLE_VERSION_FOR_FILES: str = databasetable_version_for_files
 
 
 __version__: str = VERSION

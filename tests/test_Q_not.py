@@ -25,7 +25,8 @@ from tests.global_settings import host
 #     ).to_json()
 # )
 #         0   10  4     40    10  4     0
-# print(Q('sex = "male" and sex = "female" AND NOT sex = "unknown"').to_json())
+a = Q('sex = "male" AND sex = "female" AND NOT sex = "unknown"').run()
+print(a)
 
 # print(Q('sex = "male" or sex = "female" AND NOT sex = "unknown"').to_json())
 
