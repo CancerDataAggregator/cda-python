@@ -72,10 +72,10 @@ def check_version_and_table(
 ) -> Tuple[str, str]:
 
     if version is None:
-        version = const.table_version
+        version = Constants.table_version
 
     if table is None:
-        table = const.default_file_table
+        table = Constants.default_file_table
     return (version, table)
 
 
