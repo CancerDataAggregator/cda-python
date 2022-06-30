@@ -132,13 +132,14 @@ def unique_terms(
         unverified_http()
         tmp_configuration.verify_ssl = False
 
-    if table is None and isinstance(Constants.default_table, str):
-        table = DEFAULT_TABLE
+    if table is None:
+        table = Constants.default_table
 
     if async_req is None:
         async_req = False
     col_name = backwards_comp(col_name)
     version = table_white_list(table, version)
+
     cda_client_obj = cda_client.ApiClient(configuration=tmp_configuration)
     try:
         with cda_client_obj as api_client:
@@ -175,7 +176,7 @@ def unique_terms(
 
 @lru_cache_timed(seconds=60)
 def columns(
-    version: Optional[str] = Constants.table_version,
+    version: Optional[str] = None,
     host: Optional[str] = None,
     offset: int = 0,
     limit: int = 100,
@@ -205,7 +206,8 @@ def columns(
     # Execute query
     if host is None:
         host = Constants.CDA_API_URL
-
+    if version is None:
+        version = Constants.table_version
     tmp_configuration: cda_client.Configuration = cda_client.Configuration(host=host)
 
     if verify is None:
@@ -214,7 +216,7 @@ def columns(
     if verify is False:
         unverified_http()
         tmp_configuration.verify_ssl = False
-    if table is None and isinstance(Constants.default_table, str):
+    if table is None:
         table = Constants.default_table
 
     if async_req is None:
