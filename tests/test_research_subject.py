@@ -1,9 +1,12 @@
 from cdapython import Q
-from tests.global_settings import host
+from tests.global_settings import host, table
 
 
 def testing():
-    q = Q('id = "TCGA-E2-A10A"')
+    try:
+        q = Q('id = "TCGA-E2-A10A"')
 
-    r = q.researchsubject.run(host=host)
-    print(r.pretty_print())
+        r = q.researchsubject.run(host=host, table=table)
+        print(r.pretty_print())
+    except Exception as e:
+        print(e)

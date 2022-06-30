@@ -44,11 +44,6 @@ logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 
 # constants
 WAITING_TEXT = "Waiting for results"
-if (
-    isinstance(Constants.default_file_table, str)
-    and Constants.default_file_table is not None
-):
-    DEFAULT_TABLE_FILE: Optional[str] = Constants.default_file_table.split(".")[1]
 
 
 def builder_api_client(host: Optional[str], verify: Optional[bool]) -> Configuration:
@@ -75,7 +70,7 @@ def check_version_and_table(
         version = Constants.table_version
 
     if table is None:
-        table = Constants.default_file_table
+        table = Constants.default_table
     return (version, table)
 
 

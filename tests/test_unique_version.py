@@ -1,4 +1,4 @@
 from cdapython import unique_terms
-from tests.global_settings import host
+from tests.global_settings import host,table
 
-print(unique_terms("vital_status", version="all_v2_1", host=host))
+print(unique_terms("vital_status", host=host,table=table))

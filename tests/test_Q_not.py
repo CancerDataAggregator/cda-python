@@ -1,5 +1,5 @@
 from cdapython import Q
-from tests.global_settings import host
+from tests.global_settings import host, table
 
 
 # def test_not() -> None:
@@ -25,7 +25,9 @@ from tests.global_settings import host
 #     ).to_json()
 # )
 #         0   10  4     40    10  4     0
-a = Q('sex = "male" AND sex = "female" AND NOT sex = "unknown"').run()
+a = Q('sex = "male" AND sex = "female" AND NOT sex = "unknown"').run(
+    host=host, table=table
+)
 print(a)
 
 # print(Q('sex = "male" or sex = "female" AND NOT sex = "unknown"').to_json())
