@@ -212,18 +212,21 @@ result = q1.run()
 
 The following comparsion operators can be used with the `Q` command:
 
-| operator | Description                                        | Q.sql required? |
-| -------- | -------------------------------------------------- | --------------- |
-| =        | condition equals                                   | no              |
-| !=, <>   | condition is not equal                             | no              |
-| <        | condition is less than                             | no              |
-| >        | condition is greater than                          | no              |
-| <=       | condition is less than or equal to                 | no              |
-| >=       | condition is less than or equal to                 | no              |
-| like     | similar to = but always wildcards ('%', '\_', etc) | no              |
-| in       | compares to a set                                  | no              |
-| not      | condition is not true                              | no              |
-| is       | 
+| operator | Description                                        
+| -------- | --------------------------------------------------  
+| =        | condition equals                                   
+| !=, <>   | condition is not equal                                          
+| <        | condition is less than                             
+| >        | condition is greater than                          
+| <=       | condition is less than or equal to                 
+| >=       | condition is less than or equal to                 
+| like     | value matches pattern (i.e wildcards %,\_,)  
+| not like | value does not match pattern (i.e wildcards %,\_,) 
+| in       | value is in the set of values specified
+| not in   | value is not in the set of values specified                                
+| is not   | value is not NULL, TRUE, FALSE                             
+| is       | value is NULL, TRUE, FALSE 
+| not      | allows you to select rows that do not match a certain condition.
 
 additionally, more complex SQL can be used with the `Q.sql` command.
 
