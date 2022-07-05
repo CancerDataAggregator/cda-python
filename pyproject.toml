@@ -57,6 +57,3 @@ targets = ["cdapython"]
 exclude = ["venv", "ven3", "tests"]
 skips = ["B101", "B601"]
 
-
-[project.entry-points]
-cdapython = "cdapython:__main__.py"
