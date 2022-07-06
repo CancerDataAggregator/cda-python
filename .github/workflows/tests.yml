@@ -32,7 +32,6 @@ jobs:
 
       - name: Unit tests
         run: |
-          ls cdapython
           pip install pytest
           cd tests
           py.test
