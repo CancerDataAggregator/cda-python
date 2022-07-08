@@ -1,10 +1,12 @@
 from cdapython import Q
-from time import sleep
+from tests.global_settings import host, table
 
 
 def test_call_api():
-    # sleep(1)
     q = Q('id = "TCGA-E2-A10A"')
-    r = q.run(verify=False)
-    print(r)
+    r = q.run(verify=False, host=host, table=table)
     assert isinstance(r.sql, str) is True
+    print(r)
+
+
+test_call_api()

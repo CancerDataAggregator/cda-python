@@ -10,5 +10,4 @@ services:
       - '${NOTEBOOK_PORT}:8888'
     volumes:
       - ./notebooks:/home/joyvan/work
-    command: bash -c "python -m pip cache purge"
-    command: bash -c "pip install --no-cache-dir  git+https://github.com/CancerDataAggregator/cda-python.git@${GIT_TAG_VERSION} && pip install --no-cache-dir git+https://github.com/CancerDataAggregator/cda-service-python-client.git && /usr/local/bin/start.sh jupyter notebook --NotebookApp.token=''"
+    command: bash -c "python -m pip cache purge" && bash -c "pip install git+https://github.com/CancerDataAggregator/cda-python.git@${GIT_TAG_VERSION_CDA_PYTHON} && pip install --no-cache-dir git+https://github.com/CancerDataAggregator/cda-service-python-client.git@${GIT_TAG_VERSION_CDA_CLIENT} && /usr/local/bin/start.sh jupyter notebook --NotebookApp.token=''"

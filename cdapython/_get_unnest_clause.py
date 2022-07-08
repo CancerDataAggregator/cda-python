@@ -6,7 +6,11 @@
 
 # A.B.C.D.column ->
 # SELECT DISTINCT(_D.column) FROM TABLE, UNNEST(A) AS _A, UNNEST(_A.B) AS _B, UNNEST(_B.C) AS _C, UNNEST(_C.D) AS _D
-def _get_unnest_clause(col_name):
+
+from typing import List, Tuple, Union
+
+
+def _get_unnest_clause(col_name: str) -> Tuple[str, List[str]]:
     _new_col, _unnest = col_name, []
     c = col_name.split(".")
     if len(c) > 1:

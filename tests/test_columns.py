@@ -1,7 +1,7 @@
-from cdapython import columns, Q
+from cdapython import Q, columns
+from tests.global_settings import host, table
 
 
 def test_columns():
-    Q.set_host_url("http://34.71.0.127:8080")
-    cols = columns()
+    cols = columns(host=host, table=table).to_list()
     assert isinstance(cols, list) is True
