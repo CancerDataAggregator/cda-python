@@ -9,14 +9,14 @@ def get_version(filepath: str):
     version_client = None
     with open(filepath, "r") as f:
         for i in f.readlines():
-            if i.startswith("VERSION:"):
+            if i.startswith("version = "):
                 version = str(i.split("=")[1].strip().replace('"', ""))
             if i.startswith("CLIENT_VERSION"):
                 version_client = str(i.split("=")[1].strip().replace('"', ""))
     return (version, version_client)
 
 
-__version__, version_client = get_version("cdapython/constant_variables.py")
+__version__, version_client = get_version("pyproject.toml")
 print(__version__)
 
 current_path = Path(__file__).parent
