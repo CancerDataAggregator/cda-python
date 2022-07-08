@@ -7,5 +7,5 @@ table_prod = Constants.default_table
 integration_host = "http://35.192.60.10:8080/"
 dev_host = "https://cancerdata.dsde-dev.broadinstitute.org/"
 
-host = production_host
-table = table_prod
+host = dev_host
+table = table_dev
