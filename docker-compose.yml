@@ -13,6 +13,6 @@ services:
 
     command: >
       sh -c "
-      pip install git+https://github.com/CancerDataAggregator/cda-python.git@${GIT_TAG_VERSION_CDA_PYTHON}
+      pip install git+https://github.com/CancerDataAggregator/cda-python.git@${GIT_TAG_VERSION_CDA_PYTHON} --no-cache-dir
       && /usr/local/bin/start.sh jupyter notebook --NotebookApp.token=''
       "
