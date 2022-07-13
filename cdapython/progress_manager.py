@@ -15,17 +15,17 @@ T = TypeVar("T", bound="Paginator")
 
 
 class ProgressManager:
-    def __init__(self: TProgressManager, other: "Result", cls: T) -> None:
-        self.count = other._limit
-        self.total = other.total_row_count
+    def __init__(self: TProgressManager, cls) -> None:
+        self.count = cls.result._limit
+        self.total = cls.result.total_row_count
         self.cls = cls
-        self.__call__()
+        _, self.task = self.__call__()
 
     def __iter__(self: TProgressManager) -> Any:
         return self.cls
 
     def __call__(self: TProgressManager) -> Any:
-        with Progress() as progress:
-            task = progress.add_task("Processing", total=self.total)
-            progress.update(task, advance=self.count)
-            return self.cls
+        
+
+    def return_cls(self) -> Any:
+        return (self.cls, self.task)

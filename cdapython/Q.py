@@ -40,8 +40,6 @@ from cdapython.results.result import Result, get_query_result
 from cdapython.simple_parser import simple_parser
 
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
-
-
 # constants
 WAITING_TEXT = "Waiting for results"
 
