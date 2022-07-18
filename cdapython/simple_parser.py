@@ -1,5 +1,6 @@
 import re
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Optional
+from typing_extensions import Literal
 
 from cda_client.model.query import Query
 
@@ -223,7 +224,7 @@ class CommaType(Token):
 
         return query
 
-    def nud(self, context) -> Query:
+    def nud(self, context: Parser) -> Query:
         query = Query()
         query.value = self.text
 
@@ -377,7 +378,7 @@ class LeftParen(Token):
 
     match = RightParen
 
-    def nud(self, context: Parser):
+    def nud(self, context: Parser) -> Any:
         # Fetch the next expression
 
         expr = context.expression()
@@ -389,7 +390,7 @@ class LeftParen(Token):
             expr.value = f"({expr.value})"
         return expr
 
-    def __repr__(self):  # pragma: no cover
+    def __repr__(self) -> Literal["<(>"]:  # pragma: no cover
         return "<(>"
 
 

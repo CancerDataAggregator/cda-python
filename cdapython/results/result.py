@@ -66,7 +66,6 @@ class Result:
         self, show_value: Optional[bool], show_count: Optional[bool]
     ) -> str:
         return f"""
-            QueryID: {self._query_id}
             {"Query:"+self.sql if show_value is True else ""  }
             Offset: {self._offset}
             Count: {self.count}
@@ -179,8 +178,10 @@ class Result:
 
     def paginator(
         self,
+        output: str = "",
         to_df: bool = False,
         to_list: bool = False,
+        limit: int = None,
     ) -> Paginator:
         """_summary_
         paginator this will automatically page over results
@@ -190,10 +191,15 @@ class Result:
         Returns:
             _type_: _description_
         """
+        if limit is None:
+            if isinstance(self._limit, int):
+                limit = self._limit
         return Paginator(
             self,
             to_df=to_df,
             to_list=to_list,
+            limit=limit,
+            output=output,
             format_type=self.format_type,
         )
 

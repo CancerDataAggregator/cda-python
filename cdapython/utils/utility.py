@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import logging
-from re import I
 from typing import TYPE_CHECKING, Optional
 
 import cda_client

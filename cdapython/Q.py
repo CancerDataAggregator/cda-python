@@ -28,7 +28,6 @@ from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
 from cda_client.model.query_response_data import QueryResponseData
 from rich import print
-from rich.progress import Progress
 from urllib3.connection import NewConnectionError  # type: ignore
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, SSLError
@@ -148,13 +147,19 @@ class Q:
         return str(self.__class__) + ": \n" + str(self.__dict__)
 
     # region helper methods
-    def to_json(self, indent: int = 4) -> str:
+    def to_json(
+        self, indent: int = 4, write_file: bool = False, file_name: str = "Q_json_dump"
+    ) -> str:
         """Created for the creating boolean-query for testing
 
         Returns:
             str: returns a json str to the user
         """
-        return dumps(self, indent=indent, cls=_QEncoder)
+        tmp_json = dumps(self, indent=indent, cls=_QEncoder)
+        if write_file:
+            with open(f"{file_name}.json", "w") as f:
+                f.write(tmp_json)
+        return tmp_json
 
     # endregion
 
@@ -244,18 +249,17 @@ class Q:
                 return None
 
             df = pd.DataFrame()
-            with Progress() as progress:
-                download_task = progress.add_task("Download", total=r.total_row_count)
-                for i in r.paginator(to_df=True):
-                    df = pd.concat([df, i])
-                    progress.update(download_task, advance=len(i))
+            for i in r.paginator(to_df=True):
+                df = pd.concat([df, i])
             return df
         except Exception as e:
             print(e)
         return None
 
     @staticmethod
-    def bigquery_status(host=None, verify=None) -> Union[str, Any]:
+    def bigquery_status(
+        host: Optional[str] = None, verify: Optional[str] = None
+    ) -> Union[str, Any]:
         """[summary]
         Uses the cda_client library's MetaClass to get status check on the cda
         BigQuery tablas

@@ -37,7 +37,7 @@ setup(
         "CancerDataAggregator python",
     ],
     include_package_data=True,
-    package_data={"cdapython": ["py.typed"], "": [".env", "cdapython/config.ini"]},
+    package_data={"cdapython": ["py.typed"], "": [".env", ""]},
     package_dir={"cdapython": "cdapython"},
     version=VERSION,
     py_modules=["cdapython"],
@@ -46,7 +46,7 @@ setup(
     url="https://github.com/CancerDataAggregator/cdapython",
     install_requires=[
         "tdparser>=1.1.6",
-        "numpy>=1.21.5",
+        "numpy>=1.22.0",
         "wheel>=0.36.2",
         "urllib3>=1.26.8",
         "rich>=12.0.1",
