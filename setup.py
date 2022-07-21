@@ -46,7 +46,7 @@ setup(
     url="https://github.com/CancerDataAggregator/cdapython",
     install_requires=[
         "tdparser>=1.1.6",
-        "numpy>=1.22.0",
+        "numpy>=1.21.6",
         "wheel>=0.36.2",
         "urllib3>=1.26.8",
         "rich>=12.0.1",
@@ -62,6 +62,6 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     entry_points={
-        "console_scripts": ["cdapython = cdapython:_script_main"],
+        "console_scripts": ["cdapython = cdapython:main"],
     },
 )
