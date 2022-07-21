@@ -47,4 +47,4 @@ cli.add_command(run)
 cli.add_command(ls_column)
 
 if __name__ == "__main__":
-    cli()
+    cli.main()

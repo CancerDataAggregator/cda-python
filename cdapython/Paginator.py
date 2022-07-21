@@ -3,7 +3,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, TypeVar, Union
 
 
-from rich.progress import Progress, MofNCompleteColumn, TimeElapsedColumn
+from rich.progress import( 
+    Progress, 
+    MofNCompleteColumn, 
+    TimeElapsedColumn,
+    TextColumn,
+    BarColumn,
+    TaskProgressColumn
+)
 
 from cdapython.utils.none_check import none_check
 
@@ -35,8 +42,13 @@ class Paginator:
         self.format_type = format_type
         self.output = output
         self.progress = Progress(
-            *Progress.get_default_columns(), TimeElapsedColumn(), MofNCompleteColumn()
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TimeElapsedColumn(),
+            MofNCompleteColumn()
         )
+
         self.task = self.progress.add_task(
             "Processing", total=self.result.total_row_count
         )
@@ -101,5 +113,12 @@ class Paginator:
 
             return self._do_next()
         except Exception as e:
+            self.progress.console.clear_live()
             self.progress.stop()
+            (self.progress.remove_task(i.id) for i in self.progress.tasks)
+            raise e
+        except KeyboardInterrupt as e:
+            self.progress.console.clear_live()
+            self.progress.stop()
+            (self.progress.remove_task(i.id) for i in self.progress.tasks)
             raise e
