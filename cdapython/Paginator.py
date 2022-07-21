@@ -3,13 +3,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, TypeVar, Union
 
 
-from rich.progress import( 
-    Progress, 
-    MofNCompleteColumn, 
+from rich.progress import (
+    Progress,
+    MofNCompleteColumn,
     TimeElapsedColumn,
     TextColumn,
     BarColumn,
-    TaskProgressColumn
+    TaskProgressColumn,
 )
 
 from cdapython.utils.none_check import none_check
@@ -46,7 +46,7 @@ class Paginator:
             BarColumn(),
             TaskProgressColumn(),
             TimeElapsedColumn(),
-            MofNCompleteColumn()
+            MofNCompleteColumn(),
         )
 
         self.task = self.progress.add_task(
