@@ -218,7 +218,7 @@ class Result:
                 state.concat_df(i)
             if to_list or output == "full_list":
                 state.concat_list(i)
-        if to_df:
+        if to_df or output == "full_df":
             return state.get_df()
         else:
             return state.get_list()
