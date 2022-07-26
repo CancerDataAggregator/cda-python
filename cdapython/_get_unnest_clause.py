@@ -7,7 +7,7 @@
 # A.B.C.D.column ->
 # SELECT DISTINCT(_D.column) FROM TABLE, UNNEST(A) AS _A, UNNEST(_A.B) AS _B, UNNEST(_B.C) AS _C, UNNEST(_C.D) AS _D
 
-from typing import List, Tuple, Union
+from typing import List, Tuple
 
 
 def _get_unnest_clause(col_name: str) -> Tuple[str, List[str]]:

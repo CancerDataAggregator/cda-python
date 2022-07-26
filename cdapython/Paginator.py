@@ -72,7 +72,7 @@ class Paginator:
                 self.progress.update(self.task, advance=self.result.count)
                 return result_nx
             except Exception as e:
-                self.progress.stop_task()
+                (self.progress.remove_task(i.id) for i in self.progress.tasks)
                 self.progress.stop()
                 raise e
         else:

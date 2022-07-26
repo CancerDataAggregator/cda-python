@@ -2,9 +2,9 @@ import json
 from collections import ChainMap
 from io import StringIO
 from multiprocessing.pool import ApplyResult
+
 from time import sleep
 from typing import (
-    TYPE_CHECKING,
     Any,
     AsyncGenerator,
     Dict,
@@ -13,7 +13,7 @@ from typing import (
     Optional,
     Union,
 )
-
+import pandas as pd
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
 from pandas import DataFrame, Series, json_normalize, read_csv
@@ -21,9 +21,7 @@ from rich import print
 from typing_extensions import Literal
 
 from cdapython.Paginator import Paginator
-
-if TYPE_CHECKING:
-    from cdapython.Q import Q
+from cdapython.utils.state import State
 
 
 class Result:
@@ -84,12 +82,6 @@ class Result:
 
     def __eq__(self, __other: object) -> Union[Any, Literal[False]]:
         return isinstance(__other, Result) and self.__result == __other.__result
-
-    def __ne__(self, __o: object) -> bool:
-        result = self.__eq__(__o)
-
-        if result is NotImplemented:
-            return NotImplemented
 
     def __hash__(self) -> int:
         return hash(tuple(self.__result))
@@ -202,6 +194,34 @@ class Result:
             output=output,
             format_type=self.format_type,
         )
+
+    def auto_paginator(
+        self,
+        output: str = "",
+        to_df: bool = False,
+        to_list: bool = False,
+        limit: int = None,
+        host_list=None,
+        host_df=None,
+    ):
+        iterator = Paginator(
+            self,
+            to_df=to_df,
+            to_list=to_list,
+            limit=limit,
+            output=output,
+            format_type=self.format_type,
+        )
+        state = State(df=DataFrame(), list=[])
+        for i in iterator:
+            if to_df or output == "full_df":
+                state.concat_df(i)
+            if to_list or output == "full_list":
+                state.concat_list(i)
+        if to_df:
+            return state.get_df()
+        else:
+            return state.get_list()
 
     def __getitem__(
         self, idx: Union[int, slice]

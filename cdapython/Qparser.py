@@ -7,8 +7,6 @@ from tdparser.topdown import Parser
 from cdapython.Q import Q
 from cdapython.utils.check_case import check_keyword
 
-if TYPE_CHECKING:
-    from cdapython.Q import Q
 
 symbol_table = {}
 

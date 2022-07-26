@@ -1,5 +1,5 @@
 import re
-from typing import TYPE_CHECKING, Any, Optional
+from typing import Any, Optional
 from typing_extensions import Literal
 
 from cda_client.model.query import Query
@@ -8,9 +8,6 @@ from tdparser import Lexer, Token
 from tdparser.topdown import Parser
 from cdapython.functions import backwards_comp, col, infer_quote, query_type_conversion
 from cdapython.utils.check_case import check_keyword
-
-if TYPE_CHECKING:
-    from cdapython.Q import Q
 
 
 def build_query_copy(q: Query) -> Optional[Query]:
@@ -321,6 +318,13 @@ class IS(Token):
         return query
 
 
+class Var(Token):
+    lbp = 19
+
+    def led(self, left: Query, context: Parser) -> Query:
+        print(left, context)
+
+
 class IS_NOT(Token):
     lbp = 19
 
@@ -402,7 +406,7 @@ lexer = Lexer(with_parens=False)
 lexer.register_token(
     Expression,
     re.compile(
-        r"(\-[\S]+)|(\"[\w\s]+\")|(\b(?!(\bAND\b))(?!(\bOR\b))(?!(\bNOT\b))(?!(\bFROM\b))(?!(\bIN\b))(?!(\bLIKE\b))(?!(\bIS\b))[\w.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
+        r"(\-[\S]+)|(\"[\w\s]+\")|(\b(?!(\bAND\b))(?!(\bOR\b))(?!(\bNOT\b))(?!(\bFROM\b))(?!(\bIN\b))(?!(\bLIKE\b))(?!(\bIS\b))(?!(\bVar\b))[\w.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
     ),
 )
 
@@ -429,6 +433,7 @@ lexer.register_token(IS_NOT, re.compile(r"((IS)\s+(NOT))"))
 lexer.register_token(NOT_IN, re.compile(r"((NOT)\s+(IN))"))
 lexer.register_token(NOT_LIKE, re.compile(r"((NOT)\s+(LIKE))"))
 lexer.register_token(IS, re.compile(r"(IS)"))
+lexer.register_token(Var, re.compile(r"(Var)"))
 
 
 def simple_parser(text: str) -> "Query":

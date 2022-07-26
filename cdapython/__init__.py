@@ -9,33 +9,6 @@ from cdapython.factories.count import Count
 from rich import print
 from cdapython.utils.utility import columns, query, unique_terms
 
-__name__ = "cdapython"
-__version__ = Constants._VERSION
-__about__ = f"Q {__version__}"
-
-
-try:
-    # python2
-    import __builtin__
-except ImportError:
-    # python3
-    import builtins as __builtin__
-
-
-def console_print(*args, **kwargs):
-    from rich.console import Console
-
-    console = Console()
-    console.print(*args, **kwargs)
-
-
-__builtin__.print = console_print
-
-
-def __repr__() -> str:
-    return __version__
-
-
 from cdapython.factories import (
     COUNT,
     DIAGNOSIS,
@@ -86,6 +59,33 @@ from cdapython.factories.treatment import Treatment, TreatmentCount
 
 from cdapython.factories.file import File
 from cdapython.factories.file_count import FileCount
+
+__name__ = "cdapython"
+__version__ = Constants._VERSION
+__about__ = f"Q {__version__}"
+
+
+try:
+    # python2
+    import __builtin__
+except ImportError:
+    # python3
+    import builtins as __builtin__
+
+
+def console_print(*args, **kwargs):
+    from rich.console import Console
+
+    console = Console()
+    console.print(*args, **kwargs)
+
+
+__builtin__.print = console_print
+
+
+def __repr__() -> str:
+    return __version__
+
 
 QFactory.add_factory(FILE, File.Factory)
 QFactory.add_factory(FILE_COUNT, FileCount.Factory)

@@ -1,5 +1,3 @@
-import sys
-
 import cdapython
 
 import click
@@ -45,6 +43,7 @@ def ls_column(filter: str) -> None:
 cli.add_command(shell)
 cli.add_command(run)
 cli.add_command(ls_column)
+
 
 if __name__ == "__main__":
     cli.main()

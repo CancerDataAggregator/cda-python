@@ -4,7 +4,6 @@ from tdparser.lexer import LexerError
 from tdparser.topdown import MissingTokensError
 
 from cdapython.Q import Q
-from cdapython.utils.utility import query
 
 
 class Environ:

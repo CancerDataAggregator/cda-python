@@ -1,5 +1,4 @@
 import logging
-from copy import copy
 from json import JSONEncoder, dumps, loads
 from logging import error as logError
 from multiprocessing.pool import ApplyResult
@@ -92,7 +91,12 @@ class _QEncoder(JSONEncoder):
         if isinstance(o, MappingProxyType):
             return None
         else:
-            tmp_dict = o.__dict__
+            """
+            Using vars() over o.__dict__ dunder method,
+            it is more pythonic because it is generally better to use a function over a magic/dunder method
+            to use vars() it returns the same thing as a dict of the class
+            """
+            tmp_dict = vars(o)
             if "query" in tmp_dict:
                 return tmp_dict["query"]
             if "_data_store" in tmp_dict:

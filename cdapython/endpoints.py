@@ -1,5 +1,3 @@
-from typing import Any, Callable
-
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
 from cda_client.model.query import Query
