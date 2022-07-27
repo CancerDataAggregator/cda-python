@@ -43,7 +43,6 @@ ResearchSubject.Specimen.derived_from_subject
 )
 s = Q("sex = 'male'").run()
 df = pandas.DataFrame()
-id(df)
 p = s.auto_paginator(to_df=True, limit=10000, host_df=df)
 
 
