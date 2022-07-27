@@ -102,6 +102,7 @@ def unique_terms(
     version: Optional[str] = Constants.table_version,
     files: Optional[bool] = False,
     show_sql: bool = False,
+    show_counts: bool = False,
 ) -> Optional["StringResult"]:
     """[summary]
 
@@ -148,6 +149,7 @@ def unique_terms(
                 body=col_name,
                 system=str(system),
                 table=table,
+                count=show_counts,
             )
 
             # Execute query

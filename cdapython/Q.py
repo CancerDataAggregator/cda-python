@@ -164,7 +164,8 @@ class Q:
             with open(f"{file_name}.json", "w") as f:
                 f.write(tmp_json)
         return tmp_json
-
+    def to_dict(self):
+        return vars(self)["query"]
     # endregion
 
     # region staticmethods
