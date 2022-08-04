@@ -172,7 +172,7 @@ class Result:
         )
 
     def join_as_str(self, key: str, delimiter: str = ",") -> str:
-        if key is "":
+        if key == "":
             raise KeyError("You need to add a value to join on")
         field_split = key.split(".")
 
