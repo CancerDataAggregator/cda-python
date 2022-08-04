@@ -172,43 +172,38 @@ class Result:
         )
 
     def join_as_str(self, key: str, delimiter: str = ",") -> str:
-        _tmp = []
-        loop_data = []
-        if key.find(".") != -1:
-            data = key.split(".")
-            tmp_array = []
-            def _looper(key: str, data: Union[list, dict]) -> list:
-                if isinstance(data, dict):
-                    if isinstance(key,list):
-                        for i in key:
-                            tmp_array.append(data[i])
-                    else:
-                        tmp_array.append(data[key])
-                        _looper(key=key,data=data)
-                if isinstance(data, list) and len(data) != 0:
-                    for i in data:
+        if key is "":
+            raise KeyError("You need to add a value to join on")
+        field_split = key.split(".")
 
-                        _looper(key=list(i.keys()), data=i)
-            try:
-                for i in data:
-                    for a in self._result:
-                        if a[i]:
-                            _looper(key=i, data=a[i])
-                            loop_data.extend(tmp_array)
-                        else:
-                            break
-            except Exception as e:
-                print(e)
-        else:
-            loop_data = [i[key] for i in self._result]
+        if len(field_split) == 1:
+            return delimiter.join([i[key] for i in self._result])
 
-        for w in loop_data:
-            if isinstance(w, list):
-                for i in w:
-                    _tmp.append(f"{i}")
-            else:
-                _tmp.append(f"{w}")
-        return f"{delimiter}".join(_tmp)
+        def find_field(
+            current_field_index: int, field_list: List[Any], data: List[Any]
+        ) -> Union[str, Any]:
+            my_instance = data[field_list[current_field_index]]
+
+            if current_field_index == len(field_list) - 1:
+                return my_instance
+            if isinstance(my_instance, dict):
+                return find_field(current_field_index + 1, field_list, my_instance)
+            if isinstance(my_instance, list):
+                return delimiter.join(
+                    [
+                        find_field(current_field_index + 1, field_list, m)
+                        for m in my_instance
+                    ]
+                )
+
+            raise Exception("you messed up")
+
+        return delimiter.join(
+            [
+                find_field(current_field_index=0, field_list=field_split, data=result)
+                for result in self._result
+            ]
+        )
 
     def to_list(self) -> List[Any]:
         """_summary_
