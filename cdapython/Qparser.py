@@ -1,5 +1,5 @@
 import re
-from typing import  Union
+from typing import Union
 
 from tdparser import Lexer, Token
 from tdparser.topdown import Parser
