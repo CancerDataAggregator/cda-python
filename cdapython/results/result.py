@@ -14,7 +14,6 @@ from typing import (
     Optional,
     Union,
 )
-import pandas as pd
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
 from pandas import DataFrame, Series, json_normalize, read_csv

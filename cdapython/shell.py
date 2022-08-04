@@ -103,7 +103,7 @@ while True:
         continue
     try:
         result: Q = Q(text)
-        if setServer == None:
+        if setServer is None:
             queryResult = result.run()
         else:
             queryResult = result.run(host=setServer)

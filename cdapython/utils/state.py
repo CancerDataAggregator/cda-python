@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Union, Optional
+from typing import Union, Optional
 
 from cdapython.utils.none_check import none_check
 from pandas import DataFrame, concat
