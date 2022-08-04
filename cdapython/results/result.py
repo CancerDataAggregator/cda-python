@@ -1,4 +1,5 @@
 import json
+import re
 from collections import ChainMap
 from io import StringIO
 from multiprocessing.pool import ApplyResult
@@ -24,6 +25,22 @@ from cdapython.Paginator import Paginator
 from cdapython.utils.state import State
 
 
+class _QEncoder(json.JSONEncoder):
+    """_QEncoder this is a a class to help with json conversion
+        the standard json dump
+
+    Args:
+        json (_type_): _description_
+    """
+
+    def decode(self, o):
+        regex = re.compile(r"([^\"\\]|\\([\"\\\/bfnrt]|u[a-zA-Z\d]{4}))+")
+
+        if isinstance(o, str):
+            print(regex.match(o, pos=0))
+        return o
+
+
 class Result:
     """_summary_
     The Results Class is a convenient wrapper around the response object from the CDA service.
@@ -41,7 +58,7 @@ class Result:
         format_type: str = "json",
     ) -> None:
         self._api_response: QueryResponseData = api_response
-        self.__result: List[Any] = self._api_response.result
+        self._result: List[Any] = self._api_response.result
         self._query_id: str = query_id
         self._offset: Optional[int] = offset
         self._limit: Optional[int] = limit
@@ -51,11 +68,9 @@ class Result:
         self.format_type = format_type
         self._df: DataFrame
 
-        if self.format_type == "tsv" and isinstance(self.__result, list):
+        if self.format_type == "tsv" and isinstance(self._result, list):
             data_text: str = ""
-            data_text = "\n".join(
-                map(lambda e: str(e).replace("\n", ""), self.__result)
-            )
+            data_text = "\n".join(map(lambda e: str(e).replace("\n", ""), self._result))
             self._df = read_csv(StringIO(data_text), sep="\t")
 
         # add a if check to query output for counts to hide sql
@@ -78,17 +93,17 @@ class Result:
         return self._repr_value(show_value=self.show_sql, show_count=self.show_count)
 
     def __dict__(self) -> Dict[str, Any]:  # type: ignore
-        return dict(ChainMap(*self.__result))
+        return dict(ChainMap(*self._result))
 
     def __eq__(self, __other: object) -> Union[Any, Literal[False]]:
-        return isinstance(__other, Result) and self.__result == __other.__result
+        return isinstance(__other, Result) and self._result == __other.__result
 
     def __hash__(self) -> int:
-        return hash(tuple(self.__result))
+        return hash(tuple(self._result))
 
     def __contains__(self, value: str) -> bool:
         exist = False
-        for item in self.__result:
+        for item in self._result:
             if value in item.values():
                 exist = True
 
@@ -111,7 +126,7 @@ class Result:
         Returns:
             int
         """
-        return len(self.__result)
+        return len(self._result)
 
     @property
     def total_row_count(self) -> int:
@@ -156,6 +171,45 @@ class Result:
             meta_prefix=meta_prefix,
         )
 
+    def join_as_str(self, key: str, delimiter: str = ",") -> str:
+        _tmp = []
+        loop_data = []
+        if key.find(".") != -1:
+            data = key.split(".")
+            tmp_array = []
+            def _looper(key: str, data: Union[list, dict]) -> list:
+                if isinstance(data, dict):
+                    if isinstance(key,list):
+                        for i in key:
+                            tmp_array.append(data[i])
+                    else:
+                        tmp_array.append(data[key])
+                        _looper(key=key,data=data)
+                if isinstance(data, list) and len(data) != 0:
+                    for i in data:
+
+                        _looper(key=list(i.keys()), data=i)
+            try:
+                for i in data:
+                    for a in self._result:
+                        if a[i]:
+                            _looper(key=i, data=a[i])
+                            loop_data.extend(tmp_array)
+                        else:
+                            break
+            except Exception as e:
+                print(e)
+        else:
+            loop_data = [i[key] for i in self._result]
+
+        for w in loop_data:
+            if isinstance(w, list):
+                for i in w:
+                    _tmp.append(f"{i}")
+            else:
+                _tmp.append(f"{w}")
+        return f"{delimiter}".join(_tmp)
+
     def to_list(self) -> List[Any]:
         """_summary_
 
@@ -163,7 +217,7 @@ class Result:
             list: _description_
         """
 
-        return self.__result
+        return self._result
 
     def __len__(self) -> int:
         return self.count
@@ -227,25 +281,25 @@ class Result:
         self, idx: Union[int, slice]
     ) -> Union[Series, DataFrame, Any, list]:
 
-        if isinstance(self.__result, DataFrame):
-            return self.__result.loc[idx]
+        if isinstance(self._result, DataFrame):
+            return self._result.loc[idx]
 
         if isinstance(idx, int):
             if idx < 0:
                 idx = self.count + idx
-            return self.__result[idx]
+            return self._result[idx]
         else:
             # for slicing result
             start, stop, step = idx.indices(self.count)
             range_index = range(start, stop, step)
-            return [self.__result[i] for i in range_index]
+            return [self._result[i] for i in range_index]
 
     def __iter__(self) -> Iterator:
-        return iter(self.__result)
+        return iter(self._result)
 
     def __aiter__(self) -> AsyncGenerator[Any, None]:
         async def tmp() -> AsyncGenerator[Any, None]:
-            yield self.__result
+            yield self._result
 
         return tmp()
 
