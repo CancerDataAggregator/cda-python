@@ -42,7 +42,7 @@ setup(
     version=VERSION,
     py_modules=["cdapython"],
     platforms=["POSIX", "MacOS", "Windows"],
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     url="https://github.com/CancerDataAggregator/cdapython",
     install_requires=[
         "tdparser>=1.1.6",
@@ -50,6 +50,7 @@ setup(
         "wheel>=0.36.2",
         "urllib3>=1.26.8",
         "rich>=12.0.1",
+        "itables == 1.1.2",
         "matplotlib>=3.5.1",
         "typing-extensions==4.2.0",
         "pandas==1.3.5",
