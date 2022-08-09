@@ -3,17 +3,9 @@ import re
 from collections import ChainMap
 from io import StringIO
 from multiprocessing.pool import ApplyResult
-
 from time import sleep
-from typing import (
-    Any,
-    AsyncGenerator,
-    Dict,
-    Iterator,
-    List,
-    Optional,
-    Union,
-)
+from typing import Any, AsyncGenerator, Dict, Iterator, List, Optional, Pattern, Union
+
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
 from pandas import DataFrame, Series, json_normalize, read_csv
@@ -22,6 +14,7 @@ from typing_extensions import Literal
 
 from cdapython.Paginator import Paginator
 from cdapython.utils.state import State
+from cdapython.utils.none_check import none_check
 
 
 class _QEncoder(json.JSONEncoder):
@@ -32,8 +25,8 @@ class _QEncoder(json.JSONEncoder):
         json (_type_): _description_
     """
 
-    def decode(self, o):
-        regex = re.compile(r"([^\"\\]|\\([\"\\\/bfnrt]|u[a-zA-Z\d]{4}))+")
+    def decode(self, o) -> str:
+        regex: Pattern[str] = re.compile(r"([^\"\\]|\\([\"\\\/bfnrt]|u[a-zA-Z\d]{4}))+")
 
         if isinstance(o, str):
             print(regex.match(o, pos=0))
@@ -64,19 +57,19 @@ class Result:
         self._api_instance: QueryApi = api_instance
         self.show_sql: Optional[bool] = show_sql
         self.show_count: Optional[bool] = show_count
-        self.format_type = format_type
+        self.format_type: str = format_type
         self._df: DataFrame
 
         if self.format_type == "tsv" and isinstance(self._result, list):
             data_text: str = ""
-            data_text = "\n".join(map(lambda e: str(e).replace("\n", ""), self._result))
+            data_text: str = "\n".join(
+                map(lambda e: str(e).replace("\n", ""), self._result)
+            )
             self._df = read_csv(StringIO(data_text), sep="\t")
 
         # add a if check to query output for counts to hide sql
 
-    def _repr_value(
-        self, show_value: Optional[bool], show_count: Optional[bool]
-    ) -> str:
+    def _repr_value(self, show_value: Optional[bool]) -> str:
         return f"""
             {"Query:"+self.sql if show_value is True else ""  }
             Offset: {self._offset}
@@ -86,10 +79,10 @@ class Result:
             """
 
     def __repr__(self) -> str:
-        return self._repr_value(show_value=self.show_sql, show_count=self.show_count)
+        return self._repr_value(show_value=self.show_sql)
 
     def __str__(self) -> str:
-        return self._repr_value(show_value=self.show_sql, show_count=self.show_count)
+        return self._repr_value(show_value=self.show_sql)
 
     def __dict__(self) -> Dict[str, Any]:  # type: ignore
         return dict(ChainMap(*self._result))
@@ -101,10 +94,10 @@ class Result:
         return hash(tuple(self._result))
 
     def __contains__(self, value: str) -> bool:
-        exist = False
+        exist: bool = False
         for item in self._result:
             if value in item.values():
-                exist = True
+                exist: bool = True
 
         return exist
 
@@ -149,7 +142,7 @@ class Result:
         meta: Optional[Union[str, List[Union[str, List[str]]]]] = None,
         meta_prefix: Optional[str] = None,
         max_level: Optional[int] = None,
-    ) -> Optional[DataFrame]:
+    ) -> DataFrame:
         """[summary]
         Creates a pandas DataFrame for the Results
 
@@ -173,15 +166,15 @@ class Result:
     def join_as_str(self, key: str, delimiter: str = ",") -> str:
         if key == "":
             raise KeyError("You need to add a value to join on")
-        field_split = key.split(".")
+        field_split: list[str] = key.split(".")
 
         if len(field_split) == 1:
-            return delimiter.join([i[key] for i in self._result])
+            return delimiter.join(f'"{w}"' for w in [i[key] for i in self._result])
 
         def find_field(
             current_field_index: int, field_list: List[Any], data: List[Any]
         ) -> Union[str, Any]:
-            my_instance = data[field_list[current_field_index]]
+            my_instance: Any = data[field_list[current_field_index]]
 
             if current_field_index == len(field_list) - 1:
                 return my_instance
@@ -197,12 +190,14 @@ class Result:
 
             raise Exception("you messed up")
 
-        return delimiter.join(
-            [
+        tmp = delimiter.join(
+            f'"{w}"'
+            for w in [
                 find_field(current_field_index=0, field_list=field_split, data=result)
                 for result in self._result
             ]
         )
+        return tmp
 
     def to_list(self) -> List[Any]:
         """_summary_
@@ -221,7 +216,7 @@ class Result:
         output: str = "",
         to_df: bool = False,
         to_list: bool = False,
-        limit: int = None,
+        limit: Union[int, None] = None,
     ) -> Paginator:
         """_summary_
         paginator this will automatically page over results
@@ -231,9 +226,6 @@ class Result:
         Returns:
             _type_: _description_
         """
-        if limit is None:
-            if isinstance(self._limit, int):
-                limit = self._limit
         return Paginator(
             self,
             to_df=to_df,
@@ -248,11 +240,9 @@ class Result:
         output: str = "",
         to_df: bool = False,
         to_list: bool = False,
-        limit: int = None,
-        host_list=None,
-        host_df=None,
-    ):
-        iterator = Paginator(
+        limit: Union[int, None] = None,
+    ) -> Union[DataFrame, List[Any]]:
+        iterator: Paginator = Paginator(
             self,
             to_df=to_df,
             to_list=to_list,
@@ -260,7 +250,7 @@ class Result:
             output=output,
             format_type=self.format_type,
         )
-        state = State(df=DataFrame(), list=[])
+        state: State = State(df=DataFrame(), _list=[])
         for i in iterator:
             if to_df or output == "full_df":
                 state.concat_df(i)
@@ -280,15 +270,15 @@ class Result:
 
         if isinstance(idx, int):
             if idx < 0:
-                idx = self.count + idx
+                idx: int = self.count + idx
             return self._result[idx]
         else:
             # for slicing result
             start, stop, step = idx.indices(self.count)
-            range_index = range(start, stop, step)
+            range_index: range = range(start, stop, step)
             return [self._result[i] for i in range_index]
 
-    def __iter__(self) -> Iterator:
+    def __iter__(self) -> Iterator[Any]:
         return iter(self._result)
 
     def __aiter__(self) -> AsyncGenerator[Any, None]:
@@ -362,9 +352,9 @@ class Result:
         pre_stream: bool = True,
     ) -> Optional["Result"]:
         if isinstance(self._offset, int) and isinstance(self._limit, int):
-            _offset = self._offset - self._limit
-            _offset = max(0, _offset)
-            _limit = limit or self._limit
+            _offset: int = self._offset - self._limit
+            _offset: int = max(0, _offset)
+            _limit: int = limit or self._limit
             return self._get_result(_offset, _limit, async_req, pre_stream)
         return None
 
