@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
 from IPython import get_ipython
 from IPython.display import display_html
@@ -9,14 +9,15 @@ from rich.table import Table
 
 from cdapython.results.result import Result
 
+if TYPE_CHECKING:
+    from pandas import DataFrame, Series
+
 
 class CountResult(Result):
-    def _repr_value(
-        self, show_value: Optional[bool], show_count: Optional[bool]
-    ) -> str:
+    def _repr_value(self, show_value: Optional[bool]) -> str:
         """_summary_
-          This function is protected. Specifies how to display the result for counts to a user. If IPython is available,
-          this will show as a set of dataframes side by side. Otherwise, it will default to a dataframe per line.
+        This function is protected. Specifies how to display the result for counts to a user. If IPython is available,
+        this will show as a set of dataframes side by side. Otherwise, it will default to a dataframe per line.
         Args:
             show_value (Optional[bool]): _description_
             show_count (Optional[bool]): _description_
@@ -24,16 +25,17 @@ class CountResult(Result):
         Returns:
             str: _description_
         """
-        result = self[0]
+
+        result: Union[Series, DataFrame] = self[0]
         html_string: str = ""
         count_string: str = ""
-        console = Console()
-        tables: list[Table] = []
+        console: Console = Console()
+        tables: List[Table] = []
         for key in result:
-            table = Table(title=key)
+            table: Table = Table(title=key)
             value = result[key]
             if isinstance(value, list):
-                df = json_normalize(value)
+                df: DataFrame = json_normalize(value)
                 s = df.style.hide_index()
                 count_string = f"{count_string}\n\n{str(df).center(20)}"
                 table.add_column(key)
@@ -45,29 +47,29 @@ class CountResult(Result):
 
                     table.add_row(item[key], str(item["count"]))
 
-                headers = {
+                headers: Dict[str, str] = {
                     "selector": "th",
                     "props": "background-color: #000066; color: white; text-align: left",
                 }
-                columns = {
+                columns: Dict[str, str] = {
                     "selector": "td",
                     "props": "text-align:left; border-bottom: 1px solid black;",
                 }
                 s.set_table_styles([headers, columns])
                 s.set_table_attributes("style='display:inline'")
-                html_string = html_string + s._repr_html_()
+                html_string: str = html_string + s._repr_html_()
 
             else:
-                key_string = f"{key} : {value}".center(20)
+                key_string: str = f"{key} : {value}".center(20)
                 console.print(key_string)
 
-                count_string = count_string + "\n\n" + key_string
+                count_string: str = count_string + "\n\n" + key_string
 
             tables.append(table)
         if self.isnotebook():
             display_html(html_string, raw=True)
             if self.show_sql is True:
-                syntax = Syntax(
+                syntax: Syntax = Syntax(
                     code=self.sql,
                     lexer="SQL",
                     indent_guides=True,
@@ -77,8 +79,7 @@ class CountResult(Result):
             return ""
         else:
             if self.show_sql is True:
-                # count_string = f"{count_string}\n\n{self.sql}"
-                syntax = Syntax(
+                syntax: Syntax = Syntax(
                     code=self.sql,
                     lexer="SQL",
                     indent_guides=True,
@@ -91,7 +92,7 @@ class CountResult(Result):
 
     def isnotebook(self) -> bool:
         try:
-            shell = get_ipython().__class__.__name__
+            shell: str = get_ipython().__class__.__name__
             if shell == "ZMQInteractiveShell":
                 return True  # Jupyter notebook or qtconsole
             elif shell == "TerminalInteractiveShell":
