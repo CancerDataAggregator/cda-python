@@ -5,10 +5,10 @@ from pandas import DataFrame, concat
 
 class State:
     def __init__(
-        self, df: Optional[DataFrame] = None, _list: Optional[list] = None
+        self, df: Optional[DataFrame] = None, list_array: Optional[list] = None
     ) -> None:
         self.df: Union[DataFrame, None] = df
-        self._list: Union[List[Any], None] = _list
+        self._list: Union[List[Any], None] = list_array
 
     def get_df(self) -> DataFrame:
         return none_check(self.df)

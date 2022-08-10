@@ -250,7 +250,7 @@ class Result:
             output=output,
             format_type=self.format_type,
         )
-        state: State = State(df=DataFrame(), _list=[])
+        state: State = State(df=DataFrame(), list_array=[])
         for i in iterator:
             if to_df or output == "full_df":
                 state.concat_df(i)
