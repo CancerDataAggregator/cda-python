@@ -1,3 +1,6 @@
+from typing import Any, Union
+from typing_extensions import Literal
+from xmlrpc.client import boolean
 from rich import print
 from rich.console import Console
 from tdparser.lexer import LexerError
@@ -7,11 +10,11 @@ from cdapython.Q import Q
 
 
 class Environ:
-    def __init__(self, parent=None):
-        self.env = {}
-        self.parent = parent
+    def __init__(self, parent=None) -> None:
+        self.env: dict = {}
+        self.parent: Any = parent
 
-    def get(self, item):
+    def get(self, item) -> Union[Any, None]:
         if item in self.env:
             return self.env[item]
         if self.parent is not None:
@@ -53,10 +56,10 @@ except ImportError:
 """[summary]
     add's history to shell in current session
 """
-new = True
-setServer = None
-setDataFrame = None
-console = Console(record=True)
+new: bool = True
+setServer: Union[str, None] = None
+setDataFrame: Union[bool, None] = None
+console: Console = Console(record=True)
 
 
 def help() -> None:
@@ -84,8 +87,8 @@ while True:
         print(
             f'Q {Q.get_version()} Type "help()", "copyright", "credits" or "license" for more information.'
         )
-        new = False
-    text = input("Q >>> ")
+        new: bool = False
+    text: str = input("Q >>> ")
     if text == "help()":
         help()
         continue

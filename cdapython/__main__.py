@@ -4,18 +4,18 @@ import click
 
 import cdapython.constant_variables as const
 from cdapython.utils.utility import columns
+from cdapython import shell as Qshell
 
 
 @click.group()
-def cli():
+def cli() -> None:
     pass
 
 
 @click.command()
-def shell():
-    from cdapython import shell
+def shell() -> None:
 
-    shell
+    Qshell
 
 
 @click.command()
@@ -23,10 +23,10 @@ def shell():
 def run(filepath: str) -> None:
     with open(filepath, "r") as file:
         for line in file:
-            line = line.strip()
-            if not line or line[0] == "#":
+            line_new: str = line.strip()
+            if not line_new or line_new[0] == "#":
                 continue
-            print(cdapython.Q(line.rstrip()).run().to_dataframe())
+            print(cdapython.Q(line_new.rstrip()).run().to_dataframe())
 
 
 @click.command()

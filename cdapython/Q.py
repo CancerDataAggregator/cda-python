@@ -1,10 +1,10 @@
 import logging
 from json import JSONEncoder, dumps, loads
-from logging import error as logError
 from multiprocessing.pool import ApplyResult
 from time import sleep
 from types import MappingProxyType
-from typing import Any, Dict, Optional, Tuple, TypeVar, Union
+from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union
+from typing_extensions import Literal
 import pandas as pd
 from cda_client import ApiClient, Configuration
 from cda_client.api.meta_api import MetaApi
@@ -36,10 +36,11 @@ from cdapython.error_logger import unverified_http
 from cdapython.functions import find_ssl_path
 from cdapython.results.result import Result, get_query_result
 from cdapython.simple_parser import simple_parser
+from pandas import DataFrame
 
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 # constants
-WAITING_TEXT = "Waiting for results"
+WAITING_TEXT: Literal["Waiting for results"] = "Waiting for results"
 
 
 def builder_api_client(host: Optional[str], verify: Optional[bool]) -> Configuration:
@@ -96,7 +97,7 @@ class _QEncoder(JSONEncoder):
             it is more pythonic because it is generally better to use a function over a magic/dunder method
             to use vars() it returns the same thing as a dict of the class
             """
-            tmp_dict = vars(o)
+            tmp_dict: dict[str, Any] = vars(o)
             if "query" in tmp_dict:
                 return tmp_dict["query"]
             if "_data_store" in tmp_dict:
@@ -119,7 +120,7 @@ class Q:
         Args:
             *args (object):
         """
-        self.query = Query()
+        self.query: Query = Query()
 
         if len(args) == 1:
 
@@ -129,7 +130,7 @@ class Q:
             if type(args[0]) is Query:
                 self.query = args[0]
             else:
-                query_parsed = simple_parser(args[0].strip().replace("\n", " "))
+                query_parsed: Query = simple_parser(args[0].strip().replace("\n", " "))
                 self.query = query_parsed
 
         elif len(args) != 3:
@@ -140,9 +141,9 @@ class Q:
             """_summary_
             this is for Q operators support
             """
-            _l = args[0]
-            _op = args[1]
-            _r = args[2]
+            _l: Union[Query, str] = args[0]
+            _op: Union[Query, str] = args[1]
+            _r: Union[Query, str] = args[2]
             self.query.node_type = _op
             self.query.l = _l
             self.query.r = _r
@@ -165,7 +166,7 @@ class Q:
                 f.write(tmp_json)
         return tmp_json
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         return vars(self)["query"]
 
     # endregion
@@ -210,7 +211,7 @@ class Q:
         offset: int = 0,
         limit: int = 100,
         verbose: Optional[bool] = True,
-    ) -> Optional[pd.DataFrame]:
+    ) -> Optional[DataFrame]:
         """[summary]
 
         Args:
@@ -227,13 +228,13 @@ class Q:
             [DataFrame | None]: [This will return a Result class]
         """
 
-        cda_client_obj = ApiClient(
+        cda_client_obj: ApiClient = ApiClient(
             configuration=builder_api_client(host=host, verify=verify), pool_threads=2
         )
         try:
 
             with cda_client_obj as api_client:
-                api_instance = QueryApi(api_client)
+                api_instance: QueryApi = QueryApi(api_client)
                 api_response = api_instance.bulk_data(
                     table=table, version=version, async_req=async_call
                 )
@@ -249,15 +250,15 @@ class Q:
                     api_response.wait(10000)
                 api_response = api_response.get()
 
-            r = get_query_result(
+            r: Union[Result, None] = get_query_result(
                 api_instance, api_response.query_id, offset, limit, async_call
             )
             if r is None:
                 return None
 
-            df = pd.DataFrame()
+            df: DataFrame = pd.DataFrame()
             for i in r.paginator(to_df=True):
-                df = pd.concat([df, i])
+                df: DataFrame = pd.concat([df, i])
             return df
         except Exception as e:
             print(e)
@@ -273,7 +274,7 @@ class Q:
         Returns:
             str: status messages
         """
-        cda_client_obj = ApiClient(
+        cda_client_obj: ApiClient = ApiClient(
             configuration=builder_api_client(host=host, verify=verify)
         )
         return str(
@@ -299,12 +300,12 @@ class Q:
             object: [description]
         """
 
-        cda_client_obj = ApiClient(
+        cda_client_obj: ApiClient = ApiClient(
             configuration=builder_api_client(host=host, verify=verify)
         )
         try:
             with cda_client_obj as api_client:
-                api_instance = QueryApi(api_client)
+                api_instance: QueryApi = QueryApi(api_client)
                 api_response = api_instance.job_status(id)
                 return api_response["status"]
 
@@ -468,12 +469,12 @@ class Q:
         table: Optional[str] = None,
         async_call: bool = False,
         verify: Optional[bool] = None,
-        verbose: Optional[bool] = True,
+        verbose: bool = True,
         filter: Optional[str] = None,
-        flatten: Optional[bool] = False,
+        flatten: bool = False,
         format: str = "json",
-        show_sql: Optional[bool] = False,
-    ) -> Union[Result, QueryCreatedData, ApplyResult]:
+        show_sql: bool = False,
+    ) -> Union[Result, QueryCreatedData, ApplyResult, None]:
         """_summary_
 
         Args:
@@ -493,8 +494,7 @@ class Q:
         Returns:
             Optional[Result]: _description_
         """
-
-        cda_client_obj = ApiClient(
+        cda_client_obj: ApiClient = ApiClient(
             configuration=builder_api_client(host=host, verify=verify)
         )
 
@@ -503,12 +503,11 @@ class Q:
         if filter is not None:
             self.query = Q.__select(self, fields=filter).query
 
-        if show_sql is None:
-            show_sql = False
+        self._show_sql: bool = show_sql or False
 
         try:
             with cda_client_obj as api_client:
-                api_instance = QueryApi(api_client)
+                api_instance: QueryApi = QueryApi(api_client)
                 # Execute boolean query
                 if verbose:
                     print("Getting results from database", end="\n\n")
@@ -536,13 +535,13 @@ class Q:
                 offset=offset,
                 limit=limit,
                 async_req=async_call,
-                show_sql=show_sql,
+                show_sql=self._show_sql,
                 show_count=True,
                 format_type=format,
             )
         except ServiceException as httpError:
             if httpError.body is not None:
-                logError(
+                print(
                     f"""
                 Http Status: {httpError.status}
                 Error Message: {loads(httpError.body)["message"]}
@@ -550,26 +549,31 @@ class Q:
                 )
 
         except NewConnectionError:
-            print("Connection error")
+            if verbose:
+                print("Connection error")
 
         except SSLError as e:
-            print(e)
+            if verbose:
+                print(e)
 
         except InsecureRequestWarning:
-            print(
-                "Adding certificate verification pem is strongly advised please read our https://cda.readthedocs.io/en/latest/Installation.html "
-            )
+            if verbose:
+                print(
+                    "Adding certificate verification pem is strongly advised please read our https://cda.readthedocs.io/en/latest/Installation.html "
+                )
 
         except MaxRetryError as e:
-            print(
-                f"Connection error max retry limit of 3 hit please check url or local python ssl pem {e}"
-            )
+            if verbose:
+                print(
+                    f"Connection error max retry limit of 3 hit please check url or local python ssl pem {e}"
+                )
         except ApiException as e:
-            print(e.body)
+            if verbose:
+                print(e.body)
 
         except Exception as e:
-            print(e)
-        return None
+            if verbose:
+                print(e)
 
     def AND(self, right: "Q") -> "Q":
         return self.__class__(self.query, "AND", right.query)
@@ -620,7 +624,7 @@ class Q:
         # This lambda will strip a comma and rejoin the string
         fields = ",".join(map(lambda fields: fields.strip(","), fields.split()))
 
-        tmp = Query()
+        tmp: Query = Query()
         tmp.node_type = "SELECTVALUES"
         tmp.value = fields
         return self.__class__(tmp, "SELECT", self.query)

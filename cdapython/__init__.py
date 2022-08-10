@@ -2,6 +2,8 @@
 cdapython is a library used to interact with the machine generated CDA Python Client and offers some syntactic sugar to make it more pleasant to query the CDA.
 """
 from __future__ import print_function
+from typing import Any, Dict
+from typing_extensions import Literal
 from cdapython._get_unnest_clause import _get_unnest_clause
 from cdapython.constant_variables import Constants
 from cdapython.Q import Q
@@ -60,9 +62,9 @@ from cdapython.factories.treatment import Treatment, TreatmentCount
 from cdapython.factories.file import File
 from cdapython.factories.file_count import FileCount
 
-__name__ = "cdapython"
-__version__ = Constants._VERSION
-__about__ = f"Q {__version__}"
+__name__: Literal["cdapython"] = "cdapython"
+__version__: str = Constants._VERSION
+__about__: str = f"Q {__version__}"
 
 
 try:
@@ -73,10 +75,10 @@ except ImportError:
     import builtins as __builtin__
 
 
-def console_print(*args, **kwargs):
+def console_print(*args: Any, **kwargs: Any) -> None:
     from rich.console import Console
 
-    console = Console()
+    console: Console = Console()
     console.print(*args, **kwargs)
 
 

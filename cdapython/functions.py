@@ -9,15 +9,15 @@ from cdapython.dataclasses_Q.querystr import QueryStr
 from cdapython.utils.ConversionMap import CONVERSIONMAP
 
 
-def col(col_name: Optional[Union[str, Query]]) -> Query:
+def col(col_name: Union[str, Query, None]) -> Query:
     return Query(node_type="column", value=col_name)
 
 
-def quoted(quoted_val: Optional[Union[str, Query]]) -> Query:
+def quoted(quoted_val: Union[str, Query, None]) -> Query:
     return Query(node_type="quoted", value=quoted_val)
 
 
-def unquoted(val: Optional[Union[str, Query]]) -> Query:
+def unquoted(val: Union[str, Query, None]) -> Query:
     return Query(node_type="unquoted", value=val)
 
 
@@ -36,10 +36,10 @@ def find_ssl_path() -> bool:
     check: bool = True
 
     if not path.exists(openssl_dir):
-        check = False
+        check: bool = False
 
     if openssl_cafile.find("pem") == -1:
-        check = False
+        check: bool = False
 
     return check
 
@@ -91,7 +91,7 @@ def infer_quote(val: Query) -> Query:
     pass
 
 
-def infer_quote(val: Any) -> Union[Query, QueryStr]:
+def infer_quote(val: Any) -> Union[Query, QueryStr, str]:
     """[summary]
     Handles Strings With quotes by checking the value type
     Args:
@@ -128,14 +128,14 @@ def query_type_conversion(
         (tuple[Literal['LIKE'], Query] | tuple[str, str])
     """
     if _r.find("%") != -1:
-        tmp = Query()
+        tmp: Query = Query()
         tmp.node_type = "quoted"
         tmp.value = _r
-        tmp_str = "NOT " if _op == "!=" or _op == "<>" else ""
+        tmp_str: Literal["NOT ", ""] = "NOT " if _op == "!=" or _op == "<>" else ""
         return (f"{tmp_str}LIKE", tmp)
 
     if _r.find("LIKE") != -1:
-        tmp = Query()
+        tmp: Query = Query()
         tmp.node_type = "quoted"
         tmp.value = _r
         return ("LIKE", tmp)
