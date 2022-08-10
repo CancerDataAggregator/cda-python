@@ -24,7 +24,7 @@ class Measure:
                     seconds = round((end_ / 1000) % 60, 3)
                     minutes = round(int((end_ / (1000 * 60)) % 60))
                     print(
-                        f"Total execution time: {end_ if end_ > 0 else 0} ms {seconds if seconds > 0 else 0} sec {minutes if minutes > 0 else 0} min"
+                        f"Total execution time: {minutes if minutes > 0 else 0} min {seconds if seconds > 0 else 0} sec {end_ if end_ > 0 else 0} ms "
                     )
 
         return wrapper
