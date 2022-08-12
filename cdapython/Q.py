@@ -26,7 +26,6 @@ from cda_client.exceptions import ApiException, ServiceException
 from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
 from cda_client.model.query_response_data import QueryResponseData
-from rich import print
 from urllib3.connection import NewConnectionError  # type: ignore
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, SSLError
@@ -37,6 +36,7 @@ from cdapython.functions import find_ssl_path
 from cdapython.results.result import Result, get_query_result
 from cdapython.simple_parser import simple_parser
 from pandas import DataFrame
+
 
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 # constants
@@ -145,8 +145,8 @@ class Q:
             _op: Union[Query, str] = args[1]
             _r: Union[Query, str] = args[2]
             self.query.node_type = _op
-            self.query.l = _l
-            self.query.r = _r
+            self.query.l = _l  # noqa: E741
+            self.query.r = _r  # noqa: E741
 
     def __repr__(self: TQ) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
@@ -510,7 +510,12 @@ class Q:
                 api_instance: QueryApi = QueryApi(api_client)
                 # Execute boolean query
                 if verbose:
-                    print("Getting results from database", end="\n\n")
+                    print(
+                        "Getting results from database",
+                        style="#E1BE6A on #40B0A6",
+                        end="\n\n",
+                    )
+
                 api_response: Union[
                     QueryCreatedData, ApplyResult
                 ] = self._call_endpoint(
@@ -611,7 +616,7 @@ class Q:
     def IS(self, fields: str) -> "Q":
         return self.__class__(self.query, "IS", fields)
 
-    def __select(self, fields: str) -> "Q":
+    def __select(self, fields) -> "Q":
         """[summary]
 
         Args:
@@ -621,9 +626,10 @@ class Q:
             [Q]: [returns a Q object]
         """
         ""
-        # This lambda will strip a comma and rejoin the string
-        fields = ",".join(map(lambda fields: fields.strip(","), fields.split()))
 
+        # This lambda will strip a comma and rejoin the string
+        fields: str = ",".join(map(lambda fields: fields.strip(","), fields.split()))
+        fields: str = fields.replace(":", " AS ")
         tmp: Query = Query()
         tmp.node_type = "SELECTVALUES"
         tmp.value = fields
