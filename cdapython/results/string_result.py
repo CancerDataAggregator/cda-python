@@ -32,8 +32,9 @@ class StringResult(Result):
         )
 
     def to_list(self, filters: Optional[str] = None, exact: bool = False) -> list:
-        if filters is not None:
-            filters: str = filters.strip().replace("\n", " ")
+        if filters is not None and filters != "":
+
+            filters: str = filters.replace("\n", " ").strip()
             values = [list(i.values())[0] for i in self._api_response.result]
             values = list(filter(None, values))
             if exact:

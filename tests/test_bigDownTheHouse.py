@@ -8,7 +8,7 @@ def Down_house():
     q3 = Q("days_to_birth < -50*365")
     q4 = Q('File.data_category = "Imaging"')
     q = q4.AND(q3.AND(q1.OR(q2)))
-    t = q.file.run(host=host, table=table)
+    t = q.file.run()
     assert t is not None
     print(t.to_dataframe().head())
 
