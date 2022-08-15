@@ -38,6 +38,9 @@ from cdapython.error_logger import unverified_http
 from cdapython.functions import find_ssl_path
 from cdapython.results.result import Result, get_query_result
 from cdapython.simple_parser import simple_parser
+from pandas import DataFrame
+from cdapython.math_parser import math_parse
+
 
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 
@@ -128,7 +131,8 @@ class Q:
             if type(args[0]) is Query:
                 self.query = args[0]
             else:
-                query_parsed = simple_parser(args[0].strip().replace("\n", " "))
+                math_parsed = math_parse(args[0].strip().replace("\n", " "))
+                query_parsed: Query = simple_parser(args[0].strip().replace("\n", " "))
                 self.query = query_parsed
 
         elif len(args) != 3:

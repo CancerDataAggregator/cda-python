@@ -11,4 +11,4 @@ def test_ssl_q() -> None:
 
 
 print(host, table)
-columns(verify=False, host=host, table=table)
+columns(verify=False, host=host, table=table, verbose=True)
