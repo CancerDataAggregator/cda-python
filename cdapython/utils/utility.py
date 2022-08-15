@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import json
 import logging
-from re import I
 from typing import TYPE_CHECKING, Optional
 
-import cda_client
+from cda_client.configuration import Configuration
+from cda_client.api_client import ApiClient
 from cda_client.api.query_api import QueryApi
 from cda_client.exceptions import ServiceException
 from rich import print
@@ -42,7 +42,7 @@ if isinstance(Constants.CDA_API_URL, str):
 
 
 def http_error_logger(http_error: ServiceException) -> None:
-    logging.error(
+    print(
         f"""
             Http Status: {http_error.status}
             Error Message: {json.loads(http_error.body)["message"]}
@@ -103,6 +103,8 @@ def unique_terms(
     version: Optional[str] = Constants.table_version,
     files: Optional[bool] = False,
     show_sql: bool = False,
+    show_counts: bool = False,
+    verbose: bool = True,
 ) -> Optional["StringResult"]:
     """[summary]
 
@@ -123,13 +125,14 @@ def unique_terms(
     if host is None:
         host = Constants.CDA_API_URL
 
-    tmp_configuration: cda_client.Configuration = cda_client.Configuration(host=host)
+    tmp_configuration: Configuration = Configuration(host=host)
 
     if verify is None:
         tmp_configuration.verify_ssl = find_ssl_path()
 
     if verify is False:
-        unverified_http()
+        if verbose:
+            unverified_http()
         tmp_configuration.verify_ssl = False
 
     if table is None:
@@ -140,7 +143,7 @@ def unique_terms(
     col_name = backwards_comp(col_name)
     version = table_white_list(table, version)
 
-    cda_client_obj = cda_client.ApiClient(configuration=tmp_configuration)
+    cda_client_obj: ApiClient = ApiClient(configuration=tmp_configuration)
     try:
         with cda_client_obj as api_client:
             api_instance = QueryApi(api_client)
@@ -149,6 +152,7 @@ def unique_terms(
                 body=col_name,
                 system=str(system),
                 table=table,
+                count=show_counts,
             )
 
             # Execute query
@@ -167,10 +171,12 @@ def unique_terms(
 
             return query_result
     except ServiceException as http_error:
-        http_error_logger(http_error)
+        if verbose:
+            http_error_logger(http_error)
 
     except Exception as e:
-        print(e)
+        if verbose:
+            print(e)
     return None
 
 
@@ -187,6 +193,7 @@ def columns(
     files: Optional[bool] = False,
     async_call: bool = False,
     show_sql: bool = False,
+    verbose: bool = True,
 ) -> Optional["StringResult"]:
     """[summary]
 
@@ -208,13 +215,14 @@ def columns(
         host = Constants.CDA_API_URL
     if version is None:
         version = Constants.table_version
-    tmp_configuration: cda_client.Configuration = cda_client.Configuration(host=host)
+    tmp_configuration: Configuration = Configuration(host=host)
 
     if verify is None:
         tmp_configuration.verify_ssl = find_ssl_path()
 
     if verify is False:
-        unverified_http()
+        if verbose:
+            unverified_http()
         tmp_configuration.verify_ssl = False
     if table is None:
         table = Constants.default_table
@@ -224,7 +232,7 @@ def columns(
 
     version = table_white_list(table, version)
 
-    cda_client_obj = cda_client.ApiClient(configuration=tmp_configuration)
+    cda_client_obj: ApiClient = ApiClient(configuration=tmp_configuration)
 
     try:
         with cda_client_obj as api_client:
@@ -246,9 +254,11 @@ def columns(
             # column_array = np.array([list(t.values())[0] for t in query_result])
             return query_result
     except ServiceException as http_error:
-        http_error_logger(http_error)
+        if verbose:
+            http_error_logger(http_error)
     except InsecureRequestWarning:
         pass
     except Exception as e:
-        print(e)
+        if verbose:
+            print(e)
     return None

@@ -3,7 +3,7 @@ WORKDIR /src/notebooks
 COPY requirements.txt ./
 RUN pip install jupyter
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install git+https://github.com/CancerDataAggregator/cda-python.git@new_simple_parser_for_Q
+RUN pip install git+https://github.com/CancerDataAggregator/cda-python.git@
 RUN useradd -ms /bin/bash jupyter
 USER jupyter
 COPY . .

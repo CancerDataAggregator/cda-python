@@ -24,5 +24,11 @@ class QSyntaxError(SyntaxError):
         self.keyword = keyword
         super().__init__(self.message)
 
+    def PRINT_Q_ERROR(self) -> str:
+        return f'{self.message} -> Q operator "{self.keyword}" is not uppercase. Please use "{self.keyword.upper()}" instead'
+
     def __str__(self) -> str:
-        return f"{self.message} -> {self.keyword} in Q statement is not allowed only uppercase operators"
+        return self.PRINT_Q_ERROR()
+
+    def __repr__(self) -> str:
+        return self.PRINT_Q_ERROR()

@@ -1,18 +1,10 @@
 import json
+import re
 from collections import ChainMap
 from io import StringIO
 from multiprocessing.pool import ApplyResult
 from time import sleep
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    AsyncGenerator,
-    Dict,
-    Iterator,
-    List,
-    Optional,
-    Union,
-)
+from typing import Any, AsyncGenerator, Dict, Iterator, List, Optional, Pattern, Union
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
@@ -21,9 +13,24 @@ from rich import print
 from typing_extensions import Literal
 
 from cdapython.Paginator import Paginator
+from cdapython.utils.state import State
+from cdapython.utils.none_check import none_check
 
-if TYPE_CHECKING:
-    from cdapython.Q import Q
+
+class _QEncoder(json.JSONEncoder):
+    """_QEncoder this is a a class to help with json conversion
+        the standard json dump
+
+    Args:
+        json (_type_): _description_
+    """
+
+    def decode(self, o) -> str:
+        regex: Pattern[str] = re.compile(r"([^\"\\]|\\([\"\\\/bfnrt]|u[a-zA-Z\d]{4}))+")
+
+        if isinstance(o, str):
+            print(regex.match(o, pos=0))
+        return o
 
 
 class Result:
@@ -43,30 +50,27 @@ class Result:
         format_type: str = "json",
     ) -> None:
         self._api_response: QueryResponseData = api_response
-        self.__result: List[Any] = self._api_response.result
+        self._result: List[Any] = self._api_response.result
         self._query_id: str = query_id
         self._offset: Optional[int] = offset
         self._limit: Optional[int] = limit
         self._api_instance: QueryApi = api_instance
         self.show_sql: Optional[bool] = show_sql
         self.show_count: Optional[bool] = show_count
-        self.format_type = format_type
+        self.format_type: str = format_type
         self._df: DataFrame
 
-        if self.format_type == "tsv" and isinstance(self.__result, list):
+        if self.format_type == "tsv" and isinstance(self._result, list):
             data_text: str = ""
-            data_text = "\n".join(
-                map(lambda e: str(e).replace("\n", ""), self.__result)
+            data_text: str = "\n".join(
+                map(lambda e: str(e).replace("\n", ""), self._result)
             )
             self._df = read_csv(StringIO(data_text), sep="\t")
 
         # add a if check to query output for counts to hide sql
 
-    def _repr_value(
-        self, show_value: Optional[bool], show_count: Optional[bool]
-    ) -> str:
+    def _repr_value(self, show_value: Optional[bool]) -> str:
         return f"""
-            QueryID: {self._query_id}
             {"Query:"+self.sql if show_value is True else ""  }
             Offset: {self._offset}
             Count: {self.count}
@@ -75,31 +79,25 @@ class Result:
             """
 
     def __repr__(self) -> str:
-        return self._repr_value(show_value=self.show_sql, show_count=self.show_count)
+        return self._repr_value(show_value=self.show_sql)
 
     def __str__(self) -> str:
-        return self._repr_value(show_value=self.show_sql, show_count=self.show_count)
+        return self._repr_value(show_value=self.show_sql)
 
     def __dict__(self) -> Dict[str, Any]:  # type: ignore
-        return dict(ChainMap(*self.__result))
+        return dict(ChainMap(*self._result))
 
     def __eq__(self, __other: object) -> Union[Any, Literal[False]]:
-        return isinstance(__other, Result) and self.__result == __other.__result
-
-    def __ne__(self, __o: object) -> bool:
-        result = self.__eq__(__o)
-
-        if result is NotImplemented:
-            return NotImplemented
+        return isinstance(__other, Result) and self._result == __other.__result
 
     def __hash__(self) -> int:
-        return hash(tuple(self.__result))
+        return hash(tuple(self._result))
 
     def __contains__(self, value: str) -> bool:
-        exist = False
-        for item in self.__result:
+        exist: bool = False
+        for item in self._result:
             if value in item.values():
-                exist = True
+                exist: bool = True
 
         return exist
 
@@ -120,7 +118,7 @@ class Result:
         Returns:
             int
         """
-        return len(self.__result)
+        return len(self._result)
 
     @property
     def total_row_count(self) -> int:
@@ -144,7 +142,7 @@ class Result:
         meta: Optional[Union[str, List[Union[str, List[str]]]]] = None,
         meta_prefix: Optional[str] = None,
         max_level: Optional[int] = None,
-    ) -> Optional[DataFrame]:
+    ) -> DataFrame:
         """[summary]
         Creates a pandas DataFrame for the Results
 
@@ -165,6 +163,42 @@ class Result:
             meta_prefix=meta_prefix,
         )
 
+    def join_as_str(self, key: str, delimiter: str = ",") -> str:
+        if key == "":
+            raise KeyError("You need to add a value to join on")
+        field_split: list[str] = key.split(".")
+
+        if len(field_split) == 1:
+            return delimiter.join(f'"{w}"' for w in [i[key] for i in self._result])
+
+        def find_field(
+            current_field_index: int, field_list: List[Any], data: List[Any]
+        ) -> Union[str, Any]:
+            my_instance: Any = data[field_list[current_field_index]]
+
+            if current_field_index == len(field_list) - 1:
+                return my_instance
+            if isinstance(my_instance, dict):
+                return find_field(current_field_index + 1, field_list, my_instance)
+            if isinstance(my_instance, list):
+                return delimiter.join(
+                    [
+                        find_field(current_field_index + 1, field_list, m)
+                        for m in my_instance
+                    ]
+                )
+
+            raise Exception("you messed up")
+
+        tmp = delimiter.join(
+            f'"{w}"'
+            for w in [
+                find_field(current_field_index=0, field_list=field_split, data=result)
+                for result in self._result
+            ]
+        )
+        return tmp
+
     def to_list(self) -> List[Any]:
         """_summary_
 
@@ -172,15 +206,17 @@ class Result:
             list: _description_
         """
 
-        return self.__result
+        return self._result
 
     def __len__(self) -> int:
         return self.count
 
     def paginator(
         self,
+        output: str = "",
         to_df: bool = False,
         to_list: bool = False,
+        limit: Union[int, None] = None,
     ) -> Paginator:
         """_summary_
         paginator this will automatically page over results
@@ -194,32 +230,60 @@ class Result:
             self,
             to_df=to_df,
             to_list=to_list,
+            limit=limit,
+            output=output,
             format_type=self.format_type,
         )
+
+    def auto_paginator(
+        self,
+        output: str = "",
+        to_df: bool = False,
+        to_list: bool = False,
+        limit: Union[int, None] = None,
+    ) -> Union[DataFrame, List[Any]]:
+        iterator: Paginator = Paginator(
+            self,
+            to_df=to_df,
+            to_list=to_list,
+            limit=limit,
+            output=output,
+            format_type=self.format_type,
+        )
+        state: State = State(df=DataFrame(), list_array=[])
+        for i in iterator:
+            if to_df or output == "full_df":
+                state.concat_df(i)
+            if to_list or output == "full_list":
+                state.concat_list(i)
+        if to_df or output == "full_df":
+            return state.get_df()
+        else:
+            return state.get_list()
 
     def __getitem__(
         self, idx: Union[int, slice]
     ) -> Union[Series, DataFrame, Any, list]:
 
-        if isinstance(self.__result, DataFrame):
-            return self.__result.loc[idx]
+        if isinstance(self._result, DataFrame):
+            return self._result.loc[idx]
 
         if isinstance(idx, int):
             if idx < 0:
-                idx = self.count + idx
-            return self.__result[idx]
+                idx: int = self.count + idx
+            return self._result[idx]
         else:
             # for slicing result
             start, stop, step = idx.indices(self.count)
-            range_index = range(start, stop, step)
-            return [self.__result[i] for i in range_index]
+            range_index: range = range(start, stop, step)
+            return [self._result[i] for i in range_index]
 
-    def __iter__(self) -> Iterator:
-        return iter(self.__result)
+    def __iter__(self) -> Iterator[Any]:
+        return iter(self._result)
 
     def __aiter__(self) -> AsyncGenerator[Any, None]:
         async def tmp() -> AsyncGenerator[Any, None]:
-            yield self.__result
+            yield self._result
 
         return tmp()
 
@@ -288,9 +352,9 @@ class Result:
         pre_stream: bool = True,
     ) -> Optional["Result"]:
         if isinstance(self._offset, int) and isinstance(self._limit, int):
-            _offset = self._offset - self._limit
-            _offset = max(0, _offset)
-            _limit = limit or self._limit
+            _offset: int = self._offset - self._limit
+            _offset: int = max(0, _offset)
+            _limit: int = limit or self._limit
             return self._get_result(_offset, _limit, async_req, pre_stream)
         return None
 

@@ -1,23 +1,15 @@
 """
 cdapython is a library used to interact with the machine generated CDA Python Client and offers some syntactic sugar to make it more pleasant to query the CDA.
 """
-
+from __future__ import print_function
+from typing import Any, Dict
+from typing_extensions import Literal
 from cdapython._get_unnest_clause import _get_unnest_clause
 from cdapython.constant_variables import Constants
 from cdapython.Q import Q
 from cdapython.factories.count import Count
-
-
+from rich import print
 from cdapython.utils.utility import columns, query, unique_terms
-
-__name__ = "cdapython"
-__version__ = Constants._VERSION
-__about__ = f"Q {__version__}"
-
-
-def __repr__() -> str:
-    return __version__
-
 
 from cdapython.factories import (
     COUNT,
@@ -69,6 +61,33 @@ from cdapython.factories.treatment import Treatment, TreatmentCount
 
 from cdapython.factories.file import File
 from cdapython.factories.file_count import FileCount
+
+__name__: Literal["cdapython"] = "cdapython"
+__version__: str = Constants._VERSION
+__about__: str = f"Q {__version__}"
+
+
+try:
+    # python2
+    import __builtin__
+except ImportError:
+    # python3
+    import builtins as __builtin__
+
+
+def console_print(*args: Any, **kwargs: Any) -> None:
+    from rich.console import Console
+
+    console: Console = Console()
+    console.print(*args, **kwargs)
+
+
+__builtin__.print = console_print
+
+
+def __repr__() -> str:
+    return __version__
+
 
 QFactory.add_factory(FILE, File.Factory)
 QFactory.add_factory(FILE_COUNT, FileCount.Factory)

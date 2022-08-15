@@ -1,11 +1,17 @@
 import json
 from cdapython import Q
+import pytest
 
 
-def test_json_check() -> None:
-    json1 = Q(
-        'ResearchSubject.primary_diagnosis_site = "uterus" OR ResearchSubject.primary_diagnosis_condition = "Uterine Corpus Endometrial Carcinoma"'
-    ).researchsubject.count.to_json()
+@pytest.mark.parametrize(
+    "values",
+    [
+        'ResearchSubject.primary_diagnosis_site = "uterus" OR ResearchSubject.primary_diagnosis_condition = "Uterine Corpus Endometrial Carcinoma"',
+    ],
+)
+def test_json_check(values) -> None:
+    json1 = Q(values).researchsubject.count.to_json()
+    assert json.loads(json1)["node_type"] == "OR"
 
     Query1 = Q('ResearchSubject.primary_diagnosis_site = "uterus"')
     Query2 = Q(

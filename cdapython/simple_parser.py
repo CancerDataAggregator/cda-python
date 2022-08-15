@@ -1,5 +1,6 @@
 import re
-from typing import TYPE_CHECKING, Optional
+from typing import Any, Optional
+from typing_extensions import Literal
 
 from cda_client.model.query import Query
 
@@ -7,9 +8,6 @@ from tdparser import Lexer, Token
 from tdparser.topdown import Parser
 from cdapython.functions import backwards_comp, col, infer_quote, query_type_conversion
 from cdapython.utils.check_case import check_keyword
-
-if TYPE_CHECKING:
-    from cdapython.Q import Q
 
 
 def build_query_copy(q: Query) -> Optional[Query]:
@@ -223,7 +221,7 @@ class CommaType(Token):
 
         return query
 
-    def nud(self, context) -> Query:
+    def nud(self, context: Parser) -> Query:
         query = Query()
         query.value = self.text
 
@@ -377,7 +375,7 @@ class LeftParen(Token):
 
     match = RightParen
 
-    def nud(self, context: Parser):
+    def nud(self, context: Parser) -> Any:
         # Fetch the next expression
 
         expr = context.expression()
@@ -389,7 +387,7 @@ class LeftParen(Token):
             expr.value = f"({expr.value})"
         return expr
 
-    def __repr__(self):  # pragma: no cover
+    def __repr__(self) -> Literal["<(>"]:  # pragma: no cover
         return "<(>"
 
 
