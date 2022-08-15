@@ -512,7 +512,6 @@ class Q:
                 if verbose:
                     print(
                         "Getting results from database",
-                        style="#E1BE6A on #40B0A6",
                         end="\n\n",
                     )
 
