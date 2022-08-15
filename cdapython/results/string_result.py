@@ -38,7 +38,8 @@ class StringResult(Result):
             values = list(filter(None, values))
             return list(
                 filter(
-                    lambda items: (str(items).lower().find(str(filters)) != -1), values
+                    lambda items: (str(items).lower().find(str(filters.lower())) != -1),
+                    values,
                 )
             )
         return [list(i.values())[0] for i in self._api_response.result]
