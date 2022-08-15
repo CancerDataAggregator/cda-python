@@ -31,17 +31,29 @@ class StringResult(Result):
             format_type,
         )
 
-    def to_list(self, filters: Optional[str] = None) -> list:
+    def to_list(self, filters: Optional[str] = None, exact: bool = False) -> list:
         if filters is not None:
-            filters = filters.strip().replace("\n", " ")
+            filters: str = filters.strip().replace("\n", " ")
             values = [list(i.values())[0] for i in self._api_response.result]
             values = list(filter(None, values))
-            return list(
-                filter(
-                    lambda items: (str(items).lower().find(str(filters.lower())) != -1),
-                    values,
+            if exact:
+                return list(
+                    filter(
+                        lambda items: (str(items).lower() == filters.lower()),
+                        values,
+                    )
                 )
-            )
+
+            else:
+
+                return list(
+                    filter(
+                        lambda items: (
+                            str(items).lower().find(str(filters.lower())) != -1
+                        ),
+                        values,
+                    )
+                )
         return [list(i.values())[0] for i in self._api_response.result]
 
 
