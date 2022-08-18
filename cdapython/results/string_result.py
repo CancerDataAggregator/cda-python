@@ -35,8 +35,12 @@ class StringResult(Result):
         if filters is not None and filters != "":
 
             filters: str = filters.replace("\n", " ").strip()
-            values = [list(i.values())[0] for i in self._api_response.result]
-            values = list(filter(None, values))
+            values: list["StringResult"] = [
+                list(i.values())[0]
+                for i in self._api_response.result
+                if list(i.values())[0] is not None
+            ]
+            # values = list(filter(None, values))
             if exact:
                 return list(
                     filter(

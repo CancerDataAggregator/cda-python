@@ -9,6 +9,7 @@ def test_unique_terms_convert() -> None:
         table="gdc-bq-sample.dev",
         show_sql=True,
         show_counts=True,
+        async_req=True,
     ).to_dataframe()
 
 

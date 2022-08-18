@@ -467,7 +467,7 @@ class Q:
         host: Optional[str] = None,
         dry_run: bool = False,
         table: Optional[str] = None,
-        async_call: bool = False,
+        async_call: bool = True,
         verify: Optional[bool] = None,
         verbose: bool = True,
         filter: Optional[str] = None,

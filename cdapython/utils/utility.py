@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+from multiprocessing.pool import ApplyResult
 from typing import TYPE_CHECKING, Optional
 
 from cda_client.configuration import Configuration
@@ -99,7 +100,7 @@ def unique_terms(
     host: Optional[str] = None,
     table: Optional[str] = None,
     verify: Optional[bool] = None,
-    async_req: Optional[bool] = None,
+    async_req: Optional[bool] = True,
     version: Optional[str] = Constants.table_version,
     files: Optional[bool] = False,
     show_sql: bool = False,
@@ -153,7 +154,10 @@ def unique_terms(
                 system=str(system),
                 table=table,
                 count=show_counts,
+                async_req=async_req,
             )
+        if isinstance(api_response, ApplyResult):
+            api_response = api_response.get()
 
             # Execute query
             query_result = get_query_string_result(
@@ -188,10 +192,10 @@ def columns(
     limit: int = 100,
     table: Optional[str] = None,
     verify: Optional[bool] = None,
-    async_req: Optional[bool] = None,
+    async_req: Optional[bool] = True,
     pre_stream: bool = True,
     files: Optional[bool] = False,
-    async_call: bool = False,
+    async_call: bool = True,
     show_sql: bool = False,
     verbose: bool = True,
 ) -> Optional["StringResult"]:
@@ -238,6 +242,8 @@ def columns(
         with cda_client_obj as api_client:
             api_instance = QueryApi(api_client)
             api_response = api_instance.columns(version=version, table=table)
+            if isinstance(api_response, ApplyResult):
+                api_response = api_response.get()
             query_result = get_query_string_result(
                 api_instance=api_instance,
                 query_id=api_response.query_id,
