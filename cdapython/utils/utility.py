@@ -5,9 +5,9 @@ import logging
 from multiprocessing.pool import ApplyResult
 from typing import TYPE_CHECKING, Optional
 
-from cda_client.configuration import Configuration
-from cda_client.api_client import ApiClient
 from cda_client.api.query_api import QueryApi
+from cda_client.api_client import ApiClient
+from cda_client.configuration import Configuration
 from cda_client.exceptions import ServiceException
 from rich import print
 from urllib3.exceptions import InsecureRequestWarning

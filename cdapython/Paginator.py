@@ -1,24 +1,24 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, TypeVar, Union, Any
-from typing_extensions import Literal
+from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union
 
 from rich.progress import (
-    Progress,
-    MofNCompleteColumn,
-    TimeElapsedColumn,
-    TextColumn,
     BarColumn,
+    MofNCompleteColumn,
+    Progress,
     TaskProgressColumn,
+    TextColumn,
+    TimeElapsedColumn,
 )
+from typing_extensions import Literal
 
 from cdapython.utils.none_check import none_check
 
 if TYPE_CHECKING:
     from pandas import DataFrame
+    from rich.progress import TaskID
 
     from cdapython.results.result import Result
-    from rich.progress import TaskID
 
 TPaginator = TypeVar("TPaginator", bound="Paginator")
 

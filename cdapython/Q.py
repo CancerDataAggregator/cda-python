@@ -1,15 +1,33 @@
+"""
+Q this is the main file for Q lang.
+this file holds the class for Q , links to the parsers
+and SQL Like operators queue supports further to the bottom
+"""
 import logging
 from json import JSONEncoder, dumps, loads
 from multiprocessing.pool import ApplyResult
 from time import sleep
 from types import MappingProxyType
-from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union
-from typing_extensions import Literal
+from typing import Any, Dict, Optional, Tuple, TypeVar, Union
+
 import pandas as pd
 from cda_client import ApiClient, Configuration
 from cda_client.api.meta_api import MetaApi
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
+from cda_client.exceptions import ApiException, ServiceException
+from cda_client.model.query import Query
+from cda_client.model.query_created_data import QueryCreatedData
+from cda_client.model.query_response_data import QueryResponseData
+from pandas import DataFrame
+from typing_extensions import Literal
+from urllib3.connection import NewConnectionError  # type: ignore
+from urllib3.connectionpool import MaxRetryError
+from urllib3.exceptions import InsecureRequestWarning, SSLError
+
+from cdapython.constant_variables import Constants
+from cdapython.decorators.measure import Measure
+from cdapython.error_logger import unverified_http
 from cdapython.factories import (
     COUNT,
     DIAGNOSIS,
@@ -20,23 +38,9 @@ from cdapython.factories import (
     TREATMENT,
 )
 from cdapython.factories.q_factory import QFactory
-
-from cdapython.results.result import Result
-from cda_client.exceptions import ApiException, ServiceException
-from cda_client.model.query import Query
-from cda_client.model.query_created_data import QueryCreatedData
-from cda_client.model.query_response_data import QueryResponseData
-from urllib3.connection import NewConnectionError  # type: ignore
-from urllib3.connectionpool import MaxRetryError
-from urllib3.exceptions import InsecureRequestWarning, SSLError
-from cdapython.constant_variables import Constants
-from cdapython.decorators.measure import Measure
-from cdapython.error_logger import unverified_http
 from cdapython.functions import find_ssl_path
 from cdapython.results.result import Result, get_query_result
 from cdapython.simple_parser import simple_parser
-from pandas import DataFrame
-
 
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 # constants
@@ -91,19 +95,18 @@ class _QEncoder(JSONEncoder):
 
         if isinstance(o, MappingProxyType):
             return None
-        else:
-            """
-            Using vars() over o.__dict__ dunder method,
-            it is more pythonic because it is generally better to use a function over a magic/dunder method
-            to use vars() it returns the same thing as a dict of the class
-            """
-            tmp_dict: dict[str, Any] = vars(o)
-            if "query" in tmp_dict:
-                return tmp_dict["query"]
-            if "_data_store" in tmp_dict:
-                return tmp_dict["_data_store"]
 
-            return tmp_dict
+        """
+        Using vars() over o.__dict__ dunder method,
+        it is more pythonic because it is generally better to use a function over a magic/dunder method
+        """
+        tmp_dict: dict[str, Any] = vars(o)
+        if "query" in tmp_dict:
+            return tmp_dict["query"]
+        if "_data_store" in tmp_dict:
+            return tmp_dict["_data_store"]
+
+        return tmp_dict
 
 
 TQ = TypeVar("TQ", bound="Q")
@@ -127,7 +130,7 @@ class Q:
             if args[0] is None:
                 raise RuntimeError("Q statement parse error")
 
-            if type(args[0]) is Query:
+            if isinstance(args[0], Query):
                 self.query = args[0]
             else:
                 query_parsed: Query = simple_parser(args[0].strip().replace("\n", " "))
@@ -138,9 +141,9 @@ class Q:
                 "Require one or three arguments. Please see documentation."
             )
         else:
-            """_summary_
-            this is for Q operators support
-            """
+
+            # this is for Q operators support
+
             _l: Union[Query, str] = args[0]
             _op: Union[Query, str] = args[1]
             _r: Union[Query, str] = args[2]
@@ -174,18 +177,38 @@ class Q:
     # region staticmethods
     @staticmethod
     def get_version() -> str:
+        """returns the global version Q is pointing to
+
+        Returns:
+            str: returns a str of the current version
+        """
         return Constants._VERSION
 
     @staticmethod
     def set_host_url(url: str) -> None:
+        """this method will set the Global Q host url
+
+        Args:
+            url (str): param to set the global url
+        """
         Constants.CDA_API_URL = url
 
     @staticmethod
     def get_host_url() -> str:
+        """this method will get the Global Q host url
+
+        Returns:
+            str: returns a str of the current url
+        """
         return Constants.CDA_API_URL
 
     @staticmethod
     def set_default_project_dataset(table: str) -> None:
+        """_summary_
+
+        Args:
+            table (str): _description_
+        """
         Constants.default_table = table
 
     @staticmethod
@@ -256,10 +279,10 @@ class Q:
             if r is None:
                 return None
 
-            df: DataFrame = pd.DataFrame()
+            dataframe: DataFrame = pd.DataFrame()
             for i in r.paginator(to_df=True):
-                df: DataFrame = pd.concat([df, i])
-            return df
+                dataframe: DataFrame = pd.concat([dataframe, i])
+            return dataframe
         except Exception as e:
             print(e)
         return None
@@ -285,7 +308,7 @@ class Q:
 
     @staticmethod
     def query_job_status(
-        id: str, host: Optional[str] = None, verify: Optional[bool] = None
+        query_id: str, host: Optional[str] = None, verify: Optional[bool] = None
     ) -> Optional[Any]:
         """[summary]
 
@@ -306,7 +329,7 @@ class Q:
         try:
             with cda_client_obj as api_client:
                 api_instance: QueryApi = QueryApi(api_client)
-                api_response = api_instance.job_status(id)
+                api_response = api_instance.job_status(query_id)
                 return api_response["status"]
 
         except InsecureRequestWarning as e:
@@ -471,8 +494,7 @@ class Q:
         verify: Optional[bool] = None,
         verbose: bool = True,
         filter: Optional[str] = None,
-        flatten: bool = False,
-        format: str = "json",
+        format_type: str = "json",
         show_sql: bool = False,
     ) -> Union[Result, QueryCreatedData, ApplyResult, None]:
         """_summary_
@@ -541,14 +563,14 @@ class Q:
                 async_req=async_call,
                 show_sql=self._show_sql,
                 show_count=True,
-                format_type=format,
+                format_type=format_type,
             )
-        except ServiceException as httpError:
-            if httpError.body is not None:
+        except ServiceException as http_error:
+            if http_error.body is not None:
                 print(
                     f"""
-                Http Status: {httpError.status}
-                Error Message: {loads(httpError.body)["message"]}
+                Http Status: {http_error.status}
+                Error Message: {loads(http_error.body)["message"]}
                 """
                 )
 
@@ -556,9 +578,9 @@ class Q:
             if verbose:
                 print("Connection error")
 
-        except SSLError as e:
+        except SSLError as ssl_error:
             if verbose:
-                print(e)
+                print(ssl_error)
 
         except InsecureRequestWarning:
             if verbose:
@@ -566,14 +588,14 @@ class Q:
                     "Adding certificate verification pem is strongly advised please read our https://cda.readthedocs.io/en/latest/Installation.html "
                 )
 
-        except MaxRetryError as e:
+        except MaxRetryError as max_retry_error:
             if verbose:
                 print(
-                    f"Connection error max retry limit of 3 hit please check url or local python ssl pem {e}"
+                    f"Connection error max retry limit of 3 hit please check url or local python ssl pem {max_retry_error}"
                 )
-        except ApiException as e:
+        except ApiException as api_exception:
             if verbose:
-                print(e.body)
+                print(api_exception.body)
 
         except Exception as e:
             if verbose:
@@ -624,7 +646,6 @@ class Q:
         Returns:
             [Q]: [returns a Q object]
         """
-        ""
 
         # This lambda will strip a comma and rejoin the string
         fields: str = ",".join(map(lambda fields: fields.strip(","), fields.split()))
