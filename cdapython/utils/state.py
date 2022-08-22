@@ -1,6 +1,8 @@
-from typing import Any, List, Union, Optional
-from cdapython.utils.none_check import none_check
+from typing import Any, List, Optional, Union
+
 from pandas import DataFrame, concat
+
+from cdapython.utils.none_check import none_check
 
 
 class State:

@@ -1,11 +1,11 @@
 import re
 from typing import Any, Optional
-from typing_extensions import Literal
 
 from cda_client.model.query import Query
-
 from tdparser import Lexer, Token
 from tdparser.topdown import Parser
+from typing_extensions import Literal
+
 from cdapython.functions import backwards_comp, col, infer_quote, query_type_conversion
 from cdapython.utils.check_case import check_keyword
 

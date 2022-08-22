@@ -1,10 +1,9 @@
-import cdapython
-
 import click
 
+import cdapython
 import cdapython.constant_variables as const
-from cdapython.utils.utility import columns
 from cdapython import shell as Qshell
+from cdapython.utils.utility import columns
 
 
 @click.group()

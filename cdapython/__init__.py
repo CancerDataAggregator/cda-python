@@ -2,15 +2,14 @@
 cdapython is a library used to interact with the machine generated CDA Python Client and offers some syntactic sugar to make it more pleasant to query the CDA.
 """
 from __future__ import print_function
+
 from typing import Any, Dict
+
+from rich import print
 from typing_extensions import Literal
+
 from cdapython._get_unnest_clause import _get_unnest_clause
 from cdapython.constant_variables import Constants
-from cdapython.Q import Q
-from cdapython.factories.count import Count
-from rich import print
-from cdapython.utils.utility import columns, query, unique_terms
-
 from cdapython.factories import (
     COUNT,
     DIAGNOSIS,
@@ -33,34 +32,32 @@ from cdapython.factories import (
     TREATMENT_COUNT,
     QFactory,
 )
+from cdapython.factories.count import Count
+from cdapython.factories.diagnosis import Diagnosis, DiagnosisCount
+from cdapython.factories.file import File
+from cdapython.factories.file_count import FileCount
 from cdapython.factories.q_factory import QFactory
-from cdapython.factories.subject import (
-    Subject,
-    SubjectCount,
-    SubjectFiles,
-    SubjectFileCount,
-)
-
 from cdapython.factories.research_subject import (
     ResearchSubject,
     ResearchSubjectCount,
-    ResearchSubjectFiles,
     ResearchSubjectFileCount,
+    ResearchSubjectFiles,
 )
-
 from cdapython.factories.specimen import (
     Specimen,
     SpecimenCount,
-    SpecimenFiles,
     SpecimenFileCount,
+    SpecimenFiles,
 )
-
-from cdapython.factories.diagnosis import Diagnosis, DiagnosisCount
-
+from cdapython.factories.subject import (
+    Subject,
+    SubjectCount,
+    SubjectFileCount,
+    SubjectFiles,
+)
 from cdapython.factories.treatment import Treatment, TreatmentCount
-
-from cdapython.factories.file import File
-from cdapython.factories.file_count import FileCount
+from cdapython.Q import Q
+from cdapython.utils.utility import columns, query, unique_terms
 
 __name__: Literal["cdapython"] = "cdapython"
 __version__: str = Constants._VERSION

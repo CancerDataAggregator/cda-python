@@ -13,8 +13,8 @@ from rich import print
 from typing_extensions import Literal
 
 from cdapython.Paginator import Paginator
-from cdapython.utils.state import State
 from cdapython.utils.none_check import none_check
+from cdapython.utils.state import State
 
 
 class _QEncoder(json.JSONEncoder):
