@@ -137,7 +137,7 @@ class NotEq(Token):
         return query
 
 
-class Greaterthaneq(Token):
+class GreaterThanEq(Token):
     lbp = 5  # Precedence
 
     def led(self, left: Query, context: Parser) -> Query:
@@ -152,7 +152,7 @@ class Greaterthaneq(Token):
         return query
 
 
-class Greaterthan(Token):
+class GreaterThan(Token):
     lbp = 5  # Precedence
 
     def led(self, left: Query, context: Parser) -> Query:
@@ -167,7 +167,7 @@ class Greaterthan(Token):
         return query
 
 
-class Lessthaneq(Token):
+class LessThanEq(Token):
     lbp = 5  # Precedence
 
     def led(self, left: Query, context: Parser) -> Query:
@@ -182,7 +182,7 @@ class Lessthaneq(Token):
         return query
 
 
-class Lessthan(Token):
+class LessThan(Token):
     lbp = 5  # Precedence
 
     def led(self, left: Query, context: Parser) -> Query:
@@ -198,7 +198,7 @@ class Lessthan(Token):
         return query
 
 
-class Doublequotes(Token):
+class DoubleQuotes(Token):
     lbp = 10  # Precedence
 
     def nud(self, context: Parser) -> Query:
@@ -242,7 +242,7 @@ class ArrayType(Token):
         return query
 
 
-class Singlequotes(Token):
+class SingleQuotes(Token):
     lbp = 10  # Precedence
 
     def nud(self, context: Parser) -> Query:
@@ -405,15 +405,14 @@ lexer.register_token(
 
 lexer.register_token(LeftParen, re.compile(r"\("))
 lexer.register_token(RightParen, re.compile(r"\)"))
-lexer.register_token(Doublequotes, re.compile(r'(".*?")'))
-lexer.register_token(Singlequotes, re.compile(r"('.*?')"))
+lexer.register_token(DoubleQuotes, re.compile(r'(".*?")'))
+lexer.register_token(SingleQuotes, re.compile(r"('.*?')"))
 lexer.register_token(ArrayType, re.compile(r"(\[.*?\])"))
 lexer.register_token(CommaType, re.compile(r"(\s*,\s*)"))
-lexer.register_token(Greaterthan, re.compile(r"(\s+>+\s)"))
-lexer.register_token(Lessthan, re.compile(r"(\s+<+\s)"))
-lexer.register_token(Greaterthaneq, re.compile(r"(\s+>=+\s)"))
-lexer.register_token(Lessthan, re.compile(r"(\s+<+\s)"))
-lexer.register_token(Lessthaneq, re.compile(r"(\s+<=+\s)"))
+lexer.register_token(GreaterThan, re.compile(r"(\s+>+\s)"))
+lexer.register_token(LessThan, re.compile(r"(\s+<+\s)"))
+lexer.register_token(GreaterThanEq, re.compile(r"(\s+>=+\s)"))
+lexer.register_token(LessThanEq, re.compile(r"(\s+<=+\s)"))
 lexer.register_token(NotEq, re.compile(r"(\s+!=+\s)"))
 lexer.register_token(NotEq, re.compile(r"(\s+<>+\s)"))
 lexer.register_token(And, re.compile(r"(AND)"))

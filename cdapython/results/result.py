@@ -1,3 +1,7 @@
+"""
+result is a convenient wrapper around the response object from the CDA service it adds user functionality.
+like creating dataframe and manipulating data for ease-of-use such as paginating automatically for the user through their result objects.
+"""
 import json
 import re
 from collections import ChainMap
@@ -8,12 +12,12 @@ from typing import Any, AsyncGenerator, Dict, Iterator, List, Optional, Pattern,
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
-from pandas import DataFrame, Series, json_normalize, read_csv
+from pandas import DataFrame, Series, json_normalize, read_csv, MultiIndex
 from rich import print
+from rich.table import Table
 from typing_extensions import Literal
 
 from cdapython.Paginator import Paginator
-from cdapython.utils.none_check import none_check
 from cdapython.utils.state import State
 
 
@@ -25,16 +29,19 @@ class _QEncoder(json.JSONEncoder):
         json (_type_): _description_
     """
 
-    def decode(self, o) -> str:
+    def decode(self, object_json) -> str:
+        """
+        This is for json decoding super method
+        """
         regex: Pattern[str] = re.compile(r"([^\"\\]|\\([\"\\\/bfnrt]|u[a-zA-Z\d]{4}))+")
 
-        if isinstance(o, str):
-            print(regex.match(o, pos=0))
-        return o
+        if isinstance(object_json, str):
+            print(regex.match(object_json, pos=0))
+        return object_json
 
 
 class Result:
-    """_summary_
+    """
     The Results Class is a convenient wrapper around the response object from the CDA service.
     """
 
@@ -88,7 +95,7 @@ class Result:
         return dict(ChainMap(*self._result))
 
     def __eq__(self, __other: object) -> Union[Any, Literal[False]]:
-        return isinstance(__other, Result) and self._result == __other.__result
+        return isinstance(__other, Result) and self._result == __other._result
 
     def __hash__(self) -> int:
         return hash(tuple(self._result))
@@ -97,7 +104,7 @@ class Result:
         exist: bool = False
         for item in self._result:
             if value in item.values():
-                exist: bool = True
+                exist = True
 
         return exist
 
@@ -126,12 +133,17 @@ class Result:
         get the total count for the query
 
         Returns:
-            int
+            int: _description_
         """
         return int(self._api_response.total_row_count)
 
     @property
     def has_next_page(self) -> bool:
+        """This checks to see if there is a next page
+
+        Returns:
+            bool: returns a bool value if there is a next page
+        """
         if isinstance(self._offset, int) and isinstance(self._limit, int):
             return (self._offset + self._limit) <= self.total_row_count
         return False
@@ -163,10 +175,60 @@ class Result:
             meta_prefix=meta_prefix,
         )
 
+    def df_to_table(
+        self,
+        pandas_dataframe: Union[None, DataFrame] = None,
+        rich_table: Union[None, Table] = None,
+        show_index: bool = True,
+        index_name: Optional[str] = None,
+    ) -> Table:
+        """Convert a pandas.DataFrame obj into a rich.Table obj.
+        copied from https://gist.github.com/neelabalan/33ab34cf65b43e305c3f12ec6db05938#file-df_to_table-py
+        Args:
+            pandas_dataframe (DataFrame): A Pandas DataFrame to be converted to a rich Table.
+            rich_table (Table): A rich Table that should be populated by the DataFrame values.
+            show_index (bool): Add a column with a row count to the table. Defaults to True.
+            index_name (str, optional): The column name to give to the index column. Defaults to None, showing no value.
+        Returns:
+            Table: The rich Table instance passed, populated with the DataFrame values."""
+        _pandas_dataframe = None
+        if pandas_dataframe is None:
+            _pandas_dataframe: DataFrame = self.to_dataframe()
+
+        if rich_table is None:
+            rich_table: Table = Table(show_header=True, header_style="bold magenta")
+        if show_index:
+            index_name: str = str(index_name) if index_name else ""
+            rich_table.add_column(index_name)
+
+        for column in _pandas_dataframe.columns:
+            rich_table.add_column(str(column))
+
+        for index, value_list in enumerate(_pandas_dataframe.values.tolist()):
+            row: list[str] = [str(index)] if show_index else []
+            row.extend([str(x) for x in value_list])
+            rich_table.add_row(*row)
+
+        return rich_table
+
     def join_as_str(self, key: str, delimiter: str = ",") -> str:
+        """
+        This method is made for to search and join values by comma separated
+
+        Args:
+            key (str): The key value used to search json array.
+            delimiter (str, optional): _description_. Defaults to ",".
+
+        Raises:
+            KeyError: This is rasied if the user forgets to add a value to search on.
+            Exception: This is a catch all for errors
+
+        Returns:
+            str: This returns a comma separated field
+        """
         if key == "":
             raise KeyError("You need to add a value to join on")
-        field_split: list[str] = key.split(".")
+        field_split: List[str] = key.split(".")
 
         if len(field_split) == 1:
             return delimiter.join(f'"{w}"' for w in [i[key] for i in self._result])
@@ -200,7 +262,8 @@ class Result:
         return tmp
 
     def to_list(self) -> List[Any]:
-        """_summary_
+        """
+        This Returns a list for the results
 
         Returns:
             list: _description_
@@ -242,6 +305,18 @@ class Result:
         to_list: bool = False,
         limit: Union[int, None] = None,
     ) -> Union[DataFrame, List[Any]]:
+        """
+        auto_paginator is a method that will loop for you
+
+        Args:
+            output (str, optional): _description_. Defaults to "".
+            to_df (bool, optional): _description_. Defaults to False.
+            to_list (bool, optional): _description_. Defaults to False.
+            limit (Union[int, None], optional): _description_. Defaults to None.
+
+        Returns:
+            Union[DataFrame, List[Any]]: _description_
+        """
         iterator: Paginator = Paginator(
             self,
             to_df=to_df,
@@ -258,25 +333,35 @@ class Result:
                 state.concat_list(i)
         if to_df or output == "full_df":
             return state.get_df()
-        else:
+        if to_list or output == "full_list":
             return state.get_list()
+        return None
 
     def __getitem__(
         self, idx: Union[int, slice]
     ) -> Union[Series, DataFrame, Any, list]:
+        """
+        This access values Result as a list
+        Args:
+            idx (Union[int, slice]): _description_
 
+        Returns:
+            Union[Series, DataFrame, Any, list]: _description_
+        """
         if isinstance(self._result, DataFrame):
             return self._result.loc[idx]
 
         if isinstance(idx, int):
+            _idx = idx
             if idx < 0:
-                idx: int = self.count + idx
-            return self._result[idx]
-        else:
+                _idx: int = self.count + idx
+            return self._result[_idx]
+        if isinstance(idx, slice):
             # for slicing result
             start, stop, step = idx.indices(self.count)
             range_index: range = range(start, stop, step)
             return [self._result[i] for i in range_index]
+        return None
 
     def __iter__(self) -> Iterator[Any]:
         return iter(self._result)
@@ -307,6 +392,11 @@ class Result:
         async_req: bool = False,
         pre_stream: bool = True,
     ) -> Optional["Result"]:
+        """async wrapper for next page
+
+        Returns:
+            _type_: _description_
+        """
         return self.next_page(limit=limit, async_req=async_req, pre_stream=pre_stream)
 
     async def async_prev_page(
@@ -315,6 +405,12 @@ class Result:
         async_req: bool = False,
         pre_stream: bool = True,
     ) -> Optional["Result"]:
+        """
+        async wrapper for prev page
+
+        Returns:
+            _type_: _description_
+        """
         return self.prev_page(limit=limit, async_req=async_req, pre_stream=pre_stream)
 
     def next_page(
@@ -323,7 +419,7 @@ class Result:
         async_req: bool = False,
         pre_stream: bool = True,
     ) -> Optional["Result"]:
-        """_summary_
+        """
         The next_page function will call the server for the next page using this \
         limit to determine the next level of page results
         Args:
@@ -340,8 +436,8 @@ class Result:
         if not self.has_next_page:
             raise StopIteration
         if isinstance(self._offset, int) and isinstance(self._limit, int):
-            _offset = self._offset + self._limit
-            _limit = limit or self._limit
+            _offset: int = self._offset + self._limit
+            _limit: int = limit or self._limit
             return self._get_result(_offset, _limit, async_req, pre_stream)
         return None
 
@@ -351,6 +447,12 @@ class Result:
         async_req: bool = False,
         pre_stream: bool = True,
     ) -> Optional["Result"]:
+        """prev_page
+
+
+        Returns:
+            _type_: _description_
+        """
         if isinstance(self._offset, int) and isinstance(self._limit, int):
             _offset: int = self._offset - self._limit
             _offset: int = max(0, _offset)
@@ -387,7 +489,7 @@ def get_query_result(
     show_count: bool = True,
     format_type: str = "json",
 ) -> Optional[Result]:
-    """[summary]
+    """
         This will call the next query and wait for the result \
         then return a Result object to the user.
     Args:

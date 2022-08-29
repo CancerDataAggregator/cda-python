@@ -10,7 +10,6 @@ from time import sleep
 from types import MappingProxyType
 from typing import Any, Dict, Optional, Tuple, TypeVar, Union
 
-import pandas as pd
 from cda_client import ApiClient, Configuration
 from cda_client.api.meta_api import MetaApi
 from cda_client.api.query_api import QueryApi
@@ -19,7 +18,7 @@ from cda_client.exceptions import ApiException, ServiceException
 from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
 from cda_client.model.query_response_data import QueryResponseData
-from pandas import DataFrame
+from pandas import DataFrame, concat
 from typing_extensions import Literal
 from urllib3.connection import NewConnectionError  # type: ignore
 from urllib3.connectionpool import MaxRetryError
@@ -32,6 +31,7 @@ from cdapython.factories import (
     COUNT,
     DIAGNOSIS,
     FILE,
+    MUTATIONS,
     RESEARCH_SUBJECT,
     SPECIMEN,
     SUBJECT,
@@ -41,7 +41,6 @@ from cdapython.factories.q_factory import QFactory
 from cdapython.functions import find_ssl_path
 from cdapython.results.result import Result, get_query_result
 from cdapython.simple_parser import simple_parser
-from pandas import DataFrame
 
 # from cdapython.math_parser import math_parse
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
@@ -102,7 +101,7 @@ class _QEncoder(JSONEncoder):
         Using vars() over o.__dict__ dunder method,
         it is more pythonic because it is generally better to use a function over a magic/dunder method
         """
-        tmp_dict: dict[str, Any] = vars(o)
+        tmp_dict: Dict[str, Any] = vars(o)
         if "query" in tmp_dict:
             return tmp_dict["query"]
         if "_data_store" in tmp_dict:
@@ -172,8 +171,8 @@ class Q:
                 f.write(tmp_json)
         return tmp_json
 
-    def to_dict(self) -> Dict[str, Any]:
-        return vars(self)["query"]
+    def to_dict(self) -> Any:
+        return self.query.to_dict()
 
     # endregion
 
@@ -282,17 +281,18 @@ class Q:
             if r is None:
                 return None
 
-            dataframe: DataFrame = pd.DataFrame()
+            dataframe: DataFrame = DataFrame()
+            df: DataFrame = DataFrame()
             for i in r.paginator(to_df=True):
-                dataframe: DataFrame = pd.concat([dataframe, i])
-            return dataframe
+                df: DataFrame = concat([dataframe, i])
+            return df
         except Exception as e:
             print(e)
         return None
 
     @staticmethod
     def bigquery_status(
-        host: Optional[str] = None, verify: Optional[str] = None
+        host: Optional[str] = None, verify: Optional[bool] = None
     ) -> Union[str, Any]:
         """[summary]
         Uses the cda_client library's MetaClass to get status check on the cda
@@ -380,6 +380,10 @@ class Q:
     @property
     def treatment(self) -> "Q":
         return QFactory.create_entity(TREATMENT, self)
+
+    @property
+    def mutation(self) -> "Q":
+        return QFactory.create_entity(MUTATIONS, self)
 
     def _call_endpoint(
         self,
@@ -496,7 +500,7 @@ class Q:
         async_call: bool = True,
         verify: Optional[bool] = None,
         verbose: bool = True,
-        filter: Optional[str] = None,
+        filters: Optional[str] = None,
         format_type: str = "json",
         show_sql: bool = False,
     ) -> Union[Result, QueryCreatedData, ApplyResult, None]:
@@ -525,8 +529,8 @@ class Q:
 
         version, table = check_version_and_table(version, table)
 
-        if filter is not None:
-            self.query = Q.__select(self, fields=filter).query
+        if filters is not None:
+            self.query = Q.__select(self, fields=filters).query
 
         self._show_sql: bool = show_sql or False
 
@@ -605,15 +609,47 @@ class Q:
                 print(e)
 
     def AND(self, right: "Q") -> "Q":
+        """Q's AND operator this will add a AND to between two Q queries
+
+        Args:
+            right (Q): _description_
+
+        Returns:
+            Q: a joined Q queries with a AND node
+        """
         return self.__class__(self.query, "AND", right.query)
 
     def OR(self, right: "Q") -> "Q":
+        """Q's OR operator this will add a OR to between two Q queries
+
+        Args:
+            right (Q): _description_
+
+        Returns:
+            Q: a joined Q queries with a OR node
+        """
         return self.__class__(self.query, "OR", right.query)
 
     def FROM(self, right: "Q") -> "Q":
+        """Q's FROM operator this will add a SUBQUERY to between two Q queries
+
+        Args:
+            right (Q): _description_
+
+        Returns:
+            Q: a joined Q queries with a SUBQUERY node
+        """
         return self.__class__(self.query, "SUBQUERY", right.query)
 
     def NOT(self) -> "Q":
+        """Q's FROM operator this will add a NOT to between a Q query and a None for Not
+
+        Args:
+            right (Q): _description_
+
+        Returns:
+            Q: Adds a NOT to a Q query
+        """
         return self.__class__(self.query, "NOT", None)
 
     def _Not_EQ(self, right: "Q") -> "Q":
@@ -640,7 +676,7 @@ class Q:
     def IS(self, fields: str) -> "Q":
         return self.__class__(self.query, "IS", fields)
 
-    def __select(self, fields) -> "Q":
+    def __select(self, fields: str) -> "Q":
         """[summary]
 
         Args:
@@ -651,9 +687,10 @@ class Q:
         """
 
         # This lambda will strip a comma and rejoin the string
-        fields: str = ",".join(map(lambda fields: fields.strip(","), fields.split()))
-        fields: str = fields.replace(":", " AS ")
+        mod_fields: str = ",".join(
+            map(lambda fields: fields.strip(","), fields.split())
+        ).replace(":", " AS ")
         tmp: Query = Query()
         tmp.node_type = "SELECTVALUES"
-        tmp.value = fields
+        tmp.value = mod_fields
         return self.__class__(tmp, "SELECT", self.query)
