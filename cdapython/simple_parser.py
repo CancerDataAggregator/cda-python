@@ -47,6 +47,45 @@ def like_converter(query: Query, right_side: Query, left: Query) -> Query:
     return query
 
 
+class Integer(Token):
+    lbp = 0
+    regexp = r"\d+"
+
+    def nud(self, context):
+        return int(self.text)
+
+
+class Addition(Token):
+    regexp = r"\+"
+    lbp = 10
+
+    def led(self, left, context):
+        right_side = context.expression(self.lbp)
+        if isinstance(right_side, int):
+            query_value = Query()
+            query_value.value = str(left + int(right_side))
+            right_side = query_value
+        else:
+            right_side.value = str(left + int(right_side.value))
+        return right_side
+
+
+class Multiplication(Token):
+    regexp = r"\*"
+    lbp = 20
+
+    def led(self, left, context):
+
+        right_side = context.expression(self.lbp)
+        if isinstance(right_side, int):
+            query_value = Query()
+            query_value.value = str(left * int(right_side))
+            right_side = query_value
+        else:
+            right_side.value = str(left * int(right_side.value))
+        return right_side
+
+
 class Expression(Token):
     lbp = 0
 
@@ -396,10 +435,11 @@ class end_token:
 
 
 lexer = Lexer(with_parens=False)
+lexer.register_tokens(Integer, Addition, Multiplication)
 lexer.register_token(
     Expression,
     re.compile(
-        r"(\-[\S]+)|(\"[\w\s]+\")|(\b(?!(\bAND\b))(?!(\bOR\b))(?!(\bNOT\b))(?!(\bFROM\b))(?!(\bIN\b))(?!(\bLIKE\b))(?!(\bIS\b))[\w.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
+        r"(\-[\S]+)|(\"[\w\s]+\")|(?!\*)(?!\+)(?!-?[0-9])(\b(?!(\bAND\b))(?!(\bOR\b))(?!(\bNOT\b))(?!(\bFROM\b))(?!(\bIN\b))(?!(\bLIKE\b))(?!(\bIS\b))[a-zA-Z_.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
     ),
 )
 

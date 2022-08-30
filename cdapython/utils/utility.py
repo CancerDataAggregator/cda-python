@@ -244,6 +244,7 @@ def columns(
             api_response = api_instance.columns(version=version, table=table)
             if isinstance(api_response, ApplyResult):
                 api_response = api_response.get()
+
             query_result = get_query_string_result(
                 api_instance=api_instance,
                 query_id=api_response.query_id,
