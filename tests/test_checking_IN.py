@@ -1,5 +1,25 @@
 from cdapython import Q
+from cdapython.results.result import Result
 from tests.global_settings import host, table
+from tests.fake_result import FakeResultData
+from unittest import mock
+
+
+result = [
+    {
+        "id": "GENIE-DFCI-007281",
+        "identifier": [{"system": "GDC", "value": "GENIE-DFCI-007281"}],
+        "species": "homo sapiens",
+        "sex": "male",
+        "race": "white",
+        "ethnicity": "not hispanic or latino",
+        "days_to_birth": -16071,
+        "subject_associated_project": ["GENIE-DFCI"],
+        "vital_status": "Not Reported",
+        "days_to_death": None,
+        "cause_of_death": None,
+    }
+]
 
 
 def checking_test():
@@ -10,6 +30,3 @@ def checking_test():
     assert q1.query.to_dict()["l"]["node_type"] == "IN"
     r = q1.run(host=host, table=table)
     print(r)
-
-
-checking_test()

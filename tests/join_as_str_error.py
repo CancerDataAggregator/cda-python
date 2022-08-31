@@ -1,8 +1,10 @@
 from cdapython import Q
-from global_settings import localhost, table,host
+from global_settings import localhost, table, host
+from supermock import SuperMock
 
+@SuperMock()
 d = Q('ResearchSubject.Specimen.specimen_type = "slide"').specimen.run(
-    filter="""
+    filters="""
     id:r_id 
     species:things
     sex:gender
@@ -23,7 +25,7 @@ d = Q('ResearchSubject.Specimen.specimen_type = "slide"').specimen.run(
     table=table,
 )
 
-
+print(d.to_list())
 print(d.to_dataframe())
 
 print(d.join_as_str(key="me", delimiter=","))
