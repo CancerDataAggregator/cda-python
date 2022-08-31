@@ -52,7 +52,9 @@ class Integer(Token):
     regexp = r"\d+"
 
     def nud(self, context):
-        return int(self.text)
+        query = Query()
+        query.value = int(self.text)
+        return query
 
 
 class Addition(Token):
