@@ -53,7 +53,7 @@ class Integer(Token):
 
     def nud(self, context):
         query = Query()
-        query.value = int(self.text)
+        query.value = self.text
         return query
 
 
