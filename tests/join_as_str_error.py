@@ -1,8 +1,6 @@
 from cdapython import Q
 from global_settings import localhost, table, host
-from supermock import SuperMock
 
-@SuperMock()
 d = Q('ResearchSubject.Specimen.specimen_type = "slide"').specimen.run(
     filters="""
     id:r_id 
