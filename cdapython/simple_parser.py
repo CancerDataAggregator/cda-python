@@ -72,17 +72,29 @@ class Addition(Token):
 
 class Multiplication(Token):
     regexp = r"\*"
-    lbp = 20
+    lbp = 15
 
     def led(self, left, context):
-
+        right_math = 0
+        left_math = 0
+        query_value = Query()
         right_side = context.expression(self.lbp)
+
+        if isinstance(right_side, Query):
+            right_math = int(right_side.value)
+
+        if isinstance(left, Query):
+            left_side = left.value
+            left_math = int(left_side)
+
         if isinstance(right_side, int):
-            query_value = Query()
-            query_value.value = str(left * int(right_side))
-            right_side = query_value
-        else:
-            right_side.value = str(left * int(right_side.value))
+            right_math = int(right_side)
+
+        if isinstance(left, int):
+            left_math = int(left)
+
+        query_value.value = str(left_math * right_math)
+        right_side = query_value
         return right_side
 
 
