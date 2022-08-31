@@ -49,7 +49,7 @@ setup(
         "numpy>=1.21.6",
         "wheel>=0.36.2",
         "urllib3>=1.26.8",
-        "rich>=12.0.1",
+        "rich>=12.5.1",
         "itables == 1.1.2",
         "matplotlib>=3.5.1",
         "typing-extensions==4.2.0",
