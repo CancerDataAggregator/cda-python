@@ -149,6 +149,7 @@ class Q:
             _l: Union[Query, str] = args[0]
             _op: Union[Query, str] = args[1]
             _r: Union[Query, str] = args[2]
+
             self.query.node_type = _op
             self.query.l = _l  # noqa: E741
             self.query.r = _r  # noqa: E741
@@ -608,7 +609,12 @@ class Q:
             if verbose:
                 print(e)
 
-    def AND(self, right: "Q") -> "Q":
+    def _Q_wrap(self, right: Union[str, "Q", None], op):
+        if isinstance(right, str):
+            right = Q(right)
+        return self.__class__(self.query, op, right.query)
+
+    def AND(self, right: Union[str, "Q"]) -> "Q":
         """Q's AND operator this will add a AND to between two Q queries
 
         Args:
@@ -617,9 +623,9 @@ class Q:
         Returns:
             Q: a joined Q queries with a AND node
         """
-        return self.__class__(self.query, "AND", right.query)
+        return self._Q_wrap(right, op="AND")
 
-    def OR(self, right: "Q") -> "Q":
+    def OR(self, right: Union[str, "Q"]) -> "Q":
         """Q's OR operator this will add a OR to between two Q queries
 
         Args:
@@ -628,9 +634,9 @@ class Q:
         Returns:
             Q: a joined Q queries with a OR node
         """
-        return self.__class__(self.query, "OR", right.query)
+        return self._Q_wrap(right, op="OR")
 
-    def FROM(self, right: "Q") -> "Q":
+    def FROM(self, right: Union[str, "Q"]) -> "Q":
         """Q's FROM operator this will add a SUBQUERY to between two Q queries
 
         Args:
@@ -639,7 +645,7 @@ class Q:
         Returns:
             Q: a joined Q queries with a SUBQUERY node
         """
-        return self.__class__(self.query, "SUBQUERY", right.query)
+        return self._Q_wrap(right, op="SUBQUERY")
 
     def NOT(self) -> "Q":
         """Q's FROM operator this will add a NOT to between a Q query and a None for Not
@@ -650,16 +656,16 @@ class Q:
         Returns:
             Q: Adds a NOT to a Q query
         """
-        return self.__class__(self.query, "NOT", None)
+        return self._Q_wrap(None, op="NOT")
 
-    def _Not_EQ(self, right: "Q") -> "Q":
-        return self.__class__(self.query, "!=", right.query)
+    def _Not_EQ(self, right: Union[str, "Q"]) -> "Q":
+        return self._Q_wrap(right, op="!=")
 
-    def _Greater_Than_EQ(self, right: "Q") -> "Q":
-        return self.__class__(self.query, ">=", right.query)
+    def _Greater_Than_EQ(self, right: Union[str, "Q"]) -> "Q":
+        return self._Q_wrap(right, op=">=")
 
-    def _Greater_Than(self, right: "Q") -> "Q":
-        return self.__class__(self.query, ">", right.query)
+    def _Greater_Than(self, right: Union[str, "Q"]) -> "Q":
+        return self._Q_wrap(right, op=">")
 
     def _Less_Than_EQ(self, right: "Q") -> "Q":
         return self.__class__(self.query, "<=", right.query)
