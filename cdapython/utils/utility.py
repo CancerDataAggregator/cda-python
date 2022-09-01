@@ -9,7 +9,7 @@ from cda_client.api.query_api import QueryApi
 from cda_client.api_client import ApiClient
 from cda_client.configuration import Configuration
 from cda_client.exceptions import ServiceException
-from pandas import DataFrame
+from pandas import DataFrame, json_normalize
 from rich import print
 from urllib3.exceptions import InsecureRequestWarning
 
@@ -248,7 +248,14 @@ def columns(
                     show_sql=show_sql, show_count=True, result=api_response["result"]
                 )
                 if description:
-                    return query_result.to_dataframe()
+
+                    data_table = {
+                        "Result": [list(i.keys())[0] for i in api_response["result"]],
+                        "Description": [
+                            list(i.values())[0] for i in api_response["result"]
+                        ],
+                    }
+                    return DataFrame(data_table)
                 return query_result
             else:
                 query_result: ColumnsResult = ColumnsResult(

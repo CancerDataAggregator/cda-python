@@ -1,5 +1,5 @@
 from typing import Optional, Union, List
-from pandas import DataFrame
+from pandas import DataFrame, json_normalize
 
 from cdapython.results.base import BaseResult
 
@@ -56,3 +56,30 @@ class ColumnsResult(BaseResult):
                     )
                 )
         return [list(i.keys())[0] for i in self._result]
+
+    def to_dataframe(
+        self,
+        record_path: Optional[Union[str, list]] = None,
+        meta: Optional[Union[str, List[Union[str, List[str]]]]] = None,
+        meta_prefix: Optional[str] = None,
+        max_level: Optional[int] = None,
+    ) -> DataFrame:
+        """[summary]
+        Creates a pandas DataFrame for the Results
+
+        Returns:
+            DataFrame: [description]
+        """
+        if self.format_type == "tsv":
+            return self._df
+
+        if record_path is None:
+            return json_normalize(iter(self))
+
+        return json_normalize(
+            iter(self),
+            max_level=max_level,
+            record_path=record_path,
+            meta=meta,
+            meta_prefix=meta_prefix,
+        )
