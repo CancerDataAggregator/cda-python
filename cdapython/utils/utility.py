@@ -250,7 +250,9 @@ def columns(
                 if description:
 
                     data_table = {
-                        "Result": [list(i.keys())[0] for i in api_response["result"]],
+                        "Column_Name": [
+                            list(i.keys())[0] for i in api_response["result"]
+                        ],
                         "Description": [
                             list(i.values())[0] for i in api_response["result"]
                         ],
