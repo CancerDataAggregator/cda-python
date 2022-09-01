@@ -20,6 +20,15 @@ class ColumnsResult(BaseResult):
             result=result,
         )
 
+    def _repr_value(self, show_value: Optional[bool]) -> str:
+        return f"""Number of Fields {len(self._result)}"""
+
+    def __repr__(self) -> str:
+        return self._repr_value(show_value=self.show_sql)
+
+    def __str__(self) -> str:
+        return self._repr_value(show_value=self.show_sql)
+
     def to_list(self, filters: Optional[str] = None, exact: bool = False) -> list:
         if filters is not None and filters != "":
 

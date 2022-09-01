@@ -3,12 +3,13 @@ from __future__ import annotations
 import json
 import logging
 from multiprocessing.pool import ApplyResult
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import ApiClient
 from cda_client.configuration import Configuration
 from cda_client.exceptions import ServiceException
+from pandas import DataFrame
 from rich import print
 from urllib3.exceptions import InsecureRequestWarning
 
@@ -17,6 +18,7 @@ from cdapython.decorators.cache import lru_cache_timed
 from cdapython.error_logger import unverified_http
 from cdapython.functions import backwards_comp, find_ssl_path
 from cdapython.Qparser import parser
+from cdapython.results.columns_result import ColumnsResult
 from cdapython.results.string_result import get_query_string_result
 
 logging.captureWarnings(InsecureRequestWarning)
@@ -188,17 +190,13 @@ def unique_terms(
 def columns(
     version: Optional[str] = None,
     host: Optional[str] = None,
-    offset: int = 0,
-    limit: int = 100,
     table: Optional[str] = None,
     verify: Optional[bool] = None,
     async_req: Optional[bool] = True,
-    pre_stream: bool = True,
-    files: Optional[bool] = False,
-    async_call: bool = True,
     show_sql: bool = False,
     verbose: bool = True,
-) -> Optional["StringResult"]:
+    description: bool = False,
+):
     """[summary]
 
     Args:
@@ -245,21 +243,24 @@ def columns(
             if isinstance(api_response, ApplyResult):
                 api_response = api_response.get()
 
-            query_result = get_query_string_result(
-                api_instance=api_instance,
-                query_id=api_response.query_id,
-                offset=offset,
-                limit=limit,
-                async_req=async_call,
-                show_sql=show_sql,
-                show_count=True,
-            )
+            if "result" in api_response:
+                query_result: ColumnsResult = ColumnsResult(
+                    show_sql=show_sql, show_count=True, result=api_response["result"]
+                )
+                if description:
+                    return query_result.to_dataframe()
+                return query_result
+            else:
+                query_result: ColumnsResult = ColumnsResult(
+                    show_sql=show_sql, show_count=True, result=api_response
+                )
+            result_value: ColumnsResult = query_result
 
             if query_result is None:
+                result_value = None
                 return None
 
-            # column_array = np.array([list(t.values())[0] for t in query_result])
-            return query_result
+            return result_value
     except ServiceException as http_error:
         if verbose:
             http_error_logger(http_error)
