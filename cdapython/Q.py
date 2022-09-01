@@ -680,7 +680,7 @@ class Q:
         pass
 
     def IS(self, fields: str) -> "Q":
-        return self.__class__(self.query, "IS", fields)
+        return self._Q_wrap(fields, op="IS")
 
     def __select(self, fields: str) -> "Q":
         """[summary]
