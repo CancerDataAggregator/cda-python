@@ -1,4 +1,4 @@
-from cdapython import Q
+from cdapython import query, Q
 from tests.global_settings import host
 from unittest import mock
 from pandas import DataFrame
@@ -29,11 +29,9 @@ fake_result = CountResult(
 
 
 @mock.patch("cdapython.Q.run", return_value=fake_result)
-def testing_researchsubject(a) -> None:
+def testing_subject(a) -> None:
     q2 = Q("sex = 'male'")
-    q = q2.researchsubject.count.run(host=host)
+    print(q2.to_json())
+    q = q2.subject.count.run(host=host)
     assert isinstance(q.to_list(), list) is True
     assert isinstance(q.to_dataframe(), DataFrame) is True
-
-
-testing_researchsubject()
