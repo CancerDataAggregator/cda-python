@@ -1,6 +1,7 @@
 from cdapython import Q
 from tests.global_settings import localhost, host
 
+
 def test_copying_Q():
 
     q1 = Q('ResearchSubject.primary_disease_type = "Lung%"')

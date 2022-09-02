@@ -3,7 +3,6 @@ from cdapython import Q
 import pytest
 
 
-
 def test_json_check(values) -> None:
     json1 = Q(values).researchsubject.count.to_json()
     assert json.loads(json1)["node_type"] == "OR"

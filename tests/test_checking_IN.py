@@ -6,34 +6,34 @@ from unittest import mock
 from pandas import DataFrame
 
 
-
 result = [
     {
-        'id': 'GENIE-DFCI-007281',
-        'identifier': [{'system': 'GDC', 'value': 'GENIE-DFCI-007281'}],
-        'species': 'homo sapiens',
-        'sex': 'male',
-        'race': 'white',
-        'ethnicity': 'not hispanic or latino',
-        'days_to_birth': -16071,
-        'subject_associated_project': ['GENIE-DFCI'],
-        'vital_status': 'Not Reported',
-        'days_to_death': None,
-        'cause_of_death': None
+        "id": "GENIE-DFCI-007281",
+        "identifier": [{"system": "GDC", "value": "GENIE-DFCI-007281"}],
+        "species": "homo sapiens",
+        "sex": "male",
+        "race": "white",
+        "ethnicity": "not hispanic or latino",
+        "days_to_birth": -16071,
+        "subject_associated_project": ["GENIE-DFCI"],
+        "vital_status": "Not Reported",
+        "days_to_death": None,
+        "cause_of_death": None,
     }
 ]
 
 fake = FakeResultData(result)
 fake_result = Result(
-                    api_response=fake.api_response,
-                    query_id=fake.query_id,
-                    offset=fake.offset,
-                    limit=fake.limit,
-                    api_instance=fake.api_instance,
-                    show_sql=fake.show_sql,
-                    show_count=fake.show_count,
-                    format_type=fake.format_type,
-                )
+    api_response=fake.api_response,
+    query_id=fake.query_id,
+    offset=fake.offset,
+    limit=fake.limit,
+    api_instance=fake.api_instance,
+    show_sql=fake.show_sql,
+    show_count=fake.show_count,
+    format_type=fake.format_type,
+)
+
 
 @mock.patch("cdapython.Q.run", return_value=fake_result)
 def test_checking_test(a):
