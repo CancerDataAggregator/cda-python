@@ -47,6 +47,23 @@ def like_converter(query: Query, right_side: Query, left: Query) -> Query:
     return query
 
 
+def is_float(num):
+    if re.match(r"[-+]?\d*\.\d+", num) is not None:
+        return True
+    else:
+        return False
+
+
+class Decmimal_Number(Token):
+    lbp = 0
+    regexp = r"[-+]?\d*\.\d+"
+
+    def nud(self, context):
+        query = Query()
+        query.value = self.text
+        return query
+
+
 class Integer(Token):
     lbp = 0
     regexp = r"\d+"
@@ -72,6 +89,40 @@ class Addition(Token):
         return right_side
 
 
+class Division(Token):
+    regexp = r"\/"
+    lbp = 15
+
+    def led(self, left, context):
+        right_math = 0
+        left_math = 0
+        query_value = Query()
+        right_side = context.expression(self.lbp)
+
+        if isinstance(right_side, Query):
+            if is_float(right_side.value) is True:
+                right_math = float(right_side.value)
+            else:
+                right_math = int(right_side.value)
+
+        if isinstance(left, Query):
+            left_side = left.value
+            if is_float(left_side) is True:
+                left_math = float(left_side)
+            else:
+                left_math = int(left_side)
+
+        if isinstance(right_side, int):
+            right_math = int(right_side)
+
+        if isinstance(left, int):
+            left_math = int(left)
+
+        query_value.value = str(left_math / right_math)
+        right_side = query_value
+        return right_side
+
+
 class Multiplication(Token):
     regexp = r"\*"
     lbp = 15
@@ -83,11 +134,17 @@ class Multiplication(Token):
         right_side = context.expression(self.lbp)
 
         if isinstance(right_side, Query):
-            right_math = int(right_side.value)
+            if is_float(right_side.value) is True:
+                right_math = float(right_side.value)
+            else:
+                right_math = int(right_side.value)
 
         if isinstance(left, Query):
             left_side = left.value
-            left_math = int(left_side)
+            if is_float(left_side) is True:
+                left_math = float(left_side)
+            else:
+                left_math = int(left_side)
 
         if isinstance(right_side, int):
             right_math = int(right_side)
@@ -449,11 +506,11 @@ class end_token:
 
 
 lexer = Lexer(with_parens=False)
-lexer.register_tokens(Integer, Addition, Multiplication)
+lexer.register_tokens(Integer, Decmimal_Number, Addition, Multiplication, Division)
 lexer.register_token(
     Expression,
     re.compile(
-        r"(\-[\S]+)|(\"[\w\s]+\")|(?!\*)(?!\+)(?!-?[0-9])(\b(?!(\bAND\b))(?!(\bOR\b))(?!(\bNOT\b))(?!(\bFROM\b))(?!(\bIN\b))(?!(\bLIKE\b))(?!(\bIS\b))[a-zA-Z_.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
+        r"(\-[\S]+)|(\"[\w\s]+\")|(?!\*)(?!\+)(?!\/)(?![+-]?([0-9]*[.])?[0-9]+)(\b(?!(\bAND\b))(?!(\bOR\b))(?!(\bNOT\b))(?!(\bFROM\b))(?!(\bIN\b))(?!(\bLIKE\b))(?!(\bIS\b))[a-zA-Z_.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
     ),
 )
 
