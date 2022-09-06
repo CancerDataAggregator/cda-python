@@ -11,11 +11,6 @@ def test_in_parser_testing() -> None:
 
 
 def test_age_at_death() -> None:
-    q2 = (
-        Q(
-            'age_at_death IS null OR age_at_death = 0 AND sex = "male" OR sex = "female" '
-        )
-        .run(host=host, table=table)
-        .to_dataframe()
-    )
-    print(host, table)
+    q2 = Q(
+        'age_at_death IS null OR age_at_death = 0 AND sex = "male" OR sex = "female" '
+    ).run(host=host, table=table)
