@@ -20,6 +20,9 @@ ipywidgets="7.7.0"
 python-dotenv="0.18.0"
 itables = "^1.1.2"
 ipython = "7.34.0"
+nbconvert = "6.5.1"
+Pillow = "9.2.0"
+notebook = "6.4.12"
 
 
 
