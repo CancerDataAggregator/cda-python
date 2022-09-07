@@ -2,7 +2,7 @@ import click
 
 import cdapython
 import cdapython.constant_variables as const
-from cdapython import shell as Qshell
+
 from cdapython.utils.utility import columns
 
 
@@ -13,6 +13,7 @@ def cli() -> None:
 
 @click.command()
 def shell() -> None:
+    from cdapython import shell as Qshell
 
     Qshell
 
@@ -44,5 +45,9 @@ cli.add_command(run)
 cli.add_command(ls_column)
 
 
-if __name__ == "__main__":
+def main() -> None:
     cli.main()
+
+
+if __name__ == "__main__":
+    main()

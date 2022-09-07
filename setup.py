@@ -63,6 +63,6 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     entry_points={
-        "console_scripts": ["cdapython = cdapython:main"],
+        "console_scripts": ["Q = cdapython.__main__:main"],
     },
 )

@@ -61,6 +61,7 @@ new: bool = True
 setServer: Union[str, None] = None
 setDataFrame: Union[bool, None] = None
 console: Console = Console(record=True)
+setTable: Union[str, None] = None
 
 
 def help() -> None:
@@ -76,6 +77,7 @@ def help() -> None:
         exit()
         clear()
         server() set the server
+        table()
         DataFrame()
         \n
         """
@@ -89,7 +91,7 @@ while True:
             f'Q {Q.get_version()} Type "help()", "copyright", "credits" or "license" for more information.'
         )
         new: bool = False
-    text: str = input("Q >>> ")
+    text: str = input(">>>")
     if text == "help()":
         help()
         continue
@@ -102,6 +104,8 @@ while True:
     if text == "server()":
         setServer = console.input("Enter your server ")
         continue
+    if text == "table()":
+        setServer = console.input("Enter your table ")
     if text == "DataFrame()":
         setDataFrame = True
         continue
@@ -110,7 +114,7 @@ while True:
         if setServer is None:
             queryResult = result.run()
         else:
-            queryResult = result.run(host=setServer)
+            queryResult = result.run(host=setServer, table=setTable)
 
         if setDataFrame:
             queryResult = queryResult.to_dataframe()

@@ -1,6 +1,6 @@
 from cdapython import Q
 from unittest import mock
-from fake_result import FakeResultData
+from tests.fake_result import FakeResultData
 from cdapython.results.result import Result
 
 
@@ -6981,7 +6981,8 @@ fake_result = Result(
     format_type=fake.format_type,
 )
 
-@mock.patch("cdapython.Q.run", return_value=result)
+
+@mock.patch("cdapython.Q.run", return_value=fake_result)
 def test_kidney(a):
     q1 = Q('ResearchSubject.primary_diagnosis_site = "Kidney"')
     r1 = q1.run(limit=500)
