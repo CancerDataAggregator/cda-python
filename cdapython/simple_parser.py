@@ -10,6 +10,28 @@ from cdapython.functions import backwards_comp, col, infer_quote, query_type_con
 from cdapython.utils.check_case import check_keyword
 
 
+SYMBOL_TABLE = {}
+
+
+class Symbol_Base(Token):
+    sym_id = None
+    sym_value = None
+    first = second = third = None
+
+    def nud(self):
+        raise SyntaxError("Syntax error (%r)." % self.sym_id)
+
+    def led(self, left):
+        raise SyntaxError("Unknown operator (%r)." % self.sym_id)
+
+    def __repr__(self):
+        if self.sym_id == "(name)" or self.sym_id == "(literal)":
+            return "(%s %s)" % (self.sym_id[1:-1], self.sym_value)
+        out = [self.sym_id, self.first, self.second, self.third]
+        out = map(str, filter(None, out))
+        return "(" + " ".join(out) + ")"
+
+
 def build_query_copy(q: Query) -> Optional[Query]:
     if q is None:
         return None
@@ -48,7 +70,8 @@ def like_converter(query: Query, right_side: Query, left: Query) -> Query:
 
 
 def is_float(num):
-    if re.match(r"[-+]?\d*\.\d+", num) is not None:
+    float_regex = re.compile(r"[-+]?\d*\.\d+")
+    if re.match(float_regex, num) is not None:
         return True
     else:
         return False
@@ -76,16 +99,36 @@ class Integer(Token):
 
 class Addition(Token):
     regexp = r"\+"
-    lbp = 10
+    lbp = 15
 
     def led(self, left, context):
+        right_math = 0
+        left_math = 0
+        query_value = Query()
         right_side = context.expression(self.lbp)
+        if isinstance(right_side, Query):
+            if is_float(right_side.value) is True:
+                right_math = float(right_side.value)
+            else:
+                right_math = int(right_side.value)
+
+        if isinstance(left, Query):
+            left_side = left.value
+            if is_float(left_side) is True:
+                left_math = float(left_side)
+            else:
+                left_math = int(left_side)
+
+        if isinstance(right_side, float):
+            right_math = float(right_side)
         if isinstance(right_side, int):
-            query_value = Query()
-            query_value.value = str(left + int(right_side))
-            right_side = query_value
-        else:
-            right_side.value = str(left + int(right_side.value))
+            right_math = int(right_side)
+        if isinstance(left, float):
+            left_math = float(left)
+        if isinstance(left, int):
+            left_math = int(left)
+        query_value.value = str(left_math / right_math)
+        right_side = query_value
         return right_side
 
 
@@ -112,9 +155,12 @@ class Division(Token):
             else:
                 left_math = int(left_side)
 
+        if isinstance(right_side, float):
+            right_math = float(right_side)
         if isinstance(right_side, int):
             right_math = int(right_side)
-
+        if isinstance(left, float):
+            left_math = float(left)
         if isinstance(left, int):
             left_math = int(left)
 
@@ -145,6 +191,12 @@ class Multiplication(Token):
                 left_math = float(left_side)
             else:
                 left_math = int(left_side)
+
+        if isinstance(right_side, float):
+            right_math = float(right_side)
+
+        if isinstance(left, float):
+            left_math = float(left)
 
         if isinstance(right_side, int):
             right_math = int(right_side)

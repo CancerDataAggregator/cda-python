@@ -501,7 +501,7 @@ class Q:
         async_call: bool = False,
         verify: Optional[bool] = None,
         verbose: bool = True,
-        filters: Optional[str] = None,
+        include: Optional[str] = None,
         format_type: str = "json",
         show_sql: bool = False,
     ) -> Union[Result, QueryCreatedData, ApplyResult, None]:
@@ -530,8 +530,8 @@ class Q:
 
         version, table = check_version_and_table(version, table)
 
-        if filters is not None:
-            self.query = Q.__select(self, fields=filters).query
+        if include is not None:
+            self.query = Q.__select(self, fields=include).query
 
         self._show_sql: bool = show_sql or False
 
