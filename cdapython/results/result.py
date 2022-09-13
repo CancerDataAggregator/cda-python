@@ -152,7 +152,7 @@ class Result(BaseResult):
         output: str = "",
         to_df: bool = False,
         to_list: bool = False,
-        limit: Union[int, None] = None,
+        page_size: Union[int, None] = None,
     ) -> Paginator:
         """_summary_
         paginator this will automatically page over results
@@ -166,7 +166,7 @@ class Result(BaseResult):
             self,
             to_df=to_df,
             to_list=to_list,
-            limit=limit,
+            limit=page_size,
             output=output,
             format_type=self.format_type,
         )
@@ -176,7 +176,7 @@ class Result(BaseResult):
         output: str = "",
         to_df: bool = False,
         to_list: bool = False,
-        limit: Union[int, None] = None,
+        page_size: Union[int, None] = None,
     ) -> Union[DataFrame, List[Any]]:
         """
         auto_paginator is a method that will loop for you
@@ -194,7 +194,7 @@ class Result(BaseResult):
             self,
             to_df=to_df,
             to_list=to_list,
-            limit=limit,
+            limit=page_size,
             output=output,
             format_type=self.format_type,
         )

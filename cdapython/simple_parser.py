@@ -69,8 +69,8 @@ def like_converter(query: Query, right_side: Query, left: Query) -> Query:
     return query
 
 
-def is_float(num):
-    float_regex = re.compile(r"[-+]?\d*\.\d+")
+def is_float(num) -> bool:
+    float_regex: re.Pattern[str] = re.compile(r"[-+]?\d*\.\d+")
     if re.match(float_regex, num) is not None:
         return True
     else:
