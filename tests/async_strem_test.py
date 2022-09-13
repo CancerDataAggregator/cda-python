@@ -12,7 +12,7 @@ async def main() -> None:
     q = q.run(host=host, table=table, async_call=True, show_sql=True, limit=10)
 
     df = DataFrame()
-    async for i in q.paginator(limit=200, output="full_df"):
+    async for i in q.paginator(page_size=200, output="full_df"):
         df = concat([df, i])
     print(df.head())
 
