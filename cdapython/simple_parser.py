@@ -1,5 +1,5 @@
 import re
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from cda_client.model.query import Query
 from tdparser import Lexer, Token
@@ -97,37 +97,58 @@ class Integer(Token):
         return query
 
 
+def math_logic_check(right_side: Union[Query, str], left: Union[Query, str]):
+    right_math: Union[int, float, None] = None
+    left_math: Union[int, float, None] = None
+    if isinstance(right_side, Query):
+        if is_float(right_side.value) is True:
+            right_math = float(right_side.value)
+        else:
+            right_math: int = int(right_side.value)
+
+    if isinstance(left, Query):
+        left_side = left.value
+        if is_float(left_side) is True:
+            left_math = float(left_side)
+        else:
+            left_math = int(left_side)
+
+    if isinstance(right_side, float):
+        right_math = float(right_side)
+    if isinstance(right_side, int):
+        right_math = int(right_side)
+    if isinstance(left, float):
+        left_math = float(left)
+    if isinstance(left, int):
+        left_math = int(left)
+
+    return (right_math, left_math)
+
+
 class Addition(Token):
     regexp = r"\+"
     lbp = 15
 
     def led(self, left, context):
-        right_math = 0
-        left_math = 0
+
         query_value = Query()
         right_side = context.expression(self.lbp)
-        if isinstance(right_side, Query):
-            if is_float(right_side.value) is True:
-                right_math = float(right_side.value)
-            else:
-                right_math = int(right_side.value)
-
-        if isinstance(left, Query):
-            left_side = left.value
-            if is_float(left_side) is True:
-                left_math = float(left_side)
-            else:
-                left_math = int(left_side)
-
-        if isinstance(right_side, float):
-            right_math = float(right_side)
-        if isinstance(right_side, int):
-            right_math = int(right_side)
-        if isinstance(left, float):
-            left_math = float(left)
-        if isinstance(left, int):
-            left_math = int(left)
+        right_math, left_math = math_logic_check(right_side, left)
         query_value.value = str(left_math + right_math)
+        right_side = query_value
+        return right_side
+
+
+class Subtraction(Token):
+    regexp = r"\-"
+    lbp = 15
+
+    def led(self, left, context):
+
+        query_value = Query()
+        right_side = context.expression(self.lbp)
+        right_math, left_math = math_logic_check(right_side, left)
+        query_value.value = str(left_math - right_math)
         right_side = query_value
         return right_side
 
@@ -137,33 +158,9 @@ class Division(Token):
     lbp = 15
 
     def led(self, left, context):
-        right_math = 0
-        left_math = 0
         query_value = Query()
         right_side = context.expression(self.lbp)
-
-        if isinstance(right_side, Query):
-            if is_float(right_side.value) is True:
-                right_math = float(right_side.value)
-            else:
-                right_math = int(right_side.value)
-
-        if isinstance(left, Query):
-            left_side = left.value
-            if is_float(left_side) is True:
-                left_math = float(left_side)
-            else:
-                left_math = int(left_side)
-
-        if isinstance(right_side, float):
-            right_math = float(right_side)
-        if isinstance(right_side, int):
-            right_math = int(right_side)
-        if isinstance(left, float):
-            left_math = float(left)
-        if isinstance(left, int):
-            left_math = int(left)
-
+        right_math, left_math = math_logic_check(right_side, left)
         query_value.value = str(left_math / right_math)
         right_side = query_value
         return right_side
@@ -174,36 +171,9 @@ class Multiplication(Token):
     lbp = 15
 
     def led(self, left, context):
-        right_math = 0
-        left_math = 0
         query_value = Query()
         right_side = context.expression(self.lbp)
-
-        if isinstance(right_side, Query):
-            if is_float(right_side.value) is True:
-                right_math = float(right_side.value)
-            else:
-                right_math = int(right_side.value)
-
-        if isinstance(left, Query):
-            left_side = left.value
-            if is_float(left_side) is True:
-                left_math = float(left_side)
-            else:
-                left_math = int(left_side)
-
-        if isinstance(right_side, float):
-            right_math = float(right_side)
-
-        if isinstance(left, float):
-            left_math = float(left)
-
-        if isinstance(right_side, int):
-            right_math = int(right_side)
-
-        if isinstance(left, int):
-            left_math = int(left)
-
+        right_math, left_math = math_logic_check(right_side, left)
         query_value.value = str(left_math * right_math)
         right_side = query_value
         return right_side
@@ -558,7 +528,9 @@ class end_token:
 
 
 lexer = Lexer(with_parens=False)
-lexer.register_tokens(Integer, Decmimal_Number, Addition, Multiplication, Division)
+lexer.register_tokens(
+    Integer, Decmimal_Number, Addition, Multiplication, Division, Subtraction
+)
 lexer.register_token(
     Expression,
     re.compile(
