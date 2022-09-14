@@ -127,7 +127,7 @@ class Addition(Token):
             left_math = float(left)
         if isinstance(left, int):
             left_math = int(left)
-        query_value.value = str(left_math / right_math)
+        query_value.value = str(left_math + right_math)
         right_side = query_value
         return right_side
 
