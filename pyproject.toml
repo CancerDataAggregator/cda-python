@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cdapython"
-version = "2022.7.13"
+version = "2022.9.15"
 authors = ["cdadevs"]
 description = ""
 license = "Apache License"
