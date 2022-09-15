@@ -8,7 +8,7 @@ from typing import Any, Dict
 from rich import print
 from typing_extensions import Literal
 
-from cdapython._get_unnest_clause import _get_unnest_clause
+
 from cdapython.constant_variables import Constants
 from cdapython.factories import (
     COUNT,
