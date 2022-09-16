@@ -55,7 +55,7 @@ class ColumnsResult(BaseResult):
                         values,
                     )
                 )
-        return [list(i.keys())[0] for i in self._result]
+        return [i for i in self._result]
 
     def to_dataframe(
         self,
