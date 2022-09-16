@@ -35,24 +35,48 @@ class ColumnsResult(BaseResult):
         if filters is not None and filters != "":
 
             filters: str = filters.replace("\n", " ").strip()
-            values: list["ColumnsResult"] = [
-                list(i.keys())[0] for i in self._result if list(i.keys())[0] is not None
-            ]
+            if self.description is False:
+                values: list["ColumnsResult"] = [
+                    list(i.keys())[0]
+                    for i in self._result
+                    if list(i.keys())[0] is not None
+                ]
+            if self.description:
+                values: list["ColumnsResult"] = [
+                    i for i in self._result if list(i.keys())[0] is not None
+                ]
             # values = list(filter(None, values))
             if exact:
-                return list(
-                    filter(
-                        lambda items: (str(items).lower() == filters.lower()),
-                        values,
+                if self.description is False:
+                    return list(
+                        filter(
+                            lambda items: (str(items).lower() == filters.lower()),
+                            values,
+                        )
                     )
-                )
-
-            else:
-
                 return list(
                     filter(
                         lambda items: (
-                            str(items).lower().find(str(filters.lower())) != -1
+                            str(list(items.keys())[0]).lower() == filters.lower
+                        ),
+                        values,
+                    )
+                )
+            else:
+                if self.description is False:
+                    return list(
+                        filter(
+                            lambda items: (
+                                str(items).lower().find(str(filters.lower())) != -1
+                            ),
+                            values,
+                        )
+                    )
+                return list(
+                    filter(
+                        lambda items: (
+                            str(list(items.keys())[0]).lower().find(filters.lower())
+                            != -1
                         ),
                         values,
                     )
