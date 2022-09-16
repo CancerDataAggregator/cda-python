@@ -57,7 +57,7 @@ class ColumnsResult(BaseResult):
                         values,
                     )
                 )
-        if not self.description:
+        if self.description is False:
             return [list(i.keys())[0] for i in self._result]
         return [i for i in self._result]
 
@@ -77,7 +77,7 @@ class ColumnsResult(BaseResult):
         if self.format_type == "tsv":
             return self._df
 
-        if not self.description:
+        if self.description is False:
             data_table = {"Column_Name": [list(i.keys())[0] for i in self._result]}
             return DataFrame(data_table)
 

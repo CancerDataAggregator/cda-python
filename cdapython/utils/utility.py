@@ -245,7 +245,10 @@ def columns(
 
             if "result" in api_response:
                 query_result: ColumnsResult = ColumnsResult(
-                    show_sql=show_sql, show_count=True, result=api_response["result"]
+                    show_sql=show_sql,
+                    show_count=True,
+                    result=api_response["result"],
+                    description=description,
                 )
 
             else:
