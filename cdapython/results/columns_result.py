@@ -10,9 +10,11 @@ class ColumnsResult(BaseResult):
         show_sql: bool,
         show_count: bool,
         result: List,
+        description: bool = True,
         format_type: str = "json",
     ) -> None:
         self._result = result
+        self.description = description
         super().__init__(
             show_sql=show_sql,
             show_count=show_count,
@@ -55,7 +57,9 @@ class ColumnsResult(BaseResult):
                         values,
                     )
                 )
-        return [i for i in self._result]
+        if not self.description:
+            return [list(i.keys())[0] for i in self._result]
+        return [i.keys() for i in self._result]
 
     def to_dataframe(
         self,
@@ -73,13 +77,13 @@ class ColumnsResult(BaseResult):
         if self.format_type == "tsv":
             return self._df
 
-        if record_path is None:
-            return json_normalize(iter(self))
+        if not self.description:
+            data_table = {"Column_Name": [list(i.keys())[0] for i in self._result]}
+            return DataFrame(data_table)
 
-        return json_normalize(
-            iter(self),
-            max_level=max_level,
-            record_path=record_path,
-            meta=meta,
-            meta_prefix=meta_prefix,
-        )
+        data_table = {
+            "Column_Name": [list(i.keys())[0] for i in self._result],
+            "Description": [list(i.values())[0] for i in self._result],
+        }
+
+        return DataFrame(data_table)

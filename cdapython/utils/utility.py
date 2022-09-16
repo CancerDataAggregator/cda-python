@@ -195,7 +195,7 @@ def columns(
     async_req: Optional[bool] = True,
     show_sql: bool = False,
     verbose: bool = True,
-    description: bool = False,
+    description: bool = True,
 ):
     """[summary]
 
@@ -247,21 +247,13 @@ def columns(
                 query_result: ColumnsResult = ColumnsResult(
                     show_sql=show_sql, show_count=True, result=api_response["result"]
                 )
-                if description:
 
-                    data_table = {
-                        "Column_Name": [
-                            list(i.keys())[0] for i in api_response["result"]
-                        ],
-                        "Description": [
-                            list(i.values())[0] for i in api_response["result"]
-                        ],
-                    }
-                    return DataFrame(data_table)
-                return query_result
             else:
                 query_result: ColumnsResult = ColumnsResult(
-                    show_sql=show_sql, show_count=True, result=api_response
+                    show_sql=show_sql,
+                    show_count=True,
+                    result=api_response,
+                    description=description,
                 )
             result_value: ColumnsResult = query_result
 
