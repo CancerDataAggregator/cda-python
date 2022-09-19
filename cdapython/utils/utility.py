@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Optional, Union
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import ApiClient
 from cda_client.configuration import Configuration
-from cda_client.exceptions import ServiceException
+from cda_client.exceptions import ServiceException, ApiException
 from pandas import DataFrame, json_normalize
 from rich import print
 from urllib3.exceptions import InsecureRequestWarning
@@ -45,10 +45,15 @@ if isinstance(Constants.CDA_API_URL, str):
 
 
 def http_error_logger(http_error: ServiceException) -> None:
+    (
+        msg,
+        status_code,
+        _,
+    ) = json.loads(http_error.body).values()
     print(
         f"""
-            Http Status: {http_error.status}
-            Error Message: {json.loads(http_error.body)["message"]}
+            Http Status: {status_code}
+            Error Message: {msg}
             """
     )
 
@@ -179,7 +184,9 @@ def unique_terms(
     except ServiceException as http_error:
         if verbose:
             http_error_logger(http_error)
-
+    except ApiException as http_error:
+        if verbose:
+            http_error_logger(http_error)
     except Exception as e:
         if verbose:
             print(e)
