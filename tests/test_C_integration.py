@@ -3,7 +3,9 @@ from tests.global_settings import integration_host, integration_table
 
 
 def test_basic_integration() -> None:
-    cols = columns(host=integration_host, table=integration_table).to_list()
+    cols = columns(
+        host=integration_host, table=integration_table, description=False
+    ).to_list()
     assert "race" in cols
 
 
