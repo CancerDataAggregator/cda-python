@@ -46,3 +46,4 @@ ven3
 .coverage
 .coverage.*
 config-dev.ini
+.DS_Store

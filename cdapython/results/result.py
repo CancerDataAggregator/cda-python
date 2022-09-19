@@ -1,33 +1,48 @@
+"""
+result is a convenient wrapper around the response object from the CDA service it adds user functionality.
+like creating dataframe and manipulating data for ease-of-use such as paginating automatically for the user through their result objects.
+"""
 import json
+import re
 from collections import ChainMap
 from io import StringIO
 from multiprocessing.pool import ApplyResult
 from time import sleep
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    AsyncGenerator,
-    Dict,
-    Iterator,
-    List,
-    Optional,
-    Union,
-)
+from typing import Any, AsyncGenerator, Dict, Iterator, List, Optional, Pattern, Union
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
-from pandas import DataFrame, Series, json_normalize, read_csv
+from pandas import DataFrame, Series, json_normalize, read_csv, MultiIndex
 from rich import print
+from rich.table import Table
 from typing_extensions import Literal
 
 from cdapython.Paginator import Paginator
+from cdapython.results.base import BaseResult
+from cdapython.utils.state import State
 
-if TYPE_CHECKING:
-    from cdapython.Q import Q
+
+class _QEncoder(json.JSONEncoder):
+    """_QEncoder this is a a class to help with json conversion
+        the standard json dump
+
+    Args:
+        json (_type_): _description_
+    """
+
+    def decode(self, object_json) -> str:
+        """
+        This is for json decoding super method
+        """
+        regex: Pattern[str] = re.compile(r"([^\"\\]|\\([\"\\\/bfnrt]|u[a-zA-Z\d]{4}))+")
+
+        if isinstance(object_json, str):
+            print(regex.match(object_json, pos=0))
+        return object_json
 
 
-class Result:
-    """_summary_
+class Result(BaseResult):
+    """
     The Results Class is a convenient wrapper around the response object from the CDA service.
     """
 
@@ -42,31 +57,26 @@ class Result:
         show_count: bool,
         format_type: str = "json",
     ) -> None:
+        super().__init__(show_sql, show_count, format_type)
         self._api_response: QueryResponseData = api_response
-        self.__result: List[Any] = self._api_response.result
+        self._result: List[Any] = self._api_response.result
         self._query_id: str = query_id
         self._offset: Optional[int] = offset
         self._limit: Optional[int] = limit
         self._api_instance: QueryApi = api_instance
-        self.show_sql: Optional[bool] = show_sql
-        self.show_count: Optional[bool] = show_count
-        self.format_type = format_type
         self._df: DataFrame
 
-        if self.format_type == "tsv" and isinstance(self.__result, list):
+        if self.format_type == "tsv" and isinstance(self._result, list):
             data_text: str = ""
-            data_text = "\n".join(
-                map(lambda e: str(e).replace("\n", ""), self.__result)
+            data_text: str = "\n".join(
+                map(lambda e: str(e).replace("\n", ""), self._result)
             )
             self._df = read_csv(StringIO(data_text), sep="\t")
 
         # add a if check to query output for counts to hide sql
 
-    def _repr_value(
-        self, show_value: Optional[bool], show_count: Optional[bool]
-    ) -> str:
+    def _repr_value(self, show_value: Optional[bool]) -> str:
         return f"""
-            QueryID: {self._query_id}
             {"Query:"+self.sql if show_value is True else ""  }
             Offset: {self._offset}
             Count: {self.count}
@@ -75,29 +85,23 @@ class Result:
             """
 
     def __repr__(self) -> str:
-        return self._repr_value(show_value=self.show_sql, show_count=self.show_count)
+        return self._repr_value(show_value=self.show_sql)
 
     def __str__(self) -> str:
-        return self._repr_value(show_value=self.show_sql, show_count=self.show_count)
+        return self._repr_value(show_value=self.show_sql)
 
     def __dict__(self) -> Dict[str, Any]:  # type: ignore
-        return dict(ChainMap(*self.__result))
+        return dict(ChainMap(*self._result))
 
     def __eq__(self, __other: object) -> Union[Any, Literal[False]]:
-        return isinstance(__other, Result) and self.__result == __other.__result
-
-    def __ne__(self, __o: object) -> bool:
-        result = self.__eq__(__o)
-
-        if result is NotImplemented:
-            return NotImplemented
+        return isinstance(__other, Result) and self._result == __other._result
 
     def __hash__(self) -> int:
-        return hash(tuple(self.__result))
+        return hash(tuple(self._result))
 
     def __contains__(self, value: str) -> bool:
-        exist = False
-        for item in self.__result:
+        exist: bool = False
+        for item in self._result:
             if value in item.values():
                 exist = True
 
@@ -120,7 +124,7 @@ class Result:
         Returns:
             int
         """
-        return len(self.__result)
+        return len(self._result)
 
     @property
     def total_row_count(self) -> int:
@@ -128,59 +132,27 @@ class Result:
         get the total count for the query
 
         Returns:
-            int
+            int: _description_
         """
         return int(self._api_response.total_row_count)
 
     @property
     def has_next_page(self) -> bool:
+        """This checks to see if there is a next page
+
+        Returns:
+            bool: returns a bool value if there is a next page
+        """
         if isinstance(self._offset, int) and isinstance(self._limit, int):
             return (self._offset + self._limit) <= self.total_row_count
         return False
 
-    def to_dataframe(
-        self,
-        record_path: Optional[Union[str, list]] = None,
-        meta: Optional[Union[str, List[Union[str, List[str]]]]] = None,
-        meta_prefix: Optional[str] = None,
-        max_level: Optional[int] = None,
-    ) -> Optional[DataFrame]:
-        """[summary]
-        Creates a pandas DataFrame for the Results
-
-        Returns:
-            DataFrame: [description]
-        """
-        if self.format_type == "tsv":
-            return self._df
-
-        if record_path is None:
-            return json_normalize(iter(self))
-
-        return json_normalize(
-            iter(self),
-            max_level=max_level,
-            record_path=record_path,
-            meta=meta,
-            meta_prefix=meta_prefix,
-        )
-
-    def to_list(self) -> List[Any]:
-        """_summary_
-
-        Returns:
-            list: _description_
-        """
-
-        return self.__result
-
-    def __len__(self) -> int:
-        return self.count
-
     def paginator(
         self,
+        output: str = "",
         to_df: bool = False,
         to_list: bool = False,
+        page_size: int = None,
     ) -> Paginator:
         """_summary_
         paginator this will automatically page over results
@@ -190,52 +162,59 @@ class Result:
         Returns:
             _type_: _description_
         """
+        if page_size is None and isinstance(self._limit, int):
+            page_size = self._limit
+
         return Paginator(
             self,
             to_df=to_df,
             to_list=to_list,
+            limit=page_size,
+            output=output,
             format_type=self.format_type,
         )
 
-    def __getitem__(
-        self, idx: Union[int, slice]
-    ) -> Union[Series, DataFrame, Any, list]:
-
-        if isinstance(self.__result, DataFrame):
-            return self.__result.loc[idx]
-
-        if isinstance(idx, int):
-            if idx < 0:
-                idx = self.count + idx
-            return self.__result[idx]
-        else:
-            # for slicing result
-            start, stop, step = idx.indices(self.count)
-            range_index = range(start, stop, step)
-            return [self.__result[i] for i in range_index]
-
-    def __iter__(self) -> Iterator:
-        return iter(self.__result)
-
-    def __aiter__(self) -> AsyncGenerator[Any, None]:
-        async def tmp() -> AsyncGenerator[Any, None]:
-            yield self.__result
-
-        return tmp()
-
-    def pretty_print(self, idx: Optional[int] = None) -> None:
-        """_summary_
-        pretty_print will print out a json object if you pass a index then it will print \
-        the object at that index without the index
-        it will automatically print alll results in the json object
-        Args:
-            idx (Optional[int], optional): _description_. Defaults to None.
+    def auto_paginator(
+        self,
+        output: str = "",
+        to_df: bool = False,
+        to_list: bool = False,
+        page_size: Union[int, None] = None,
+    ) -> Union[DataFrame, List[Any]]:
         """
-        if idx is None:
-            for i in range(self.count):
-                print(json.dumps(self[i], indent=4))
-        else:
-            print(json.dumps(self[idx], indent=4))
+        auto_paginator is a method that will loop for you
+
+        Args:
+            output (str, optional): _description_. Defaults to "".
+            to_df (bool, optional): _description_. Defaults to False.
+            to_list (bool, optional): _description_. Defaults to False.
+            limit (Union[int, None], optional): _description_. Defaults to None.
+
+        Returns:
+            Union[DataFrame, List[Any]]: _description_
+        """
+        if page_size is None and isinstance(self._limit, int):
+            page_size = self._limit
+
+        iterator: Paginator = Paginator(
+            self,
+            to_df=to_df,
+            to_list=to_list,
+            limit=page_size,
+            output=output,
+            format_type=self.format_type,
+        )
+        state: State = State(df=DataFrame(), list_array=[])
+        for i in iterator:
+            if to_df or output == "full_df":
+                state.concat_df(i)
+            if to_list or output == "full_list":
+                state.concat_list(i)
+        if to_df or output == "full_df":
+            return state.get_df()
+        if to_list or output == "full_list":
+            return state.get_list()
+        return None
 
     async def async_next_page(
         self,
@@ -243,6 +222,11 @@ class Result:
         async_req: bool = False,
         pre_stream: bool = True,
     ) -> Optional["Result"]:
+        """async wrapper for next page
+
+        Returns:
+            _type_: _description_
+        """
         return self.next_page(limit=limit, async_req=async_req, pre_stream=pre_stream)
 
     async def async_prev_page(
@@ -251,6 +235,12 @@ class Result:
         async_req: bool = False,
         pre_stream: bool = True,
     ) -> Optional["Result"]:
+        """
+        async wrapper for prev page
+
+        Returns:
+            _type_: _description_
+        """
         return self.prev_page(limit=limit, async_req=async_req, pre_stream=pre_stream)
 
     def next_page(
@@ -259,7 +249,7 @@ class Result:
         async_req: bool = False,
         pre_stream: bool = True,
     ) -> Optional["Result"]:
-        """_summary_
+        """
         The next_page function will call the server for the next page using this \
         limit to determine the next level of page results
         Args:
@@ -276,8 +266,8 @@ class Result:
         if not self.has_next_page:
             raise StopIteration
         if isinstance(self._offset, int) and isinstance(self._limit, int):
-            _offset = self._offset + self._limit
-            _limit = limit or self._limit
+            _offset: int = self._offset + self._limit
+            _limit: int = limit or self._limit
             return self._get_result(_offset, _limit, async_req, pre_stream)
         return None
 
@@ -287,10 +277,16 @@ class Result:
         async_req: bool = False,
         pre_stream: bool = True,
     ) -> Optional["Result"]:
+        """prev_page
+
+
+        Returns:
+            _type_: _description_
+        """
         if isinstance(self._offset, int) and isinstance(self._limit, int):
-            _offset = self._offset - self._limit
-            _offset = max(0, _offset)
-            _limit = limit or self._limit
+            _offset: int = self._offset - self._limit
+            _offset: int = max(0, _offset)
+            _limit: int = limit or self._limit
             return self._get_result(_offset, _limit, async_req, pre_stream)
         return None
 
@@ -323,7 +319,7 @@ def get_query_result(
     show_count: bool = True,
     format_type: str = "json",
 ) -> Optional[Result]:
-    """[summary]
+    """
         This will call the next query and wait for the result \
         then return a Result object to the user.
     Args:

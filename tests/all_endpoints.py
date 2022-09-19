@@ -1,9 +1,9 @@
 from cdapython.Q import Q
 from tests.global_settings import host, localhost, table
 
-q1 = Q('ResearchSubject.primary_diagnosis_site = "Kidney"')
-q2 = Q("ResearchSubject.Diagnosis.stage = 'Stage I'")
-q3 = Q("ResearchSubject.Diagnosis.stage = 'Stage II'")
+q1 = Q('primary_diagnosis_site = "Kidney"')
+q2 = Q("stage = 'Stage I'")
+q3 = Q("stage = 'Stage II'")
 diag = q2.OR(q3)
 myquery = diag.AND(q1)
 

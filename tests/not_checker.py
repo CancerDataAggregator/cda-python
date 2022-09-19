@@ -1,4 +1,4 @@
-from cdapython.utility import query
+from cdapython import query
 from tests.global_settings import host
 
 q = query(

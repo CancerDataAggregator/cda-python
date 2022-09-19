@@ -1,15 +1,35 @@
 import re
-from typing import TYPE_CHECKING, Optional
+from typing import Any, Optional, Union
 
 from cda_client.model.query import Query
-
 from tdparser import Lexer, Token
 from tdparser.topdown import Parser
+from typing_extensions import Literal
+
 from cdapython.functions import backwards_comp, col, infer_quote, query_type_conversion
 from cdapython.utils.check_case import check_keyword
 
-if TYPE_CHECKING:
-    from cdapython.Q import Q
+
+SYMBOL_TABLE = {}
+
+
+class Symbol_Base(Token):
+    sym_id = None
+    sym_value = None
+    first = second = third = None
+
+    def nud(self):
+        raise SyntaxError("Syntax error (%r)." % self.sym_id)
+
+    def led(self, left):
+        raise SyntaxError("Unknown operator (%r)." % self.sym_id)
+
+    def __repr__(self):
+        if self.sym_id == "(name)" or self.sym_id == "(literal)":
+            return "(%s %s)" % (self.sym_id[1:-1], self.sym_value)
+        out = [self.sym_id, self.first, self.second, self.third]
+        out = map(str, filter(None, out))
+        return "(" + " ".join(out) + ")"
 
 
 def build_query_copy(q: Query) -> Optional[Query]:
@@ -47,6 +67,116 @@ def like_converter(query: Query, right_side: Query, left: Query) -> Query:
     query.l = col(backwards_comp(left.value))
     query.r = infer_quote(returned_right.value.strip())
     return query
+
+
+def is_float(num) -> bool:
+    float_regex: re.Pattern[str] = re.compile(r"[-+]?\d*\.\d+")
+    if re.match(float_regex, num) is not None:
+        return True
+    else:
+        return False
+
+
+class Decmimal_Number(Token):
+    lbp = 0
+    regexp = r"[-+]?\d*\.\d+"
+
+    def nud(self, context):
+        query = Query()
+        query.value = self.text
+        return query
+
+
+class Integer(Token):
+    lbp = 0
+    regexp = r"\d+"
+
+    def nud(self, context):
+        query = Query()
+        query.value = self.text
+        return query
+
+
+def math_logic_check(right_side: Union[Query, str], left: Union[Query, str]):
+    right_math: Union[int, float, None] = None
+    left_math: Union[int, float, None] = None
+    if isinstance(right_side, Query):
+        if is_float(right_side.value) is True:
+            right_math = float(right_side.value)
+        else:
+            right_math: int = int(right_side.value)
+
+    if isinstance(left, Query):
+        left_side = left.value
+        if is_float(left_side) is True:
+            left_math = float(left_side)
+        else:
+            left_math = int(left_side)
+
+    if isinstance(right_side, float):
+        right_math = float(right_side)
+    if isinstance(right_side, int):
+        right_math = int(right_side)
+    if isinstance(left, float):
+        left_math = float(left)
+    if isinstance(left, int):
+        left_math = int(left)
+
+    return (right_math, left_math)
+
+
+class Addition(Token):
+    regexp = r"\+"
+    lbp = 15
+
+    def led(self, left, context):
+
+        query_value = Query()
+        right_side = context.expression(self.lbp)
+        right_math, left_math = math_logic_check(right_side, left)
+        query_value.value = str(left_math + right_math)
+        right_side = query_value
+        return right_side
+
+
+class Subtraction(Token):
+    regexp = r"\-"
+    lbp = 15
+
+    def led(self, left, context):
+
+        query_value = Query()
+        right_side = context.expression(self.lbp)
+        right_math, left_math = math_logic_check(right_side, left)
+        query_value.value = str(left_math - right_math)
+        right_side = query_value
+        return right_side
+
+
+class Division(Token):
+    regexp = r"\/"
+    lbp = 15
+
+    def led(self, left, context):
+        query_value = Query()
+        right_side = context.expression(self.lbp)
+        right_math, left_math = math_logic_check(right_side, left)
+        query_value.value = str(left_math / right_math)
+        right_side = query_value
+        return right_side
+
+
+class Multiplication(Token):
+    regexp = r"\*"
+    lbp = 15
+
+    def led(self, left, context):
+        query_value = Query()
+        right_side = context.expression(self.lbp)
+        right_math, left_math = math_logic_check(right_side, left)
+        query_value.value = str(left_math * right_math)
+        right_side = query_value
+        return right_side
 
 
 class Expression(Token):
@@ -139,7 +269,7 @@ class NotEq(Token):
         return query
 
 
-class Greaterthaneq(Token):
+class GreaterThanEq(Token):
     lbp = 5  # Precedence
 
     def led(self, left: Query, context: Parser) -> Query:
@@ -154,7 +284,7 @@ class Greaterthaneq(Token):
         return query
 
 
-class Greaterthan(Token):
+class GreaterThan(Token):
     lbp = 5  # Precedence
 
     def led(self, left: Query, context: Parser) -> Query:
@@ -169,7 +299,7 @@ class Greaterthan(Token):
         return query
 
 
-class Lessthaneq(Token):
+class LessThanEq(Token):
     lbp = 5  # Precedence
 
     def led(self, left: Query, context: Parser) -> Query:
@@ -184,7 +314,7 @@ class Lessthaneq(Token):
         return query
 
 
-class Lessthan(Token):
+class LessThan(Token):
     lbp = 5  # Precedence
 
     def led(self, left: Query, context: Parser) -> Query:
@@ -200,7 +330,7 @@ class Lessthan(Token):
         return query
 
 
-class Doublequotes(Token):
+class DoubleQuotes(Token):
     lbp = 10  # Precedence
 
     def nud(self, context: Parser) -> Query:
@@ -223,7 +353,7 @@ class CommaType(Token):
 
         return query
 
-    def nud(self, context) -> Query:
+    def nud(self, context: Parser) -> Query:
         query = Query()
         query.value = self.text
 
@@ -244,7 +374,7 @@ class ArrayType(Token):
         return query
 
 
-class Singlequotes(Token):
+class SingleQuotes(Token):
     lbp = 10  # Precedence
 
     def nud(self, context: Parser) -> Query:
@@ -377,7 +507,7 @@ class LeftParen(Token):
 
     match = RightParen
 
-    def nud(self, context: Parser):
+    def nud(self, context: Parser) -> Any:
         # Fetch the next expression
 
         expr = context.expression()
@@ -389,7 +519,7 @@ class LeftParen(Token):
             expr.value = f"({expr.value})"
         return expr
 
-    def __repr__(self):  # pragma: no cover
+    def __repr__(self) -> Literal["<(>"]:  # pragma: no cover
         return "<(>"
 
 
@@ -398,24 +528,26 @@ class end_token:
 
 
 lexer = Lexer(with_parens=False)
+lexer.register_tokens(
+    Integer, Decmimal_Number, Addition, Multiplication, Division, Subtraction
+)
 lexer.register_token(
     Expression,
     re.compile(
-        r"(\-[\S]+)|(\"[\w\s]+\")|(\b(?!(\bAND\b))(?!(\bOR\b))(?!(\bNOT\b))(?!(\bFROM\b))(?!(\bIN\b))(?!(\bLIKE\b))(?!(\bIS\b))[\w.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
+        r"(\-[\S]+)|(\"[\w\s]+\")|(?!\*)(?!\+)(?!\/)(?![+-]?([0-9]*[.])?[0-9]+)(\b(?!(\bAND\b))(?!(\bOR\b))(?!(\bNOT\b))(?!(\bFROM\b))(?!(\bIN\b))(?!(\bLIKE\b))(?!(\bIS\b))[a-zA-Z_.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
     ),
 )
 
 lexer.register_token(LeftParen, re.compile(r"\("))
 lexer.register_token(RightParen, re.compile(r"\)"))
-lexer.register_token(Doublequotes, re.compile(r'(".*?")'))
-lexer.register_token(Singlequotes, re.compile(r"('.*?')"))
+lexer.register_token(DoubleQuotes, re.compile(r'(".*?")'))
+lexer.register_token(SingleQuotes, re.compile(r"('.*?')"))
 lexer.register_token(ArrayType, re.compile(r"(\[.*?\])"))
 lexer.register_token(CommaType, re.compile(r"(\s*,\s*)"))
-lexer.register_token(Greaterthan, re.compile(r"(\s+>+\s)"))
-lexer.register_token(Lessthan, re.compile(r"(\s+<+\s)"))
-lexer.register_token(Greaterthaneq, re.compile(r"(\s+>=+\s)"))
-lexer.register_token(Lessthan, re.compile(r"(\s+<+\s)"))
-lexer.register_token(Lessthaneq, re.compile(r"(\s+<=+\s)"))
+lexer.register_token(GreaterThan, re.compile(r"(\s+>+\s)"))
+lexer.register_token(LessThan, re.compile(r"(\s+<+\s)"))
+lexer.register_token(GreaterThanEq, re.compile(r"(\s+>=+\s)"))
+lexer.register_token(LessThanEq, re.compile(r"(\s+<=+\s)"))
 lexer.register_token(NotEq, re.compile(r"(\s+!=+\s)"))
 lexer.register_token(NotEq, re.compile(r"(\s+<>+\s)"))
 lexer.register_token(And, re.compile(r"(AND)"))
