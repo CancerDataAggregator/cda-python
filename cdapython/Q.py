@@ -1,49 +1,51 @@
+"""
+Q this is the main file for Q lang.
+this file holds the class for Q , links to the parsers
+and SQL Like operators queue supports further to the bottom
+"""
 import logging
-from copy import copy
 from json import JSONEncoder, dumps, loads
-from logging import error as logError
 from multiprocessing.pool import ApplyResult
 from time import sleep
 from types import MappingProxyType
 from typing import Any, Dict, Optional, Tuple, TypeVar, Union
-import pandas as pd
+
 from cda_client import ApiClient, Configuration
 from cda_client.api.meta_api import MetaApi
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
+from cda_client.exceptions import ApiException, ServiceException
+from cda_client.model.query import Query
+from cda_client.model.query_created_data import QueryCreatedData
+from cda_client.model.query_response_data import QueryResponseData
+from pandas import DataFrame, concat
+from typing_extensions import Literal
+from urllib3.connection import NewConnectionError  # type: ignore
+from urllib3.connectionpool import MaxRetryError
+from urllib3.exceptions import InsecureRequestWarning, SSLError
+
+from cdapython.constant_variables import Constants
+from cdapython.decorators.measure import Measure
+from cdapython.error_logger import unverified_http
 from cdapython.factories import (
     COUNT,
     DIAGNOSIS,
     FILE,
+    MUTATIONS,
     RESEARCH_SUBJECT,
     SPECIMEN,
     SUBJECT,
     TREATMENT,
 )
 from cdapython.factories.q_factory import QFactory
-
-from cdapython.results.result import Result
-from cda_client.exceptions import ApiException, ServiceException
-from cda_client.model.query import Query
-from cda_client.model.query_created_data import QueryCreatedData
-from cda_client.model.query_response_data import QueryResponseData
-from rich import print
-from rich.progress import Progress
-from urllib3.connection import NewConnectionError  # type: ignore
-from urllib3.connectionpool import MaxRetryError
-from urllib3.exceptions import InsecureRequestWarning, SSLError
-from cdapython.constant_variables import Constants
-from cdapython.decorators.measure import Measure
-from cdapython.error_logger import unverified_http
 from cdapython.functions import find_ssl_path
 from cdapython.results.result import Result, get_query_result
 from cdapython.simple_parser import simple_parser
 
+# from cdapython.math_parser import math_parse
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
-
-
 # constants
-WAITING_TEXT = "Waiting for results"
+WAITING_TEXT: Literal["Waiting for results"] = "Waiting for results"
 
 
 def builder_api_client(host: Optional[str], verify: Optional[bool]) -> Configuration:
@@ -94,14 +96,18 @@ class _QEncoder(JSONEncoder):
 
         if isinstance(o, MappingProxyType):
             return None
-        else:
-            tmp_dict = o.__dict__
-            if "query" in tmp_dict:
-                return tmp_dict["query"]
-            if "_data_store" in tmp_dict:
-                return tmp_dict["_data_store"]
 
-            return tmp_dict
+        """
+        Using vars() over o.__dict__ dunder method,
+        it is more pythonic because it is generally better to use a function over a magic/dunder method
+        """
+        tmp_dict: Dict[str, Any] = vars(o)
+        if "query" in tmp_dict:
+            return tmp_dict["query"]
+        if "_data_store" in tmp_dict:
+            return tmp_dict["_data_store"]
+
+        return tmp_dict
 
 
 TQ = TypeVar("TQ", bound="Q")
@@ -118,17 +124,18 @@ class Q:
         Args:
             *args (object):
         """
-        self.query = Query()
+        self.query: Query = Query()
 
         if len(args) == 1:
 
             if args[0] is None:
                 raise RuntimeError("Q statement parse error")
 
-            if type(args[0]) is Query:
+            if isinstance(args[0], Query):
                 self.query = args[0]
             else:
-                query_parsed = simple_parser(args[0].strip().replace("\n", " "))
+                # math_parsed = math_parse(args[0].strip().replace("\n", " "))
+                query_parsed: Query = simple_parser(args[0].strip().replace("\n", " "))
                 self.query = query_parsed
 
         elif len(args) != 3:
@@ -136,45 +143,75 @@ class Q:
                 "Require one or three arguments. Please see documentation."
             )
         else:
-            """_summary_
-            this is for Q operators support
-            """
-            _l = args[0]
-            _op = args[1]
-            _r = args[2]
+
+            # this is for Q operators support
+
+            _l: Union[Query, str] = args[0]
+            _op: Union[Query, str] = args[1]
+            _r: Union[Query, str] = args[2]
+
             self.query.node_type = _op
-            self.query.l = _l
-            self.query.r = _r
+            self.query.l = _l  # noqa: E741
+            self.query.r = _r  # noqa: E741
 
     def __repr__(self: TQ) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
 
     # region helper methods
-    def to_json(self, indent: int = 4) -> str:
+    def to_json(
+        self, indent: int = 4, write_file: bool = False, file_name: str = "Q_json_dump"
+    ) -> str:
         """Created for the creating boolean-query for testing
 
         Returns:
             str: returns a json str to the user
         """
-        return dumps(self, indent=indent, cls=_QEncoder)
+        tmp_json = dumps(self, indent=indent, cls=_QEncoder)
+        if write_file:
+            with open(f"{file_name}.json", "w") as f:
+                f.write(tmp_json)
+        return tmp_json
+
+    def to_dict(self) -> Any:
+        return self.query.to_dict()
 
     # endregion
 
     # region staticmethods
     @staticmethod
     def get_version() -> str:
+        """returns the global version Q is pointing to
+
+        Returns:
+            str: returns a str of the current version
+        """
         return Constants._VERSION
 
     @staticmethod
     def set_host_url(url: str) -> None:
+        """this method will set the Global Q host url
+
+        Args:
+            url (str): param to set the global url
+        """
         Constants.CDA_API_URL = url
 
     @staticmethod
     def get_host_url() -> str:
+        """this method will get the Global Q host url
+
+        Returns:
+            str: returns a str of the current url
+        """
         return Constants.CDA_API_URL
 
     @staticmethod
     def set_default_project_dataset(table: str) -> None:
+        """_summary_
+
+        Args:
+            table (str): _description_
+        """
         Constants.default_table = table
 
     @staticmethod
@@ -200,7 +237,7 @@ class Q:
         offset: int = 0,
         limit: int = 100,
         verbose: Optional[bool] = True,
-    ) -> Optional[pd.DataFrame]:
+    ) -> Optional[DataFrame]:
         """[summary]
 
         Args:
@@ -217,13 +254,13 @@ class Q:
             [DataFrame | None]: [This will return a Result class]
         """
 
-        cda_client_obj = ApiClient(
+        cda_client_obj: ApiClient = ApiClient(
             configuration=builder_api_client(host=host, verify=verify), pool_threads=2
         )
         try:
 
             with cda_client_obj as api_client:
-                api_instance = QueryApi(api_client)
+                api_instance: QueryApi = QueryApi(api_client)
                 api_response = api_instance.bulk_data(
                     table=table, version=version, async_req=async_call
                 )
@@ -239,32 +276,32 @@ class Q:
                     api_response.wait(10000)
                 api_response = api_response.get()
 
-            r = get_query_result(
+            r: Union[Result, None] = get_query_result(
                 api_instance, api_response.query_id, offset, limit, async_call
             )
             if r is None:
                 return None
 
-            df = pd.DataFrame()
-            with Progress() as progress:
-                download_task = progress.add_task("Download", total=r.total_row_count)
-                for i in r.paginator(to_df=True):
-                    df = pd.concat([df, i])
-                    progress.update(download_task, advance=len(i))
+            dataframe: DataFrame = DataFrame()
+            df: DataFrame = DataFrame()
+            for i in r.paginator(to_df=True):
+                df: DataFrame = concat([dataframe, i])
             return df
         except Exception as e:
             print(e)
         return None
 
     @staticmethod
-    def bigquery_status(host=None, verify=None) -> Union[str, Any]:
+    def bigquery_status(
+        host: Optional[str] = None, verify: Optional[bool] = None
+    ) -> Union[str, Any]:
         """[summary]
         Uses the cda_client library's MetaClass to get status check on the cda
         BigQuery tablas
         Returns:
             str: status messages
         """
-        cda_client_obj = ApiClient(
+        cda_client_obj: ApiClient = ApiClient(
             configuration=builder_api_client(host=host, verify=verify)
         )
         return str(
@@ -275,7 +312,7 @@ class Q:
 
     @staticmethod
     def query_job_status(
-        id: str, host: Optional[str] = None, verify: Optional[bool] = None
+        query_id: str, host: Optional[str] = None, verify: Optional[bool] = None
     ) -> Optional[Any]:
         """[summary]
 
@@ -290,13 +327,13 @@ class Q:
             object: [description]
         """
 
-        cda_client_obj = ApiClient(
+        cda_client_obj: ApiClient = ApiClient(
             configuration=builder_api_client(host=host, verify=verify)
         )
         try:
             with cda_client_obj as api_client:
-                api_instance = QueryApi(api_client)
-                api_response = api_instance.job_status(id)
+                api_instance: QueryApi = QueryApi(api_client)
+                api_response = api_instance.job_status(query_id)
                 return api_response["status"]
 
         except InsecureRequestWarning as e:
@@ -344,6 +381,10 @@ class Q:
     @property
     def treatment(self) -> "Q":
         return QFactory.create_entity(TREATMENT, self)
+
+    @property
+    def mutation(self) -> "Q":
+        return QFactory.create_entity(MUTATIONS, self)
 
     def _call_endpoint(
         self,
@@ -459,12 +500,11 @@ class Q:
         table: Optional[str] = None,
         async_call: bool = False,
         verify: Optional[bool] = None,
-        verbose: Optional[bool] = True,
-        filter: Optional[str] = None,
-        flatten: Optional[bool] = False,
-        format: str = "json",
-        show_sql: Optional[bool] = False,
-    ) -> Union[Result, QueryCreatedData, ApplyResult]:
+        verbose: bool = True,
+        include: Optional[str] = None,
+        format_type: str = "json",
+        show_sql: bool = False,
+    ) -> Union[Result, QueryCreatedData, ApplyResult, None]:
         """_summary_
 
         Args:
@@ -484,25 +524,27 @@ class Q:
         Returns:
             Optional[Result]: _description_
         """
-
-        cda_client_obj = ApiClient(
+        cda_client_obj: ApiClient = ApiClient(
             configuration=builder_api_client(host=host, verify=verify)
         )
 
         version, table = check_version_and_table(version, table)
 
-        if filter is not None:
-            self.query = Q.__select(self, fields=filter).query
+        if include is not None:
+            self.query = Q.__select(self, fields=include).query
 
-        if show_sql is None:
-            show_sql = False
+        self._show_sql: bool = show_sql or False
 
         try:
             with cda_client_obj as api_client:
-                api_instance = QueryApi(api_client)
+                api_instance: QueryApi = QueryApi(api_client)
                 # Execute boolean query
                 if verbose:
-                    print("Getting results from database", end="\n\n")
+                    print(
+                        "Getting results from database",
+                        end="\n\n",
+                    )
+
                 api_response: Union[
                     QueryCreatedData, ApplyResult
                 ] = self._call_endpoint(
@@ -527,61 +569,103 @@ class Q:
                 offset=offset,
                 limit=limit,
                 async_req=async_call,
-                show_sql=show_sql,
+                show_sql=self._show_sql,
                 show_count=True,
-                format_type=format,
+                format_type=format_type,
             )
-        except ServiceException as httpError:
-            if httpError.body is not None:
-                logError(
+        except ServiceException as http_error:
+            if http_error.body is not None:
+                print(
                     f"""
-                Http Status: {httpError.status}
-                Error Message: {loads(httpError.body)["message"]}
+                Http Status: {http_error.status}
+                Error Message: {loads(http_error.body)["message"]}
                 """
                 )
 
         except NewConnectionError:
-            print("Connection error")
+            if verbose:
+                print("Connection error")
 
-        except SSLError as e:
-            print(e)
+        except SSLError as ssl_error:
+            if verbose:
+                print(ssl_error)
 
         except InsecureRequestWarning:
-            print(
-                "Adding certificate verification pem is strongly advised please read our https://cda.readthedocs.io/en/latest/Installation.html "
-            )
+            if verbose:
+                print(
+                    "Adding certificate verification pem is strongly advised please read our https://cda.readthedocs.io/en/latest/Installation.html "
+                )
 
-        except MaxRetryError as e:
-            print(
-                f"Connection error max retry limit of 3 hit please check url or local python ssl pem {e}"
-            )
-        except ApiException as e:
-            print(e.body)
+        except MaxRetryError as max_retry_error:
+            if verbose:
+                print(
+                    f"Connection error max retry limit of 3 hit please check url or local python ssl pem {max_retry_error}"
+                )
+        except ApiException as api_exception:
+            if verbose:
+                print(api_exception.body)
 
         except Exception as e:
-            print(e)
-        return None
+            if verbose:
+                print(e)
 
-    def AND(self, right: "Q") -> "Q":
-        return self.__class__(self.query, "AND", right.query)
+    def _Q_wrap(self, right: Union[str, "Q", None], op):
+        if isinstance(right, str):
+            right = Q(right)
+        return self.__class__(self.query, op, right.query)
 
-    def OR(self, right: "Q") -> "Q":
-        return self.__class__(self.query, "OR", right.query)
+    def AND(self, right: Union[str, "Q"]) -> "Q":
+        """Q's AND operator this will add a AND to between two Q queries
 
-    def FROM(self, right: "Q") -> "Q":
-        return self.__class__(self.query, "SUBQUERY", right.query)
+        Args:
+            right (Q): _description_
+
+        Returns:
+            Q: a joined Q queries with a AND node
+        """
+        return self._Q_wrap(right, op="AND")
+
+    def OR(self, right: Union[str, "Q"]) -> "Q":
+        """Q's OR operator this will add a OR to between two Q queries
+
+        Args:
+            right (Q): _description_
+
+        Returns:
+            Q: a joined Q queries with a OR node
+        """
+        return self._Q_wrap(right, op="OR")
+
+    def FROM(self, right: Union[str, "Q"]) -> "Q":
+        """Q's FROM operator this will add a SUBQUERY to between two Q queries
+
+        Args:
+            right (Q): _description_
+
+        Returns:
+            Q: a joined Q queries with a SUBQUERY node
+        """
+        return self._Q_wrap(right, op="SUBQUERY")
 
     def NOT(self) -> "Q":
-        return self.__class__(self.query, "NOT", None)
+        """Q's FROM operator this will add a NOT to between a Q query and a None for Not
 
-    def _Not_EQ(self, right: "Q") -> "Q":
-        return self.__class__(self.query, "!=", right.query)
+        Args:
+            right (Q): _description_
 
-    def _Greater_Than_EQ(self, right: "Q") -> "Q":
-        return self.__class__(self.query, ">=", right.query)
+        Returns:
+            Q: Adds a NOT to a Q query
+        """
+        return self._Q_wrap(None, op="NOT")
 
-    def _Greater_Than(self, right: "Q") -> "Q":
-        return self.__class__(self.query, ">", right.query)
+    def _Not_EQ(self, right: Union[str, "Q"]) -> "Q":
+        return self._Q_wrap(right, op="!=")
+
+    def _Greater_Than_EQ(self, right: Union[str, "Q"]) -> "Q":
+        return self._Q_wrap(right, op=">=")
+
+    def _Greater_Than(self, right: Union[str, "Q"]) -> "Q":
+        return self._Q_wrap(right, op=">")
 
     def _Less_Than_EQ(self, right: "Q") -> "Q":
         return self.__class__(self.query, "<=", right.query)
@@ -596,7 +680,7 @@ class Q:
         pass
 
     def IS(self, fields: str) -> "Q":
-        return self.__class__(self.query, "IS", fields)
+        return self._Q_wrap(fields, op="IS")
 
     def __select(self, fields: str) -> "Q":
         """[summary]
@@ -607,11 +691,12 @@ class Q:
         Returns:
             [Q]: [returns a Q object]
         """
-        ""
-        # This lambda will strip a comma and rejoin the string
-        fields = ",".join(map(lambda fields: fields.strip(","), fields.split()))
 
-        tmp = Query()
+        # This lambda will strip a comma and rejoin the string
+        mod_fields: str = ",".join(
+            map(lambda fields: fields.strip(","), fields.split())
+        ).replace(":", " AS ")
+        tmp: Query = Query()
         tmp.node_type = "SELECTVALUES"
-        tmp.value = fields
+        tmp.value = mod_fields
         return self.__class__(tmp, "SELECT", self.query)

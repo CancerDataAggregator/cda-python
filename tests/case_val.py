@@ -1,3 +1,4 @@
-from cdapython import query, Q
+from cdapython import Q
 
-Q("sex != 'male' aND sex = 'female'")
+for i in ["+", "-", "/", "*"]:
+    print(Q(f"days_to_birth >= 50 {i} 365").to_json())

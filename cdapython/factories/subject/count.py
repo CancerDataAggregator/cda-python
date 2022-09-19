@@ -1,13 +1,15 @@
 from typing import TYPE_CHECKING, Optional
+
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
 from cda_client.model.query import Query
+from cda_client.model.query_response_data import QueryResponseData
+
 from cdapython.factories import SUBJECT_FILE_COUNT
 from cdapython.factories.q_factory import AbstractFactory, QFactory
 from cdapython.factories.subject.subject import Subject
 from cdapython.results.count_result import CountResult
 from cdapython.results.result import Result
-from cda_client.model.query_response_data import QueryResponseData
 
 if TYPE_CHECKING:
     from cdapython.Q import Q

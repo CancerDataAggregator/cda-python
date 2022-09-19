@@ -3,17 +3,16 @@ import asyncio
 from pandas import DataFrame, concat
 
 from cdapython import Q
-from tests.global_settings import host, localhost, table
+from tests.global_settings import host, localhost, table_dev, dev_host
 
 
 async def main() -> None:
-    q = Q("ResearchSubject.primary_disease_type = 'Lung%' AND sex = 'male'")
+    q = Q("primary_disease_type = 'Lung%' AND sex = 'male'")
     print(q.to_json())
-    q = q.run(host=host, table=table, async_call=True, show_sql=True, limit=1000)
+    q = q.run(host=dev_host, table=table_dev, async_call=True, show_sql=True, limit=10)
 
     df = DataFrame()
-    async for i in q.paginator(to_df=True):
-        print(len(i))
+    async for i in q.paginator(page_size=200, output="full_df"):
         df = concat([df, i])
     print(df.head())
 

@@ -1,10 +1,52 @@
+from typing import Any, Union
+from xmlrpc.client import boolean
+
 from rich import print
 from rich.console import Console
 from tdparser.lexer import LexerError
 from tdparser.topdown import MissingTokensError
+from typing_extensions import Literal
 
 from cdapython.Q import Q
-from cdapython.utils.utility import query
+
+
+class Environ:
+    def __init__(self, parent=None) -> None:
+        self.env: dict = {}
+        self.parent: Any = parent
+
+    def get(self, item) -> Union[Any, None]:
+        if item in self.env:
+            return self.env[item]
+        if self.parent is not None:
+            return self.parent.get(item)
+        return None
+
+    def insert(self, item, value):
+        self.env[item] = value
+
+    def update(self, item, value):
+        curr = self
+        while curr is not None:
+            if item in curr.env:
+                curr.env[item] = value
+                return
+            curr = curr.parent
+        self.env[item] = value
+
+    def __getattr__(self, item):
+        # for example use io as IO, search only in self
+        # and not in parent
+        return self.env[item]
+
+    def __repr__(self):
+        rep = "{}".format(self.env)
+        parent = self.parent
+        while parent:
+            rep += "\n" + parent.__repr__()
+            parent = parent.parent
+        return rep
+
 
 try:
     import readline
@@ -15,10 +57,11 @@ except ImportError:
 """[summary]
     add's history to shell in current session
 """
-new = True
-setServer = None
-setDataFrame = None
-console = Console(record=True)
+new: bool = True
+setServer: Union[str, None] = None
+setDataFrame: Union[bool, None] = None
+console: Console = Console(record=True)
+setTable: Union[str, None] = None
 
 
 def help() -> None:
@@ -34,6 +77,7 @@ def help() -> None:
         exit()
         clear()
         server() set the server
+        table()
         DataFrame()
         \n
         """
@@ -43,8 +87,11 @@ def help() -> None:
 while True:
     if new is True:
         help()
-        new = False
-    text = input("Q > ")
+        print(
+            f'Q {Q.get_version()} Type "help()", "copyright", "credits" or "license" for more information.'
+        )
+        new: bool = False
+    text: str = input(">>>")
     if text == "help()":
         help()
         continue
@@ -57,15 +104,17 @@ while True:
     if text == "server()":
         setServer = console.input("Enter your server ")
         continue
+    if text == "table()":
+        setServer = console.input("Enter your table ")
     if text == "DataFrame()":
         setDataFrame = True
         continue
     try:
         result: Q = Q(text)
-        if setServer == None:
+        if setServer is None:
             queryResult = result.run()
         else:
-            queryResult = result.run(host=setServer)
+            queryResult = result.run(host=setServer, table=setTable)
 
         if setDataFrame:
             queryResult = queryResult.to_dataframe()

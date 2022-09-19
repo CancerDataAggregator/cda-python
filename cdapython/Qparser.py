@@ -1,14 +1,12 @@
 import re
-from typing import TYPE_CHECKING, Union
+
+from typing import Union
 
 from tdparser import Lexer, Token
 from tdparser.topdown import Parser
 
 from cdapython.Q import Q
 from cdapython.utils.check_case import check_keyword
-
-if TYPE_CHECKING:
-    from cdapython.Q import Q
 
 symbol_table = {}
 
