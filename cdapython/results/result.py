@@ -152,7 +152,7 @@ class Result(BaseResult):
         output: str = "",
         to_df: bool = False,
         to_list: bool = False,
-        page_size: Union[int, None] = None,
+        page_size: int = None
     ) -> Paginator:
         """_summary_
         paginator this will automatically page over results
@@ -162,6 +162,9 @@ class Result(BaseResult):
         Returns:
             _type_: _description_
         """
+        if page_size is None and isinstance(self._limit, int):
+            page_size = self._limit
+
         return Paginator(
             self,
             to_df=to_df,
@@ -190,6 +193,9 @@ class Result(BaseResult):
         Returns:
             Union[DataFrame, List[Any]]: _description_
         """
+        if page_size is None and isinstance(self._limit, int):
+            page_size = self._limit
+
         iterator: Paginator = Paginator(
             self,
             to_df=to_df,
