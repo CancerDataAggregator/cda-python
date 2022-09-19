@@ -1,6 +1,6 @@
 from cdapython import Q
 from pandas import DataFrame, concat
-from global_settings import dev_host, table_dev
+from tests.global_settings import dev_host, table_dev
 
 q = Q('subject_identifier_value = "TCGA-E2-A10A"')
 files_of_interest = q.file.run(host=dev_host, table=table_dev)
