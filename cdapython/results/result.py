@@ -152,7 +152,7 @@ class Result(BaseResult):
         output: str = "",
         to_df: bool = False,
         to_list: bool = False,
-        page_size: int = None
+        page_size: int = None,
     ) -> Paginator:
         """_summary_
         paginator this will automatically page over results
