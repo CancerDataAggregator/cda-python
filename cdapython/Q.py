@@ -689,9 +689,11 @@ class Q:
             [Q]: [returns a Q object]
         """
         # This lambda will strip a comma and rejoin the string
-        mod_fields: str = ",".join(
-            map(lambda fields: fields.strip(","), fields.split())
-        ).replace(":-1", " DESC").replace(":1", " ASC")
+        mod_fields: str = (
+            ",".join(map(lambda fields: fields.strip(","), fields.split()))
+            .replace(":-1", " DESC")
+            .replace(":1", " ASC")
+        )
         tmp: Query = Query()
         tmp.node_type = "ORDERBYVALUES"
         tmp.value = mod_fields
