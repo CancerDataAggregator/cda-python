@@ -676,8 +676,28 @@ class Q:
     def SELECT(self, fields: str) -> "Q":
         return self.__select(fields=fields)
 
-    def __Order_By(self, fields: str) -> None:
-        pass
+    def ORDER_BY(self, fields: str) -> "Q":
+        return self.__Order_By(fields=fields)
+
+    def __Order_By(self, fields: str) -> "Q":
+        """[summary]
+
+        Args:
+            fields (str): [takes in a list of order by values]
+
+        Returns:
+            [Q]: [returns a Q object]
+        """
+        # This lambda will strip a comma and rejoin the string
+        mod_fields: str = (
+            ",".join(map(lambda fields: fields.strip(","), fields.split()))
+            .replace(":-1", " DESC")
+            .replace(":1", " ASC")
+        )
+        tmp: Query = Query()
+        tmp.node_type = "ORDERBYVALUES"
+        tmp.value = mod_fields
+        return self.__class__(tmp, "ORDERBY", self.query)
 
     def IS(self, fields: str) -> "Q":
         return self._Q_wrap(fields, op="IS")
