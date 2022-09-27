@@ -102,8 +102,8 @@ class ColumnsResult(BaseResult):
         """
 
         self._data_table = {
-            "Column_Name": [list(i.keys())[0] for i in self._result],
-            "Description": [list(i.values())[0] for i in self._result],
+            "column_name": [list(i.keys())[0] for i in self._result],
+            "description": [list(i.values())[0] for i in self._result],
         }
         if include is not None:
             col, val = include.split(":")
