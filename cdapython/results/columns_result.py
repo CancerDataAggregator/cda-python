@@ -92,6 +92,7 @@ class ColumnsResult(BaseResult):
         meta: Optional[Union[str, List[Union[str, List[str]]]]] = None,
         meta_prefix: Optional[str] = None,
         max_level: Optional[int] = None,
+        include: Union[str, None] = None,
     ) -> DataFrame:
         """[summary]
         Creates a pandas DataFrame for the Results
@@ -99,6 +100,16 @@ class ColumnsResult(BaseResult):
         Returns:
             DataFrame: [description]
         """
+
+        self._data_table = {
+            "Column_Name": [list(i.keys())[0] for i in self._result],
+            "Description": [list(i.values())[0] for i in self._result],
+        }
+        if include is not None:
+            col, val = include.split(":")
+            df = DataFrame(self._data_table)
+            value = df[df[col].str.contains(val, case=False, na=False)]
+            return value
         if self.format_type == "tsv":
             return self._df
 
@@ -106,9 +117,4 @@ class ColumnsResult(BaseResult):
             data_table = {"Column_Name": [list(i.keys())[0] for i in self._result]}
             return DataFrame(data_table)
 
-        data_table = {
-            "Column_Name": [list(i.keys())[0] for i in self._result],
-            "Description": [list(i.values())[0] for i in self._result],
-        }
-
-        return DataFrame(data_table)
+        return DataFrame(self._data_table)

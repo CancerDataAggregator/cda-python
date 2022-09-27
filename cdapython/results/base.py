@@ -53,6 +53,7 @@ class BaseResult:
         meta: Optional[Union[str, List[Union[str, List[str]]]]] = None,
         meta_prefix: Optional[str] = None,
         max_level: Optional[int] = None,
+        include: Union[str, None] = None,
     ) -> DataFrame:
         """[summary]
         Creates a pandas DataFrame for the Results
@@ -60,6 +61,13 @@ class BaseResult:
         Returns:
             DataFrame: [description]
         """
+
+        if include is not None:
+            col, val = include.split(":")
+            df = json_normalize(iter(self))
+            value = df[df[col].str.contains(val, case=False, na=False)]
+            return value
+
         if self.format_type == "tsv":
             return self._df
 
