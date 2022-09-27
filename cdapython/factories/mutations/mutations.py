@@ -7,7 +7,7 @@ from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
 from cda_client.model.query import Query
 
-from cdapython.factories import MUTATIONS_COUNT, MUTATIONS
+from cdapython.factories import MUTATIONS, MUTATIONS_COUNT
 from cdapython.factories.entity import Entity
 from cdapython.factories.q_factory import AbstractFactory, QFactory
 

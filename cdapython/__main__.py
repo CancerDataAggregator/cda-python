@@ -2,7 +2,6 @@ import click
 
 import cdapython
 import cdapython.constant_variables as const
-
 from cdapython.utils.utility import columns
 
 

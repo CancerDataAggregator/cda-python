@@ -1,4 +1,5 @@
-from typing import Optional, Union, List
+from typing import List, Optional, Union
+
 from pandas import DataFrame, json_normalize
 
 from cdapython.results.base import BaseResult

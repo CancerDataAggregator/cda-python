@@ -9,7 +9,6 @@ from typing_extensions import Literal
 from cdapython.functions import backwards_comp, col, infer_quote, query_type_conversion
 from cdapython.utils.check_case import check_keyword
 
-
 SYMBOL_TABLE = {}
 
 

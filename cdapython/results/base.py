@@ -1,9 +1,10 @@
-from collections import ChainMap
 import json
-from typing_extensions import Literal
-from typing import AsyncGenerator, Iterator, List, Optional, Any, Union, Dict
-from pandas import DataFrame, json_normalize, Series
+from collections import ChainMap
+from typing import Any, AsyncGenerator, Dict, Iterator, List, Optional, Union
+
+from pandas import DataFrame, Series, json_normalize
 from rich.table import Table
+from typing_extensions import Literal
 
 
 class BaseResult:
