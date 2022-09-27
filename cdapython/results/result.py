@@ -8,7 +8,17 @@ from collections import ChainMap
 from io import StringIO
 from multiprocessing.pool import ApplyResult
 from time import sleep
-from typing import Any, AsyncGenerator, Dict, Iterator, List, Optional, Pattern, Union
+from typing import (
+    Any,
+    AsyncGenerator,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Pattern,
+    Type,
+    Union,
+)
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
@@ -298,6 +308,7 @@ class Result(BaseResult):
         pre_stream: bool = True,
     ) -> Optional["Result"]:
         return get_query_result(
+            self.__class__,
             self._api_instance,
             self._query_id,
             _offset,
@@ -309,6 +320,7 @@ class Result(BaseResult):
 
 
 def get_query_result(
+    clz: Type,
     api_instance: QueryApi,
     query_id: str,
     offset: Optional[int],
@@ -348,7 +360,7 @@ def get_query_result(
 
         sleep(2.5)
         if response.total_row_count is not None:
-            return Result(
+            return clz(
                 response,
                 query_id,
                 offset,

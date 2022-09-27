@@ -19,7 +19,8 @@ from cdapython.error_logger import unverified_http
 from cdapython.functions import backwards_comp, find_ssl_path
 from cdapython.Qparser import parser
 from cdapython.results.columns_result import ColumnsResult
-from cdapython.results.string_result import get_query_string_result
+from cdapython.results.result import get_query_result
+from cdapython.results.string_result import StringResult
 
 logging.captureWarnings(InsecureRequestWarning)
 
@@ -167,7 +168,8 @@ def unique_terms(
             api_response = api_response.get()
 
             # Execute query
-            query_result = get_query_string_result(
+            query_result = get_query_result(
+                StringResult,
                 api_instance=api_instance,
                 query_id=api_response.query_id,
                 offset=offset,

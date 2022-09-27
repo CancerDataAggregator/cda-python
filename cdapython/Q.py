@@ -277,7 +277,7 @@ class Q:
                 api_response = api_response.get()
 
             r: Union[Result, None] = get_query_result(
-                api_instance, api_response.query_id, offset, limit, async_call
+                Result, api_instance, api_response.query_id, offset, limit, async_call
             )
             if r is None:
                 return None
