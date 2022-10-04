@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 
 from pandas import DataFrame, json_normalize
 
@@ -101,20 +101,22 @@ class ColumnsResult(BaseResult):
             DataFrame: [description]
         """
 
-        self._data_table = {
+        self._data_table: dict[str, list[Any]] = {
             "column_name": [list(i.keys())[0] for i in self._result],
             "description": [list(i.values())[0] for i in self._result],
         }
         if include is not None:
             col, val = include.split(":")
             df = DataFrame(self._data_table)
-            value = df[df[col].str.contains(val, case=False, na=False)]
+            value: DataFrame = df[df[col].str.contains(val, case=False, na=False)]
             return value
         if self.format_type == "tsv":
             return self._df
 
         if self.description is False:
-            data_table = {"Column_Name": [list(i.keys())[0] for i in self._result]}
+            data_table: dict[str, list[Any]] = {
+                "Column_Name": [list(i.keys())[0] for i in self._result]
+            }
             return DataFrame(data_table)
 
         return DataFrame(self._data_table)
