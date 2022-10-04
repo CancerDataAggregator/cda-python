@@ -494,6 +494,26 @@ class NOT_LIKE(Token):
         return query
 
 
+class From(Token):
+    lbp = 2  # Precedence
+
+    def led(self, left: Query, context: Parser) -> Query:
+        """Compute the value of this token when between two expressions."""
+        # Fetch the expression to the right, stopping at the next boundary
+        # of same precedence
+        query = Query()
+        l_copy_query = build_query_copy(left)
+
+        query.node_type = "SUBQUERY"
+        query.l = l_copy_query
+
+        right_side: Query = context.expression(self.lbp)
+        r_copy_query = build_query_copy(right_side)
+
+        query.r = r_copy_query
+        return query
+
+
 class RightParen(Token):
     """A right parenthesis."""
 
@@ -554,6 +574,7 @@ lexer.register_token(Or, re.compile(r"(OR)"))
 lexer.register_token(Eq, re.compile(r"(=)"))
 lexer.register_token(IN, re.compile(r"(IN)"))
 lexer.register_token(LIKE, re.compile(r"(LIKE)"))
+lexer.register_token(From, re.compile(r"(FROM)"))
 lexer.register_token(NOT, re.compile(r"(NOT)"))
 lexer.register_token(IS_NOT, re.compile(r"((IS)\s+(NOT))"))
 lexer.register_token(NOT_IN, re.compile(r"((NOT)\s+(IN))"))
