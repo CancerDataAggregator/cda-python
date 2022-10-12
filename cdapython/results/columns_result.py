@@ -34,7 +34,7 @@ class ColumnsResult(BaseResult):
 
     def to_list(self, filters: Optional[str] = None, exact: bool = False) -> list:
         if filters is not None and filters != "":
-
+            values = None
             filters: str = filters.replace("\n", " ").strip()
             if self.description is False:
                 values: list["ColumnsResult"] = [
@@ -58,7 +58,7 @@ class ColumnsResult(BaseResult):
                 return list(
                     filter(
                         lambda items: (
-                            str(list(items.keys())[0]).lower() == filters.lower
+                            str(list(items.keys())[0]).lower() == filters.lower()
                         ),
                         values,
                     )
