@@ -57,7 +57,7 @@ class ColumnsResult(BaseResult):
                 return list(
                     filter(
                         lambda items: (
-                            str(list(items.keys())[0]).lower() == filters.lower
+                            str(list(items.keys())[0]).lower() == filters.lower()
                         ),
                         values,
                     )
