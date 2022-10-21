@@ -101,10 +101,18 @@ class ColumnsResult(BaseResult):
             DataFrame: [description]
         """
 
-        self._data_table: dict[str, list[Any]] = {
-            "column_name": [list(i.keys())[0] for i in self._result],
-            "description": [list(i.values())[0] for i in self._result],
-        }
+        self._data_table: dict[str, list[Any]] = json_normalize(self._result).rename(
+            str.capitalize, axis="columns"
+        )
+        # self._data_table.rename(
+        #     columns={
+        #         "description": "Description",
+        #         "fieldName": "Column_Name",
+        #         "endpoint": "Endpoint",
+        #         "type": "Column_Type",
+        #         "mode": "Column_Mode",
+        #     }
+        # )
         if include is not None:
             col, val = include.split(":")
             df = DataFrame(self._data_table)
@@ -115,7 +123,7 @@ class ColumnsResult(BaseResult):
 
         if self.description is False:
             data_table: dict[str, list[Any]] = {
-                "Column_Name": [list(i.keys())[0] for i in self._result]
+                "Column_Name": [i for i in self._result]
             }
             return DataFrame(data_table)
 
