@@ -11,3 +11,9 @@ from cdapython import Q, columns
 
 
 columns().to_dataframe(include="Column_Name:specimen_Files")
+
+
+Q("GDC_FILTER = 'NonExonic;bitgt'").mutation.ORDER_BY("sex:-1").run(
+    host="https://cancerdata.dsde-dev.broadinstitute.org/",
+    table="broad-dsde-dev.cda_dev",
+).to_dataframe(include="sample_barcode_tumor:TCG,sample_barcode_tumor:TCG")

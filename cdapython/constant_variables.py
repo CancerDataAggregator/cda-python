@@ -1,5 +1,5 @@
 class Constants:
-    _VERSION: str = "2022.9.27"
+    _VERSION: str = "2022.10.24"
     _DATABASETABLE_VERSION: str = "all_Subjects_v3_0_final"
     _CLIENT_VERSION: str = "3.0.0"
     _DATABASETABLE: str = "broad-dsde-prod.cda_prod"
