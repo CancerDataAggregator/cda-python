@@ -2,7 +2,7 @@ import json
 from collections import ChainMap
 from typing import Any, AsyncGenerator, Dict, Iterator, List, Optional, Union
 
-from pandas import DataFrame, Series, json_normalize
+from pandas import DataFrame,Series, json_normalize, merge, Index
 from rich.table import Table
 from typing_extensions import Literal
 
@@ -53,7 +53,8 @@ class BaseResult:
         meta: Optional[Union[str, List[Union[str, List[str]]]]] = None,
         meta_prefix: Optional[str] = None,
         max_level: Optional[int] = None,
-        include: Union[str, None] = None,
+        search_fields: Optional[Union[str, List[str]]] = None,
+        search_value: Optional[str] = None,
     ) -> DataFrame:
         """[summary]
         Creates a pandas DataFrame for the Results
@@ -62,11 +63,31 @@ class BaseResult:
             DataFrame: [description]
         """
 
-        if include is not None:
-            col, val = include.split(":")
-            df = json_normalize(iter(self))
-            value = df[df[col].str.contains(val, case=False, na=False)]
+            
+        self._data_table: DataFrame = json_normalize(self._result)
+        if search_fields == "":
+            search_fields = None
+        if search_fields is not None:
+            df = self._data_table
+            column_names = list(df.columns)
+        
+            if isinstance(search_fields, str):
+                search_fields = [search_fields]
+            search_fields: list[str] = search_fields
+            search_value = str(search_value)
+            value: DataFrame = DataFrame(columns=column_names, index=Index([], dtype="int"))
+            for i in search_fields:
+                value = merge(
+                    value,
+                    df[df[i].str.contains(search_value, case=False, na=False)],
+                    how="right",
+                    right_on=column_names,
+                    left_on=column_names,
+                )
+            
+
             return value
+
 
         if self.format_type == "tsv":
             return self._df

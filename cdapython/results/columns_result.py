@@ -128,15 +128,16 @@ class ColumnsResult(BaseResult):
             DataFrame: [description]
         """
 
-        self._data_table: dict[str, list[Any]] = json_normalize(self._result)
+        self._data_table: DataFrame = json_normalize(self._result)
 
         if search_fields is not None:
             column_names = ["fieldName", "endpoint", "description", "type", "mode"]
             search_fields = search_fields
             search_value = search_value
-            df = DataFrame(self._data_table)
+            df = self._data_table
             value = DataFrame(columns=column_names, index=Index([], dtype="int"))
-
+            if isinstance(search_fields, str):
+                search_fields = [search_fields]
             for i in search_fields:
                 value = merge(
                     value,
