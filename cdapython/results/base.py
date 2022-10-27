@@ -2,7 +2,7 @@ import json
 from collections import ChainMap
 from typing import Any, AsyncGenerator, Dict, Iterator, List, Optional, Union
 
-from pandas import DataFrame,Series, json_normalize, merge, Index
+from pandas import DataFrame, Series, json_normalize, merge, Index
 from rich.table import Table
 from typing_extensions import Literal
 
@@ -63,19 +63,20 @@ class BaseResult:
             DataFrame: [description]
         """
 
-            
         self._data_table: DataFrame = json_normalize(self._result)
         if search_fields == "":
             search_fields = None
         if search_fields is not None:
             df = self._data_table
             column_names = list(df.columns)
-        
+
             if isinstance(search_fields, str):
                 search_fields = [search_fields]
             search_fields: list[str] = search_fields
             search_value = str(search_value)
-            value: DataFrame = DataFrame(columns=column_names, index=Index([], dtype="int"))
+            value: DataFrame = DataFrame(
+                columns=column_names, index=Index([], dtype="int")
+            )
             for i in search_fields:
                 value = merge(
                     value,
@@ -84,10 +85,8 @@ class BaseResult:
                     right_on=column_names,
                     left_on=column_names,
                 )
-            
 
             return value
-
 
         if self.format_type == "tsv":
             return self._df

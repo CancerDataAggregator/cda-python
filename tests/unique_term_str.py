@@ -7,5 +7,7 @@ Q.get_host_url()
 
 
 print(
-   unique_terms("primary_diagnosis_site", show_counts = True).to_dataframe(search_fields= "*", search_value = "gland")
+    unique_terms("primary_diagnosis_site", show_counts=True).to_dataframe(
+        search_fields="*", search_value="gland"
+    )
 )
