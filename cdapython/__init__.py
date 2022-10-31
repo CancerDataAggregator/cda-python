@@ -65,7 +65,31 @@ __name__: Literal["cdapython"] = "cdapython"
 __version__: str = Constants._VERSION
 __about__: str = f"Q {__version__}"
 
-
+__all__ = [
+    "__name__",
+    "__version__",
+    "__about__",
+    "Constants",
+    "Q",
+    "columns",
+    "query",
+    "unique_terms",
+    "Subject",
+    "SubjectCount",
+    "SubjectFileCount",
+    "SubjectFiles",
+    "Treatment",
+    "TreatmentCount",
+    "Specimen",
+    "SpecimenCount",
+    "SpecimenFileCount",
+    "SpecimenFiles",
+    "ResearchSubject",
+    "ResearchSubjectCount",
+    "ResearchSubjectFileCount",
+    "ResearchSubjectFiles",
+    "QFactory",
+]
 try:
     # python2
     import __builtin__

@@ -6,6 +6,11 @@ from cdapython.utils.none_check import none_check
 
 
 class State:
+    """
+    This class was made to keep the state for the paginator function will
+    the class will save the reference in memory to the list or dataframe
+    """
+
     def __init__(
         self, df: Optional[DataFrame] = None, list_array: Optional[list] = None
     ) -> None:
