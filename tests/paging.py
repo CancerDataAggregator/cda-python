@@ -9,4 +9,4 @@ a = (
 )
 print(a)
 
-Q.bigquery_status()
+# Q.bigquery_status()
