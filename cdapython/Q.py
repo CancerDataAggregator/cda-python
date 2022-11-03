@@ -604,7 +604,9 @@ class Q:
         except ApiException as api_exception:
             if verbose:
                 print(api_exception.body)
-
+        except AttributeError as e:
+            if verbose:
+                print(e)
         except Exception as e:
             if verbose:
                 print(e)

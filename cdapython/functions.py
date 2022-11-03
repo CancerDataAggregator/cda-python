@@ -1,6 +1,6 @@
 from os import path
 from ssl import get_default_verify_paths
-from typing import Any, Optional, Tuple, Union, overload
+from typing import Any, Tuple, Union, overload
 
 from cda_client.model.query import Query
 from typing_extensions import Literal
@@ -91,7 +91,20 @@ def infer_quote(val: Query) -> Query:
     pass
 
 
-def infer_quote(val: Any) -> Union[Query, QueryStr, str]:
+@overload
+def infer_quote(val: QueryStr) -> QueryStr:
+    """_summary_
+    this is a overload for a Query for typechecking
+    Args:
+        val (Query): _description_
+
+    Returns:
+        Query: _description_
+    """
+    pass
+
+
+def infer_quote(val: Union[str, Query, QueryStr]) -> Union[Query, QueryStr, str]:
     """[summary]
     Handles Strings With quotes by checking the value type
     Args:

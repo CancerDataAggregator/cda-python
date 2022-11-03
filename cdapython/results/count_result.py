@@ -43,7 +43,7 @@ class CountResult(Result):
 
                 for item in value:
                     if item[key] is None:
-                        item[key] = "null"
+                        item[key] = "NULL"
 
                     table.add_row(item[key], str(item["count"]))
 
