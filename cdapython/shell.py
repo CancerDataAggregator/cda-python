@@ -5,7 +5,7 @@ from rich import print
 from rich.console import Console
 from tdparser.lexer import LexerError
 from tdparser.topdown import MissingTokensError
-from typing_extensions import Literal
+
 
 from cdapython.Q import Q
 

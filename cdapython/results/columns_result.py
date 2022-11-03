@@ -1,7 +1,27 @@
-from typing import Optional, Union, List
-from pandas import DataFrame, json_normalize
+from typing import Any, List, Optional, Union
+from typing_extensions import Literal, TypedDict
+
+from pandas import DataFrame, json_normalize, merge, Index
 
 from cdapython.results.base import BaseResult
+
+
+class _Column_Types(TypedDict):
+    """
+    This is made for typechecking a dict
+    Args:
+        TypedDict (_type_): _description_
+    """
+
+    fieldName: str
+    endpoint: str
+    description: str
+    mode: str
+
+
+_Column_str = Union[
+    Literal["fieldName"], Literal["endpoint"], Literal["description"], Literal["mode"]
+]
 
 
 class ColumnsResult(BaseResult):
@@ -31,33 +51,35 @@ class ColumnsResult(BaseResult):
     def __str__(self) -> str:
         return self._repr_value(show_value=self.show_sql)
 
-    def to_list(self, filters: Optional[str] = None, exact: bool = False) -> list:
+    def to_list(
+        self, filters: Optional[str] = None, exact: bool = False, endpoint: str = ""
+    ) -> list:
         if filters is not None and filters != "":
-
+            values: Optional[List[_Column_Types]] = None
             filters: str = filters.replace("\n", " ").strip()
             if self.description is False:
-                values: list["ColumnsResult"] = [
-                    list(i.keys())[0]
-                    for i in self._result
-                    if list(i.keys())[0] is not None
+                values = [
+                    i["fieldName"] for i in self._result if i["fieldName"] is not None
                 ]
             if self.description:
-                values: list["ColumnsResult"] = [
-                    i for i in self._result if list(i.keys())[0] is not None
-                ]
+                values = [i for i in self._result if list(i) is not None]
             # values = list(filter(None, values))
             if exact:
                 if self.description is False:
                     return list(
                         filter(
-                            lambda items: (str(items).lower() == filters.lower()),
+                            lambda items: (
+                                str(items["fieldName"]).lower() == filters.lower()
+                            ),
                             values,
                         )
                     )
                 return list(
                     filter(
                         lambda items: (
-                            str(list(items.keys())[0]).lower() == filters.lower()
+                            str(items["description"]).lower() == filters.lower()
+                            or str(items["endpoint"]).lower() == filters.lower()
+                            or str(items["fieldName"]).lower() == filters.lower()
                         ),
                         values,
                     )
@@ -75,14 +97,19 @@ class ColumnsResult(BaseResult):
                 return list(
                     filter(
                         lambda items: (
-                            str(list(items.keys())[0]).lower().find(filters.lower())
+                            str(items["description"]).lower().find(filters.lower())
+                            != -1
+                            or str(items["endpoint"]).lower().find(filters.lower())
+                            != -1
+                            or str(items["fieldName"]).lower().find(filters.lower())
                             != -1
                         ),
                         values,
                     )
                 )
         if self.description is False:
-            return [list(i.keys())[0] for i in self._result]
+            return [i["fieldName"] for i in self._result]
+
         return [i for i in self._result]
 
     def to_dataframe(
@@ -91,6 +118,8 @@ class ColumnsResult(BaseResult):
         meta: Optional[Union[str, List[Union[str, List[str]]]]] = None,
         meta_prefix: Optional[str] = None,
         max_level: Optional[int] = None,
+        search_fields: Optional[Union[_Column_str, List[_Column_str]]] = None,
+        search_value: Optional[str] = None,
     ) -> DataFrame:
         """[summary]
         Creates a pandas DataFrame for the Results
@@ -98,16 +127,33 @@ class ColumnsResult(BaseResult):
         Returns:
             DataFrame: [description]
         """
+
+        self._data_table: DataFrame = json_normalize(self._result)
+
+        if search_fields is not None:
+            column_names = ["fieldName", "endpoint", "description", "type", "mode"]
+            search_fields = search_fields
+            search_value = search_value
+            df = self._data_table
+            value = DataFrame(columns=column_names, index=Index([], dtype="int"))
+            if isinstance(search_fields, str):
+                search_fields = [search_fields]
+            for i in search_fields:
+                value = merge(
+                    value,
+                    df[df[i].str.contains(search_value, case=False, na=False)],
+                    how="right",
+                    right_on=column_names,
+                    left_on=column_names,
+                )
+            return value
         if self.format_type == "tsv":
             return self._df
 
         if self.description is False:
-            data_table = {"Column_Name": [list(i.keys())[0] for i in self._result]}
+            data_table: dict[str, list[Any]] = {
+                "fieldName": [i["fieldName"] for i in self._result]
+            }
             return DataFrame(data_table)
 
-        data_table = {
-            "Column_Name": [list(i.keys())[0] for i in self._result],
-            "Description": [list(i.values())[0] for i in self._result],
-        }
-
-        return DataFrame(data_table)
+        return DataFrame(self._data_table)

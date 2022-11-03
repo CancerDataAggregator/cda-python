@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Optional, Union
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import ApiClient
 from cda_client.configuration import Configuration
-from cda_client.exceptions import ServiceException, ApiException
+from cda_client.exceptions import ApiException, ServiceException
 from pandas import DataFrame, json_normalize
 from rich import print
 from urllib3.exceptions import InsecureRequestWarning
@@ -19,7 +19,8 @@ from cdapython.error_logger import unverified_http
 from cdapython.functions import backwards_comp, find_ssl_path
 from cdapython.Qparser import parser
 from cdapython.results.columns_result import ColumnsResult
-from cdapython.results.string_result import get_query_string_result
+from cdapython.results.result import get_query_result
+from cdapython.results.string_result import StringResult
 
 logging.captureWarnings(InsecureRequestWarning)
 
@@ -167,7 +168,8 @@ def unique_terms(
             api_response = api_response.get()
 
             # Execute query
-            query_result = get_query_string_result(
+            query_result = get_query_result(
+                StringResult,
                 api_instance=api_instance,
                 query_id=api_response.query_id,
                 offset=offset,

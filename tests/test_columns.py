@@ -1,13 +1,17 @@
 from cdapython import Q, columns
 
-# from tests.global_settings import host, table, localhost
+from tests.global_settings import host, table, integration_host
+
+"""
+fieldName,endpoint,description
+"""
 
 
 def test_columns():
-    integration_host = "http://35.192.60.10:8080/"
-    Q.set_default_project_dataset("gdc-bq-sample.dev")
-    cols = columns(host=integration_host).to_list()
-    assert isinstance(cols, list) is True
+
+    print(
+        columns(host=integration_host, version="all_Subjects_v3_1_final").to_dataframe()
+    )
 
 
 test_columns()

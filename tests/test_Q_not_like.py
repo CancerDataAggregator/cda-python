@@ -1,7 +1,9 @@
+from typing import Any
+from unittest import TestCase
 from cdapython import Q
 from tests.global_settings import host, table
 from cdapython.results.count_result import CountResult
-from unittest import mock
+from unittest.mock import patch
 from pandas import DataFrame
 from tests.fake_result import FakeResultData
 
@@ -60,8 +62,8 @@ result = [
     }
 ]
 
-fake = FakeResultData(result)
-fake_result = CountResult(
+fake: FakeResultData = FakeResultData(result)
+fake_result: CountResult = CountResult(
     api_response=fake.api_response,
     query_id=fake.query_id,
     offset=fake.offset,
@@ -73,12 +75,14 @@ fake_result = CountResult(
 )
 
 
-@mock.patch("cdapython.Q.run", return_value=fake_result)
-def test_not_like(a) -> None:
-    q = Q('sex NOT LIKE "m%"').subject.count.run(host=host, table=table)
-    print(q.to_list())
-    assert isinstance(q.to_list(), list) is True
-    assert isinstance(q.to_dataframe(), DataFrame) is True
-
-
-test_not_like()
+class TestData(TestCase):
+    @patch("cdapython.Q")
+    def test_not_like(self, data) -> None:
+        q = (
+            data('sex NOT LIKE "m%"')
+            .subject.count.run(host=host, table=table)
+            .return_value
+        ) = fake_result
+        print(q.to_list())
+        assert isinstance(q.to_list(), list) is True
+        assert isinstance(q.to_dataframe(), DataFrame) is True

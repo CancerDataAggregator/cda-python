@@ -277,7 +277,7 @@ class Q:
                 api_response = api_response.get()
 
             r: Union[Result, None] = get_query_result(
-                api_instance, api_response.query_id, offset, limit, async_call
+                Result, api_instance, api_response.query_id, offset, limit, async_call
             )
             if r is None:
                 return None
@@ -604,7 +604,9 @@ class Q:
         except ApiException as api_exception:
             if verbose:
                 print(api_exception.body)
-
+        except AttributeError as e:
+            if verbose:
+                print(e)
         except Exception as e:
             if verbose:
                 print(e)
@@ -676,8 +678,28 @@ class Q:
     def SELECT(self, fields: str) -> "Q":
         return self.__select(fields=fields)
 
-    def __Order_By(self, fields: str) -> None:
-        pass
+    def ORDER_BY(self, fields: str) -> "Q":
+        return self.__Order_By(fields=fields)
+
+    def __Order_By(self, fields: str) -> "Q":
+        """[summary]
+
+        Args:
+            fields (str): [takes in a list of order by values]
+
+        Returns:
+            [Q]: [returns a Q object]
+        """
+        # This lambda will strip a comma and rejoin the string
+        mod_fields: str = (
+            ",".join(map(lambda fields: fields.strip(","), fields.split()))
+            .replace(":-1", " DESC")
+            .replace(":1", " ASC")
+        )
+        tmp: Query = Query()
+        tmp.node_type = "ORDERBYVALUES"
+        tmp.value = mod_fields
+        return self.__class__(tmp, "ORDERBY", self.query)
 
     def IS(self, fields: str) -> "Q":
         return self._Q_wrap(fields, op="IS")

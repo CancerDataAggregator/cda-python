@@ -42,7 +42,7 @@ typeReport
 ven3
 .nox
 .pytype
-ven3
+venv11
 .coverage
 .coverage.*
 config-dev.ini
