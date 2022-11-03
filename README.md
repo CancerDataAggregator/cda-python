@@ -37,11 +37,11 @@ conflicts, and is not supported.
 
 ### requirements
 
-    - git [(Install)](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-    - terminal/command line
+- git [(Install)](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- terminal/command line
 
 
-1. [Download and install docker](https://www.docker.com/products/docker-desktop/){ .md-button .md-button--primary}
+1. [Download and install docker](https://www.docker.com/products/docker-desktop/)
 
 2. Open Terminal or PowerShell and run:
 ```bash
