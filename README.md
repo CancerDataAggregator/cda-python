@@ -40,7 +40,6 @@ conflicts, and is not supported.
 - git [(Install)](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - terminal/command line
 
-
 1. [Download and install docker](https://www.docker.com/products/docker-desktop/)
 
 2. Open Terminal or PowerShell and run:
@@ -63,28 +62,29 @@ This will open a docker container with all the required packages for using the A
 
 ### notes
 
-    - To stop the container from running, return to the terminal window (from step 2), and type **Control C to stop** the container.
+- To stop the container from running, return to the terminal window (from step 2), and type **Control C to stop** the container.
 
 ### notes
 
-    To delete the container from your machine, use this command in the cda-python project directory.
+To delete the container from your machine, use this command in the cda-python project directory.
 
-    ```bash
-    docker compose down
-    ```
+```bash
+docker compose down
+```
 
 ## Conda + Pip install
 
 ### requirements
 
-    - terminal/command line
-    - python version >= 3.7 [(Install)](https://www.python.org/downloads/)
-    - conda [Install](https://docs.conda.io/en/latest/miniconda.html)
+- terminal/command line
+- python version >= 3.7 [(Install)](https://www.python.org/downloads/)
+- conda [Install](https://docs.conda.io/en/latest/miniconda.html)
 
 1. Open Terminal or PowerShell and create a new conda environment:
-  ```bash
-  conda create -n cda python=3.7
-  ```
+
+```bash
+conda create -n cda python=3.7
+```
   type `y` when prompted
 
 2. Activate the environment:
@@ -102,17 +102,19 @@ This will open a docker container with all the required packages for using the A
 
 
 ### notes
-      You only need to create a new conda environment once!
+You only need to create a new conda environment once!
 
-      - To exit the conda environment, return to the terminal window (from step 1), and type **Control C to stop** the notebook then:
-      ```bash
-      conda deactivate
-      ```
-      - To return to the notebook in conda, open a terminal and type:
-      ```bash
-      conda activate cda
-      jupyter notebooks
-      ```
+- To exit the conda environment, return to the terminal window (from step 1), and type **Control C to stop** the notebook then:
+
+```bash
+conda deactivate
+```
+- To return to the notebook in conda, open a terminal and type:
+
+```bash
+conda activate cda
+jupyter notebooks
+```
 
 
 
