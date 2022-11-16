@@ -109,7 +109,7 @@ def unique_terms(
     table: Optional[str] = None,
     verify: Optional[bool] = None,
     async_req: Optional[bool] = True,
-    version: Optional[str] = Constants.table_version,
+    version: Optional[str] = None,
     files: Optional[bool] = False,
     show_sql: bool = False,
     show_counts: bool = False,
@@ -130,7 +130,8 @@ def unique_terms(
     Returns:
         Optional[List[Any]]: [description]
     """
-
+     if version is None:
+        version = Constants.table_version
     if host is None:
         host = Constants.CDA_API_URL
 
