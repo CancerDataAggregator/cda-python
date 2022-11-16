@@ -130,7 +130,7 @@ def unique_terms(
     Returns:
         Optional[List[Any]]: [description]
     """
-     if version is None:
+    if version is None:
         version = Constants.table_version
     if host is None:
         host = Constants.CDA_API_URL
