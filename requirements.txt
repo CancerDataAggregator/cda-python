@@ -16,7 +16,7 @@ fastjsonschema==2.15.3; python_version >= "3.7"
 fonttools==4.34.4; python_version >= "3.7"
 importlib-metadata==4.2.0; python_version < "3.8" and python_version >= "3.7"
 importlib-resources==5.8.0; python_version < "3.9" and python_version >= "3.7"
-ipykernel==6.15.1; python_version >= "3.7"
+ipykernel==6.17.1; python_version >= "3.7"
 ipython-genutils==0.2.0; python_version >= "3.7"
 ipython==7.34.0; python_version >= "3.7"
 ipywidgets==7.7.0
