@@ -179,7 +179,7 @@ class Q:
         """
         values_to_search: list[str] = []
         if not Path(file_to_search).resolve().is_file():
-            raise IOError("File not found")
+            raise IOError(f"File not found {Path(file_to_search).resolve()}")
 
         with open(str(Path(file_to_search).resolve())) as f:
             for i in f.readlines():
