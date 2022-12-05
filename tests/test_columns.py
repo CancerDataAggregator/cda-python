@@ -1,6 +1,5 @@
 from cdapython import Q, columns
-
-from tests.global_settings import host, table, integration_host
+from tests.global_settings import host, integration_host, table
 
 """
 fieldName,endpoint,description

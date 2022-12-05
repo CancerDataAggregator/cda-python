@@ -10,7 +10,7 @@ from time import sleep
 from types import MappingProxyType
 from typing import Any, Dict, Optional, Tuple, TypeVar, Union
 
-from cda_client import ApiClient, Configuration
+from cda_client import ApiClient
 from cda_client.api.meta_api import MetaApi
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
@@ -26,7 +26,6 @@ from urllib3.exceptions import InsecureRequestWarning, SSLError
 
 from cdapython.constant_variables import Constants
 from cdapython.decorators.measure import Measure
-from cdapython.error_logger import unverified_http
 from cdapython.factories import (
     COUNT,
     DIAGNOSIS,
@@ -38,30 +37,14 @@ from cdapython.factories import (
     TREATMENT,
 )
 from cdapython.factories.q_factory import QFactory
-from cdapython.functions import find_ssl_path
 from cdapython.results.result import Result, get_query_result
 from cdapython.simple_parser import simple_parser
+from cdapython.utils.Cda_Configuration import CdaConfiguration
 
 # from cdapython.math_parser import math_parse
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 # constants
 WAITING_TEXT: Literal["Waiting for results"] = "Waiting for results"
-
-
-def builder_api_client(host: Optional[str], verify: Optional[bool]) -> Configuration:
-    if host is None:
-        host = Constants.CDA_API_URL
-
-    tmp_configuration: Configuration = Configuration(host=host)
-
-    if verify is None:
-        tmp_configuration.verify_ssl = find_ssl_path()
-
-    if verify is False:
-        unverified_http()
-        tmp_configuration.verify_ssl = False
-
-    return tmp_configuration
 
 
 def check_version_and_table(
@@ -178,6 +161,7 @@ class Q:
     # endregion
 
     # region staticmethods
+
     @staticmethod
     def get_version() -> str:
         """returns the global version Q is pointing to
@@ -194,7 +178,10 @@ class Q:
         Args:
             url (str): param to set the global url
         """
-        Constants.CDA_API_URL = url
+        if len(url.strip()) > 0:
+            Constants.CDA_API_URL = url
+        else:
+            print(f"Please enter a url")
 
     @staticmethod
     def get_host_url() -> str:
@@ -212,7 +199,10 @@ class Q:
         Args:
             table (str): _description_
         """
-        Constants.default_table = table
+        if len(table.strip()) > 0:
+            Constants.default_table = table
+        else:
+            print(f"Please enter a table")
 
     @staticmethod
     def get_default_project_dataset() -> str:
@@ -220,7 +210,10 @@ class Q:
 
     @staticmethod
     def set_table_version(table_version: str) -> None:
-        Constants.table_version = table_version
+        if len(table_version.strip()) > 0:
+            Constants.table_version = table_version
+        else:
+            print(f"Please enter a table version")
 
     @staticmethod
     def get_table_version() -> str:
@@ -255,7 +248,8 @@ class Q:
         """
 
         cda_client_obj: ApiClient = ApiClient(
-            configuration=builder_api_client(host=host, verify=verify), pool_threads=2
+            configuration=CdaConfiguration(host=host, verify=verify, verbose=verbose),
+            pool_threads=2,
         )
         try:
 
@@ -302,7 +296,7 @@ class Q:
             str: status messages
         """
         cda_client_obj: ApiClient = ApiClient(
-            configuration=builder_api_client(host=host, verify=verify)
+            configuration=CdaConfiguration(host=host, verify=verify)
         )
         return str(
             MetaApi(api_client=cda_client_obj).service_status()["systems"][
@@ -328,7 +322,7 @@ class Q:
         """
 
         cda_client_obj: ApiClient = ApiClient(
-            configuration=builder_api_client(host=host, verify=verify)
+            configuration=CdaConfiguration(host=host, verify=verify)
         )
         try:
             with cda_client_obj as api_client:
@@ -525,7 +519,7 @@ class Q:
             Optional[Result]: _description_
         """
         cda_client_obj: ApiClient = ApiClient(
-            configuration=builder_api_client(host=host, verify=verify)
+            configuration=CdaConfiguration(host=host, verify=verify, verbose=verbose)
         )
 
         version, table = check_version_and_table(version, table)
