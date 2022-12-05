@@ -6,9 +6,10 @@ and SQL Like operators queue supports further to the bottom
 import logging
 from json import JSONEncoder, dumps, loads
 from multiprocessing.pool import ApplyResult
+from pathlib import Path
 from time import sleep
 from types import MappingProxyType
-from typing import Any, Dict, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, TypeVar, Union
 
 from cda_client import ApiClient
 from cda_client.api.meta_api import MetaApi
@@ -19,7 +20,7 @@ from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
 from cda_client.model.query_response_data import QueryResponseData
 from pandas import DataFrame, concat
-from typing_extensions import Literal
+from typing_extensions import Literal, TypeAlias
 from urllib3.connection import NewConnectionError  # type: ignore
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, SSLError
@@ -41,6 +42,8 @@ from cdapython.results.result import Result, get_query_result
 from cdapython.simple_parser import simple_parser
 from cdapython.utils.Cda_Configuration import CdaConfiguration
 
+if TYPE_CHECKING:
+    from os import PathLike
 # from cdapython.math_parser import math_parse
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 # constants
@@ -159,6 +162,30 @@ class Q:
         return self.query.to_dict()
 
     # endregion
+
+    @classmethod
+    def from_file(cls, field_to_search: str, file_to_search: str):
+        """_summary_
+        This function will read in a text file and use the IN statement to search the file
+        Args:
+            field_to_search (str): _description_
+            file_to_search (str): _description_
+
+        Raises:
+            IOError: _description_
+
+        Returns:
+            _type_: _description_
+        """
+        values_to_search: list[str] = []
+        if not Path(file_to_search).resolve().is_file():
+            raise IOError("File not found")
+
+        with open(str(Path(file_to_search).resolve())) as f:
+            for i in f.readlines():
+                values_to_search.append(f"'{i.strip()}'")
+
+        return cls(f'{field_to_search} IN ({",".join(values_to_search)})')
 
     # region staticmethods
 
