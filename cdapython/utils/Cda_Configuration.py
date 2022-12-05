@@ -1,6 +1,6 @@
 from os import path
 from ssl import get_default_verify_paths
-from typing import Optional
+from typing import Any, Optional
 
 from cda_client.configuration import Configuration
 
@@ -31,18 +31,11 @@ class CdaConfiguration(Configuration):
         if host is None:
             host = Constants.CDA_API_URL
 
-        self.host = host.strip("/")
-
-        if self.verify is None:
-            self.verify_ssl = self._find_ssl_path()
-
-        if self.verify is False:
-            if verbose:
-                self._unverified_http()
-            self.verify_ssl = False
+        self._host = host.strip("/")
+        self.verbose = verbose
 
         super().__init__(
-            host,
+            self._host,
             api_key,
             api_key_prefix,
             access_token,
@@ -56,6 +49,19 @@ class CdaConfiguration(Configuration):
             server_operation_variables,
             ssl_ca_cert,
         )
+        self._check_verify()
+
+    def _check_verify(self, *args: Any, **kwds: Any) -> None:
+        """
+        This function was made to overwrite the verfly_ssl prop in the super method
+        """
+        if self.verify is None:
+            self.verify_ssl = self._find_ssl_path()
+
+        if self.verify is False:
+            if self.verbose:
+                self._unverified_http()
+            self.verify_ssl = False
 
     def _find_ssl_path(self) -> bool:
         """[summary]

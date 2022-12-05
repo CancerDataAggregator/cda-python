@@ -1,5 +1,5 @@
-from cdapython import Q, columns
-from tests.global_settings import host, integration_host, table
+from cdapython import columns
+from tests.global_settings import integration_host
 
 """
 fieldName,endpoint,description
@@ -9,7 +9,9 @@ fieldName,endpoint,description
 def test_columns():
 
     print(
-        columns(host=integration_host, version="all_Subjects_v3_1_final").to_dataframe()
+        columns(
+            host=integration_host, version="all_Subjects_v3_1_final", verify=False
+        ).to_dataframe()
     )
 
 
