@@ -9,27 +9,6 @@ from typing_extensions import Literal
 from cdapython.functions import backwards_comp, col, infer_quote, query_type_conversion
 from cdapython.utils.check_case import check_keyword
 
-SYMBOL_TABLE = {}
-
-
-class Symbol_Base(Token):
-    sym_id = None
-    sym_value = None
-    first = second = third = None
-
-    def nud(self):
-        raise SyntaxError("Syntax error (%r)." % self.sym_id)
-
-    def led(self, left):
-        raise SyntaxError("Unknown operator (%r)." % self.sym_id)
-
-    def __repr__(self):
-        if self.sym_id == "(name)" or self.sym_id == "(literal)":
-            return "(%s %s)" % (self.sym_id[1:-1], self.sym_value)
-        out = [self.sym_id, self.first, self.second, self.third]
-        out = map(str, filter(None, out))
-        return "(" + " ".join(out) + ")"
-
 
 def build_query_copy(q: Query) -> Optional[Query]:
     if q is None:

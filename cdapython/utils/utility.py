@@ -60,6 +60,9 @@ def http_error_logger(http_error: ServiceException) -> None:
 
 
 def query(text: str) -> "Q":
+    """
+    This is a hold over for the older parser this uses the Qparser class
+    """
     return parser(text)
 
 

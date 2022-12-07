@@ -42,9 +42,6 @@ from cdapython.results.result import Result, get_query_result
 from cdapython.simple_parser import simple_parser
 from cdapython.utils.Cda_Configuration import CdaConfiguration
 
-if TYPE_CHECKING:
-    from os import PathLike
-# from cdapython.math_parser import math_parse
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 # constants
 WAITING_TEXT: Literal["Waiting for results"] = "Waiting for results"
@@ -120,7 +117,6 @@ class Q:
             if isinstance(args[0], Query):
                 self.query = args[0]
             else:
-                # math_parsed = math_parse(args[0].strip().replace("\n", " "))
                 query_parsed: Query = simple_parser(args[0].strip().replace("\n", " "))
                 self.query = query_parsed
 
