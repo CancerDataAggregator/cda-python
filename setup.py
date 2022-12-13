@@ -16,13 +16,13 @@ def get_version(filepath: str):
     return (version, version_client)
 
 
-__version__, version_client = get_version("pyproject.toml")
-print(__version__)
+_version, version_client = get_version("pyproject.toml")
+print(_version)
 
 current_path = Path(__file__).parent
 
 NAME = "cdapython"
-VERSION: str = __version__
+VERSION: str = _version
 now = datetime.utcnow()
 desc_path = Path(current_path, "README.md")
 with open(desc_path, "r", encoding="utf-8", errors="surrogateescape") as fh:
@@ -55,14 +55,11 @@ setup(
         "typing-extensions==4.2.0",
         "pandas==1.3.5",
         "ipywidgets>=7.7.0",
-        "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git@3.2.0",
+        "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git@3.3.0",
         "python-dotenv>=0.18.0",
         "ipython>=7.32.0",
     ],
     description="User friendly Python library to access CDA service.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    entry_points={
-        "console_scripts": ["Q = cdapython.__main__:main"],
-    },
 )

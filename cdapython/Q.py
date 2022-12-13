@@ -19,7 +19,7 @@ from cda_client.exceptions import ApiException, ServiceException
 from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
 from cda_client.model.query_response_data import QueryResponseData
-from pandas import DataFrame, concat
+from pandas import DataFrame, concat, read_csv
 from typing_extensions import Literal, TypeAlias
 from urllib3.connection import NewConnectionError  # type: ignore
 from urllib3.connectionpool import MaxRetryError
@@ -160,7 +160,9 @@ class Q:
     # endregion
 
     @classmethod
-    def from_file(cls, field_to_search: str, file_to_search: str):
+    def from_file(
+        cls, field_to_search: str, file_to_search: str, key: Optional[str] = None
+    ):
         """_summary_
         This function will read in a text file and use the IN statement to search the file
         Args:
@@ -176,10 +178,21 @@ class Q:
         values_to_search: list[str] = []
         if not Path(file_to_search).resolve().is_file():
             raise IOError(f"File not found {Path(file_to_search).resolve()}")
+        if Path(file_to_search).suffix != ".txt":
+            if Path(file_to_search).suffix == ".csv":
+                if key is None:
+                    raise Exception("No Key for csv search")
+                df = read_csv(file_to_search)
+                if key.isnumeric():
+                    key = int(key)
+                values_to_search.extend(df[key].to_list())
+            else:
+                raise IOError(f"File Import Error only txt and csv supported")
 
-        with open(str(Path(file_to_search).resolve())) as f:
-            for i in f.readlines():
-                values_to_search.append(f"'{i.strip()}'")
+            if Path(file_to_search).suffix == ".txt":
+                with open(str(Path(file_to_search).resolve())) as f:
+                    for i in f.readlines():
+                        values_to_search.append(f"'{i.strip()}'")
 
         return cls(f'{field_to_search} IN ({",".join(values_to_search)})')
 
