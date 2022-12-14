@@ -19,8 +19,8 @@ from cda_client.exceptions import ApiException, ServiceException
 from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
 from cda_client.model.query_response_data import QueryResponseData
-from pandas import DataFrame, concat, read_csv
-from typing_extensions import Literal, TypeAlias
+from pandas import DataFrame, concat, read_csv, read_fwf
+from typing_extensions import Literal
 from urllib3.connection import NewConnectionError  # type: ignore
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, SSLError
@@ -182,19 +182,25 @@ class Q:
             if Path(file_to_search).suffix == ".csv":
                 if key is None:
                     raise Exception("No Key for csv search")
-                df = read_csv(file_to_search)
-                if key.isnumeric():
-                    key = int(key)
-                values_to_search.extend(df[key].to_list())
+                df = read_csv(file_to_search).fillna("")
+                values_to_search.extend([f"{i}" for i in df[key].to_list()])
+            if Path(file_to_search).suffix == ".tsv":
+                if key is None:
+                    raise Exception("No Key for tsv search")
+                df = read_csv(file_to_search, delimiter="\t").fillna("")
+                values_to_search.extend([f"{i}" for i in df[key].to_list()])
             else:
                 raise IOError(f"File Import Error only txt and csv supported")
 
-            if Path(file_to_search).suffix == ".txt":
-                with open(str(Path(file_to_search).resolve())) as f:
-                    for i in f.readlines():
-                        values_to_search.append(f"'{i.strip()}'")
+        if Path(file_to_search).suffix == ".txt":
+            df = read_fwf(file_to_search, header=None, sep="\n")
+            values_to_search.extend([f"{i}" for i in df[0].to_list()])
 
-        return cls(f'{field_to_search} IN ({",".join(values_to_search)})')
+        values_to_search_joined = ",".join(
+            f'"{w}"' for w in list(set(filter(lambda i: i != "", values_to_search)))
+        )
+        query_value = f"{field_to_search} IN ({values_to_search_joined})"
+        return cls(query_value)
 
     # region staticmethods
 
