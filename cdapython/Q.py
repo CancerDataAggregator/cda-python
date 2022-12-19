@@ -133,7 +133,6 @@ class Q:
             self.query.l = _l  # noqa: E741
             self.query.r = _r  # noqa: E741
 
-
     def __repr__(self) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
 
