@@ -1,7 +1,7 @@
 from typing import Any, List, Optional, Union
-from typing_extensions import Literal, TypedDict
 
-from pandas import DataFrame, json_normalize, merge, Index
+from pandas import DataFrame, Index, json_normalize, merge
+from typing_extensions import Literal, TypedDict
 
 from cdapython.results.base import BaseResult
 

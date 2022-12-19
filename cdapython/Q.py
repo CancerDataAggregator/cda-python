@@ -9,7 +9,7 @@ from multiprocessing.pool import ApplyResult
 from pathlib import Path
 from time import sleep
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, TypeVar, Union
 
 from cda_client import ApiClient
 from cda_client.api.meta_api import MetaApi
@@ -20,7 +20,7 @@ from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
 from cda_client.model.query_response_data import QueryResponseData
 from pandas import DataFrame, concat, read_csv, read_fwf
-from typing_extensions import Literal
+from typing_extensions import Literal, Self
 from urllib3.connection import NewConnectionError  # type: ignore
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, SSLError
@@ -93,15 +93,12 @@ class _QEncoder(JSONEncoder):
         return tmp_dict
 
 
-TQ = TypeVar("TQ", bound="Q")
-
-
 class Q:
     """
     Q lang is Language used to send query to the cda service
     """
 
-    def __init__(self: TQ, *args: Union[str, Query]) -> None:
+    def __init__(self, *args: Union[str, Query]) -> None:
         """
 
         Args:
@@ -136,7 +133,8 @@ class Q:
             self.query.l = _l  # noqa: E741
             self.query.r = _r  # noqa: E741
 
-    def __repr__(self: TQ) -> str:
+
+    def __repr__(self) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
 
     # region helper methods
@@ -162,7 +160,7 @@ class Q:
     @classmethod
     def from_file(
         cls, field_to_search: str, file_to_search: str, key: Optional[str] = None
-    ):
+    ) -> "Q":
         """_summary_
         This function will read in a text file and use the IN statement to search the file
         Args:
@@ -175,7 +173,7 @@ class Q:
         Returns:
             _type_: _description_
         """
-        values_to_search: list[str] = []
+        values_to_search: List[str] = []
         if not Path(file_to_search).resolve().is_file():
             raise IOError(f"File not found {Path(file_to_search).resolve()}")
         if Path(file_to_search).suffix != ".txt":
@@ -527,7 +525,7 @@ class Q:
 
     @Measure()
     def run(
-        self: TQ,
+        self: "Q",
         offset: int = 0,
         limit: int = 100,
         version: Optional[str] = None,
@@ -647,7 +645,7 @@ class Q:
             if verbose:
                 print(e)
 
-    def _Q_wrap(self, right: Union[str, "Q", None], op):
+    def _Q_wrap(self, right: Union[str, "Q", None], op) -> "Q":
         if isinstance(right, str):
             right = Q(right)
         return self.__class__(self.query, op, right.query)
