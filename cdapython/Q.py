@@ -166,7 +166,7 @@ class Q:
         Args:
             field_to_search (str): cda column name
             file_to_search (str): user path to file
-            key (Optional[str], optional): column name in csv or tsv not text 
+            key (Optional[str], optional): column name in csv or tsv not text
 
         Raises:
             IOError: _description_
