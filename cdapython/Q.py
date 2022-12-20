@@ -161,16 +161,21 @@ class Q:
         cls, field_to_search: str, file_to_search: str, key: Optional[str] = None
     ) -> "Q":
         """_summary_
-        This function will read in a text file and use the IN statement to search the file
+            This function will read in a txt , csv or tsv and use the IN statement to search the file
+
         Args:
-            field_to_search (str): _description_
-            file_to_search (str): _description_
+            field_to_search (str): cda column name
+            file_to_search (str): user path to file
+            key (Optional[str], optional): column name in csv or tsv not text 
 
         Raises:
             IOError: _description_
+            Exception: _description_
+            Exception: _description_
+            IOError: _description_
 
         Returns:
-            _type_: _description_
+            Q
         """
         values_to_search: List[str] = []
         if not Path(file_to_search).resolve().is_file():
