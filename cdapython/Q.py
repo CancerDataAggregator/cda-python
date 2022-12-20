@@ -181,7 +181,7 @@ class Q:
                     raise Exception("No Key for csv search")
                 df = read_csv(file_to_search).fillna("")
                 values_to_search.extend([f"{i}" for i in df[key].to_list()])
-            if Path(file_to_search).suffix == ".tsv":
+            elif Path(file_to_search).suffix == ".tsv":
                 if key is None:
                     raise Exception("No Key for tsv search")
                 df = read_csv(file_to_search, delimiter="\t").fillna("")
