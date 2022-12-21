@@ -1,7 +1,7 @@
-from cdapython import __version__
+from cdapython import Q
 
-version = "2022.12.12"
+version = "2022.12.21"
 
 
 def test_python_version() -> None:
-    assert __version__ == version
+    assert Q.get_version() == version
