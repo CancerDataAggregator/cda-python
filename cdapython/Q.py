@@ -6,11 +6,12 @@ and SQL Like operators queue supports further to the bottom
 import logging
 from json import JSONEncoder, dumps, loads
 from multiprocessing.pool import ApplyResult
+from pathlib import Path
 from time import sleep
 from types import MappingProxyType
-from typing import Any, Dict, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, TypeVar, Union
 
-from cda_client import ApiClient, Configuration
+from cda_client import ApiClient
 from cda_client.api.meta_api import MetaApi
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
@@ -18,15 +19,14 @@ from cda_client.exceptions import ApiException, ServiceException
 from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
 from cda_client.model.query_response_data import QueryResponseData
-from pandas import DataFrame, concat
-from typing_extensions import Literal
+from pandas import DataFrame, concat, read_csv, read_fwf
+from typing_extensions import Literal, Self
 from urllib3.connection import NewConnectionError  # type: ignore
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, SSLError
 
 from cdapython.constant_variables import Constants
 from cdapython.decorators.measure import Measure
-from cdapython.error_logger import unverified_http
 from cdapython.factories import (
     COUNT,
     DIAGNOSIS,
@@ -38,30 +38,13 @@ from cdapython.factories import (
     TREATMENT,
 )
 from cdapython.factories.q_factory import QFactory
-from cdapython.functions import find_ssl_path
 from cdapython.results.result import Result, get_query_result
 from cdapython.simple_parser import simple_parser
+from cdapython.utils.Cda_Configuration import CdaConfiguration
 
-# from cdapython.math_parser import math_parse
 logging.captureWarnings(InsecureRequestWarning)  # type: ignore
 # constants
 WAITING_TEXT: Literal["Waiting for results"] = "Waiting for results"
-
-
-def builder_api_client(host: Optional[str], verify: Optional[bool]) -> Configuration:
-    if host is None:
-        host = Constants.CDA_API_URL
-
-    tmp_configuration: Configuration = Configuration(host=host)
-
-    if verify is None:
-        tmp_configuration.verify_ssl = find_ssl_path()
-
-    if verify is False:
-        unverified_http()
-        tmp_configuration.verify_ssl = False
-
-    return tmp_configuration
 
 
 def check_version_and_table(
@@ -110,15 +93,12 @@ class _QEncoder(JSONEncoder):
         return tmp_dict
 
 
-TQ = TypeVar("TQ", bound="Q")
-
-
 class Q:
     """
     Q lang is Language used to send query to the cda service
     """
 
-    def __init__(self: TQ, *args: Union[str, Query]) -> None:
+    def __init__(self, *args: Union[str, Query]) -> None:
         """
 
         Args:
@@ -134,7 +114,6 @@ class Q:
             if isinstance(args[0], Query):
                 self.query = args[0]
             else:
-                # math_parsed = math_parse(args[0].strip().replace("\n", " "))
                 query_parsed: Query = simple_parser(args[0].strip().replace("\n", " "))
                 self.query = query_parsed
 
@@ -154,7 +133,7 @@ class Q:
             self.query.l = _l  # noqa: E741
             self.query.r = _r  # noqa: E741
 
-    def __repr__(self: TQ) -> str:
+    def __repr__(self) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
 
     # region helper methods
@@ -177,7 +156,56 @@ class Q:
 
     # endregion
 
+    @classmethod
+    def from_file(
+        cls, field_to_search: str, file_to_search: str, key: Optional[str] = None
+    ) -> "Q":
+        """_summary_
+            This function will read in a txt , csv or tsv and use the IN statement to search the file
+
+        Args:
+            field_to_search (str): cda column name
+            file_to_search (str): user path to file
+            key (Optional[str], optional): column name in csv or tsv not text
+
+        Raises:
+            IOError: _description_
+            Exception: _description_
+            Exception: _description_
+            IOError: _description_
+
+        Returns:
+            Q
+        """
+        values_to_search: List[str] = []
+        if not Path(file_to_search).resolve().is_file():
+            raise IOError(f"File not found {Path(file_to_search).resolve()}")
+        if Path(file_to_search).suffix != ".txt":
+            if Path(file_to_search).suffix == ".csv":
+                if key is None:
+                    raise Exception("No Key for csv search")
+                df = read_csv(file_to_search).fillna("")
+                values_to_search.extend([f"{i}" for i in df[key].to_list()])
+            elif Path(file_to_search).suffix == ".tsv":
+                if key is None:
+                    raise Exception("No Key for tsv search")
+                df = read_csv(file_to_search, delimiter="\t").fillna("")
+                values_to_search.extend([f"{i}" for i in df[key].to_list()])
+            else:
+                raise IOError(f"File Import Error only txt and csv supported")
+
+        if Path(file_to_search).suffix == ".txt":
+            df = read_fwf(file_to_search, header=None, sep="\n")
+            values_to_search.extend([f"{i}" for i in df[0].to_list()])
+
+        values_to_search_joined = ",".join(
+            f'"{w}"' for w in list(set(filter(lambda i: i != "", values_to_search)))
+        )
+        query_value = f"{field_to_search} IN ({values_to_search_joined})"
+        return cls(query_value)
+
     # region staticmethods
+
     @staticmethod
     def get_version() -> str:
         """returns the global version Q is pointing to
@@ -194,7 +222,10 @@ class Q:
         Args:
             url (str): param to set the global url
         """
-        Constants.CDA_API_URL = url
+        if len(url.strip()) > 0:
+            Constants.CDA_API_URL = url
+        else:
+            print(f"Please enter a url")
 
     @staticmethod
     def get_host_url() -> str:
@@ -212,7 +243,10 @@ class Q:
         Args:
             table (str): _description_
         """
-        Constants.default_table = table
+        if len(table.strip()) > 0:
+            Constants.default_table = table
+        else:
+            print(f"Please enter a table")
 
     @staticmethod
     def get_default_project_dataset() -> str:
@@ -220,7 +254,10 @@ class Q:
 
     @staticmethod
     def set_table_version(table_version: str) -> None:
-        Constants.table_version = table_version
+        if len(table_version.strip()) > 0:
+            Constants.table_version = table_version
+        else:
+            print(f"Please enter a table version")
 
     @staticmethod
     def get_table_version() -> str:
@@ -255,7 +292,8 @@ class Q:
         """
 
         cda_client_obj: ApiClient = ApiClient(
-            configuration=builder_api_client(host=host, verify=verify), pool_threads=2
+            configuration=CdaConfiguration(host=host, verify=verify, verbose=verbose),
+            pool_threads=2,
         )
         try:
 
@@ -302,7 +340,7 @@ class Q:
             str: status messages
         """
         cda_client_obj: ApiClient = ApiClient(
-            configuration=builder_api_client(host=host, verify=verify)
+            configuration=CdaConfiguration(host=host, verify=verify)
         )
         return str(
             MetaApi(api_client=cda_client_obj).service_status()["systems"][
@@ -328,7 +366,7 @@ class Q:
         """
 
         cda_client_obj: ApiClient = ApiClient(
-            configuration=builder_api_client(host=host, verify=verify)
+            configuration=CdaConfiguration(host=host, verify=verify)
         )
         try:
             with cda_client_obj as api_client:
@@ -491,7 +529,7 @@ class Q:
 
     @Measure()
     def run(
-        self: TQ,
+        self: "Q",
         offset: int = 0,
         limit: int = 100,
         version: Optional[str] = None,
@@ -525,7 +563,7 @@ class Q:
             Optional[Result]: _description_
         """
         cda_client_obj: ApiClient = ApiClient(
-            configuration=builder_api_client(host=host, verify=verify)
+            configuration=CdaConfiguration(host=host, verify=verify, verbose=verbose)
         )
 
         version, table = check_version_and_table(version, table)
@@ -611,7 +649,7 @@ class Q:
             if verbose:
                 print(e)
 
-    def _Q_wrap(self, right: Union[str, "Q", None], op):
+    def _Q_wrap(self, right: Union[str, "Q", None], op) -> "Q":
         if isinstance(right, str):
             right = Q(right)
         return self.__class__(self.query, op, right.query)

@@ -15,12 +15,12 @@ from urllib3.exceptions import InsecureRequestWarning
 
 from cdapython.constant_variables import Constants
 from cdapython.decorators.cache import lru_cache_timed
-from cdapython.error_logger import unverified_http
-from cdapython.functions import backwards_comp, find_ssl_path
+from cdapython.functions import backwards_comp
 from cdapython.Qparser import parser
 from cdapython.results.columns_result import ColumnsResult
 from cdapython.results.result import get_query_result
 from cdapython.results.string_result import StringResult
+from cdapython.utils.Cda_Configuration import CdaConfiguration
 
 logging.captureWarnings(InsecureRequestWarning)
 
@@ -60,6 +60,9 @@ def http_error_logger(http_error: ServiceException) -> None:
 
 
 def query(text: str) -> "Q":
+    """
+    This is a hold over for the older parser this uses the Qparser class
+    """
     return parser(text)
 
 
@@ -109,7 +112,7 @@ def unique_terms(
     table: Optional[str] = None,
     verify: Optional[bool] = None,
     async_req: Optional[bool] = True,
-    version: Optional[str] = Constants.table_version,
+    version: Optional[str] = None,
     files: Optional[bool] = False,
     show_sql: bool = False,
     show_counts: bool = False,
@@ -130,19 +133,10 @@ def unique_terms(
     Returns:
         Optional[List[Any]]: [description]
     """
-
+    if version is None:
+        version = Constants.table_version
     if host is None:
         host = Constants.CDA_API_URL
-
-    tmp_configuration: Configuration = Configuration(host=host)
-
-    if verify is None:
-        tmp_configuration.verify_ssl = find_ssl_path()
-
-    if verify is False:
-        if verbose:
-            unverified_http()
-        tmp_configuration.verify_ssl = False
 
     if table is None:
         table = Constants.default_table
@@ -152,7 +146,9 @@ def unique_terms(
     col_name = backwards_comp(col_name)
     version = table_white_list(table, version)
 
-    cda_client_obj: ApiClient = ApiClient(configuration=tmp_configuration)
+    cda_client_obj: ApiClient = ApiClient(
+        configuration=CdaConfiguration(host=host, verify=verify)
+    )
     try:
         with cda_client_obj as api_client:
             api_instance = QueryApi(api_client)
@@ -226,15 +222,7 @@ def columns(
         host = Constants.CDA_API_URL
     if version is None:
         version = Constants.table_version
-    tmp_configuration: Configuration = Configuration(host=host)
 
-    if verify is None:
-        tmp_configuration.verify_ssl = find_ssl_path()
-
-    if verify is False:
-        if verbose:
-            unverified_http()
-        tmp_configuration.verify_ssl = False
     if table is None:
         table = Constants.default_table
 
@@ -243,7 +231,9 @@ def columns(
 
     version = table_white_list(table, version)
 
-    cda_client_obj: ApiClient = ApiClient(configuration=tmp_configuration)
+    cda_client_obj: ApiClient = ApiClient(
+        configuration=CdaConfiguration(host=host, verify=verify, verbose=verbose)
+    )
 
     try:
         with cda_client_obj as api_client:
