@@ -1,7 +1,5 @@
-from cdapython import unique_terms, columns
+from global_settings import localhost
 
-print(
-    unique_terms("File.imaging_modality", show_sql=True).to_list(
-        filters="", exact=False
-    )
-)
+from cdapython import columns, unique_terms
+
+print(unique_terms("sex", show_counts=True, host=localhost).df_to_table())
