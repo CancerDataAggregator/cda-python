@@ -11,6 +11,14 @@ from cdapython.utils.check_case import check_keyword
 
 
 def build_query_copy(q: Query) -> Optional[Query]:
+    """
+    This is for passing by ref instead of value this is a fix for python's copy error
+    Args:
+        q (Query): _description_
+
+    Returns:
+        Optional[Query]: _description_
+    """
     if q is None:
         return None
 
@@ -55,7 +63,7 @@ def is_float(num) -> bool:
         return False
 
 
-class Decmimal_Number(Token):
+class Decimal_Number(Token):
     lbp = 0
     regexp = r"[-+]?\d*\.\d+"
 
@@ -527,7 +535,7 @@ class end_token:
 
 lexer = Lexer(with_parens=False)
 lexer.register_tokens(
-    Integer, Decmimal_Number, Addition, Multiplication, Division, Subtraction
+    Integer, Decimal_Number, Addition, Multiplication, Division, Subtraction
 )
 lexer.register_token(
     Expression,
@@ -562,5 +570,4 @@ lexer.register_token(IS, re.compile(r"(IS)"))
 
 
 def simple_parser(text: str) -> "Query":
-
     return lexer.parse(text)

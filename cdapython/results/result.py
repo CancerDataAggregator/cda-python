@@ -198,7 +198,7 @@ class Result(BaseResult):
             output (str, optional): _description_. Defaults to "".
             to_df (bool, optional): _description_. Defaults to False.
             to_list (bool, optional): _description_. Defaults to False.
-            limit (Union[int, None], optional): _description_. Defaults to None.
+            page_size (Union[int, None], optional): _description_. Defaults to None.
 
         Returns:
             Union[DataFrame, List[Any]]: _description_

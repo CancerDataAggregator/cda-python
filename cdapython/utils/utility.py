@@ -66,42 +66,6 @@ def query(text: str) -> "Q":
     return parser(text)
 
 
-def table_white_list(table: Optional[str], version: Optional[str]) -> Optional[str]:
-    """[summary]
-    This checks the allowed list List and Throws a error if there is a table
-    not allowed
-    Args:
-        table (str): [sets table from allowed list]
-        version (str): [sets the version if the value if needed]
-
-    Raises:
-        ValueError: [description]
-
-    Returns:
-        str: [description]
-    """
-    if table is not None and version is not None:
-        if table.find(".") == -1:
-            raise ValueError("Table not in allowlist list")
-        check_table = table.split(".")[1]
-        if check_table not in [
-            "cda_mvp",
-            "integration",
-            "dev",
-            "cda_dev",
-            "cda_prod",
-            "cda_alpha",
-            "cda_staging",
-        ]:
-            raise ValueError("Table not in allowlist list")
-
-        if check_table == "cda_mvp" and version == "all_v1_1":
-            version = "v3"
-
-        return version
-    return version
-
-
 @lru_cache_timed(seconds=10)
 def unique_terms(
     col_name: str,
@@ -144,7 +108,6 @@ def unique_terms(
     if async_req is None:
         async_req = False
     col_name = backwards_comp(col_name)
-    version = table_white_list(table, version)
 
     cda_client_obj: ApiClient = ApiClient(
         configuration=CdaConfiguration(host=host, verify=verify)
@@ -222,14 +185,12 @@ def columns(
         host = Constants.CDA_API_URL
     if version is None:
         version = Constants.table_version
-
+    # TODO REMOVE Table not used in java call
     if table is None:
         table = Constants.default_table
 
     if async_req is None:
         async_req = False
-
-    version = table_white_list(table, version)
 
     cda_client_obj: ApiClient = ApiClient(
         configuration=CdaConfiguration(host=host, verify=verify, verbose=verbose)
