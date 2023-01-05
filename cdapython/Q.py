@@ -20,7 +20,7 @@ from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
 from cda_client.model.query_response_data import QueryResponseData
 from pandas import DataFrame, concat, read_csv, read_fwf
-from typing_extensions import Literal, Self
+from typing_extensions import Literal
 from urllib3.connection import NewConnectionError  # type: ignore
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, SSLError
@@ -481,7 +481,7 @@ class Q:
         api_instance: QueryApi,
         query_id: str,
         offset: Optional[int],
-        limit: Optional[int],
+        page_size: Optional[int],
         async_req: Optional[bool],
         pre_stream: bool = True,
         show_sql: bool = True,
@@ -494,7 +494,7 @@ class Q:
             api_instance (QueryApi): [description]
             query_id (str): [description]
             offset (int): [description]
-            limit (int): [description]
+            page_size (int): [description]
             async_req (bool): [description]
             pre_stream (bool, optional): [description]. Defaults to True.
 
@@ -505,7 +505,7 @@ class Q:
             response = api_instance.query(
                 id=query_id,
                 offset=offset,
-                limit=limit,
+                limit=page_size,
                 async_req=async_req,
                 _preload_content=pre_stream,
                 _check_return_type=False,
@@ -520,7 +520,7 @@ class Q:
                     response,
                     query_id,
                     offset,
-                    limit,
+                    page_size,
                     api_instance,
                     show_sql,
                     show_count,
@@ -531,7 +531,8 @@ class Q:
     def run(
         self: "Q",
         offset: int = 0,
-        limit: int = 100,
+        page_size: int = 100,
+        limit: Optional[int] = None,
         version: Optional[str] = None,
         host: Optional[str] = None,
         dry_run: bool = False,
@@ -547,7 +548,7 @@ class Q:
 
         Args:
             offset (int, optional): _description_. Defaults to 0.
-            limit (int, optional): _description_. Defaults to 100.
+            page_size (int, optional): _description_. Defaults to 100.
             version (Optional[str], optional): _description_. Defaults to None.
             host (Optional[str], optional): _description_. Defaults to None.
             dry_run (bool, optional): _description_. Defaults to False.
@@ -570,6 +571,9 @@ class Q:
 
         if include is not None:
             self.query = Q.__select(self, fields=include).query
+
+        if limit is not None:
+            self.query = Q.__limit(self, limit)
 
         self._show_sql: bool = show_sql or False
 
@@ -605,7 +609,7 @@ class Q:
                 api_instance=api_instance,
                 query_id=api_response.query_id,  # type: ignore
                 offset=offset,
-                limit=limit,
+                page_size=page_size,
                 async_req=async_call,
                 show_sql=self._show_sql,
                 show_count=True,
@@ -760,3 +764,10 @@ class Q:
         tmp.node_type = "SELECTVALUES"
         tmp.value = mod_fields
         return self.__class__(tmp, "SELECT", self.query)
+
+    def __limit(self, number: int) -> Query:
+        tmp: Query = Query()
+        tmp.node_type = "LIMIT"
+        tmp.value = str(number)
+        tmp.r = self.query
+        return tmp

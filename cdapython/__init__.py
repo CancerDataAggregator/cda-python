@@ -5,7 +5,6 @@ from __future__ import print_function
 
 from typing import Any, Dict
 
-from rich import print
 from typing_extensions import Literal
 
 from cdapython.constant_variables import Constants

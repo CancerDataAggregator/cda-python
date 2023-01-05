@@ -2,11 +2,11 @@ import re
 from typing import Any, Optional, Union
 
 from cda_client.model.query import Query
-from tdparser import Lexer, Token
-from tdparser.topdown import Parser
 from typing_extensions import Literal
 
 from cdapython.functions import backwards_comp, col, infer_quote, query_type_conversion
+from cdapython.Q_parser import Lexer, Token
+from cdapython.Q_parser.Parser import Parser
 from cdapython.utils.check_case import check_keyword
 
 
@@ -515,11 +515,9 @@ class LeftParen(Token):
 
     def nud(self, context: Parser) -> Any:
         # Fetch the next expression
-
         expr = context.expression()
         pre_token = context.current_token
-        # Eat the next token from the flow, and fail if it isn't a right
-        # parenthesis.
+        # Eat the next token from the flow, and fail if it isn't a right parenthesis.
         context.consume(expect_class=self.match)
         if isinstance(pre_token, RightParen) and hasattr(expr, "value"):
             expr.value = f"({expr.value})"
@@ -527,6 +525,36 @@ class LeftParen(Token):
 
     def __repr__(self) -> Literal["<(>"]:  # pragma: no cover
         return "<(>"
+
+
+class Limit(Token):
+    lbp = 3
+
+    def led(self, left: Query, context: Parser) -> Query:
+        """Compute the value of this token when between two expressions."""
+        # Fetch the expression to the right, stopping at the next boundary
+        # of same precedence
+        query = Query()
+        right_side: Query = context.expression(self.lbp)
+        query.node_type = "LIMIT"
+        query.r = left
+        query.value = right_side.value
+        return query
+
+
+class Offset(Token):
+    lbp = 15
+
+    def led(self, left: Query, context: Parser) -> Query:
+        """Compute the value of this token when between two expressions."""
+        # Fetch the expression to the right, stopping at the next boundary
+        # of same precedence
+        query = Query()
+        right_side: Query = context.expression(self.lbp)
+        query.node_type = "OFFSET"
+        query.l = col(backwards_comp(left.value.strip()))
+        query.r = infer_quote(str(right_side.value))
+        return query
 
 
 class end_token:
@@ -540,7 +568,7 @@ lexer.register_tokens(
 lexer.register_token(
     Expression,
     re.compile(
-        r"([-]?[\d]+)|(\"[\w\s]+\")|(?!\*)(?!\+)(?!\/)(?![+-]?([0-9]*[.])?[0-9]+)(\b(?!(\bAND\b))(?!(\bOR\b))(?!(\bNOT\b))(?!(\bFROM\b))(?!(\bIN\b))(?!(\bLIKE\b))(?!(\bIS\b))[a-zA-Z_.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
+        r"([-]?[\d]+)|(\"[\w\s]+\")|(?!\*)(?!\+)(?!\/)(?![+-]?([0-9]*[.])?[0-9]+)(\b(?!(\bAND\b))(?!(\bOR\b))(?!(\bNOT\b))(?!(\bLIMIT\b))(?!(\bOFFSET\b))(?!(\bFROM\b))(?!(\bIN\b))(?!(\bLIKE\b))(?!(\bIS\b))[a-zA-Z_.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
     ),
 )
 
@@ -562,6 +590,8 @@ lexer.register_token(Eq, re.compile(r"(=)"))
 lexer.register_token(IN, re.compile(r"(IN)"))
 lexer.register_token(LIKE, re.compile(r"(LIKE)"))
 lexer.register_token(From, re.compile(r"(FROM)"))
+lexer.register_token(Limit, re.compile(r"(LIMIT)"))
+lexer.register_token(Offset, re.compile(r"OFFSET"))
 lexer.register_token(NOT, re.compile(r"(NOT)"))
 lexer.register_token(IS_NOT, re.compile(r"((IS)\s+(NOT))"))
 lexer.register_token(NOT_IN, re.compile(r"((NOT)\s+(IN))"))
