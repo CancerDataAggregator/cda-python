@@ -2,6 +2,8 @@
 result is a convenient wrapper around the response object from the CDA service it adds user functionality.
 like creating dataframe and manipulating data for ease-of-use such as paginating automatically for the user through their result objects.
 """
+from __future__ import annotations
+
 import json
 import re
 from collections import ChainMap
@@ -9,6 +11,7 @@ from io import StringIO
 from multiprocessing.pool import ApplyResult
 from time import sleep
 from typing import (
+    TYPE_CHECKING,
     Any,
     AsyncGenerator,
     Dict,
@@ -30,6 +33,10 @@ from typing_extensions import Literal
 from cdapython.Paginator import Paginator
 from cdapython.results.base import BaseResult
 from cdapython.utils.state import State
+
+if TYPE_CHECKING:
+    from cdapython.results.columns_result import ColumnsResult
+    from cdapython.results.string_result import StringResult
 
 
 class _QEncoder(json.JSONEncoder):
@@ -330,7 +337,7 @@ def get_query_result(
     show_sql: bool = False,
     show_count: bool = True,
     format_type: str = "json",
-) -> Optional[Result]:
+) -> Union[Result, StringResult, ColumnsResult, None]:
     """
         This will call the next query and wait for the result \
         then return a Result object to the user.

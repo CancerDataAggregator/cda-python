@@ -28,6 +28,7 @@ logging.captureWarnings(InsecureRequestWarning)
 # This is added for Type Checking class to remove a circular import)
 if TYPE_CHECKING:
     from cdapython.Q import Q
+    from cdapython.results.result import Result
     from cdapython.results.string_result import StringResult
 
 # Creating constant
@@ -45,7 +46,7 @@ if isinstance(Constants.CDA_API_URL, str):
     URL_TABLE: str = Constants.CDA_API_URL
 
 
-def http_error_logger(http_error: ServiceException) -> None:
+def http_error_logger(http_error: Union[ServiceException, ApiException]) -> None:
     (
         msg,
         status_code,
@@ -55,7 +56,7 @@ def http_error_logger(http_error: ServiceException) -> None:
         f"""
             Http Status: {status_code}
             Error Message: {msg}
-            """
+        """
     )
 
 
@@ -81,7 +82,7 @@ def unique_terms(
     show_sql: bool = False,
     show_counts: bool = False,
     verbose: bool = True,
-) -> Optional["StringResult"]:
+) -> Union[Result, StringResult, ColumnsResult, None]:
     """[summary]
 
     Args:
@@ -218,7 +219,7 @@ def columns(
                     result=api_response,
                     description=description,
                 )
-            result_value: ColumnsResult = query_result
+            result_value: Optional[ColumnsResult] = query_result
 
             if query_result is None:
                 result_value = None

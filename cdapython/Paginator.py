@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from rich.progress import (
     BarColumn,
@@ -10,7 +10,7 @@ from rich.progress import (
     TextColumn,
     TimeElapsedColumn,
 )
-from typing_extensions import Literal
+from typing_extensions import Self
 
 from cdapython.utils.none_check import none_check
 
@@ -20,12 +20,10 @@ if TYPE_CHECKING:
 
     from cdapython.results.result import Result
 
-TPaginator = TypeVar("TPaginator", bound="Paginator")
-
 
 class Paginator:
     def __init__(
-        self: TPaginator,
+        self: Self,
         result: Result,
         to_df: bool,
         to_list: bool,
@@ -54,23 +52,28 @@ class Paginator:
         )
         self.progress.update(self.task, advance=self.result.count)
 
-    def _do_next(self: Paginator) -> Union[dict, list, DataFrame, Result]:
-
-        result_nx: Union[DataFrame, list, Result] = self.result
+    def _return_result(self) -> Union[DataFrame, list, Result]:
         var_output: str = none_check(self.output)
         if var_output == "full_df":
-            result_nx: DataFrame = self.result.to_dataframe()
+            return self.result.to_dataframe()
         if var_output == "full_list":
-            result_nx: Result = self.result.to_list()
+            return self.result.to_list()
         if self.to_df:
-            result_nx: DataFrame = self.result.to_dataframe()
+            return self.result.to_dataframe()
         if self.to_list:
-            result_nx: list = self.result.to_list()
+            return self.result.to_list()
+        return self.result
+
+    def _do_next(self: Paginator) -> Union[DataFrame, list, Result, None]:
+
+        result_nx = self._return_result()
         if self.result.has_next_page:
             try:
-                self.result = self.result.next_page(limit=self.limit)
-                self.progress.update(self.task, advance=self.result.count)
-                return result_nx
+                tmp_result = self.result.next_page(limit=self.limit)
+                if tmp_result:
+                    self.result = tmp_result
+                    self.progress.update(self.task, advance=self.result.count)
+                    return result_nx
             except Exception as e:
                 (self.progress.remove_task(i.id) for i in self.progress.tasks)
                 self.progress.stop()
@@ -79,7 +82,7 @@ class Paginator:
             self.stopped = True
             return result_nx
 
-    async def a_do_next(self) -> Union[dict, list, DataFrame, Result]:
+    async def a_do_next(self) -> Union[list, DataFrame, Result, None]:
 
         return self._do_next()
 
@@ -91,7 +94,7 @@ class Paginator:
         self.progress.start()
         return self
 
-    async def __anext__(self) -> Optional[Union["DataFrame", "Result"]]:
+    async def __anext__(self) -> Union[list, DataFrame, Result, None]:
         try:
             if self.stopped:
                 self.progress.update(self.task, advance=self.result.count)
@@ -103,7 +106,7 @@ class Paginator:
             self.progress.stop()
             raise e
 
-    def __next__(self) -> Optional[Union[DataFrame, Result]]:
+    def __next__(self) -> Union[list, DataFrame, Result, None]:
         try:
             if self.stopped:
                 self.progress.update(self.task, advance=self.result.count)

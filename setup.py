@@ -45,7 +45,6 @@ setup(
     python_requires=">=3.7",
     url="https://github.com/CancerDataAggregator/cdapython",
     install_requires=[
-        "tdparser>=1.1.6",
         "numpy>=1.21.6",
         "wheel>=0.36.2",
         "urllib3>=1.26.8",
@@ -55,8 +54,7 @@ setup(
         "typing-extensions==4.2.0",
         "pandas==1.3.5",
         "ipywidgets>=7.7.0",
-        "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git@3.3.0",
-        "python-dotenv>=0.18.0",
+        "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git@3.3.1",
         "ipython>=7.32.0",
     ],
     description="User friendly Python library to access CDA service.",
