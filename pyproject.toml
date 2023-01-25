@@ -24,6 +24,7 @@ nbconvert = "6.5.1"
 Pillow = "9.3.0"
 notebook = "6.4.12"
 fastjsonschema = "2.16.2"
+jupyter-core = "4.11.2"
 
 
 
