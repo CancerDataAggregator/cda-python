@@ -1,5 +1,10 @@
 from cdapython import Q
 
+# Q.from_file(
+#     field_to_search=["subject_id", "researchsubject_id"],
+#     file_to_search="plaincsvfile.csv",
+#     key="mysubjectids",
+# ).subject.run().to_dataframe()
 print(
     Q.from_file(
         field_to_search="ethnicity",

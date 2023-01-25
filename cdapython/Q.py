@@ -9,7 +9,17 @@ from multiprocessing.pool import ApplyResult
 from pathlib import Path
 from time import sleep
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+    overload,
+)
 
 from cda_client import ApiClient
 from cda_client.api.meta_api import MetaApi
@@ -20,13 +30,13 @@ from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
 from cda_client.model.query_response_data import QueryResponseData
 from pandas import DataFrame, concat, read_csv, read_fwf
-from typing_extensions import Literal
-from urllib3.connection import NewConnectionError  # type: ignore
+from typing_extensions import Literal, Self
 from urllib3.connectionpool import MaxRetryError
-from urllib3.exceptions import InsecureRequestWarning, SSLError
+from urllib3.exceptions import InsecureRequestWarning, NewConnectionError, SSLError
 
 from cdapython.constant_variables import Constants
 from cdapython.decorators.measure import Measure
+from cdapython.exceptions.custom_exception import HTTP_ERROR_API, HTTP_ERROR_SERVICE
 from cdapython.factories import (
     COUNT,
     DIAGNOSIS,
@@ -42,7 +52,10 @@ from cdapython.results.result import Result, get_query_result
 from cdapython.simple_parser import simple_parser
 from cdapython.utils.Cda_Configuration import CdaConfiguration
 
-logging.captureWarnings(InsecureRequestWarning)  # type: ignore
+if TYPE_CHECKING:
+    from cdapython.results.columns_result import ColumnsResult
+    from cdapython.results.string_result import StringResult
+logging.captureWarnings(False)
 # constants
 WAITING_TEXT: Literal["Waiting for results"] = "Waiting for results"
 
@@ -158,7 +171,10 @@ class Q:
 
     @classmethod
     def from_file(
-        cls, field_to_search: str, file_to_search: str, key: Optional[str] = None
+        cls,
+        field_to_search: Union[List[str], str],
+        file_to_search: str,
+        key: str = "",
     ) -> "Q":
         """_summary_
             This function will read in a txt , csv or tsv and use the IN statement to search the file
@@ -314,17 +330,16 @@ class Q:
                     api_response.wait(10000)
                 api_response = api_response.get()
 
-            r: Union[Result, None] = get_query_result(
+            r: Union[Result, StringResult, ColumnsResult, None] = get_query_result(
                 Result, api_instance, api_response.query_id, offset, limit, async_call
             )
             if r is None:
                 return None
 
-            dataframe: DataFrame = DataFrame()
-            df: DataFrame = DataFrame()
-            for i in r.paginator(to_df=True):
-                df: DataFrame = concat([dataframe, i])
-            return df
+            if isinstance(r, Result) or isinstance(r, StringResult):
+                df: DataFrame = r.get_all(to_df=True)
+                return df
+
         except Exception as e:
             print(e)
         return None
@@ -432,7 +447,7 @@ class Q:
         dry_run: bool,
         table: str,
         async_req: bool,
-    ) -> Endpoint:
+    ) -> Union[QueryCreatedData, ApplyResult, Endpoint]:
         """_summary_
             Call the endpoint to start the job for data collection.
         Args:
@@ -446,13 +461,17 @@ class Q:
         Returns:
             (Union[QueryCreatedData, ApplyResult])
         """
-        return api_instance.boolean_query(
-            query=query,
-            version=version,
-            dry_run=dry_run,
-            table=table,
-            async_req=async_req,
-        )
+        try:
+            return api_instance.boolean_query(
+                query=query,
+                version=version,
+                dry_run=dry_run,
+                table=table,
+                async_req=async_req,
+            )
+        except Exception as e:
+            # this will raise the exception in the run method
+            raise
 
     def _build_result_object(
         self,
@@ -517,19 +536,21 @@ class Q:
             sleep(2.5)
             if response.total_row_count is not None:
                 return self._build_result_object(
-                    response,
-                    query_id,
-                    offset,
-                    page_size,
-                    api_instance,
-                    show_sql,
-                    show_count,
-                    format_type,
+                    api_response=response,
+                    query_id=query_id,
+                    offset=offset,
+                    limit=page_size,
+                    api_instance=api_instance,
+                    show_sql=show_sql,
+                    show_count=show_count,
+                    format_type=format_type,
                 )
+
+    run_result = Union[QueryCreatedData, ApplyResult, Result, None]
 
     @Measure()
     def run(
-        self: "Q",
+        self,
         offset: int = 0,
         page_size: int = 100,
         limit: Optional[int] = None,
@@ -543,7 +564,7 @@ class Q:
         include: Optional[str] = None,
         format_type: str = "json",
         show_sql: bool = False,
-    ) -> Union[Result, QueryCreatedData, ApplyResult, None]:
+    ) -> run_result:
         """_summary_
 
         Args:
@@ -566,7 +587,7 @@ class Q:
         cda_client_obj: ApiClient = ApiClient(
             configuration=CdaConfiguration(host=host, verify=verify, verbose=verbose)
         )
-
+        PAGE_OFFSET = 0  # this variable is used as offset for the query function
         version, table = check_version_and_table(version, table)
 
         if include is not None:
@@ -574,6 +595,9 @@ class Q:
 
         if limit is not None:
             self.query = Q.__limit(self, limit)
+
+        if offset > 0:
+            self.query = Q.__offset(self, offset)
 
         self._show_sql: bool = show_sql or False
 
@@ -587,16 +611,14 @@ class Q:
                         end="\n\n",
                     )
 
-                api_response: Union[
-                    QueryCreatedData, ApplyResult
-                ] = self._call_endpoint(
+                api_response = self._call_endpoint(
                     api_instance=api_instance,
                     query=self.query,
                     version=version,
                     dry_run=dry_run,
                     table=table,
                     async_req=async_call,
-                )  # type: ignore
+                )
                 if isinstance(api_response, ApplyResult):
                     if verbose:
                         print(WAITING_TEXT)
@@ -607,8 +629,8 @@ class Q:
 
             return self.__get_query_result(
                 api_instance=api_instance,
-                query_id=api_response.query_id,  # type: ignore
-                offset=offset,
+                query_id=api_response.query_id,
+                offset=PAGE_OFFSET,
                 page_size=page_size,
                 async_req=async_call,
                 show_sql=self._show_sql,
@@ -616,13 +638,12 @@ class Q:
                 format_type=format_type,
             )
         except ServiceException as http_error:
-            if http_error.body is not None:
-                print(
-                    f"""
-                Http Status: {http_error.status}
-                Error Message: {loads(http_error.body)["message"]}
-                """
-                )
+            if verbose:
+                print(HTTP_ERROR_SERVICE(http_error=http_error))
+
+        except ApiException as http_error:
+            if verbose:
+                print(HTTP_ERROR_API(http_error=http_error))
 
         except NewConnectionError:
             if verbose:
@@ -643,17 +664,17 @@ class Q:
                 print(
                     f"Connection error max retry limit of 3 hit please check url or local python ssl pem {max_retry_error}"
                 )
-        except ApiException as api_exception:
-            if verbose:
-                print(api_exception.body)
+
         except AttributeError as e:
             if verbose:
                 print(e)
+
         except Exception as e:
             if verbose:
                 print(e)
+        return None
 
-    def _Q_wrap(self, right: Union[str, "Q", None], op) -> "Q":
+    def _Q_wrap(self, right: Union[str, "Q", Query], op: str) -> "Q":
         if isinstance(right, str):
             right = Q(right)
         return self.__class__(self.query, op, right.query)
@@ -768,6 +789,13 @@ class Q:
     def __limit(self, number: int) -> Query:
         tmp: Query = Query()
         tmp.node_type = "LIMIT"
+        tmp.value = str(number)
+        tmp.r = self.query
+        return tmp
+
+    def __offset(self, number: int) -> Query:
+        tmp: Query = Query()
+        tmp.node_type = "OFFSET"
         tmp.value = str(number)
         tmp.r = self.query
         return tmp

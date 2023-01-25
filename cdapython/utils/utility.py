@@ -15,6 +15,7 @@ from urllib3.exceptions import InsecureRequestWarning
 
 from cdapython.constant_variables import Constants
 from cdapython.decorators.cache import lru_cache_timed
+from cdapython.exceptions.custom_exception import HTTP_ERROR_API, HTTP_ERROR_SERVICE
 from cdapython.functions import backwards_comp
 from cdapython.Qparser import parser
 from cdapython.results.columns_result import ColumnsResult
@@ -44,20 +45,6 @@ if (
 
 if isinstance(Constants.CDA_API_URL, str):
     URL_TABLE: str = Constants.CDA_API_URL
-
-
-def http_error_logger(http_error: Union[ServiceException, ApiException]) -> None:
-    (
-        msg,
-        status_code,
-        _,
-    ) = json.loads(http_error.body).values()
-    print(
-        f"""
-            Http Status: {status_code}
-            Error Message: {msg}
-        """
-    )
 
 
 def query(text: str) -> "Q":
@@ -143,12 +130,15 @@ def unique_terms(
                 return None
 
             return query_result
+
     except ServiceException as http_error:
         if verbose:
-            http_error_logger(http_error)
+            print(HTTP_ERROR_SERVICE(http_error=http_error))
+
     except ApiException as http_error:
         if verbose:
-            http_error_logger(http_error)
+            print(HTTP_ERROR_API(http_error=http_error))
+
     except Exception as e:
         if verbose:
             print(e)
@@ -228,7 +218,12 @@ def columns(
             return result_value
     except ServiceException as http_error:
         if verbose:
-            http_error_logger(http_error)
+            print(HTTP_ERROR_SERVICE(http_error=http_error))
+
+    except ApiException as http_error:
+        if verbose:
+            print(HTTP_ERROR_API(http_error=http_error))
+
     except InsecureRequestWarning:
         pass
     except Exception as e:

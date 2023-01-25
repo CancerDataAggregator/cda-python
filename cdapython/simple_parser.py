@@ -543,7 +543,7 @@ class Limit(Token):
 
 
 class Offset(Token):
-    lbp = 15
+    lbp = 3
 
     def led(self, left: Query, context: Parser) -> Query:
         """Compute the value of this token when between two expressions."""
@@ -552,8 +552,8 @@ class Offset(Token):
         query = Query()
         right_side: Query = context.expression(self.lbp)
         query.node_type = "OFFSET"
-        query.l = col(backwards_comp(left.value.strip()))
-        query.r = infer_quote(str(right_side.value))
+        query.r = left
+        query.value = right_side.value
         return query
 
 

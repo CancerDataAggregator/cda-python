@@ -21,6 +21,7 @@ from typing import (
     Pattern,
     Type,
     Union,
+    overload,
 )
 
 from cda_client.api.query_api import QueryApi
@@ -31,11 +32,13 @@ from rich.table import Table
 from typing_extensions import Literal
 
 from cdapython.Paginator import Paginator
+from cdapython.results import COLLECT_RESULT
 from cdapython.results.base import BaseResult
-from cdapython.utils.state import State
+from cdapython.results.factories.result_factory import ResultFactory
 
 if TYPE_CHECKING:
     from cdapython.results.columns_result import ColumnsResult
+    from cdapython.results.factories.collect_result import CollectResult
     from cdapython.results.string_result import StringResult
 
 
@@ -161,7 +164,7 @@ class Result(BaseResult):
             bool: returns a bool value if there is a next page
         """
         if isinstance(self._offset, int) and isinstance(self._limit, int):
-            return (self._offset + self._limit) <= self.total_row_count
+            return (self._offset + self._limit) < self.total_row_count
         return False
 
     def paginator(
@@ -169,7 +172,9 @@ class Result(BaseResult):
         output: str = "",
         to_df: bool = False,
         to_list: bool = False,
+        to_collect_result: bool = False,
         page_size: int = None,
+        show_bar: bool = False,
     ) -> Paginator:
         """_summary_
         paginator this will automatically page over results
@@ -186,52 +191,54 @@ class Result(BaseResult):
             self,
             to_df=to_df,
             to_list=to_list,
+            to_collect_result=to_collect_result,
             limit=page_size,
             output=output,
             format_type=self.format_type,
+            show_bar=show_bar,
         )
 
-    def auto_paginator(
+    def get_all(
         self,
         output: str = "",
-        to_df: bool = False,
-        to_list: bool = False,
         page_size: Union[int, None] = None,
-    ) -> Union[DataFrame, List[Any]]:
+        show_bar: bool = True,
+    ):
         """
-        auto_paginator is a method that will loop for you
+        get_all is a method that will loop for you
 
         Args:
             output (str, optional): _description_. Defaults to "".
-            to_df (bool, optional): _description_. Defaults to False.
-            to_list (bool, optional): _description_. Defaults to False.
             page_size (Union[int, None], optional): _description_. Defaults to None.
 
         Returns:
             Union[DataFrame, List[Any]]: _description_
         """
+
         if page_size is None and isinstance(self._limit, int):
             page_size = self._limit
 
         iterator: Paginator = Paginator(
             self,
-            to_df=to_df,
-            to_list=to_list,
+            to_df=False,
+            to_list=False,
             limit=page_size,
+            to_collect_result=True,
             output=output,
             format_type=self.format_type,
+            show_bar=show_bar,
         )
-        state: State = State(df=DataFrame(), list_array=[])
-        for i in iterator:
-            if to_df or output == "full_df":
-                state.concat_df(i)
-            if to_list or output == "full_list":
-                state.concat_list(i)
-        if to_df or output == "full_df":
-            return state.get_df()
-        if to_list or output == "full_list":
-            return state.get_list()
-        return None
+
+        collect_result: CollectResult = ResultFactory.create_entity(
+            COLLECT_RESULT, self
+        )
+
+        for index, i in enumerate(iterator):
+            if index == 0:
+                continue
+            collect_result.extend_result(i)
+
+        return collect_result
 
     async def async_next_page(
         self,

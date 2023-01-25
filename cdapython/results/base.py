@@ -1,8 +1,9 @@
 import json
 from collections import ChainMap
+from turtle import pd
 from typing import Any, AsyncGenerator, Dict, Iterator, List, Optional, Union
 
-from pandas import DataFrame, Series, json_normalize, merge, Index
+from pandas import DataFrame, Index, Series, json_normalize, merge
 from rich.table import Table
 from typing_extensions import Literal
 
@@ -53,8 +54,8 @@ class BaseResult:
         meta: Optional[Union[str, List[Union[str, List[str]]]]] = None,
         meta_prefix: Optional[str] = None,
         max_level: Optional[int] = None,
-        search_fields: Optional[Union[str, List[str]]] = None,
-        search_value: Optional[str] = None,
+        search_fields: Union[List[str], str, None] = None,
+        search_value: Union[str, None] = None,
     ) -> DataFrame:
         """[summary]
         Creates a pandas DataFrame for the Results
@@ -72,7 +73,7 @@ class BaseResult:
 
             if isinstance(search_fields, str):
                 search_fields = [search_fields]
-            search_fields: list[str] = search_fields
+            search_fields = search_fields
             search_value = str(search_value)
             value: DataFrame = DataFrame(
                 columns=column_names, index=Index([], dtype="int")
@@ -104,10 +105,10 @@ class BaseResult:
 
     def df_to_table(
         self,
-        pandas_dataframe: Union[None, DataFrame] = None,
+        pandas_dataframe: DataFrame = DataFrame([]),
         rich_table: Union[None, Table] = None,
         show_index: bool = True,
-        index_name: Optional[str] = None,
+        index_name: Union[str, None] = None,
     ) -> Table:
         """Convert a pandas.DataFrame obj into a rich.Table obj.
         copied from https://gist.github.com/neelabalan/33ab34cf65b43e305c3f12ec6db05938#file-df_to_table-py
@@ -118,21 +119,21 @@ class BaseResult:
             index_name (str, optional): The column name to give to the index column. Defaults to None, showing no value.
         Returns:
             Table: The rich Table instance passed, populated with the DataFrame values."""
-        _pandas_dataframe = None
-        if pandas_dataframe is None:
-            _pandas_dataframe: DataFrame = self.to_dataframe()
+
+        if pandas_dataframe.empty:
+            pandas_dataframe = self.to_dataframe()
 
         if rich_table is None:
-            rich_table: Table = Table(show_header=True, header_style="bold magenta")
+            rich_table = Table(show_header=True, header_style="bold magenta")
         if show_index:
-            index_name: str = str(index_name) if index_name else ""
+            index_name = str(index_name) if index_name else ""
             rich_table.add_column(index_name)
 
-        for column in _pandas_dataframe.columns:
+        for column in pandas_dataframe.columns:
             rich_table.add_column(str(column))
 
-        for index, value_list in enumerate(_pandas_dataframe.values.tolist()):
-            row: list[str] = [str(index)] if show_index else []
+        for index, value_list in enumerate(pandas_dataframe.values.tolist()):
+            row: List[str] = [str(index)] if show_index else []
             row.extend([str(x) for x in value_list])
             rich_table.add_row(*row)
 
@@ -147,7 +148,7 @@ class BaseResult:
             delimiter (str, optional): _description_. Defaults to ",".
 
         Raises:
-            KeyError: This is rasied if the user forgets to add a value to search on.
+            KeyError: This is raised if the user forgets to add a value to search on.
             Exception: This is a catch all for errors
 
         Returns:
@@ -161,9 +162,9 @@ class BaseResult:
             return delimiter.join(f'"{w}"' for w in [i[key] for i in self._result])
 
         def find_field(
-            current_field_index: int, field_list: List[Any], data: List[Any]
+            current_field_index: int, field_list: List[Any], data: Any
         ) -> Union[str, Any]:
-            my_instance: Any = data[field_list[current_field_index]]
+            my_instance = data[field_list[current_field_index]]
 
             if current_field_index == len(field_list) - 1:
                 return my_instance
@@ -218,14 +219,13 @@ class BaseResult:
         if isinstance(idx, int):
             _idx = idx
             if idx < 0:
-                _idx: int = self.count + idx
+                _idx = self.count + idx
             return self._result[_idx]
         if isinstance(idx, slice):
             # for slicing result
             start, stop, step = idx.indices(self.count)
             range_index: range = range(start, stop, step)
             return [self._result[i] for i in range_index]
-        return None
 
     def __iter__(self) -> Iterator[Any]:
         return iter(self._result)
