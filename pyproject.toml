@@ -37,6 +37,7 @@ bandit = "^1.7.4"
 flake8 = "^5.0.4"
 pytest-cov = "^3.0.0"
 certifi = "2022.12.7"
+coverage = "7.0.5"
 [build-system]
 # Minimum requirements for the build system to execute.
 requires = ["setuptools", "wheel"]
