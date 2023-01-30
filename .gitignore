@@ -39,6 +39,7 @@ typeReport
 .coverage
 .venv
 .ven3
+.venv_11
 ven3
 .nox
 .pytype

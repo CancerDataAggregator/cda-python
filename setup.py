@@ -46,9 +46,9 @@ setup(
     url="https://github.com/CancerDataAggregator/cdapython",
     install_requires=[
         "numpy>=1.21.6",
-        "wheel>=0.36.2",
+        "wheel>=0.38.4",
         "urllib3>=1.26.8",
-        "rich>=12.5.1",
+        "rich>=13.2.0",
         "itables == 1.1.2",
         "matplotlib>=3.5.1",
         "typing-extensions==4.2.0",
