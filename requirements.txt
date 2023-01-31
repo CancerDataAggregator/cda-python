@@ -28,7 +28,7 @@ jupyter-client==7.3.4; python_full_version >= "3.7.0" and python_version >= "3.7
 jupyter-core==4.12.0; python_version >= "3.7"
 jupyterlab-pygments==0.2.2; python_version >= "3.7"
 jupyterlab-widgets==1.1.1; python_version >= "3.6"
-kiwisolver==1.4.3; python_version >= "3.7"
+kiwisolver==1.4.4; python_version >= "3.7"
 lxml==4.9.1; python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.7"
 markdown-it-py==2.1.0; python_version >= "3.7" and python_full_version >= "3.7.0"
 markupsafe==2.1.1; python_version >= "3.7"
