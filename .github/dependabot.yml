@@ -6,7 +6,7 @@ updates:
       interval: "daily"
     # Raise pull requests for version updates
     # to pip against the `develop` branch
-    target-branch: "develop"
+    target-branch: "integration"
     # Labels on pull requests for version updates only
     labels:
       - "pip dependencies"
