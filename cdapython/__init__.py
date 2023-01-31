@@ -3,7 +3,7 @@ cdapython is a library used to interact with the machine generated CDA Python Cl
 """
 from __future__ import print_function
 
-from typing import Any, Dict
+from typing import Any
 
 from typing_extensions import Literal
 
@@ -30,7 +30,6 @@ from cdapython.factories import (
     SUBJECT_FILE_COUNT,
     TREATMENT,
     TREATMENT_COUNT,
-    QFactory,
 )
 from cdapython.factories.count import Count
 from cdapython.factories.diagnosis import Diagnosis, DiagnosisCount

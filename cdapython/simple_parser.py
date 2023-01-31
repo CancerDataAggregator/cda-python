@@ -4,7 +4,7 @@ from typing import Any, Optional, Union
 from cda_client.model.query import Query
 from typing_extensions import Literal
 
-from cdapython.functions import backwards_comp, col, infer_quote, query_type_conversion
+from cdapython.functions import col, infer_quote, query_type_conversion
 from cdapython.Q_parser import Lexer, Token
 from cdapython.Q_parser.Parser import Parser
 from cdapython.utils.check_case import check_keyword
@@ -25,18 +25,18 @@ def build_query_copy(q: Query) -> Optional[Query]:
     query_value = Query()
     try:
         query_value.l = build_query_copy(q.l)
-    except:
+    except Exception:
         pass
     try:
         query_value.r = build_query_copy(q.r)
-    except:
+    except Exception:
         pass
 
     query_value.node_type = q.node_type
 
     try:
         query_value.value = q.value
-    except:
+    except Exception:
         pass
     return query_value
 
@@ -50,7 +50,7 @@ def like_converter(query: Query, right_side: Query, left: Query) -> Query:
     )
 
     query.node_type = returned_node
-    query.l = col(backwards_comp(left.value))
+    query.l = col(left.value)
     query.r = infer_quote(returned_right.value.strip())
     return query
 
@@ -233,7 +233,7 @@ class Eq(Token):
         if isinstance(right_side.value, str) and right_side.value.find("%") != -1:
             return like_converter(query=query, right_side=right_side, left=left)
 
-        query.l = col(backwards_comp(left.value))
+        query.l = col(left.value)
         query.r = infer_quote(right_side.value)
         return query
 
@@ -250,7 +250,7 @@ class NotEq(Token):
         query.node_type = "!="
         if isinstance(right_side.value, str) and right_side.value.find("%") != -1:
             return like_converter(query=query, right_side=right_side, left=left)
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value.strip())
         return query
 
@@ -265,7 +265,7 @@ class GreaterThanEq(Token):
         # of same precedence
         right_side: Query = context.expression(self.lbp)
         query.node_type = ">="
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value.strip())
         return query
 
@@ -280,7 +280,7 @@ class GreaterThan(Token):
         # of same precedence
         right_side: Query = context.expression(self.lbp)
         query.node_type = ">"
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value.strip())
         return query
 
@@ -295,7 +295,7 @@ class LessThanEq(Token):
         # of same precedence
         right_side: Query = context.expression(self.lbp)
         query.node_type = "<="
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value.strip())
         return query
 
@@ -310,7 +310,7 @@ class LessThan(Token):
         # of same precedence
         right_side: Query = context.expression(self.lbp)
         query.node_type = "<"
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col((left.value.strip()))
         query.r = infer_quote(right_side.value.strip())
 
         return query
@@ -383,7 +383,7 @@ class IN(Token):
         # of same precedence
         right_side: Query = context.expression(self.lbp)
         query.node_type = "IN"
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value.strip())
         return query
 
@@ -402,7 +402,7 @@ class LIKE(Token):
         query.node_type, right_side = query_type_conversion(
             query.node_type, right_side.value
         )
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value.strip())
         return query
 
@@ -430,7 +430,7 @@ class IS(Token):
         right_side: Query = context.expression(self.lbp)
 
         query.node_type = "IS"
-        query.l = col(backwards_comp(left.value))
+        query.l = col(left.value)
         query.r = infer_quote(right_side.value)
 
         return query
@@ -446,7 +446,7 @@ class IS_NOT(Token):
         # of same precedence
         right_side: Query = context.expression(self.lbp)
         query.node_type = "IS NOT"
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value)
         return query
 
@@ -461,7 +461,7 @@ class NOT_IN(Token):
         query = Query()
         right_side: Query = context.expression(self.lbp)
         query.node_type = "NOT IN"
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value)
         return query
 
@@ -476,7 +476,7 @@ class NOT_LIKE(Token):
         query = Query()
         right_side: Query = context.expression(self.lbp)
         query.node_type = "NOT LIKE"
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value)
         return query
 

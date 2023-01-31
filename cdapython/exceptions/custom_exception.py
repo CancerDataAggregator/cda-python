@@ -1,5 +1,5 @@
 import json
-from typing import Union, overload
+from typing import Union
 
 from cda_client.exceptions import ApiException, ServiceException
 

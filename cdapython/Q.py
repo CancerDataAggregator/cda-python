@@ -4,22 +4,12 @@ this file holds the class for Q , links to the parsers
 and SQL Like operators queue supports further to the bottom
 """
 import logging
-from json import JSONEncoder, dumps, loads
+from json import JSONEncoder, dumps
 from multiprocessing.pool import ApplyResult
 from pathlib import Path
 from time import sleep
 from types import MappingProxyType
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    TypeVar,
-    Union,
-    overload,
-)
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 from cda_client import ApiClient
 from cda_client.api.meta_api import MetaApi
@@ -29,8 +19,8 @@ from cda_client.exceptions import ApiException, ServiceException
 from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
 from cda_client.model.query_response_data import QueryResponseData
-from pandas import DataFrame, concat, read_csv, read_fwf
-from typing_extensions import Literal, Self
+from pandas import DataFrame, read_csv, read_fwf
+from typing_extensions import Literal
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, NewConnectionError, SSLError
 
@@ -95,7 +85,8 @@ class _QEncoder(JSONEncoder):
 
         """
         Using vars() over o.__dict__ dunder method,
-        it is more pythonic because it is generally better to use a function over a magic/dunder method
+        it is more pythonic because it is generally better to use 
+        a function over a magic/dunder method
         """
         tmp_dict: Dict[str, Any] = vars(o)
         if "query" in tmp_dict:
@@ -177,7 +168,8 @@ class Q:
         key: str = "",
     ) -> "Q":
         """_summary_
-            This function will read in a txt , csv or tsv and use the IN statement to search the file
+            This function will read in a txt ,
+            csv or tsv and use the IN statement to search the file
 
         Args:
             field_to_search (str): cda column name
@@ -208,7 +200,7 @@ class Q:
                 df = read_csv(file_to_search, delimiter="\t").fillna("")
                 values_to_search.extend([f"{i}" for i in df[key].to_list()])
             else:
-                raise IOError(f"File Import Error only txt and csv supported")
+                raise IOError("File Import Error only txt and csv supported")
 
         if Path(file_to_search).suffix == ".txt":
             df = read_fwf(file_to_search, header=None, sep="\n")
@@ -241,7 +233,7 @@ class Q:
         if len(url.strip()) > 0:
             Constants.CDA_API_URL = url
         else:
-            print(f"Please enter a url")
+            print("Please enter a url")
 
     @staticmethod
     def get_host_url() -> str:
@@ -262,7 +254,7 @@ class Q:
         if len(table.strip()) > 0:
             Constants.default_table = table
         else:
-            print(f"Please enter a table")
+            print("Please enter a table")
 
     @staticmethod
     def get_default_project_dataset() -> str:
@@ -273,7 +265,7 @@ class Q:
         if len(table_version.strip()) > 0:
             Constants.table_version = table_version
         else:
-            print(f"Please enter a table version")
+            print("Please enter a table version")
 
     @staticmethod
     def get_table_version() -> str:
@@ -469,7 +461,7 @@ class Q:
                 table=table,
                 async_req=async_req,
             )
-        except Exception as e:
+        except Exception:
             # this will raise the exception in the run method
             raise
 
@@ -508,7 +500,8 @@ class Q:
         format_type: str = "json",
     ) -> Result:
         """[summary]
-            This will call the next query and wait for the result then return a Result object to the user.
+            This will call the next query and wait for
+            the result then return a Result object to the user.
         Args:
             api_instance (QueryApi): [description]
             query_id (str): [description]
@@ -656,13 +649,17 @@ class Q:
         except InsecureRequestWarning:
             if verbose:
                 print(
-                    "Adding certificate verification pem is strongly advised please read our https://cda.readthedocs.io/en/latest/Installation.html "
+                    """
+                    Adding certificate verification pem is strongly 
+                    advised please read our
+                    https://cda.readthedocs.io/en/latest/Installation.html"""
                 )
 
         except MaxRetryError as max_retry_error:
             if verbose:
                 print(
-                    f"Connection error max retry limit of 3 hit please check url or local python ssl pem {max_retry_error}"
+                    f"""Connection error max retry limit of 3 hit please check url
+                    or local python ssl pem {max_retry_error}"""
                 )
 
         except AttributeError as e:

@@ -48,3 +48,4 @@ venv11
 .coverage.*
 config-dev.ini
 .DS_Store
+.ruff_cache

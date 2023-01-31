@@ -1,6 +1,5 @@
 import json
 from collections import ChainMap
-from turtle import pd
 from typing import Any, AsyncGenerator, Dict, Iterator, List, Optional, Union
 
 from pandas import DataFrame, Index, Series, json_normalize, merge
@@ -111,7 +110,8 @@ class BaseResult:
         index_name: Union[str, None] = None,
     ) -> Table:
         """Convert a pandas.DataFrame obj into a rich.Table obj.
-        copied from https://gist.github.com/neelabalan/33ab34cf65b43e305c3f12ec6db05938#file-df_to_table-py
+        copied from
+        https://gist.github.com/neelabalan/33ab34cf65b43e305c3f12ec6db05938#file-df_to_table-py
         Args:
             pandas_dataframe (DataFrame): A Pandas DataFrame to be converted to a rich Table.
             rich_table (Table): A rich Table that should be populated by the DataFrame values.

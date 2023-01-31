@@ -1,10 +1,9 @@
-from typing import Any, Tuple, Union, overload
+from typing import Tuple, Union, overload
 
 from cda_client.model.query import Query
 from typing_extensions import Literal
 
 from cdapython.dataclasses_Q.querystr import QueryStr
-from cdapython.utils.ConversionMap import CONVERSIONMAP
 
 
 def col(col_name: Union[str, Query, None]) -> Query:
@@ -17,27 +16,6 @@ def quoted(quoted_val: Union[str, Query, None]) -> Query:
 
 def unquoted(val: Union[str, Query, None]) -> Query:
     return Query(node_type="unquoted", value=val)
-
-
-def backwards_comp(value: str) -> str:
-    """_summary_
-        This is a function will look up a string value in a dictionary
-    Args:
-        value (str): _description_
-
-    Returns:
-        str: _description_
-    """
-    if isinstance(value, str) and value in CONVERSIONMAP:
-        tmp_l: str = CONVERSIONMAP[value]
-        print(
-            f"""
-                This Value {value} has been deprecated but will be converted
-                it for you in the background please use the new value {tmp_l}
-                """
-        )
-        return tmp_l
-    return value
 
 
 @overload

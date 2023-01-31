@@ -1,6 +1,8 @@
 """
-result is a convenient wrapper around the response object from the CDA service it adds user functionality.
-like creating dataframe and manipulating data for ease-of-use such as paginating automatically for the user through their result objects.
+result is a convenient wrapper around the response object
+from the CDA service it adds user functionality.
+like creating dataframe and manipulating data for ease-of-use such 
+as paginating automatically for the user through their result objects.
 """
 from __future__ import annotations
 
@@ -10,25 +12,12 @@ from collections import ChainMap
 from io import StringIO
 from multiprocessing.pool import ApplyResult
 from time import sleep
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    AsyncGenerator,
-    Dict,
-    Iterator,
-    List,
-    Optional,
-    Pattern,
-    Type,
-    Union,
-    overload,
-)
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Pattern, Type, Union
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
-from pandas import DataFrame, MultiIndex, Series, json_normalize, read_csv
+from pandas import DataFrame, read_csv
 from rich import print
-from rich.table import Table
 from typing_extensions import Literal
 
 from cdapython.Paginator import Paginator
@@ -63,7 +52,8 @@ class _QEncoder(json.JSONEncoder):
 
 class Result(BaseResult):
     """
-    The Results Class is a convenient wrapper around the response object from the CDA service.
+    The Results Class is a convenient wrapper around the
+    response object from the CDA service.
     """
 
     def __init__(

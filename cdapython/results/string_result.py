@@ -1,5 +1,3 @@
-from multiprocessing.pool import ApplyResult
-from time import sleep
 from typing import Optional
 
 from cda_client.api.query_api import QueryApi

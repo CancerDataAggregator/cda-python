@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, NoReturn, Type, TypeVar, Union
+from typing import TYPE_CHECKING, NoReturn, Union
 
 from .Parser_Exception import InvalidTokenError
 

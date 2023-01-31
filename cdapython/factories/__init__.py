@@ -21,3 +21,14 @@ TREATMENT: str = "Treatment"
 TREATMENT_COUNT: str = f"{TREATMENT}.{COUNT}"
 MUTATIONS: str = "Mutations"
 MUTATIONS_COUNT: str = f"{MUTATIONS}.{COUNT}"
+
+
+__all__ = [
+    "QFactory",
+    "FILE",
+    "COUNT",
+    "FILE_COUNT",
+    "SUBJECT",
+    "SUBJECT_FILE",
+    "SUBJECT_FILE_COUNT",
+]

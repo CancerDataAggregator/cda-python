@@ -217,12 +217,12 @@ urllib3 = ">=1.25.3"
 [package.source]
 type = "git"
 url = "ssh://git@github.com/CancerDataAggregator/cda-service-python-client.git"
-reference = "3.3.0"
-resolved_reference = "c998904afd6ecd26b652f61bda2886f4a1c19ada"
+reference = "HEAD"
+resolved_reference = "f6c3761597e20fe6728e96777f379110642e6f7a"
 
 [[package]]
 name = "certifi"
-version = "2022.6.15"
+version = "2022.12.7"
 description = "Python package for providing Mozilla's CA Bundle."
 category = "dev"
 optional = false
@@ -442,13 +442,17 @@ description = "Python parser for the CommonMark Markdown spec"
 category = "main"
 optional = false
 python-versions = "*"
+files = [
+    {file = "commonmark-0.9.1-py2.py3-none-any.whl", hash = "sha256:da2f38c92590f83de410ba1a3cbceafbc74fee9def35f9251ba9a971d6d66fd9"},
+    {file = "commonmark-0.9.1.tar.gz", hash = "sha256:452f9dc859be7f06631ddcb328b6919c67984aca654e5fefb3914d54691aed60"},
+]
 
 [package.extras]
 test = ["flake8 (==3.7.8)", "hypothesis (==3.55.3)"]
 
 [[package]]
 name = "coverage"
-version = "6.5.0"
+version = "7.0.5"
 description = "Code coverage measurement for Python"
 category = "dev"
 optional = false
@@ -626,7 +630,7 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "fastjsonschema"
-version = "2.15.3"
+version = "2.16.2"
 description = "Fastest Python implementation of JSON schema"
 category = "main"
 optional = false
@@ -880,19 +884,19 @@ test = ["mock", "pytest (>=3.6.0)", "pytest-cov"]
 
 [[package]]
 name = "isort"
-version = "5.11.4"
+version = "5.11.5"
 description = "A Python utility / library to sort Python imports."
 category = "dev"
 optional = false
 python-versions = ">=3.7.0"
 files = [
-    {file = "isort-5.11.4-py3-none-any.whl", hash = "sha256:c033fd0edb91000a7f09527fe5c75321878f98322a77ddcc81adbd83724afb7b"},
-    {file = "isort-5.11.4.tar.gz", hash = "sha256:6db30c5ded9815d813932c04c2f85a360bcdd35fed496f4d8f35495ef0a261b6"},
+    {file = "isort-5.11.5-py3-none-any.whl", hash = "sha256:ba1d72fb2595a01c7895a5128f9585a5cc4b6d395f1c8d514989b9a7eb2a8746"},
+    {file = "isort-5.11.5.tar.gz", hash = "sha256:6be1f76a507cb2ecf16c7cf14a37e41609ca082330be4e3436a18ef74add55db"},
 ]
 
 [package.extras]
 colors = ["colorama (>=0.4.3,<0.5.0)"]
-pipfile-deprecated-finder = ["pipreqs", "requirementslib"]
+pipfile-deprecated-finder = ["pip-shims (>=0.5.2)", "pipreqs", "requirementslib"]
 plugins = ["setuptools"]
 requirements-deprecated-finder = ["pip-api", "pipreqs"]
 
@@ -1002,7 +1006,7 @@ test = ["codecov", "coverage", "ipykernel (>=6.12)", "ipython", "mypy", "pre-com
 
 [[package]]
 name = "jupyter-core"
-version = "4.11.1"
+version = "4.12.0"
 description = "Jupyter core package. A base package on which Jupyter projects rely."
 category = "main"
 optional = false
@@ -1218,32 +1222,6 @@ htmlsoup = ["BeautifulSoup4"]
 source = ["Cython (>=0.29.7)"]
 
 [[package]]
-name = "markdown-it-py"
-version = "2.1.0"
-description = "Python port of markdown-it. Markdown parsing, done right!"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "markdown-it-py-2.1.0.tar.gz", hash = "sha256:cf7e59fed14b5ae17c0006eff14a2d9a00ed5f3a846148153899a0224e2c07da"},
-    {file = "markdown_it_py-2.1.0-py3-none-any.whl", hash = "sha256:93de681e5c021a432c63147656fe21790bc01231e0cd2da73626f1aa3ac0fe27"},
-]
-
-[package.dependencies]
-mdurl = ">=0.1,<1.0"
-typing_extensions = {version = ">=3.7.4", markers = "python_version < \"3.8\""}
-
-[package.extras]
-benchmarking = ["psutil", "pytest", "pytest-benchmark (>=3.2,<4.0)"]
-code-style = ["pre-commit (==2.6)"]
-compare = ["commonmark (>=0.9.1,<0.10.0)", "markdown (>=3.3.6,<3.4.0)", "mistletoe (>=0.8.1,<0.9.0)", "mistune (>=2.0.2,<2.1.0)", "panflute (>=2.1.3,<2.2.0)"]
-linkify = ["linkify-it-py (>=1.0,<2.0)"]
-plugins = ["mdit-py-plugins"]
-profiling = ["gprof2dot"]
-rtd = ["attrs", "myst-parser", "pyyaml", "sphinx", "sphinx-copybutton", "sphinx-design", "sphinx_book_theme"]
-testing = ["coverage", "pytest", "pytest-cov", "pytest-regressions"]
-
-[[package]]
 name = "markupsafe"
 version = "2.1.2"
 description = "Safely add untrusted strings to HTML/XML markup."
@@ -1383,18 +1361,6 @@ python-versions = ">=3.6"
 files = [
     {file = "mccabe-0.7.0-py2.py3-none-any.whl", hash = "sha256:6c2d30ab6be0e4a46919781807b4f0d834ebdd6c6e3dca0bda5a15f863427b6e"},
     {file = "mccabe-0.7.0.tar.gz", hash = "sha256:348e0240c33b60bbdf4e523192ef919f28cb2c3d7d5c7794f74009290f236325"},
-]
-
-[[package]]
-name = "mdurl"
-version = "0.1.2"
-description = "Markdown URL utilities"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8"},
-    {file = "mdurl-0.1.2.tar.gz", hash = "sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba"},
 ]
 
 [[package]]
@@ -2046,14 +2012,6 @@ files = [
 ]
 
 [[package]]
-name = "py"
-version = "1.11.0"
-description = "library with cross-python path, ini-parsing, io, code, log facilities"
-category = "main"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-
-[[package]]
 name = "pycodestyle"
 version = "2.9.1"
 description = "Python style guide checker"
@@ -2334,7 +2292,7 @@ files = [
 
 [[package]]
 name = "pyzmq"
-version = "23.2.0"
+version = "25.0.0"
 description = "Python bindings for 0MQ"
 category = "main"
 optional = false
@@ -2421,7 +2379,6 @@ files = [
 
 [package.dependencies]
 cffi = {version = "*", markers = "implementation_name == \"pypy\""}
-py = {version = "*", markers = "implementation_name == \"pypy\""}
 
 [[package]]
 name = "requests"
@@ -2447,14 +2404,14 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "rich"
-version = "12.5.1"
+version = "12.6.0"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 category = "main"
 optional = false
-python-versions = ">=3.7.0"
+python-versions = ">=3.6.3,<4.0.0"
 files = [
-    {file = "rich-13.2.0-py3-none-any.whl", hash = "sha256:7c963f0d03819221e9ac561e1bc866e3f95a02248c1234daa48954e6d381c003"},
-    {file = "rich-13.2.0.tar.gz", hash = "sha256:f1a00cdd3eebf999a15d85ec498bfe0b1a77efe9b34f645768a54132ef444ac5"},
+    {file = "rich-12.6.0-py3-none-any.whl", hash = "sha256:a4eb26484f2c82589bd9a17c73d32a010b1e29d89f1604cd9bf3a2097b81bb5e"},
+    {file = "rich-12.6.0.tar.gz", hash = "sha256:ba3a3775974105c221d31141f2c116f4fd65c5ceb0698657a11e9f295ec93fd0"},
 ]
 
 [package.dependencies]
@@ -2571,14 +2528,14 @@ win32 = ["pywin32"]
 
 [[package]]
 name = "setuptools"
-version = "66.1.1"
+version = "67.0.0"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "setuptools-66.1.1-py3-none-any.whl", hash = "sha256:6f590d76b713d5de4e49fe4fbca24474469f53c83632d5d0fd056f7ff7e8112b"},
-    {file = "setuptools-66.1.1.tar.gz", hash = "sha256:ac4008d396bc9cd983ea483cb7139c0240a07bbc74ffb6232fceffedc6cf03a8"},
+    {file = "setuptools-67.0.0-py3-none-any.whl", hash = "sha256:9d790961ba6219e9ff7d9557622d2fe136816a264dd01d5997cfc057d804853d"},
+    {file = "setuptools-67.0.0.tar.gz", hash = "sha256:883131c5b6efa70b9101c7ef30b2b7b780a4283d5fc1616383cdf22c83cbefe6"},
 ]
 
 [package.extras]
@@ -2637,17 +2594,6 @@ files = [
 [package.dependencies]
 importlib-metadata = {version = ">=1.7.0", markers = "python_version < \"3.8\""}
 pbr = ">=2.0.0,<2.1.0 || >2.1.0"
-
-[[package]]
-name = "tdparser"
-version = "1.1.6"
-description = "A very simple parsing library, based on the Top-Down algorithm."
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "tdparser-1.1.6.tar.gz", hash = "sha256:d12ff20157f28b0f19113875f6fbff0812900b64028b2361d45d6c8a4cee5af9"},
-]
 
 [[package]]
 name = "terminado"
@@ -2736,14 +2682,14 @@ files = [
 
 [[package]]
 name = "traitlets"
-version = "5.8.1"
+version = "5.9.0"
 description = "Traitlets Python configuration system"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "traitlets-5.8.1-py3-none-any.whl", hash = "sha256:a1ca5df6414f8b5760f7c5f256e326ee21b581742114545b462b35ffe3f04861"},
-    {file = "traitlets-5.8.1.tar.gz", hash = "sha256:32500888f5ff7bbf3b9267ea31748fa657aaf34d56d85e60f91dda7dc7f5785b"},
+    {file = "traitlets-5.9.0-py3-none-any.whl", hash = "sha256:9e6ec080259b9a5940c797d58b613b5e31441c2257b87c2e795c5228ae80d2d8"},
+    {file = "traitlets-5.9.0.tar.gz", hash = "sha256:f6cde21a9c68cf756af02035f72d5a723bf607e862e7be33ece505abf4a3bad9"},
 ]
 
 [package.extras]
@@ -2869,21 +2815,21 @@ notebook = ">=4.4.1"
 
 [[package]]
 name = "zipp"
-version = "3.11.0"
+version = "3.12.0"
 description = "Backport of pathlib-compatible object wrapper for zip files"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "zipp-3.11.0-py3-none-any.whl", hash = "sha256:83a28fcb75844b5c0cdaf5aa4003c2d728c77e05f5aeabe8e95e56727005fbaa"},
-    {file = "zipp-3.11.0.tar.gz", hash = "sha256:a7a22e05929290a67401440b39690ae6563279bced5f314609d9d03798f56766"},
+    {file = "zipp-3.12.0-py3-none-any.whl", hash = "sha256:9eb0a4c5feab9b08871db0d672745b53450d7f26992fd1e4653aa43345e97b86"},
+    {file = "zipp-3.12.0.tar.gz", hash = "sha256:73efd63936398aac78fd92b6f4865190119d6c91b531532e798977ea8dd402eb"},
 ]
 
 [package.extras]
-docs = ["furo", "jaraco.packaging (>=9)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)"]
+docs = ["furo", "jaraco.packaging (>=9)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
 testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools", "more-itertools", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-flake8", "pytest-mypy (>=0.9.1)"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7"
-content-hash = "b29097d387f68387003eaa12f179e5e19794ea9719554131d32b0df888a239cd"
+content-hash = "283d85daf5fb3d7bc3abf0bf248fa0a970b4fd6906c96056b0208e9ec802654b"

@@ -1,11 +1,9 @@
 from typing import Any, Union
-from xmlrpc.client import boolean
 
 from rich import print
 from rich.console import Console
 from tdparser.lexer import LexerError
 from tdparser.topdown import MissingTokensError
-
 
 from cdapython.Q import Q
 
@@ -88,7 +86,8 @@ while True:
     if new is True:
         help()
         print(
-            f'Q {Q.get_version()} Type "help()", "copyright", "credits" or "license" for more information.'
+            f"""Q {Q.get_version()} Type "help()", 
+            "copyright", "credits" or "license" for more information."""
         )
         new: bool = False
     text: str = input(">>>")

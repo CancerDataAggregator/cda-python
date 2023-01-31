@@ -1,5 +1,5 @@
 import re
-from typing import TYPE_CHECKING, Any, Generator, Union
+from typing import Any, Union
 
 from .Parser import Parser
 from .Parser_Exception import LexerError

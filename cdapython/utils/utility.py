@@ -1,22 +1,18 @@
 from __future__ import annotations
 
-import json
 import logging
 from multiprocessing.pool import ApplyResult
 from typing import TYPE_CHECKING, Optional, Union
 
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import ApiClient
-from cda_client.configuration import Configuration
 from cda_client.exceptions import ApiException, ServiceException
-from pandas import DataFrame, json_normalize
 from rich import print
 from urllib3.exceptions import InsecureRequestWarning
 
 from cdapython.constant_variables import Constants
 from cdapython.decorators.cache import lru_cache_timed
 from cdapython.exceptions.custom_exception import HTTP_ERROR_API, HTTP_ERROR_SERVICE
-from cdapython.functions import backwards_comp
 from cdapython.Qparser import parser
 from cdapython.results.columns_result import ColumnsResult
 from cdapython.results.result import get_query_result
@@ -30,7 +26,6 @@ logging.captureWarnings(InsecureRequestWarning)
 if TYPE_CHECKING:
     from cdapython.Q import Q
     from cdapython.results.result import Result
-    from cdapython.results.string_result import StringResult
 
 # Creating constant
 if isinstance(Constants.default_table, str) and Constants.default_table is not None:
@@ -95,7 +90,7 @@ def unique_terms(
 
     if async_req is None:
         async_req = False
-    col_name = backwards_comp(col_name)
+    col_name = col_name
 
     cda_client_obj: ApiClient = ApiClient(
         configuration=CdaConfiguration(host=host, verify=verify)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional, Union
+from typing import TYPE_CHECKING, Any, List, Union
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
