@@ -31,7 +31,6 @@ class StringResult(Result):
 
     def to_list(self, filters: Optional[str] = None, exact: bool = False) -> list:
         if filters is not None and filters != "":
-
             filters: str = filters.replace("\n", " ").strip()
             values: list["StringResult"] = [
                 list(i.values())[0]
@@ -48,7 +47,6 @@ class StringResult(Result):
                 )
 
             else:
-
                 return list(
                     filter(
                         lambda items: (

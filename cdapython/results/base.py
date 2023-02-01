@@ -118,7 +118,8 @@ class BaseResult:
             show_index (bool): Add a column with a row count to the table. Defaults to True.
             index_name (str, optional): The column name to give to the index column. Defaults to None, showing no value.
         Returns:
-            Table: The rich Table instance passed, populated with the DataFrame values."""
+            Table: The rich Table instance passed, populated with the DataFrame values.
+        """
 
         if pandas_dataframe.empty:
             pandas_dataframe = self.to_dataframe()

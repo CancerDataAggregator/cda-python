@@ -53,7 +53,6 @@ WAITING_TEXT: Literal["Waiting for results"] = "Waiting for results"
 def check_version_and_table(
     version: Optional[str], table: Optional[str]
 ) -> Tuple[str, str]:
-
     if version is None:
         version = Constants.table_version
 
@@ -111,7 +110,6 @@ class Q:
         self.query: Query = Query()
 
         if len(args) == 1:
-
             if args[0] is None:
                 raise RuntimeError("Q statement parse error")
 
@@ -126,7 +124,6 @@ class Q:
                 "Require one or three arguments. Please see documentation."
             )
         else:
-
             # this is for Q operators support
 
             _l: Union[Query, str] = args[0]
@@ -304,7 +301,6 @@ class Q:
             pool_threads=2,
         )
         try:
-
             with cda_client_obj as api_client:
                 api_instance: QueryApi = QueryApi(api_client)
                 api_response = api_instance.bulk_data(

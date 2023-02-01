@@ -112,7 +112,6 @@ class Doublequotes(Token):
 
 
 class ArrayType(Token):
-
     lbp = 10
 
     def nud(self, context: Parser) -> str:
@@ -231,5 +230,4 @@ lexer.register_token(var, re.compile(r"(Var\s\w+\s*?=(?!=))"))
 
 
 def parser(text: str) -> "Q":
-
     return lexer.parse(text)

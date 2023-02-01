@@ -110,7 +110,6 @@ class Lexer(object):
         yield self.end_token()
 
     def parse(self, text: str):
-
         tokens = self.lex(text)
         parser = Parser(tokens)
         return parser.parse()

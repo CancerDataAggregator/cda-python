@@ -33,7 +33,6 @@ class Paginator:
         format_type: str = "JSON",
         show_bar: bool = False,
     ) -> None:
-
         self.result: Result = result
         self.to_df: bool = to_df
         self.to_list: bool = to_list
@@ -72,7 +71,6 @@ class Paginator:
         return self.result
 
     def _do_next(self: Paginator) -> Union[DataFrame, list, Result, None]:
-
         result_nx = self._return_result()
         if self.result.has_next_page:
             try:
@@ -92,7 +90,6 @@ class Paginator:
             return result_nx
 
     async def a_do_next(self) -> Union[list, DataFrame, Result, None]:
-
         return self._do_next()
 
     def __iter__(self) -> "Paginator":
