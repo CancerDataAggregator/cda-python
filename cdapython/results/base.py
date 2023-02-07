@@ -55,6 +55,7 @@ class BaseResult:
         max_level: Optional[int] = None,
         search_fields: Optional[Union[str, List[str]]] = None,
         search_value: Optional[str] = None,
+        allow_substring: bool = True,
     ) -> DataFrame:
         """[summary]
         Creates a pandas DataFrame for the Results
