@@ -55,6 +55,7 @@ class BaseResult:
         max_level: Optional[int] = None,
         search_fields: Optional[Union[str, List[str]]] = None,
         search_value: Optional[str] = None,
+        allow_substring: bool = True,
     ) -> DataFrame:
         """[summary]
         Creates a pandas DataFrame for the Results
@@ -117,7 +118,8 @@ class BaseResult:
             show_index (bool): Add a column with a row count to the table. Defaults to True.
             index_name (str, optional): The column name to give to the index column. Defaults to None, showing no value.
         Returns:
-            Table: The rich Table instance passed, populated with the DataFrame values."""
+            Table: The rich Table instance passed, populated with the DataFrame values.
+        """
         _pandas_dataframe = None
         if pandas_dataframe is None:
             _pandas_dataframe: DataFrame = self.to_dataframe()

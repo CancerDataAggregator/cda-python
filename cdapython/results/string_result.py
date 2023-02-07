@@ -1,6 +1,6 @@
 from multiprocessing.pool import ApplyResult
 from time import sleep
-from typing import Optional
+from typing import List, Optional, Union
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
@@ -31,31 +31,32 @@ class StringResult(Result):
             format_type,
         )
 
-    def to_list(self, filters: Optional[str] = None, exact: bool = False) -> list:
-        if filters is not None and filters != "":
-
-            filters: str = filters.replace("\n", " ").strip()
+    def to_list(
+        self,
+        search_value: Optional[str] = None,
+        allow_substring: bool = True,
+    ) -> list:
+        if search_value is not None:
             values: list["StringResult"] = [
                 list(i.values())[0]
                 for i in self._api_response.result
                 if list(i.values())[0] is not None
             ]
-            # values = list(filter(None, values))
-            if exact:
+
+            if allow_substring:
+                # concatenate all search values
                 return list(
                     filter(
-                        lambda items: (str(items).lower() == filters.lower()),
+                        lambda term: (
+                            str(term).lower().find(str(search_value.lower())) != -1
+                        ),
                         values,
                     )
                 )
-
             else:
-
                 return list(
                     filter(
-                        lambda items: (
-                            str(items).lower().find(str(filters.lower())) != -1
-                        ),
+                        lambda term: (term.lower() in search_value.lower()),
                         values,
                     )
                 )
