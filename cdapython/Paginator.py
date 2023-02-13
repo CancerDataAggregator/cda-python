@@ -92,12 +92,12 @@ class Paginator:
     async def a_do_next(self) -> Union[list, DataFrame, Result, None]:
         return self._do_next()
 
-    def __iter__(self) -> "Paginator":
+    def __iter__(self) -> Paginator:
         if self.show_bar:
             self.progress.start()
         return self
 
-    def __aiter__(self) -> "Paginator":
+    def __aiter__(self) -> Paginator:
         if self.show_bar:
             self.progress.start()
         return self
