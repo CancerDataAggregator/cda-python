@@ -38,6 +38,7 @@ typeReport
 .mypy_cache
 .coverage
 .venv
+venv2
 .ven3
 ven3
 .nox
