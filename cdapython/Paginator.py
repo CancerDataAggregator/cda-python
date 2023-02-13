@@ -10,7 +10,7 @@ from rich.progress import (
     TextColumn,
     TimeElapsedColumn,
 )
-from typing_extensions import Self
+
 
 from cdapython.utils.none_check import none_check
 
