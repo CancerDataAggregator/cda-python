@@ -15,6 +15,7 @@ class StringResult(Result):
     This class inheritance from the result class it is made for unique terms function
     in the utility class,just to add a different to to_list
     """
+
     def __init__(
         self,
         api_response: QueryResponseData,
@@ -64,9 +65,7 @@ class StringResult(Result):
                 )
             return list(
                 filter(
-                    lambda items: (
-                        str(items).lower().find(str(filters.lower())) != -1
-                    ),
+                    lambda items: (str(items).lower().find(str(filters.lower())) != -1),
                     values,
                 )
             )

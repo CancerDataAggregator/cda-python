@@ -12,9 +12,10 @@ from typing_extensions import Literal
 
 class BaseResult:
     """_summary_
-        This class will have all the core functionality
-        for all results so it will not have to be re-implemented
+    This class will have all the core functionality
+    for all results so it will not have to be re-implemented
     """
+
     def __init__(
         self,
         show_sql: bool,
@@ -86,7 +87,9 @@ class BaseResult:
             for i in search_fields:
                 value = merge(
                     value,
-                    data_frame[data_frame[i].str.contains(search_value, case=False, na=False)],
+                    data_frame[
+                        data_frame[i].str.contains(search_value, case=False, na=False)
+                    ],
                     how="right",
                     right_on=column_names,
                     left_on=column_names,

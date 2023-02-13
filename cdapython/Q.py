@@ -91,7 +91,7 @@ class _QEncoder(JSONEncoder):
         if isinstance(o, MappingProxyType):
             return None
         # Using vars() over o.__dict__ dunder method,
-        # it is more pythonic because it is generally better to use 
+        # it is more pythonic because it is generally better to use
         # a function over a magic/dunder method
         tmp_dict: Dict[str, Any] = vars(o)
         if "query" in tmp_dict:
