@@ -1,3 +1,6 @@
+"""
+This module was made as a base class for all results it will be imported into the result class
+"""
 import json
 from collections import ChainMap
 from typing import Any, AsyncGenerator, Dict, Iterator, List, Optional, Union
@@ -8,6 +11,10 @@ from typing_extensions import Literal
 
 
 class BaseResult:
+    """_summary_
+        This class will have all the core functionality
+        for all results so it will not have to be re-implemented
+    """
     def __init__(
         self,
         show_sql: bool,
@@ -63,16 +70,15 @@ class BaseResult:
             DataFrame: [description]
         """
 
-        self._data_table: DataFrame = json_normalize(self._result)
+        _data_table: DataFrame = json_normalize(self._result)
         if search_fields == "":
             search_fields = None
         if search_fields is not None:
-            df = self._data_table
-            column_names = list(df.columns)
+            data_frame = _data_table
+            column_names = list(data_frame.columns)
 
             if isinstance(search_fields, str):
                 search_fields = [search_fields]
-            search_fields = search_fields
             search_value = str(search_value)
             value: DataFrame = DataFrame(
                 columns=column_names, index=Index([], dtype="int")
@@ -80,7 +86,7 @@ class BaseResult:
             for i in search_fields:
                 value = merge(
                     value,
-                    df[df[i].str.contains(search_value, case=False, na=False)],
+                    data_frame[data_frame[i].str.contains(search_value, case=False, na=False)],
                     how="right",
                     right_on=column_names,
                     left_on=column_names,
@@ -116,7 +122,7 @@ class BaseResult:
             pandas_dataframe (DataFrame): A Pandas DataFrame to be converted to a rich Table.
             rich_table (Table): A rich Table that should be populated by the DataFrame values.
             show_index (bool): Add a column with a row count to the table. Defaults to True.
-            index_name (str, optional): The column name to give to the index column. Defaults to None, showing no value.
+            index_name (str, optional): The column name to give to the index column.
         Returns:
             Table: The rich Table instance passed, populated with the DataFrame values.
         """

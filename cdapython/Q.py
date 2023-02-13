@@ -53,6 +53,15 @@ WAITING_TEXT: Literal["Waiting for results"] = "Waiting for results"
 def check_version_and_table(
     version: Optional[str], table: Optional[str]
 ) -> Tuple[str, str]:
+    """_summary_
+        This is a help method that is used to check for None type
+    Args:
+        version (Optional[str]): _description_
+        table (Optional[str]): _description_
+
+    Returns:
+        Tuple[str, str]: _description_
+    """
     if version is None:
         version = Constants.table_version
 
@@ -81,18 +90,14 @@ class _QEncoder(JSONEncoder):
 
         if isinstance(o, MappingProxyType):
             return None
-
-        """
-        Using vars() over o.__dict__ dunder method,
-        it is more pythonic because it is generally better to use 
-        a function over a magic/dunder method
-        """
+        # Using vars() over o.__dict__ dunder method,
+        # it is more pythonic because it is generally better to use 
+        # a function over a magic/dunder method
         tmp_dict: Dict[str, Any] = vars(o)
         if "query" in tmp_dict:
             return tmp_dict["query"]
         if "_data_store" in tmp_dict:
             return tmp_dict["_data_store"]
-
         return tmp_dict
 
 
@@ -465,8 +470,8 @@ class Q:
         self,
         api_response: QueryResponseData,
         query_id: str,
-        offset: Optional[int],
-        limit: Optional[int],
+        offset: int,
+        limit: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -487,8 +492,8 @@ class Q:
         self,
         api_instance: QueryApi,
         query_id: str,
-        offset: Optional[int],
-        page_size: Optional[int],
+        offset: int,
+        page_size: int,
         async_req: Optional[bool],
         pre_stream: bool = True,
         show_sql: bool = True,
@@ -646,7 +651,7 @@ class Q:
             if verbose:
                 print(
                     """
-                    Adding certificate verification pem is strongly 
+                    Adding certificate verification pem is strongly
                     advised please read our
                     https://cda.readthedocs.io/en/latest/Installation.html"""
                 )

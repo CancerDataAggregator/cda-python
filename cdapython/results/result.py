@@ -1,23 +1,20 @@
 """
 result is a convenient wrapper around the response object
 from the CDA service it adds user functionality.
-like creating dataframe and manipulating data for ease-of-use such 
+like creating dataframe and manipulating data for ease-of-use such
 as paginating automatically for the user through their result objects.
 """
 from __future__ import annotations
 
-import json
-import re
 from collections import ChainMap
 from io import StringIO
 from multiprocessing.pool import ApplyResult
 from time import sleep
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Pattern, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, Union
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
 from pandas import DataFrame, read_csv
-from rich import print
 from typing_extensions import Literal
 
 from cdapython.Paginator import Paginator
@@ -31,25 +28,6 @@ if TYPE_CHECKING:
     from cdapython.results.string_result import StringResult
 
 
-class _QEncoder(json.JSONEncoder):
-    """_QEncoder this is a a class to help with json conversion
-        the standard json dump
-
-    Args:
-        json (_type_): _description_
-    """
-
-    def decode(self, object_json) -> str:
-        """
-        This is for json decoding super method
-        """
-        regex: Pattern[str] = re.compile(r"([^\"\\]|\\([\"\\\/bfnrt]|u[a-zA-Z\d]{4}))+")
-
-        if isinstance(object_json, str):
-            print(regex.match(object_json, pos=0))
-        return object_json
-
-
 class Result(BaseResult):
     """
     The Results Class is a convenient wrapper around the
@@ -60,24 +38,28 @@ class Result(BaseResult):
         self,
         api_response: QueryResponseData,
         query_id: str,
-        offset: Optional[int],
-        limit: Optional[int],
+        offset: int,
+        limit: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
         format_type: str = "json",
     ) -> None:
-        super().__init__(show_sql, show_count, format_type)
         self._api_response: QueryResponseData = api_response
         self._result: List[Any] = self._api_response.result
         self._query_id: str = query_id
-        self._offset: Optional[int] = offset
-        self._limit: Optional[int] = limit
+        self._offset: int = offset
+        self._limit: int = limit
         self._api_instance: QueryApi = api_instance
         self._df: DataFrame
+        super().__init__(
+            show_sql=show_sql,
+            show_count=show_count,
+            format_type=format_type,
+            result=self._api_response.result,
+        )
 
         if self.format_type == "tsv" and isinstance(self._result, list):
-            data_text: str = ""
             data_text: str = "\n".join(
                 map(lambda e: str(e).replace("\n", ""), self._result)
             )
@@ -163,7 +145,7 @@ class Result(BaseResult):
         to_df: bool = False,
         to_list: bool = False,
         to_collect_result: bool = False,
-        page_size: int = None,
+        page_size: int = 0,
         show_bar: bool = False,
     ) -> Paginator:
         """_summary_
@@ -174,8 +156,8 @@ class Result(BaseResult):
         Returns:
             _type_: _description_
         """
-        if page_size is None and isinstance(self._limit, int):
-            page_size = self._limit
+
+        page_size = page_size if page_size != 0 else self._limit
 
         return Paginator(
             self,
@@ -191,9 +173,9 @@ class Result(BaseResult):
     def get_all(
         self,
         output: str = "",
-        page_size: Union[int, None] = None,
+        page_size: int = 0,
         show_bar: bool = True,
-    ):
+    ) -> CollectResult:
         """
         get_all is a method that will loop for you
 
@@ -205,7 +187,7 @@ class Result(BaseResult):
             Union[DataFrame, List[Any]]: _description_
         """
 
-        if page_size is None and isinstance(self._limit, int):
+        if page_size == 0:
             page_size = self._limit
 
         iterator: Paginator = Paginator(
@@ -298,10 +280,10 @@ class Result(BaseResult):
             _type_: _description_
         """
         if isinstance(self._offset, int) and isinstance(self._limit, int):
-            _offset: int = self._offset - self._limit
-            _offset: int = max(0, _offset)
-            _limit: int = limit or self._limit
-            return self._get_result(_offset, _limit, async_req, pre_stream)
+            offset: int = self._offset - self._limit
+            offset: int = max(0, offset)
+            limit: int = limit or self._limit
+            return self._get_result(offset, limit, async_req, pre_stream)
         return None
 
     def _get_result(

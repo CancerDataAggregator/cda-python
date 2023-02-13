@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 
 class Paginator:
     def __init__(
-        self: Self,
+        self,
         result: Result,
         to_df: bool,
         to_list: bool,
@@ -82,12 +82,14 @@ class Paginator:
                     return result_nx
             except Exception as e:
                 if self.show_bar:
-                    (self.progress.remove_task(i.id) for i in self.progress.tasks)
+                    for i in self.progress.tasks:
+                        self.progress.remove_task(i.id)
                     self.progress.stop()
                 raise e
         else:
             self.stopped = True
             return result_nx
+        return None
 
     async def a_do_next(self) -> Union[list, DataFrame, Result, None]:
         return self._do_next()
@@ -130,11 +132,13 @@ class Paginator:
             if self.show_bar:
                 self.progress.console.clear_live()
                 self.progress.stop()
-                (self.progress.remove_task(i.id) for i in self.progress.tasks)
+                for i in self.progress.tasks:
+                    self.progress.remove_task(i.id)
             raise e
         except KeyboardInterrupt as e:
             if self.show_bar:
                 self.progress.console.clear_live()
                 self.progress.stop()
-                (self.progress.remove_task(i.id) for i in self.progress.tasks)
+                for i in self.progress.tasks:
+                    self.progress.remove_task(i.id)
             raise e
