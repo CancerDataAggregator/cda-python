@@ -89,7 +89,9 @@ class CdaConfiguration(Configuration):
 
     def _unverified_http(self) -> None:
         print(
-            f"""[bold yellow]Unverified HTTPS request is being made to host'{Constants.CDA_API_URL}'. 
-            Adding certificate verification is strongly advised. 
-            See: https://urllib3.readthedocs.io/en/1.26.x/advanced-usage.html#ssl-warnings[/bold yellow]"""
+            f"""[bold yellow]
+            Unverified HTTPS request is being made to host'{Constants.CDA_API_URL}'.
+            Adding certificate verification is strongly advised.
+            See: https://urllib3.readthedocs.io/en/1.26.x/advanced-usage.html#ssl-warnings
+            [/bold yellow]"""
         )

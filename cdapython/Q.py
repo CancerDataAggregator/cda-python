@@ -3,6 +3,7 @@ Q this is the main file for Q lang.
 this file holds the class for Q , links to the parsers
 and SQL Like operators queue supports further to the bottom
 """
+from __future__ import annotations
 import logging
 from json import JSONEncoder, dumps
 from multiprocessing.pool import ApplyResult
@@ -51,13 +52,13 @@ WAITING_TEXT: Literal["Waiting for results"] = "Waiting for results"
 
 
 def check_version_and_table(
-    version: Optional[str], table: Optional[str]
+    version: Union[str,None], table: Union[str,None]
 ) -> Tuple[str, str]:
     """_summary_
         This is a help method that is used to check for None type
     Args:
-        version (Optional[str]): _description_
-        table (Optional[str]): _description_
+        version (Union[str,None]): _description_
+        table (Union[str,None]): _description_
 
     Returns:
         Tuple[str, str]: _description_
@@ -78,7 +79,7 @@ class _QEncoder(JSONEncoder):
         json (_type_): _description_
     """
 
-    def default(self, o: Union["Q", "Query"]) -> Union[Any, Dict[str, Any], None]:
+    def default(self, o: Union[Q, "Query"]) -> Union[Any, Dict[str, Any], None]:
         """this will override the parent super class's default method
 
         Args:
@@ -153,11 +154,16 @@ class Q:
         """
         tmp_json = dumps(self, indent=indent, cls=_QEncoder)
         if write_file:
-            with open(f"{file_name}.json", "w") as f:
-                f.write(tmp_json)
+            with open(f"{file_name}.json", "w", encoding="utf-8") as file:
+                file.write(tmp_json)
         return tmp_json
 
     def to_dict(self) -> Any:
+        """_summary_
+        Returns the query properties as a dict
+        Returns:
+            Any: _description_
+        """
         return self.query.to_dict()
 
     # endregion
@@ -168,7 +174,7 @@ class Q:
         field_to_search: Union[List[str], str],
         file_to_search: str,
         key: str = "",
-    ) -> "Q":
+    ) -> Q:
         """_summary_
             This function will read in a txt ,
             csv or tsv and use the IN statement to search the file
@@ -275,15 +281,15 @@ class Q:
 
     @staticmethod
     def bulk_download(
-        version: Optional[str] = Constants.table_version,
-        host: Optional[str] = None,
+        version: Union[str,None]= Constants.table_version,
+        host: Union[str,None]= None,
         dry_run: bool = False,
-        table: Optional[str] = Constants.default_table,
+        table: Union[str,None]= Constants.default_table,
         async_call: bool = False,
-        verify: Optional[bool] = None,
+        verify: Union[bool,None]= None,
         offset: int = 0,
         limit: int = 100,
-        verbose: Optional[bool] = True,
+        verbose: Union[bool,None]= True,
     ) -> Optional[DataFrame]:
         """[summary]
 
@@ -339,7 +345,7 @@ class Q:
 
     @staticmethod
     def bigquery_status(
-        host: Optional[str] = None, verify: Optional[bool] = None
+        host: Union[str,None]= None, verify: Union[bool,None]= None
     ) -> Union[str, Any]:
         """[summary]
         Uses the cda_client library's MetaClass to get status check on the cda
@@ -358,7 +364,7 @@ class Q:
 
     @staticmethod
     def query_job_status(
-        query_id: str, host: Optional[str] = None, verify: Optional[bool] = None
+        query_id: str, host: Union[str,None]= None, verify: Union[bool,None]= None
     ) -> Optional[Any]:
         """[summary]
 
@@ -391,7 +397,7 @@ class Q:
     # endregion
 
     @property
-    def file(self) -> "Q":
+    def file(self) -> Q:
         """_summary_
         this is a chaining method used to get files
         Returns:
@@ -400,7 +406,7 @@ class Q:
         return QFactory.create_entity(FILE, self)
 
     @property
-    def count(self) -> "Q":
+    def count(self) -> Q:
         """_summary_
         this is a chaining method used to get counts
         Returns:
@@ -409,27 +415,27 @@ class Q:
         return QFactory.create_entity(COUNT, self)
 
     @property
-    def subject(self) -> "Q":
+    def subject(self) -> Q:
         return QFactory.create_entity(SUBJECT, self)
 
     @property
-    def researchsubject(self) -> "Q":
+    def researchsubject(self) -> Q:
         return QFactory.create_entity(RESEARCH_SUBJECT, self)
 
     @property
-    def specimen(self) -> "Q":
+    def specimen(self) -> Q:
         return QFactory.create_entity(SPECIMEN, self)
 
     @property
-    def diagnosis(self) -> "Q":
+    def diagnosis(self) -> Q:
         return QFactory.create_entity(DIAGNOSIS, self)
 
     @property
-    def treatment(self) -> "Q":
+    def treatment(self) -> Q:
         return QFactory.create_entity(TREATMENT, self)
 
     @property
-    def mutation(self) -> "Q":
+    def mutation(self) -> Q:
         return QFactory.create_entity(MUTATIONS, self)
 
     def _call_endpoint(
@@ -547,15 +553,15 @@ class Q:
         self,
         offset: int = 0,
         page_size: int = 100,
-        limit: Optional[int] = None,
-        version: Optional[str] = None,
-        host: Optional[str] = None,
+        limit: Union[int,None] = None,
+        version: Union[str,None]= None,
+        host: Union[str,None]= None,
         dry_run: bool = False,
-        table: Optional[str] = None,
+        table: Union[str,None]= None,
         async_call: bool = False,
-        verify: Optional[bool] = None,
+        verify: Union[bool,None]= None,
         verbose: bool = True,
-        include: Optional[str] = None,
+        include: Union[str,None]= None,
         format_type: str = "json",
         show_sql: bool = False,
     ) -> run_result:
@@ -581,7 +587,7 @@ class Q:
         cda_client_obj: ApiClient = ApiClient(
             configuration=CdaConfiguration(host=host, verify=verify, verbose=verbose)
         )
-        PAGE_OFFSET = 0  # this variable is used as offset for the query function
+        PAGEOFFSET = 0  # this variable is used as offset for the query function
         version, table = check_version_and_table(version, table)
 
         if include is not None:
@@ -624,7 +630,7 @@ class Q:
             return self.__get_query_result(
                 api_instance=api_instance,
                 query_id=api_response.query_id,
-                offset=PAGE_OFFSET,
+                offset=PAGEOFFSET,
                 page_size=page_size,
                 async_req=async_call,
                 show_sql=self._show_sql,
@@ -663,21 +669,21 @@ class Q:
                     or local python ssl pem {max_retry_error}"""
                 )
 
-        except AttributeError as e:
+        except AttributeError as attributeError:
             if verbose:
-                print(e)
+                print(attributeError)
 
-        except Exception as e:
+        except Exception as exception:
             if verbose:
-                print(e)
+                print(exception)
         return None
 
-    def _Q_wrap(self, right: Union[str, "Q", Query], op: str) -> "Q":
+    def q_wrap(self, right: Union[str, Q, Query], operator: str) -> Q:
         if isinstance(right, str):
             right = Q(right)
-        return self.__class__(self.query, op, right.query)
+        return self.__class__(self.query, operator, right.query)
 
-    def AND(self, right: Union[str, "Q"]) -> "Q":
+    def AND(self, right: Union[str, Q]) -> Q:
         """Q's AND operator this will add a AND to between two Q queries
 
         Args:
@@ -686,9 +692,9 @@ class Q:
         Returns:
             Q: a joined Q queries with a AND node
         """
-        return self._Q_wrap(right, op="AND")
+        return self.q_wrap(right, operator="AND")
 
-    def OR(self, right: Union[str, "Q"]) -> "Q":
+    def OR(self, right: Union[str, Q]) -> Q:
         """Q's OR operator this will add a OR to between two Q queries
 
         Args:
@@ -697,9 +703,9 @@ class Q:
         Returns:
             Q: a joined Q queries with a OR node
         """
-        return self._Q_wrap(right, op="OR")
+        return self.q_wrap(right, operator="OR")
 
-    def FROM(self, right: Union[str, "Q"]) -> "Q":
+    def FROM(self, right: Union[str, Q]) -> Q:
         """Q's FROM operator this will add a SUBQUERY to between two Q queries
 
         Args:
@@ -708,9 +714,9 @@ class Q:
         Returns:
             Q: a joined Q queries with a SUBQUERY node
         """
-        return self._Q_wrap(right, op="SUBQUERY")
+        return self.q_wrap(right, operator="SUBQUERY")
 
-    def NOT(self) -> "Q":
+    def NOT(self) -> Q:
         """Q's FROM operator this will add a NOT to between a Q query and a None for Not
 
         Args:
@@ -719,32 +725,80 @@ class Q:
         Returns:
             Q: Adds a NOT to a Q query
         """
-        return self._Q_wrap(None, op="NOT")
+        return self.q_wrap(None, operator="NOT")
 
-    def _Not_EQ(self, right: Union[str, "Q"]) -> "Q":
-        return self._Q_wrap(right, op="!=")
+    def _Not_EQ(self, right: Union[str, Q]) -> Q:
+        return self.q_wrap(right, operator="!=")
 
-    def _Greater_Than_EQ(self, right: Union[str, "Q"]) -> "Q":
-        return self._Q_wrap(right, op=">=")
+    def _Greater_Than_EQ(self, right: Union[str, Q]) -> Q:
+        """_summary_
+        This is a private method used for the parser
+        Args:
+            right (Union[str, Q]): _description_
 
-    def _Greater_Than(self, right: Union[str, "Q"]) -> "Q":
-        return self._Q_wrap(right, op=">")
+        Returns:
+            Q: _description_
+        """
+        return self.q_wrap(right, operator=">=")
 
-    def _Less_Than_EQ(self, right: "Q") -> "Q":
+    def _Greater_Than(self, right: Union[str, Q]) -> Q:
+        """_summary_
+        This is a private method used for the parser
+        Args:
+            right (Union[str, &quot;Q&quot;]): _description_
+
+        Returns:
+            Q: _description_
+        """
+        return self.q_wrap(right, operator=">")
+
+    def _Less_Than_EQ(self, right: Q) -> Q:
+        """_summary_
+        This is a private method used for the parser
+        Args:
+            right (Q): _description_
+
+        Returns:
+            Q: _description_
+        """
         return self.__class__(self.query, "<=", right.query)
 
-    def _Less_Than(self, right: "Q") -> "Q":
+    def _Less_Than(self, right: Q) -> Q:
+        """_summary_
+        This is a private method used for the parser
+        Args:
+            right (Q): _description_
+
+        Returns:
+            Q: _description_
+        """
         return self.__class__(self.query, "<", right.query)
 
-    def SELECT(self, fields: str) -> "Q":
+    def SELECT(self, fields: str) -> Q:
+        """_summary_
+        this will add fields to the SELECT values using the private select method
+        Args:
+            fields (str): _description_
+
+        Returns:
+            Q: _description_
+        """
         return self.__select(fields=fields)
 
-    def ORDER_BY(self, fields: str) -> "Q":
-        return self.__Order_By(fields=fields)
+    def ORDER_BY(self, fields: str) -> Q:
+        """_summary_
+        This is like the ORDER_BY in sql
+        Args:
+            fields (str): _description_
 
-    def __Order_By(self, fields: str) -> "Q":
+        Returns:
+            Q: _description_
+        """
+        return self._order_by(fields=fields)
+
+    def _order_by(self, fields: str) -> Q:
         """[summary]
-
+        This private method is used to Add DESC and ASC Ordering this will build a Query node
         Args:
             fields (str): [takes in a list of order by values]
 
@@ -762,10 +816,18 @@ class Q:
         tmp.value = mod_fields
         return self.__class__(tmp, "ORDERBY", self.query)
 
-    def IS(self, fields: str) -> "Q":
-        return self._Q_wrap(fields, op="IS")
+    def IS(self, fields: str) -> Q:
+        """_summary_
+        Q's IS operator this will IS Like the sql
+        Args:
+            fields (str): _description_
 
-    def __select(self, fields: str) -> "Q":
+        Returns:
+            Q: _description_
+        """
+        return self.q_wrap(fields, operator="IS")
+
+    def __select(self, fields: str) -> Q:
         """[summary]
 
         Args:

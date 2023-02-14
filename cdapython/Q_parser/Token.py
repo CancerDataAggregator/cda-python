@@ -19,7 +19,7 @@ class Token(object):
 
     regexp: Union[str, Pattern] = ""
     """
-    Access public variable 
+    Access public variable
     \n
     Used to assign regex to class
     """

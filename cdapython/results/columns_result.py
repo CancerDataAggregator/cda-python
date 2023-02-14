@@ -110,7 +110,7 @@ class ColumnsResult(BaseResult):
         if self.description is False:
             return [i["fieldName"] for i in self._result]
 
-        return [i for i in self._result]
+        return list(self._result)
 
     def to_dataframe(
         self,

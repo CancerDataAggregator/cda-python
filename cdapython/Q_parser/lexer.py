@@ -96,9 +96,9 @@ class Lexer(object):
         while text:
             token_class, matchs = self.tokens.get_token(text=text)
             if token_class is not None:
-                matched_text = text[matchs.start() : matchs.end()]
+                matched_text = text[matchs.start(): matchs.end()]
                 yield token_class(matched_text)
-                text = text[matchs.end() :]
+                text = text[matchs.end():]
                 pos += matchs.end()
             elif text[0] in self.blank_chars:
                 text = text[1:]

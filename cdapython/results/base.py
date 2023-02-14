@@ -57,10 +57,10 @@ class BaseResult:
 
     def to_dataframe(
         self,
-        record_path: Optional[Union[str, list]] = None,
-        meta: Optional[Union[str, List[Union[str, List[str]]]]] = None,
-        meta_prefix: Optional[str] = None,
-        max_level: Optional[int] = None,
+        record_path: Union[str, list, None] = None,
+        meta: Union[str, List[Union[str, List[str]]],None] = None,
+        meta_prefix: Union[str,None] = None,
+        max_level: Union[int,None] = None,
         search_fields: Union[List[str], str, None] = None,
         search_value: Union[str, None] = None,
     ) -> DataFrame:

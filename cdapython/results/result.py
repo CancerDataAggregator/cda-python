@@ -10,7 +10,7 @@ from collections import ChainMap
 from io import StringIO
 from multiprocessing.pool import ApplyResult
 from time import sleep
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, Union, cast
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
@@ -135,9 +135,8 @@ class Result(BaseResult):
         Returns:
             bool: returns a bool value if there is a next page
         """
-        if isinstance(self._offset, int) and isinstance(self._limit, int):
-            return (self._offset + self._limit) < self.total_row_count
-        return False
+        return (self._offset + self._limit) < self.total_row_count
+        
 
     def paginator(
         self,
@@ -200,15 +199,16 @@ class Result(BaseResult):
             format_type=self.format_type,
             show_bar=show_bar,
         )
-
-        collect_result: CollectResult = ResultFactory.create_entity(
+        # add this to cast to a subclass of CollectResult 
+        collect_result:CollectResult = cast(CollectResult,ResultFactory.create_entity(
             COLLECT_RESULT, self
-        )
+        ))
 
         for index, i in enumerate(iterator):
             if index == 0:
                 continue
-            collect_result.extend_result(i)
+            if isinstance(i, Result):
+                collect_result.extend_result(i)
 
         return collect_result
 
@@ -217,7 +217,7 @@ class Result(BaseResult):
         limit: Optional[int] = None,
         async_req: bool = False,
         pre_stream: bool = True,
-    ) -> Optional["Result"]:
+    ) -> Union[Result, StringResult, ColumnsResult , None]:
         """async wrapper for next page
 
         Returns:
@@ -230,7 +230,7 @@ class Result(BaseResult):
         limit: Optional[int] = None,
         async_req: bool = False,
         pre_stream: bool = True,
-    ) -> Optional["Result"]:
+    ) -> Union[Result, StringResult, ColumnsResult , None]:
         """
         async wrapper for prev page
 
@@ -244,7 +244,7 @@ class Result(BaseResult):
         limit: Optional[int] = None,
         async_req: bool = False,
         pre_stream: bool = True,
-    ) -> Optional["Result"]:
+    )-> Union[Result, StringResult, ColumnsResult , None]:
         """
         The next_page function will call the server for the next page using this \
         limit to determine the next level of page results
@@ -272,7 +272,7 @@ class Result(BaseResult):
         limit: Optional[int] = None,
         async_req: bool = False,
         pre_stream: bool = True,
-    ) -> Optional["Result"]:
+    ) -> Union[Result, StringResult, ColumnsResult , None]:
         """prev_page
 
 
@@ -280,9 +280,9 @@ class Result(BaseResult):
             _type_: _description_
         """
         if isinstance(self._offset, int) and isinstance(self._limit, int):
-            offset: int = self._offset - self._limit
-            offset: int = max(0, offset)
-            limit: int = limit or self._limit
+            offset = self._offset - self._limit
+            offset = max(0, offset)
+            limit  = limit or self._limit
             return self._get_result(offset, limit, async_req, pre_stream)
         return None
 
@@ -292,7 +292,7 @@ class Result(BaseResult):
         _limit: Optional[int],
         async_req: bool = False,
         pre_stream: bool = True,
-    ) -> Optional["Result"]:
+    ) -> Union[Result, StringResult , ColumnsResult , None]:
         return get_query_result(
             self.__class__,
             self._api_instance,

@@ -38,7 +38,7 @@ class CollectResult(NotPaginatedResult):
             format_type="json",
         )
 
-    def extend_result(self, result: Result) -> None:
+    def extend_result(self, result:Result) -> None:
         if none_check(self._result):
             self._result.extend(result.to_list())
 

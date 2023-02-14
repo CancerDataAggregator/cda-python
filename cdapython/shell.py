@@ -86,7 +86,7 @@ while True:
     if new is True:
         help()
         print(
-            f"""Q {Q.get_version()} Type "help()", 
+            f"""Q {Q.get_version()} Type "help()",
             "copyright", "credits" or "license" for more information."""
         )
         new: bool = False
