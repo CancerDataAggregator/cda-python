@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 class AbstractFactory:
     @staticmethod
-    def create(q_object: Result)-> Result:
+    def create(q_object: Result) -> Result:
         raise NotImplementedError
 
 

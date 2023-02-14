@@ -52,7 +52,7 @@ WAITING_TEXT: Literal["Waiting for results"] = "Waiting for results"
 
 
 def check_version_and_table(
-    version: Union[str,None], table: Union[str,None]
+    version: Union[str, None], table: Union[str, None]
 ) -> Tuple[str, str]:
     """_summary_
         This is a help method that is used to check for None type
@@ -281,15 +281,15 @@ class Q:
 
     @staticmethod
     def bulk_download(
-        version: Union[str,None]= Constants.table_version,
-        host: Union[str,None]= None,
+        version: Union[str, None] = Constants.table_version,
+        host: Union[str, None] = None,
         dry_run: bool = False,
-        table: Union[str,None]= Constants.default_table,
+        table: Union[str, None] = Constants.default_table,
         async_call: bool = False,
-        verify: Union[bool,None]= None,
+        verify: Union[bool, None] = None,
         offset: int = 0,
         limit: int = 100,
-        verbose: Union[bool,None]= True,
+        verbose: Union[bool, None] = True,
     ) -> Optional[DataFrame]:
         """[summary]
 
@@ -345,7 +345,7 @@ class Q:
 
     @staticmethod
     def bigquery_status(
-        host: Union[str,None]= None, verify: Union[bool,None]= None
+        host: Union[str, None] = None, verify: Union[bool, None] = None
     ) -> Union[str, Any]:
         """[summary]
         Uses the cda_client library's MetaClass to get status check on the cda
@@ -364,7 +364,7 @@ class Q:
 
     @staticmethod
     def query_job_status(
-        query_id: str, host: Union[str,None]= None, verify: Union[bool,None]= None
+        query_id: str, host: Union[str, None] = None, verify: Union[bool, None] = None
     ) -> Optional[Any]:
         """[summary]
 
@@ -553,15 +553,15 @@ class Q:
         self,
         offset: int = 0,
         page_size: int = 100,
-        limit: Union[int,None] = None,
-        version: Union[str,None]= None,
-        host: Union[str,None]= None,
+        limit: Union[int, None] = None,
+        version: Union[str, None] = None,
+        host: Union[str, None] = None,
         dry_run: bool = False,
-        table: Union[str,None]= None,
+        table: Union[str, None] = None,
         async_call: bool = False,
-        verify: Union[bool,None]= None,
+        verify: Union[bool, None] = None,
         verbose: bool = True,
-        include: Union[str,None]= None,
+        include: Union[str, None] = None,
         format_type: str = "json",
         show_sql: bool = False,
     ) -> run_result:
