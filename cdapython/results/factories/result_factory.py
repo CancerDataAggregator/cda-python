@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, Union
-
+from typing import TYPE_CHECKING, Any, Dict
 
 if TYPE_CHECKING:
     from cdapython.results.result import Result
-    from cdapython.results.factories.collect_result import CollectResult
 
 
 class AbstractFactory:

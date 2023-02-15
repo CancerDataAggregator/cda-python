@@ -1,3 +1,6 @@
+from typing import Any, Dict, Tuple
+
+
 class Error(Exception):
     pass
 
@@ -15,6 +18,12 @@ class InvalidTokenError(ParserError):
 
 
 class LexerError(Error):
-    def __init__(self, *args, **kwargs):
+    """_summary_
+    This is made for the Lexing error
+    Args:
+        Error (_type_): _description_
+    """
+
+    def __init__(self, *args: Tuple[Any], **kwargs: Dict[str, Any]) -> None:
         self.position = kwargs.pop("position", None)
-        super(LexerError, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)

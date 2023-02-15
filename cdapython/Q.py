@@ -4,6 +4,7 @@ this file holds the class for Q , links to the parsers
 and SQL Like operators queue supports further to the bottom
 """
 from __future__ import annotations
+
 import logging
 from json import JSONEncoder, dumps
 from multiprocessing.pool import ApplyResult
@@ -195,7 +196,7 @@ class Q:
         """
         values_to_search: List[str] = []
         if not Path(file_to_search).resolve().is_file():
-            raise IOError(f"File not found {Path(file_to_search).resolve()}")
+            raise OSError(f"File not found {Path(file_to_search).resolve()}")
         if Path(file_to_search).suffix != ".txt":
             if Path(file_to_search).suffix == ".csv":
                 if key is None:
@@ -208,7 +209,7 @@ class Q:
                 df = read_csv(file_to_search, delimiter="\t").fillna("")
                 values_to_search.extend([f"{i}" for i in df[key].to_list()])
             else:
-                raise IOError("File Import Error only txt and csv supported")
+                raise OSError("File Import Error only txt and csv supported")
 
         if Path(file_to_search).suffix == ".txt":
             df = read_fwf(file_to_search, header=None, sep="\n")
@@ -336,7 +337,7 @@ class Q:
                 return None
 
             if isinstance(r, Result) or isinstance(r, StringResult):
-                df: DataFrame = r.get_all(to_df=True)
+                df: DataFrame = r.get_all().to_dataframe()
                 return df
 
         except Exception as e:
@@ -416,6 +417,11 @@ class Q:
 
     @property
     def subject(self) -> Q:
+        """_summary_
+            this is a chaining method used to get subject
+        Returns:
+            Q: _description_
+        """
         return QFactory.create_entity(SUBJECT, self)
 
     @property

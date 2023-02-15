@@ -308,7 +308,7 @@ class LessThan(Token):
         # of same precedence
         right_side: Query = context.expression(self.lbp)
         query.node_type = "<"
-        query.l = col((left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value.strip())
 
         return query

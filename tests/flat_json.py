@@ -1,5 +1,4 @@
 from cdapython import query
-from cdapython.utility import columns
 
 from tests.global_settings import host
 

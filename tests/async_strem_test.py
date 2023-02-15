@@ -3,7 +3,7 @@ import asyncio
 from pandas import DataFrame, concat
 
 from cdapython import Q
-from tests.global_settings import dev_host, host, localhost, table_dev
+from tests.global_settings import dev_host, table_dev
 
 
 async def main() -> None:

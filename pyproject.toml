@@ -46,7 +46,7 @@ requires = ["setuptools", "wheel"]
 
 [tool.mypy]
 ignore_missing_imports = true
-strict = false
+strict = true
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
@@ -74,4 +74,7 @@ line_length = 88
 targets = ["cdapython"]
 exclude = ["venv", "ven3", "tests"]
 skips = ["B101", "B601"]
+
+
+[tool.pylint]
 

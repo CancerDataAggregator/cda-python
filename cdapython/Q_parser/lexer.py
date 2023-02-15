@@ -6,7 +6,7 @@ from .Parser_Exception import LexerError
 from .topdown import EndToken, LeftParen, RightParen, Token
 
 
-class TokenRegistry(object):
+class TokenRegistry:
     def __init__(self):
         self._tokens: list[tuple[Token, re.Pattern[Any]]] = []
 
@@ -46,7 +46,7 @@ class TokenRegistry(object):
         return len(self._tokens)
 
 
-class Lexer(object):
+class Lexer:
     def __init__(
         self,
         with_parens=False,
@@ -63,7 +63,7 @@ class Lexer(object):
             self.register_token(LeftParen, re.compile(r"\("))
             self.register_token(RightParen, re.compile(r"\)"))
 
-        super(Lexer, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def register_token(self, token_class, regexp=None) -> None:
         """Register a token class.
@@ -105,7 +105,7 @@ class Lexer(object):
                 pos += 1
             else:
                 raise LexerError(
-                    "Invalid character %s in %s" % (text[0], text), position=pos
+                    "Invalid character {} in {}".format(text[0], text), position=pos
                 )
         yield self.end_token()
 

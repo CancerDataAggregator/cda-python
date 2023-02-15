@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from re import Pattern
 
 
-class Token(object):
+class Token:
     """
     This is the Base class for tokens.
 
@@ -36,7 +36,7 @@ class Token(object):
         self.text = text
 
     def __repr__(self) -> str:
-        return "<%s: %r>" % (self.__class__.__name__, self.text)
+        return f"<{self.__class__.__name__}: {self.text!r}>"
 
     def nud(self, context):
         """Null denotation.

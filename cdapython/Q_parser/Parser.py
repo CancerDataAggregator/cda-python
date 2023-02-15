@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from Token import Token
 
 
-class Parser(object):
+class Parser:
     """Converts lexed tokens into their representation.
 
     Attributes:

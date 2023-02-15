@@ -1,14 +1,7 @@
-from pandas import DataFrame, concat
-
 from cdapython import Q
 from tests.global_settings import (
-    host,
-    localhost,
-    table,
     table_dev,
     dev_host,
-    integration_host,
-    integration_table,
 )
 
 q = Q('primary_disease_type LIKE "Lung%"').run(

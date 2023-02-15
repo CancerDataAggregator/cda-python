@@ -20,11 +20,11 @@ from typing_extensions import Literal
 from cdapython.Paginator import Paginator
 from cdapython.results import COLLECT_RESULT
 from cdapython.results.base import BaseResult
+from cdapython.results.factories.collect_result import CollectResult
 from cdapython.results.factories.result_factory import ResultFactory
 
 if TYPE_CHECKING:
     from cdapython.results.columns_result import ColumnsResult
-    from cdapython.results.factories.collect_result import CollectResult
     from cdapython.results.string_result import StringResult
 
 

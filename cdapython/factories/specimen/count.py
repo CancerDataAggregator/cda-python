@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
@@ -41,8 +41,8 @@ class SpecimenCount(Specimen):
         self,
         api_response: QueryResponseData,
         query_id: str,
-        offset: Optional[int],
-        limit: Optional[int],
+        offset: int,
+        limit: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,

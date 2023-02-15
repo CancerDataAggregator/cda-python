@@ -1,4 +1,4 @@
-from global_settings import host, localhost, table
+from global_settings import host, table
 
 from cdapython import Q
 

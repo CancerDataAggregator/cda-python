@@ -11,7 +11,6 @@ from rich.progress import (
     TimeElapsedColumn,
 )
 
-
 from cdapython.utils.none_check import none_check
 
 if TYPE_CHECKING:

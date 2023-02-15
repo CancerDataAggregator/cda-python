@@ -1,9 +1,8 @@
 from typing import Any, Union
 
+from Q_parser import LexerError, MissingTokensError
 from rich import print
 from rich.console import Console
-from tdparser.lexer import LexerError
-from tdparser.topdown import MissingTokensError
 
 from cdapython.Q import Q
 
@@ -38,7 +37,7 @@ class Environ:
         return self.env[item]
 
     def __repr__(self):
-        rep = "{}".format(self.env)
+        rep = f"{self.env}"
         parent = self.parent
         while parent:
             rep += "\n" + parent.__repr__()
@@ -47,7 +46,7 @@ class Environ:
 
 
 try:
-    import readline
+    import readline  # pylint: disable=W0611
 except ImportError:
     raise ImportError()
 
