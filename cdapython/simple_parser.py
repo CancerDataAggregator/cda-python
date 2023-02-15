@@ -108,7 +108,6 @@ class Addition(Token):
     lbp = 15
 
     def led(self, left, context):
-
         query_value = Query()
         right_side = context.expression(self.lbp)
         right_math, left_math = math_logic_check(right_side, left)
@@ -122,7 +121,6 @@ class Subtraction(Token):
     lbp = 15
 
     def led(self, left, context):
-
         query_value = Query()
         right_side = context.expression(self.lbp)
         right_math, left_math = math_logic_check(right_side, left)
@@ -339,7 +337,6 @@ class CommaType(Token):
 
 
 class ArrayType(Token):
-
     lbp = 10
 
     def nud(self, context: Parser) -> Query:
@@ -562,5 +559,4 @@ lexer.register_token(IS, re.compile(r"(IS)"))
 
 
 def simple_parser(text: str) -> "Query":
-
     return lexer.parse(text)

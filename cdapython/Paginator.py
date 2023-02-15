@@ -55,7 +55,6 @@ class Paginator:
         self.progress.update(self.task, advance=self.result.count)
 
     def _do_next(self: Paginator) -> Union[dict, list, DataFrame, Result]:
-
         result_nx: Union[DataFrame, list, Result] = self.result
         var_output: str = none_check(self.output)
         if var_output == "full_df":
@@ -80,7 +79,6 @@ class Paginator:
             return result_nx
 
     async def a_do_next(self) -> Union[dict, list, DataFrame, Result]:
-
         return self._do_next()
 
     def __iter__(self) -> "Paginator":
