@@ -75,6 +75,11 @@ targets = ["cdapython"]
 exclude = ["venv", "ven3", "tests"]
 skips = ["B101", "B601"]
 
+[tool.pylint.messages_control]
+max-line-length = 88
 
-[tool.pylint]
+disable = [
+    "too-many-public-methods",
+    "invalid-name"
+]
 

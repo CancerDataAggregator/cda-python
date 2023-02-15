@@ -70,6 +70,7 @@ class Paginator:
         return self.result
 
     def _do_next(self: Paginator) -> Union[DataFrame, list, Result, None]:
+
         result_nx = self._return_result()
         if self.result.has_next_page:
             try:

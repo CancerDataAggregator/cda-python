@@ -115,6 +115,7 @@ class Q:
             *args (object):
         """
         self.query: Query = Query()
+        self._show_sql: bool = False
 
         if len(args) == 1:
             if args[0] is None:
@@ -605,7 +606,7 @@ class Q:
         if offset > 0:
             self.query = Q.__offset(self, offset)
 
-        self._show_sql: bool = show_sql or False
+        self._show_sql = show_sql or False
 
         try:
             with cda_client_obj as api_client:
