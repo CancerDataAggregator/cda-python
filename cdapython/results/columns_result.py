@@ -53,11 +53,10 @@ class ColumnsResult(BaseResult):
         return self._repr_value(show_value=self.show_sql)
 
     def to_list(
-        self, 
+        self,
         search_fields: Optional[Union[str, List[str]]] = None,
         search_value: Optional[str] = None,
-        allow_substring: bool = True, 
-
+        allow_substring: bool = True,
     ) -> list:
         """_summary_
 
@@ -69,10 +68,14 @@ class ColumnsResult(BaseResult):
         Returns:
             list: _description_
         """
-        result= self.to_dataframe(search_fields=search_fields, search_value=search_value, allow_substring=allow_substring)
-        if (self.description is False):
-            return result['fieldName'].values.tolist()
-        return list(result.to_dict('records'))
+        result = self.to_dataframe(
+            search_fields=search_fields,
+            search_value=search_value,
+            allow_substring=allow_substring,
+        )
+        if self.description is False:
+            return result["fieldName"].values.tolist()
+        return list(result.to_dict("records"))
 
     def to_dataframe(
         self,
@@ -103,14 +106,27 @@ class ColumnsResult(BaseResult):
                 search_fields = [search_fields]
             if allow_substring:
                 for i in search_fields:
-                    value = concat(
-                        [value,
-                        df[df[i].str.contains(search_value, case=False, na=False)]]).drop_duplicates().reset_index(drop=True)
+                    value = (
+                        concat(
+                            [
+                                value,
+                                df[
+                                    df[i].str.contains(
+                                        search_value, case=False, na=False
+                                    )
+                                ],
+                            ]
+                        )
+                        .drop_duplicates()
+                        .reset_index(drop=True)
+                    )
             else:
                 for i in search_fields:
-                    value = concat(
-                        [value,
-                        df[df[i].str.lower() == search_value.lower()]]).drop_duplicates().reset_index(drop=True)                    
+                    value = (
+                        concat([value, df[df[i].str.lower() == search_value.lower()]])
+                        .drop_duplicates()
+                        .reset_index(drop=True)
+                    )
             return value
         if self.format_type == "tsv":
             return self._df

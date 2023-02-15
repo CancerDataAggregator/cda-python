@@ -34,7 +34,7 @@ class StringResult(Result):
     def to_list(
         self,
         search_value: Optional[str] = None,
-        allow_substring: bool = True, 
+        allow_substring: bool = True,
     ) -> list:
         if search_value is not None:
             values: list["StringResult"] = [
@@ -55,7 +55,7 @@ class StringResult(Result):
                 )
             else:
                 return list(
-                     filter(
+                    filter(
                         lambda term: (term.lower() in search_value.lower()),
                         values,
                     )
