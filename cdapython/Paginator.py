@@ -1,6 +1,9 @@
+"""
+This module hold the Paginator class 
+"""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Any, List, TypeVar, Union
 
 from rich.progress import (
     BarColumn,
@@ -17,10 +20,18 @@ if TYPE_CHECKING:
     from pandas import DataFrame
     from rich.progress import TaskID
 
+    from cdapython.results.columns_result import ColumnsResult
     from cdapython.results.result import Result
+    from cdapython.results.string_result import StringResult
+
+T = TypeVar("T")
 
 
 class Paginator:
+    """
+    This class helps the user page thought result objects
+    """
+
     def __init__(
         self,
         result: Result,
@@ -32,7 +43,7 @@ class Paginator:
         format_type: str = "JSON",
         show_bar: bool = False,
     ) -> None:
-        self.result: Result = result
+        self.result: Result | StringResult | ColumnsResult = result
         self.to_df: bool = to_df
         self.to_list: bool = to_list
         self.to_collect_result: bool = to_collect_result
@@ -56,6 +67,11 @@ class Paginator:
             self.progress.update(self.task, advance=self.result.count)
 
     def _return_result(self) -> Union[DataFrame, list, Result]:
+        """_summary_
+        This return a Result object and DataFrame
+        Returns:
+            Union[DataFrame, list, Result]: _description_
+        """
         var_output: str = none_check(self.output)
         if var_output == "full_df":
             return self.result.to_dataframe()
@@ -90,7 +106,7 @@ class Paginator:
             return result_nx
         return None
 
-    async def a_do_next(self) -> Union[list, DataFrame, Result, None]:
+    async def a_do_next(self) -> Union[List[T], DataFrame, Result, None]:
         return self._do_next()
 
     def __iter__(self) -> Paginator:

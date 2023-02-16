@@ -1,5 +1,5 @@
 import re
-from typing import Any, Optional, Union
+from typing import Any, Optional, Tuple, Union
 
 from cda_client.model.query import Query
 from typing_extensions import Literal
@@ -42,6 +42,16 @@ def build_query_copy(q: Query) -> Optional[Query]:
 
 
 def like_converter(query: Query, right_side: Query, left: Query) -> Query:
+    """_summary_
+    This is used to auto covert into a LIKE operator
+    Args:
+        query (Query): _description_
+        right_side (Query): _description_
+        left (Query): _description_
+
+    Returns:
+        Query: _description_
+    """
     returned_node: str
     returned_right: Query
 
@@ -56,6 +66,14 @@ def like_converter(query: Query, right_side: Query, left: Query) -> Query:
 
 
 def is_float(num) -> bool:
+    """_summary_
+    This is a helper function used to check if a number is a float
+    Args:
+        num (_type_): _description_
+
+    Returns:
+        bool: _description_
+    """
     float_regex: re.Pattern[str] = re.compile(r"[-+]?\d*\.\d+")
     if re.match(float_regex, num) is not None:
         return True
@@ -64,6 +82,15 @@ def is_float(num) -> bool:
 
 
 class Decimal_Number(Token):
+    """_summary_
+        This Token is used to evaluate Decimals operations
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     lbp = 0
     regexp = r"[-+]?\d*\.\d+"
 
@@ -74,6 +101,15 @@ class Decimal_Number(Token):
 
 
 class Integer(Token):
+    """_summary_
+    This Token is used to evaluate Integer operations
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     lbp = 0
     regexp = r"[-+]?\d+"
 
@@ -83,14 +119,16 @@ class Integer(Token):
         return query
 
 
-def math_logic_check(right_side: Union[Query, str], left: Union[Query, str]):
+def math_logic_check(
+    right_side: Union[Query, str], left: Union[Query, str]
+) -> Tuple[int, Union[int, float, None]]:
     right_math: Union[int, float, None] = None
     left_math: Union[int, float, None] = None
     if isinstance(right_side, Query):
         if is_float(right_side.value) is True:
             right_math = float(right_side.value)
         else:
-            right_math: int = int(right_side.value)
+            right_math = int(right_side.value)
 
     if isinstance(left, Query):
         left_side = left.value
@@ -112,6 +150,15 @@ def math_logic_check(right_side: Union[Query, str], left: Union[Query, str]):
 
 
 class Addition(Token):
+    """_summary_
+        This Token is used to evaluate Addition operations with the symbol matching this +
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     regexp = r"\+"
     lbp = 15
 
@@ -125,6 +172,16 @@ class Addition(Token):
 
 
 class Subtraction(Token):
+    """_summary_
+    This Token is used to evaluate Subtraction operations with the symbol matching this -
+
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     regexp = r"\-"
     lbp = 15
 
@@ -138,6 +195,16 @@ class Subtraction(Token):
 
 
 class Division(Token):
+    """_summary_
+    This Token is used to evaluate Division operations with the symbol matching this /
+
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     regexp = r"\/"
     lbp = 15
 
@@ -151,10 +218,28 @@ class Division(Token):
 
 
 class Multiplication(Token):
+    """_summary_
+    This Token is used to evaluate Multiplication operations with the symbol matching this *
+    Args:
+            Token (_type_): _description_
+
+        Returns:
+            _type_: _description_
+    """
+
     regexp = r"\*"
     lbp = 15
 
-    def led(self, left, context):
+    def led(self, left, context) -> Query:
+        """_summary_
+        This will parse the left and the right strings next to a multiplication sign *
+        Args:
+            left (_type_): _description_
+            context (_type_): _description_
+
+        Returns:
+            Query: _description_
+        """
         query_value = Query()
         right_side = context.expression(self.lbp)
         right_math, left_math = math_logic_check(right_side, left)
@@ -164,6 +249,15 @@ class Multiplication(Token):
 
 
 class Expression(Token):
+    """_summary_
+    This is Expression Token in the  root token most values will hit this token
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     lbp = 0
 
     def __init__(self, text: str) -> None:
@@ -178,6 +272,15 @@ class Expression(Token):
 
 
 class And(Token):
+    """_summary_
+    This Token is used to evaluate AND operations with the symbol matching this AND
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     lbp = 3  # Precedence
 
     def led(self, left: Query, context: Parser) -> Query:
@@ -198,6 +301,15 @@ class And(Token):
 
 
 class Or(Token):
+    """_summary_
+    This Token is used to evaluate OR operations with the symbol matching this OR
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     lbp = 3  # Precedence
     query = Query()
 
@@ -219,6 +331,15 @@ class Or(Token):
 
 
 class Eq(Token):
+    """_summary_
+    This Token is used to evaluate Equal operations with the symbol matching this =
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     lbp = 10  # Precedence
 
     def led(self, left: Query, context: Parser) -> Query:
@@ -237,6 +358,15 @@ class Eq(Token):
 
 
 class NotEq(Token):
+    """_summary_
+    This Token is used to evaluate Not Equal operations with the symbols matching this !=,  <>
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     lbp = 5  # Precedence
 
     def led(self, left: Query, context: Parser) -> Query:

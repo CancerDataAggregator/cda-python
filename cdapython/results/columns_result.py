@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from pandas import DataFrame, Index, json_normalize, merge
 from typing_extensions import Literal, TypedDict
@@ -29,7 +29,7 @@ class ColumnsResult(BaseResult):
         self,
         show_sql: bool,
         show_count: bool,
-        result: List,
+        result: List[Any],
         description: bool = True,
         format_type: str = "json",
     ) -> None:
@@ -53,16 +53,16 @@ class ColumnsResult(BaseResult):
 
     def to_list(
         self, filters: Optional[str] = None, exact: bool = False, endpoint: str = ""
-    ) -> list:
+    ) -> List[Any]:
         if filters is not None and filters != "":
-            values: Optional[List[_Column_Types]] = None
-            filters: str = filters.replace("\n", " ").strip()
+            values: Union[List[_Column_Types], List[Any]] = []
+            filters = filters.replace("\n", " ").strip()
             if self.description is False:
-                values = [
-                    i["fieldName"] for i in self._result if i["fieldName"] is not None
-                ]
+                values.extend(
+                    [i["fieldName"] for i in self._result if i["fieldName"] is not None]
+                )
             if self.description:
-                values = [i for i in self._result if list(i) is not None]
+                values.extend([i for i in self._result if list(i) is not None])
             # values = list(filter(None, values))
             if exact:
                 if self.description is False:
@@ -114,12 +114,12 @@ class ColumnsResult(BaseResult):
 
     def to_dataframe(
         self,
-        record_path: Optional[Union[str, list]] = None,
-        meta: Optional[Union[str, List[Union[str, List[str]]]]] = None,
-        meta_prefix: Optional[str] = None,
-        max_level: Optional[int] = None,
-        search_fields: Optional[Union[_Column_str, List[_Column_str]]] = None,
-        search_value: Optional[str] = None,
+        record_path: Union[Union[str, List[Any]], None] = None,
+        meta: Union[str, List[Union[str, List[str]]], None] = None,
+        meta_prefix: Union[str, None] = None,
+        max_level: Union[int, None] = None,
+        search_fields: Union[List[str], str, None] = None,
+        search_value: str = "",
     ) -> DataFrame:
         """[summary]
         Creates a pandas DataFrame for the Results
@@ -132,16 +132,16 @@ class ColumnsResult(BaseResult):
 
         if search_fields is not None:
             column_names = ["fieldName", "endpoint", "description", "type", "mode"]
-            search_fields = search_fields
-            search_value = search_value
-            df = self._data_table
+            data_frame = self._data_table
             value = DataFrame(columns=column_names, index=Index([], dtype="int"))
             if isinstance(search_fields, str):
                 search_fields = [search_fields]
             for i in search_fields:
                 value = merge(
                     value,
-                    df[df[i].str.contains(search_value, case=False, na=False)],
+                    data_frame[
+                        data_frame[i].str.contains(search_value, case=False, na=False)
+                    ],
                     how="right",
                     right_on=column_names,
                     left_on=column_names,
@@ -151,7 +151,7 @@ class ColumnsResult(BaseResult):
             return self._df
 
         if self.description is False:
-            data_table: dict[str, list[Any]] = {
+            data_table: Dict[str, List[Any]] = {
                 "fieldName": [i["fieldName"] for i in self._result]
             }
             return DataFrame(data_table)

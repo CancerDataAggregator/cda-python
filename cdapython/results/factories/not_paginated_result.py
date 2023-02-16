@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-from typing import Union
+from typing import TYPE_CHECKING, Union
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
 
 from cdapython.results.result import Result
+
+if TYPE_CHECKING:
+    from cdapython.Paginator import Paginator
 
 MESSAGE_NOT_ALLOW = "Pagination Not Allow with this method"
 
@@ -15,8 +18,8 @@ class NotPaginatedResult(Result):
         self,
         api_response: QueryResponseData,
         query_id: str,
-        offset: Union[int, None],
-        limit: Union[int, None],
+        offset: int,
+        limit: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -41,7 +44,7 @@ class NotPaginatedResult(Result):
         to_collect_result: bool = False,
         page_size: int = None,
         show_bar: bool = False,
-    ):
+    ) -> Paginator:
         """_summary_
         This Object has already been paginated
         Args:
@@ -65,7 +68,7 @@ class NotPaginatedResult(Result):
         output: str = "",
         page_size: Union[int, None] = None,
         show_bar: bool = True,
-    ):
+    ) -> Result:
         """_summary_
         This Object has already been paginated
         Args:

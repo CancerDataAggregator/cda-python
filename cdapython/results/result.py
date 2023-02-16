@@ -4,28 +4,31 @@ from the CDA service it adds user functionality.
 like creating dataframe and manipulating data for ease-of-use such
 as paginating automatically for the user through their result objects.
 """
+
 from __future__ import annotations
 
 from collections import ChainMap
 from io import StringIO
 from multiprocessing.pool import ApplyResult
 from time import sleep
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, TypeVar, Union, cast
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
 from pandas import DataFrame, read_csv
-from typing_extensions import Literal
+from typing_extensions import Literal, Self
 
 from cdapython.Paginator import Paginator
 from cdapython.results import COLLECT_RESULT
 from cdapython.results.base import BaseResult
-from cdapython.results.factories.collect_result import CollectResult
 from cdapython.results.factories.result_factory import ResultFactory
 
 if TYPE_CHECKING:
+    from cdapython.results import CollectResult
     from cdapython.results.columns_result import ColumnsResult
     from cdapython.results.string_result import StringResult
+
+_T = TypeVar("_T")
 
 
 class Result(BaseResult):
@@ -173,7 +176,7 @@ class Result(BaseResult):
         output: str = "",
         page_size: int = 0,
         show_bar: bool = True,
-    ) -> CollectResult:
+    ) -> "CollectResult":
         """
         get_all is a method that will loop for you
 
@@ -199,8 +202,8 @@ class Result(BaseResult):
             show_bar=show_bar,
         )
         # add this to cast to a subclass of CollectResult
-        collect_result: CollectResult = cast(
-            CollectResult, ResultFactory.create_entity(COLLECT_RESULT, self)
+        collect_result: "CollectResult" = cast(
+            "CollectResult", ResultFactory.create_entity(COLLECT_RESULT, self)
         )
 
         for index, i in enumerate(iterator):
@@ -264,7 +267,6 @@ class Result(BaseResult):
             _offset: int = self._offset + self._limit
             _limit: int = limit or self._limit
             return self._get_result(_offset, _limit, async_req, pre_stream)
-        return None
 
     def prev_page(
         self,
@@ -283,12 +285,11 @@ class Result(BaseResult):
             offset = max(0, offset)
             limit = limit or self._limit
             return self._get_result(offset, limit, async_req, pre_stream)
-        return None
 
     def _get_result(
         self,
-        _offset: Optional[int],
-        _limit: Optional[int],
+        _offset: int,
+        _limit: int,
         async_req: bool = False,
         pre_stream: bool = True,
     ) -> Union[Result, StringResult, ColumnsResult, None]:
@@ -305,7 +306,7 @@ class Result(BaseResult):
 
 
 def get_query_result(
-    clz: Type,
+    clz,
     api_instance: QueryApi,
     query_id: str,
     offset: Optional[int],

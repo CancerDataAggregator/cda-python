@@ -51,7 +51,7 @@ setup(
         "rich>=13.2.0",
         "itables == 1.1.2",
         "matplotlib>=3.5.1",
-        "typing-extensions==4.2.0",
+        "typing-extensions==4.4",
         "pandas==1.3.5",
         "ipywidgets>=7.7.0",
         "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git",
@@ -59,4 +59,7 @@ setup(
     description="User friendly Python library to access CDA service.",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    entry_points={
+        "console_scripts": ["cdapython_Q = cdapython.__main__:main"],
+    },
 )

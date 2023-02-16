@@ -13,6 +13,12 @@ class AbstractFactory:
 
 
 class ResultFactory:
+    """
+    The ResultFactory class is made to create objects
+    Returns:
+        _type_: _description_
+    """
+
     factories: Dict[str, AbstractFactory] = {}
 
     @staticmethod
@@ -20,5 +26,5 @@ class ResultFactory:
         ResultFactory.factories[id] = result_factory
 
     @staticmethod
-    def create_entity(id: str, result_object) -> Result:
+    def create_entity(id: str, result_object: Any) -> Result:
         return ResultFactory.factories[id].create(result_object)

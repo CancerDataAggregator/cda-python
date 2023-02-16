@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Union
+from typing import TYPE_CHECKING, Any, Generic, List, Union
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
@@ -14,12 +14,18 @@ if TYPE_CHECKING:
 
 
 class CollectResult(NotPaginatedResult):
+    """_summary_
+    This is made for Collecti
+    Args:
+        NotPaginatedResult (_type_): _description_
+    """
+
     def __init__(
         self,
         api_response: QueryResponseData,
         query_id: str,
-        offset: Union[int, None],
-        limit: Union[int, None],
+        offset: int,
+        limit: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -35,24 +41,50 @@ class CollectResult(NotPaginatedResult):
             api_instance=api_instance,
             show_sql=show_sql,
             show_count=show_count,
-            format_type="json",
+            format_type=format_type,
         )
 
     def extend_result(self, result: Result) -> None:
+        """_summary_
+        This will method will
+        Args:
+            result (Result): _description_
+        """
         if none_check(self._result):
             self._result.extend(result.to_list())
 
+    def get_all(
+        self,
+        output: str = "",
+        page_size: Union[None, int] = None,
+        show_bar: bool = True,
+    ) -> Result:
+        return super().get_all(output, page_size, show_bar)
+
+    def paginator(
+        self,
+        output: str = "",
+        to_df: bool = False,
+        to_list: bool = False,
+        to_collect_result: bool = False,
+        page_size: int = None,
+        show_bar: bool = False,
+    ):
+        return super().paginator(
+            output, to_df, to_list, to_collect_result, page_size, show_bar
+        )
+
     class Factory(AbstractFactory):
         @staticmethod
-        def create(result_object: Result) -> CollectResult:
+        def create(q_object: Result) -> CollectResult:
             return CollectResult(
-                api_response=result_object._api_response,
-                query_id=result_object._query_id,
-                offset=result_object._offset,
-                limit=result_object._limit,
-                api_instance=result_object._api_instance,
-                show_sql=result_object.show_sql,
-                show_count=result_object.show_count,
+                api_response=q_object._api_response,
+                query_id=q_object._query_id,
+                offset=q_object._offset,
+                limit=q_object._limit,
+                api_instance=q_object._api_instance,
+                show_sql=q_object.show_sql,
+                show_count=q_object.show_count,
                 format_type="json",
-                result=result_object._result,
+                result=q_object._result,
             )

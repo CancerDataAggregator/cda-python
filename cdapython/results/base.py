@@ -57,12 +57,12 @@ class BaseResult:
 
     def to_dataframe(
         self,
-        record_path: Union[str, list, None] = None,
+        record_path: Union[str, List[Any], None] = None,
         meta: Union[str, List[Union[str, List[str]]], None] = None,
         meta_prefix: Union[str, None] = None,
         max_level: Union[int, None] = None,
         search_fields: Union[List[str], str, None] = None,
-        search_value: Union[str, None] = None,
+        search_value: str = "",
     ) -> DataFrame:
         """[summary]
         Creates a pandas DataFrame for the Results
@@ -214,7 +214,7 @@ class BaseResult:
 
     def __getitem__(
         self, idx: Union[int, slice]
-    ) -> Union[Series, DataFrame, Any, list]:
+    ) -> Union[Series, DataFrame, Any, List[Any]]:
         """
         This access values Result as a list
         Args:
