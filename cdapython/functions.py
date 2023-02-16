@@ -17,7 +17,6 @@ def quoted(quoted_val: Union[str, Query, None]) -> Query:
 def unquoted(val: Union[str, Query, None]) -> Query:
     return Query(node_type="unquoted", value=val)
 
-
 @overload
 def infer_quote(val: QueryStr) -> QueryStr:
     """_summary_
@@ -30,7 +29,6 @@ def infer_quote(val: QueryStr) -> QueryStr:
     """
     pass
 
-
 @overload
 def infer_quote(val: Query) -> Query:
     """_summary_
@@ -42,7 +40,6 @@ def infer_quote(val: Query) -> Query:
         Query: _description_
     """
     pass
-
 
 @overload
 def infer_quote(val: str) -> str:
@@ -104,7 +101,8 @@ def query_type_conversion(
         tmp_str = "NOT " if _op in ("!=", "<>") else ""
         print((f"{tmp_str}LIKE", tmp))
         return (f"{tmp_str}LIKE", tmp)
-    print(_r.find("LIKE") != -1, _r)
+        
+    print(_r.find("LIKE") != -1,_r)
     if _r.find("LIKE") != -1:
         tmp: Query = Query()
         tmp.node_type = "quoted"
