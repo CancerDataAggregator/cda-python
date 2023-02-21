@@ -1,13 +1,8 @@
-import logging
 import time
 
-from invoke import Exit, task
-from rich import print, spinner
-from watchdog.events import (
-    FileModifiedEvent,
-    FileSystemEventHandler,
-    LoggingEventHandler,
-)
+from invoke import task
+from rich import print
+from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
 
@@ -20,7 +15,6 @@ class Handler(FileSystemEventHandler):
         # if event.is_directory:
         #     return None
         if event.src_path.find("__pycache__") == -1:
-
             self.event_type = event.event_type
             self.src_path = event.src_path
             print(
