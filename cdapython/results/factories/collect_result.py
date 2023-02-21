@@ -66,13 +66,10 @@ class CollectResult(NotPaginatedResult):
         output: str = "",
         to_df: bool = False,
         to_list: bool = False,
-        to_collect_result: bool = False,
         page_size: int = None,
         show_bar: bool = False,
     ):
-        return super().paginator(
-            output, to_df, to_list, to_collect_result, page_size, show_bar
-        )
+        return super().paginator(output, to_df, to_list, page_size, show_bar)
 
     class Factory(AbstractFactory):
         @staticmethod

@@ -17,12 +17,13 @@ class Measure:
 
     def __init__(self) -> None:
         self.kwargs: Dict[str, Any] = {}
+        self.result: Union[Any, None]
 
-    def __call__(self, func: F) -> FunctionAny:
+    def __call__(self, func: F) -> FunctionAny[F]:
         self.result = None
 
         @wraps(func)
-        def wrapper(*args: Tuple, **kwargs: Dict[str, Any]) -> FunctionAny:
+        def wrapper(*args: Tuple[Any], **kwargs: Dict[str, Any]) -> FunctionAny[F]:
             start_time = int(round(time() * 1000))
             self.kwargs = kwargs
             try:

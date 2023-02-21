@@ -37,7 +37,6 @@ class Paginator:
         result: Result,
         to_df: bool,
         to_list: bool,
-        to_collect_result: bool,
         output: str,
         limit: int,
         format_type: str = "JSON",
@@ -46,7 +45,6 @@ class Paginator:
         self.result: Result | StringResult | ColumnsResult = result
         self.to_df: bool = to_df
         self.to_list: bool = to_list
-        self.to_collect_result: bool = to_collect_result
         self.limit: Union[int, None] = limit if limit else self.result._limit
         self.count: int = self.result.count
         self.stopped: bool = False
@@ -81,8 +79,7 @@ class Paginator:
             return self.result.to_dataframe()
         if self.to_list:
             return self.result.to_list()
-        if self.to_collect_result:
-            return self.result
+
         return self.result
 
     def _do_next(self: Paginator) -> Union[DataFrame, list, Result, None]:

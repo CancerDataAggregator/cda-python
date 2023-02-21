@@ -145,7 +145,6 @@ class Result(BaseResult):
         output: str = "",
         to_df: bool = False,
         to_list: bool = False,
-        to_collect_result: bool = False,
         page_size: int = 0,
         show_bar: bool = False,
     ) -> Paginator:
@@ -164,7 +163,6 @@ class Result(BaseResult):
             self,
             to_df=to_df,
             to_list=to_list,
-            to_collect_result=to_collect_result,
             limit=page_size,
             output=output,
             format_type=self.format_type,
@@ -196,7 +194,6 @@ class Result(BaseResult):
             to_df=False,
             to_list=False,
             limit=page_size,
-            to_collect_result=True,
             output=output,
             format_type=self.format_type,
             show_bar=show_bar,

@@ -41,7 +41,6 @@ class NotPaginatedResult(Result):
         output: str = "",
         to_df: bool = False,
         to_list: bool = False,
-        to_collect_result: bool = False,
         page_size: int = None,
         show_bar: bool = False,
     ) -> Paginator:
@@ -51,7 +50,6 @@ class NotPaginatedResult(Result):
             output (str, optional): _description_. Defaults to "".
             to_df (bool, optional): _description_. Defaults to False.
             to_list (bool, optional): _description_. Defaults to False.
-            to_collect_result (bool, optional): _description_. Defaults to False.
             page_size (int, optional): _description_. Defaults to None.
             show_bar (bool, optional): _description_. Defaults to False.
 
