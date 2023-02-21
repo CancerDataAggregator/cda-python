@@ -43,6 +43,7 @@ platformdirs="2.6.2"
 
 [tool.poetry.group.dev.dependencies]
 invoke = "^2.0.0"
+watchdog = "^2.2.1"
 
 [build-system]
 # Minimum requirements for the build system to execute.

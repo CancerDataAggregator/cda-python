@@ -1,4 +1,61 @@
-from invoke import task
+import logging
+import time
+
+from invoke import Exit, task
+from rich import print, spinner
+from watchdog.events import (
+    FileModifiedEvent,
+    FileSystemEventHandler,
+    LoggingEventHandler,
+)
+from watchdog.observers import Observer
+
+
+class Handler(FileSystemEventHandler):
+    def __init__(self):
+        self.event_type = None
+        self.src_path = None
+
+    def on_any_event(self, event):
+        # if event.is_directory:
+        #     return None
+        if event.src_path.find("__pycache__") == -1:
+
+            self.event_type = event.event_type
+            self.src_path = event.src_path
+            print(
+                f"[{time.asctime()}] noticed: [{event.event_type}] on: [{event.src_path}]"
+            )
+
+
+@task
+def black_w(c):
+    print("[bold yellow] Black is watching files [/bold yellow]")
+    path = "cdapython"
+    file_event_handler = Handler()
+    observer = Observer()
+    observer.schedule(file_event_handler, path, recursive=True)
+    observer.start()
+    try:
+        while True:
+            try:
+                time.sleep(10)
+                if file_event_handler.event_type == "created":
+                    continue
+                if file_event_handler.event_type == "modified":
+                    c.run(f"black {file_event_handler.src_path}")
+            except Exception as e:
+                print(e)
+
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
+
+
+@task
+def venv(c):
+    print("Create venv ")
+    c.run("python3 -m venv venv && source venv/bin/activate")
 
 
 @task
@@ -13,18 +70,21 @@ def formatting(c) -> None:
 
 
 @task
-def mypy(c) -> None:
+def mypy(c, args=None) -> None:
     """
     This will run mypy to check the types in the cdapython
     Args:
         c (_type_): _description_
     """
     print("Checking Types")
-    c.run("mypy cdapython")
+    if args is None:
+        c.run("mypy cdapython")
+    else:
+        c.run(f"mypy {args}")
 
 
 @task
-def tests(c, args) -> None:
+def tests(c, args=None) -> None:
     """
     This will run pytest
     Args:
@@ -38,14 +98,14 @@ def tests(c, args) -> None:
 
 
 @task
-def lint(c, args) -> None:
-    """_summary_
+def lint(c, args=None) -> None:
+    """
     This will run pylint
     Args:
         c (_type_): _description_
         args (_type_): _description_
     """
-    print(args)
+    print(f"linting {args}")
     if args is None:
         c.run("pylint")
     else:
