@@ -237,7 +237,7 @@ class Result(BaseResult):
             _type_: _description_
         """
 
-         return self.prev_page(limit=limit, async_req=async_req, pre_stream=pre_stream)
+        return self.prev_page(limit=limit, async_req=async_req, pre_stream=pre_stream)
 
     def next_page(
         self,
