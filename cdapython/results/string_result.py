@@ -1,6 +1,8 @@
-from multiprocessing.pool import ApplyResult
-from time import sleep
-from typing import Optional
+"""
+This class inheritance from the result class it is made for unique terms function
+in the utility class,just to add a different to to_list
+"""
+from typing import List, Optional
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
@@ -9,12 +11,17 @@ from cdapython.results.result import Result
 
 
 class StringResult(Result):
+    """
+    This class inheritance from the result class it is made for unique terms function
+    in the utility class,just to add a different to to_list
+    """
+
     def __init__(
         self,
         api_response: QueryResponseData,
         query_id: str,
-        offset: Optional[int],
-        limit: Optional[int],
+        offset: int,
+        limit: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -32,10 +39,18 @@ class StringResult(Result):
         )
 
     def to_list(self, filters: Optional[str] = None, exact: bool = False) -> list:
-        if filters is not None and filters != "":
+        """_summary_
+        this overloads the base Result to_list function
+        Args:
+            filters (Optional[str], optional): _description_. Defaults to None.
+            exact (bool, optional): _description_. Defaults to False.
 
-            filters: str = filters.replace("\n", " ").strip()
-            values: list["StringResult"] = [
+        Returns:
+            list: _description_
+        """
+        if filters is not None and filters != "":
+            filters = filters.replace("\n", " ").strip()
+            values: List["StringResult"] = [
                 list(i.values())[0]
                 for i in self._api_response.result
                 if list(i.values())[0] is not None
@@ -48,15 +63,10 @@ class StringResult(Result):
                         values,
                     )
                 )
-
-            else:
-
-                return list(
-                    filter(
-                        lambda items: (
-                            str(items).lower().find(str(filters.lower())) != -1
-                        ),
-                        values,
-                    )
+            return list(
+                filter(
+                    lambda items: (str(items).lower().find(str(filters.lower())) != -1),
+                    values,
                 )
+            )
         return [list(i.values())[0] for i in self._api_response.result]

@@ -1,5 +1,5 @@
 from cdapython.Q import Q
-from tests.global_settings import host, localhost, table
+from tests.global_settings import host, table
 
 q1 = Q('primary_diagnosis_site = "Kidney"')
 q2 = Q("stage = 'Stage I'")

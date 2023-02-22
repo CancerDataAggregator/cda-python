@@ -40,6 +40,7 @@ typeReport
 .venv
 venv2
 .ven3
+.venv_11
 ven3
 .nox
 .pytype
@@ -48,3 +49,4 @@ venv11
 .coverage.*
 config-dev.ini
 .DS_Store
+.ruff_cache

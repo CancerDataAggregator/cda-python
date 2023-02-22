@@ -2,7 +2,6 @@ from cdapython import Q
 from unittest import mock
 from pandas import DataFrame
 from tests.fake_result import FakeResultData
-from cdapython.results.result import Result
 from cdapython.results.count_result import CountResult
 
 result = [

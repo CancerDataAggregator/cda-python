@@ -1,10 +1,9 @@
-from typing import Any, Tuple, Union, overload
+from typing import Tuple, Union, overload
 
 from cda_client.model.query import Query
 from typing_extensions import Literal
 
 from cdapython.dataclasses_Q.querystr import QueryStr
-from cdapython.utils.ConversionMap import CONVERSIONMAP
 
 
 def col(col_name: Union[str, Query, None]) -> Query:
@@ -19,36 +18,15 @@ def unquoted(val: Union[str, Query, None]) -> Query:
     return Query(node_type="unquoted", value=val)
 
 
-def backwards_comp(value: str) -> str:
-    """_summary_
-        This is a function will look up a string value in a dictionary
-    Args:
-        value (str): _description_
-
-    Returns:
-        str: _description_
-    """
-    if isinstance(value, str) and value in CONVERSIONMAP:
-        tmp_l: str = CONVERSIONMAP[value]
-        print(
-            f"""
-                This Value {value} has been deprecated but will be converted
-                it for you in the background please use the new value {tmp_l}
-                """
-        )
-        return tmp_l
-    return value
-
-
 @overload
-def infer_quote(val: str) -> str:
+def infer_quote(val: QueryStr) -> QueryStr:
     """_summary_
-    this is a overload for a str typechecking
+    this is a overload for a Query for typechecking
     Args:
-        val (str): _description_
+        val (Query): _description_
 
     Returns:
-        str: _description_
+        Query: _description_
     """
     pass
 
@@ -67,14 +45,14 @@ def infer_quote(val: Query) -> Query:
 
 
 @overload
-def infer_quote(val: QueryStr) -> QueryStr:
+def infer_quote(val: str) -> str:
     """_summary_
-    this is a overload for a Query for typechecking
+    this is a overload for a str typechecking
     Args:
-        val (Query): _description_
+        val (str): _description_
 
     Returns:
-        Query: _description_
+        str: _description_
     """
     pass
 
@@ -102,9 +80,12 @@ def infer_quote(val: Union[str, Query, QueryStr]) -> Union[Query, QueryStr, str]
 
 
 def query_type_conversion(
-    _op: str, _r: Union[str, Query, QueryStr]
+    _op: str, _r: str
 ) -> Union[
-    Tuple[Literal["LIKE"], QueryStr], Tuple[Literal["LIKE"], Query], Tuple[str, str]
+    Tuple[Literal["LIKE"], QueryStr],
+    Tuple[Literal["LIKE"], Query],
+    Tuple[Literal["NOT"], QueryStr],
+    Tuple[str, str],
 ]:
     """_summary_
         This is for query type conversion in looking operator
@@ -115,13 +96,16 @@ def query_type_conversion(
     Returns:
         (tuple[Literal['LIKE'], Query] | tuple[str, str])
     """
-    if _r.find("%") != -1:
+    print("%" in _r)
+    if "%" in _r:
         tmp: Query = Query()
         tmp.node_type = "quoted"
         tmp.value = _r
-        tmp_str: Literal["NOT ", ""] = "NOT " if _op == "!=" or _op == "<>" else ""
+        tmp_str = "NOT " if _op in ("!=", "<>") else ""
+        print((f"{tmp_str}LIKE", tmp))
         return (f"{tmp_str}LIKE", tmp)
 
+    print(_r.find("LIKE") != -1, _r)
     if _r.find("LIKE") != -1:
         tmp: Query = Query()
         tmp.node_type = "quoted"

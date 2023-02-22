@@ -1,21 +1,18 @@
 from __future__ import annotations
 
-import json
 import logging
 from multiprocessing.pool import ApplyResult
 from typing import TYPE_CHECKING, Optional, Union
 
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import ApiClient
-from cda_client.configuration import Configuration
 from cda_client.exceptions import ApiException, ServiceException
-from pandas import DataFrame, json_normalize
 from rich import print
 from urllib3.exceptions import InsecureRequestWarning
 
 from cdapython.constant_variables import Constants
 from cdapython.decorators.cache import lru_cache_timed
-from cdapython.functions import backwards_comp
+from cdapython.exceptions.custom_exception import HTTP_ERROR_API, HTTP_ERROR_SERVICE
 from cdapython.Qparser import parser
 from cdapython.results.columns_result import ColumnsResult
 from cdapython.results.result import get_query_result
@@ -28,7 +25,7 @@ logging.captureWarnings(InsecureRequestWarning)
 # This is added for Type Checking class to remove a circular import)
 if TYPE_CHECKING:
     from cdapython.Q import Q
-    from cdapython.results.string_result import StringResult
+    from cdapython.results.result import Result
 
 # Creating constant
 if isinstance(Constants.default_table, str) and Constants.default_table is not None:
@@ -43,20 +40,6 @@ if (
 
 if isinstance(Constants.CDA_API_URL, str):
     URL_TABLE: str = Constants.CDA_API_URL
-
-
-def http_error_logger(http_error: ServiceException) -> None:
-    (
-        msg,
-        status_code,
-        _,
-    ) = json.loads(http_error.body).values()
-    print(
-        f"""
-            Http Status: {status_code}
-            Error Message: {msg}
-            """
-    )
 
 
 def query(text: str) -> "Q":
@@ -81,7 +64,7 @@ def unique_terms(
     show_sql: bool = False,
     show_counts: bool = False,
     verbose: bool = True,
-) -> Optional["StringResult"]:
+) -> Union[Result, StringResult, ColumnsResult, None]:
     """[summary]
 
     Args:
@@ -107,7 +90,7 @@ def unique_terms(
 
     if async_req is None:
         async_req = False
-    col_name = backwards_comp(col_name)
+    col_name = col_name
 
     cda_client_obj: ApiClient = ApiClient(
         configuration=CdaConfiguration(host=host, verify=verify)
@@ -142,12 +125,15 @@ def unique_terms(
                 return None
 
             return query_result
+
     except ServiceException as http_error:
         if verbose:
-            http_error_logger(http_error)
+            print(HTTP_ERROR_SERVICE(http_error=http_error))
+
     except ApiException as http_error:
         if verbose:
-            http_error_logger(http_error)
+            print(HTTP_ERROR_API(http_error=http_error))
+
     except Exception as e:
         if verbose:
             print(e)
@@ -218,7 +204,7 @@ def columns(
                     result=api_response,
                     description=description,
                 )
-            result_value: ColumnsResult = query_result
+            result_value: Optional[ColumnsResult] = query_result
 
             if query_result is None:
                 result_value = None
@@ -227,7 +213,12 @@ def columns(
             return result_value
     except ServiceException as http_error:
         if verbose:
-            http_error_logger(http_error)
+            print(HTTP_ERROR_SERVICE(http_error=http_error))
+
+    except ApiException as http_error:
+        if verbose:
+            print(HTTP_ERROR_API(http_error=http_error))
+
     except InsecureRequestWarning:
         pass
     except Exception as e:

@@ -1,5 +1,4 @@
-from cdapython import Q, columns
-from tests.global_settings import localhost, table
+from cdapython import Q
 
 
 def test_alex():

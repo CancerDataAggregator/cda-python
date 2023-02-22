@@ -1,9 +1,8 @@
 from cdapython import Q
-from tests.global_settings import localhost, host
+from tests.global_settings import host
 
 
 def test_copying_Q():
-
     q1 = Q('ResearchSubject.primary_disease_type = "Lung%"')
 
     q1.subject.run(host=host)

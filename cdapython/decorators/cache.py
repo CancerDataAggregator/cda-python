@@ -8,7 +8,8 @@ from typing import Any, Callable, Dict
 
 def lru_cache_timed(seconds: int = 10, maxsize: int = 128) -> Callable:
     """
-    lru_cache_timed This function is made to cache the values for the defaults to 10 seconds
+    lru_cache_timed This function is made to cache
+    the values for the defaults to 10 seconds
 
     Args:
         seconds (int): _description_ Defaults to 10

@@ -1,5 +1,5 @@
-from cdapython import Q, columns, unique_terms
-from tests.global_settings import integration_host, integration_table, localhost
+from cdapython import Q
+from tests.global_settings import integration_table, localhost
 
 
 # def test_set_new_host():
