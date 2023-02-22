@@ -219,6 +219,26 @@ webencodings = "*"
 css = ["tinycss2 (>=1.1.0,<1.2)"]
 
 [[package]]
+name = "cda-client"
+version = "12.12.2022"
+description = "CDA API"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = []
+develop = false
+
+[package.dependencies]
+python-dateutil = "*"
+urllib3 = ">=1.25.3"
+
+[package.source]
+type = "git"
+url = "https://github.com/CancerDataAggregator/cda-service-python-client.git"
+reference = "3.3.0"
+resolved_reference = "c998904afd6ecd26b652f61bda2886f4a1c19ada"
+
+[[package]]
 name = "certifi"
 version = "2022.12.7"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -3007,4 +3027,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.11"
-content-hash = "3f5b7bb4f3028e8197f5baf0372ddcecd6f6c7f316de59d1117983545d1ba35b"
+content-hash = "b1283c03232ac3df0d56d6982c098ce4e9a87acf4dd27beaf9654df6c34a1019"

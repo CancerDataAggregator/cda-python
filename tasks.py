@@ -24,6 +24,11 @@ class Handler(FileSystemEventHandler):
 
 @task
 def black_w(c):
+    """
+    This will run black in a watching state
+    Args:
+        c (_type_): _description_
+    """
     print("[bold yellow] Black is watching files [/bold yellow]")
     path = "cdapython"
     file_event_handler = Handler()
@@ -48,6 +53,11 @@ def black_w(c):
 
 @task
 def venv(c):
+    """
+    This will create a venv for you
+    Args:
+        c (_type_): _description_
+    """
     print("Create venv ")
     c.run("python3 -m venv venv && source venv/bin/activate")
 
