@@ -96,16 +96,14 @@ def query_type_conversion(
     Returns:
         (tuple[Literal['LIKE'], Query] | tuple[str, str])
     """
-    print("%" in _r)
     if "%" in _r:
         tmp: Query = Query()
         tmp.node_type = "quoted"
         tmp.value = _r
         tmp_str = "NOT " if _op in ("!=", "<>") else ""
-        print((f"{tmp_str}LIKE", tmp))
+
         return (f"{tmp_str}LIKE", tmp)
 
-    print(_r.find("LIKE") != -1, _r)
     if _r.find("LIKE") != -1:
         tmp: Query = Query()
         tmp.node_type = "quoted"

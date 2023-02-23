@@ -1,10 +1,12 @@
-# Dev Setup Guild
-This is a guild to get your setup up to speed with the other cda developers first welcome to the team. 
+# Dev Setup Guide
+Welcome to the CDA Project!
 
+This is a guide to getting your development environment set up to contribute to the project. 
+ 
 ---
 # Download Python 3
 
-look at the python version used in the `pyproject.toml` then download the oldest python version used in the pyproject.toml 
+Check the python version used in pyproject.toml under [tool.poetry.dependencies] and download a version in that range. 
 
 [Download python](https://www.python.org/downloads/)
 
