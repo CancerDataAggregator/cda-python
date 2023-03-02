@@ -29,7 +29,7 @@ class CdaConfiguration(Configuration):
         self.verify = verify
 
         if host is None:
-            host = Constants.CDA_API_URL
+            host = Constants.cda_api_url
 
         self._host = host.strip("/")
         self.verbose = verbose
@@ -90,7 +90,7 @@ class CdaConfiguration(Configuration):
     def _unverified_http(self) -> None:
         print(
             f"""[bold yellow]
-            Unverified HTTPS request is being made to host'{Constants.CDA_API_URL}'.
+            Unverified HTTPS request is being made to host'{Constants.cda_api_url}'.
             Adding certificate verification is strongly advised.
             See: https://urllib3.readthedocs.io/en/1.26.x/advanced-usage.html#ssl-warnings
             [/bold yellow]"""

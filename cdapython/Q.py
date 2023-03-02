@@ -41,6 +41,7 @@ from cdapython.factories import (
 )
 from cdapython.factories.q_factory import QFactory
 from cdapython.results.result import Result, get_query_result
+from cdapython.select_parser.select_parser import sql_function_parser
 from cdapython.simple_parser import simple_parser
 from cdapython.utils.Cda_Configuration import CdaConfiguration
 
@@ -241,7 +242,7 @@ class Q:
             url (str): param to set the global url
         """
         if len(url.strip()) > 0:
-            Constants.CDA_API_URL = url
+            Constants.cda_api_url = url
         else:
             print("Please enter a url")
 
@@ -252,7 +253,7 @@ class Q:
         Returns:
             str: returns a str of the current url
         """
-        return Constants.CDA_API_URL
+        return Constants.cda_api_url
 
     @staticmethod
     def set_default_project_dataset(table: str) -> None:
@@ -804,8 +805,8 @@ class Q:
         return self._order_by(fields=fields)
 
     def _order_by(self, fields: str) -> Q:
-        """[summary]
-        This private method is used to Add DESC and ASC Ordering this will build a Query node
+        """
+        Private method will add DESC and ASC ordering,to build a Query node.
         Args:
             fields (str): [takes in a list of order by values]
 
@@ -843,14 +844,19 @@ class Q:
         Returns:
             [Q]: [returns a Q object]
         """
-
-        # This lambda will strip a comma and rejoin the string
-        mod_fields: str = ",".join(
-            map(lambda fields: fields.strip(","), fields.split())
-        ).replace(":", " AS ")
+        select_functions_parsed = sql_function_parser(fields)
         tmp: Query = Query()
-        tmp.node_type = "SELECTVALUES"
-        tmp.value = mod_fields
+        tmp.node_type = "SELECT"
+        tmp.l = select_functions_parsed
+        tmp.r = self.query
+
+        # # This lambda will strip a comma and rejoin the string
+        # mod_fields: str = ",".join(
+        #     map(lambda fields: fields.strip(","), fields.split())
+        # ).replace(":", " AS ")
+        # tmp: Query = Query()
+        # tmp.node_type = "SELECTVALUES"
+        # tmp.value = mod_fields
         return self.__class__(tmp, "SELECT", self.query)
 
     def __limit(self, number: int) -> Query:

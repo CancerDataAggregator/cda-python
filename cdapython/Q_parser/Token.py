@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, NoReturn, Union
+from typing import TYPE_CHECKING, NoReturn, TypeVar, Union
 
 from .Parser_Exception import InvalidTokenError
 
 if TYPE_CHECKING:
     from re import Pattern
+
+
+T = TypeVar("T")
 
 
 class Token:
@@ -38,7 +41,7 @@ class Token:
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: {self.text!r}>"
 
-    def nud(self, context):
+    def nud(self, context) -> T:
         """Null denotation.
 
         Describes what happens to this token when located at the beginning of
@@ -56,7 +59,7 @@ class Token:
             % (self, context.current_pos)
         )
 
-    def led(self, left, context) -> NoReturn:
+    def led(self, left, context) -> T:
         """Left denotation.
 
         Describe what happens to this token when appearing inside a construct

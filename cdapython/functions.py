@@ -86,6 +86,8 @@ def query_type_conversion(
     Tuple[Literal["LIKE"], Query],
     Tuple[Literal["NOT"], QueryStr],
     Tuple[str, str],
+    str,
+    Query,
 ]:
     """_summary_
         This is for query type conversion in looking operator
@@ -101,7 +103,6 @@ def query_type_conversion(
         tmp.node_type = "quoted"
         tmp.value = _r
         tmp_str = "NOT " if _op in ("!=", "<>") else ""
-
         return (f"{tmp_str}LIKE", tmp)
 
     if _r.find("LIKE") != -1:

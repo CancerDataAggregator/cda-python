@@ -87,5 +87,7 @@ class Parser:
         """Parse the flow of tokens, and return their evaluation."""
         expr = self.expression()
         if not isinstance(self.current_token, EndToken):
-            raise InvalidTokenError("Unconsumed trailing tokens.")
+            raise InvalidTokenError(
+                f"Unconsumed trailing tokens. ERROR With {self.current_token}"
+            )
         return expr

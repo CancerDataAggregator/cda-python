@@ -1,3 +1,6 @@
+"""
+This module is made for utility functions in Q 
+"""
 from __future__ import annotations
 
 import logging
@@ -37,9 +40,7 @@ if (
 ):
     DEFAULT_TABLE_FILE: Optional[str] = Constants.default_file_table.split(".")[1]
 
-
-if isinstance(Constants.CDA_API_URL, str):
-    URL_TABLE: str = Constants.CDA_API_URL
+    URL_TABLE: str = Constants.cda_api_url
 
 
 def query(text: str) -> "Q":
@@ -83,7 +84,7 @@ def unique_terms(
     if version is None:
         version = Constants.table_version
     if host is None:
-        host = Constants.CDA_API_URL
+        host = Constants.cda_api_url
 
     if table is None:
         table = Constants.default_table
@@ -168,10 +169,10 @@ def columns(
 
     # Execute query
     if host is None:
-        host = Constants.CDA_API_URL
+        host = Constants.cda_api_url
     if version is None:
         version = Constants.table_version
-    # TODO REMOVE Table not used in java call
+
     if table is None:
         table = Constants.default_table
 
@@ -225,3 +226,19 @@ def columns(
         if verbose:
             print(e)
     return None
+
+
+def get_drs_id(dri_id: str) -> str:
+    """
+    This method parse out a dri id
+    Args:
+        dri_id (str): dri_id
+    Raises:
+        Exception: _description_
+
+    Returns:
+        str: _description_
+    """
+    if dri_id.find("drs://") == -1:
+        raise Exception("need drs_uri")
+    return dri_id.replace("drs://", "")

@@ -684,6 +684,36 @@ class Offset(Token):
         return query
 
 
+class REPLACE(Token):
+    lbp = 19
+
+    def nud(self, context) -> Query:
+        query = Query()
+        # Fetch the expression to the right, stopping at the next boundary
+        # of same precedence
+        right_side: Query = context.expression(self.lbp)
+        query.node_type = "REPLACE"
+        query.l = col(
+            ""
+        )  # if you're a REPLACE is at the beginning of Q parser, there would be no left
+        query.r = right_side  # this Query values
+        return query
+
+
+class AS(Token):
+    lbp = 10
+
+    def led(self, left: Query, context) -> Query:
+        query = Query()
+        # Fetch the expression to the right, stopping at the next boundary
+        # of same precedence
+        right_side: Query = context.expression(self.lbp)
+        query.node_type = "AS"
+        query.l = left
+        query.r = infer_quote(right_side.value.strip())
+        return query
+
+
 class end_token:
     lbp = 0
 
@@ -692,15 +722,16 @@ lexer = Lexer(with_parens=False)
 lexer.register_tokens(
     Integer, Decimal_Number, Addition, Multiplication, Division, Subtraction
 )
+lexer.register_token(LeftParen, re.compile(r"\("))
+lexer.register_token(RightParen, re.compile(r"\)"))
 lexer.register_token(
     Expression,
     re.compile(
-        r"([-]?[\d]+)|(\"[\w\s]+\")|(?!\*)(?!\+)(?!\/)(?![+-]?([0-9]*[.])?[0-9]+)(\b(?!(\bAND\b))(?!(\bOR\b))(?!(\bNOT\b))(?!(\bLIMIT\b))(?!(\bOFFSET\b))(?!(\bFROM\b))(?!(\bIN\b))(?!(\bLIKE\b))(?!(\bIS\b))[a-zA-Z_.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)\d+]+\b)"
+        r"([-]?[\d]+)|(\"[\w\s]+\")|(?!\*)(?!\+)(?!\/)(?![+-]?([0-9]*[.])?[0-9]+)(\b(?!(\bAND\b))(?!(\bOR\b))(?!(\bNOT\b))(?!(\bLIMIT\b))(?!(\bOFFSET\b))(?!(\bFROM\b))(?!(\bIN\b))(?!(\bLIKE\b))(?!(\bIS\b))(?!(\bAS\b))[a-zA-Z_.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)\d+]+\b)"
     ),
 )
 
-lexer.register_token(LeftParen, re.compile(r"\("))
-lexer.register_token(RightParen, re.compile(r"\)"))
+
 lexer.register_token(DoubleQuotes, re.compile(r'(".*?")'))
 lexer.register_token(SingleQuotes, re.compile(r"('.*?')"))
 lexer.register_token(ArrayType, re.compile(r"(\[.*?\])"))
@@ -724,6 +755,8 @@ lexer.register_token(IS_NOT, re.compile(r"((IS)\s+(NOT))"))
 lexer.register_token(NOT_IN, re.compile(r"((NOT)\s+(IN))"))
 lexer.register_token(NOT_LIKE, re.compile(r"((NOT)\s+(LIKE))"))
 lexer.register_token(IS, re.compile(r"(IS)"))
+# lexer.register_token(FUNCTION, "FUNCTION")
+lexer.register_token(AS, "AS")
 
 
 def simple_parser(text: str) -> "Query":

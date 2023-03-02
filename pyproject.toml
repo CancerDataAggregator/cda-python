@@ -25,6 +25,7 @@ fastjsonschema = "2.16.2"
 jupyter-core = "4.12"
 pyzmq = "25"
 cda-client = {git = "https://github.com/CancerDataAggregator/cda-service-python-client.git", rev = "3.3.0"}
+lark = "^1.1.5"
 
 
 

@@ -1,5 +1,5 @@
 import re
-from typing import Any, Union
+from typing import Any, List, Tuple, Union
 
 from .Parser import Parser
 from .Parser_Exception import LexerError
@@ -8,7 +8,7 @@ from .topdown import EndToken, LeftParen, RightParen, Token
 
 class TokenRegistry:
     def __init__(self):
-        self._tokens: list[tuple[Token, re.Pattern[Any]]] = []
+        self._tokens: List[Tuple[Token, re.Pattern[Any]]] = []
 
     def register(self, token: Token, regexp: re.Pattern):
         self._tokens.append((token, re.compile(regexp)))
