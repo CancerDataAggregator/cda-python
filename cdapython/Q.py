@@ -40,9 +40,10 @@ from cdapython.factories import (
     TREATMENT,
 )
 from cdapython.factories.q_factory import QFactory
+from cdapython.parsers.select_parser import sql_function_parser
+from cdapython.parsers.simple_parser import simple_parser
+from cdapython.parsers.where_parser import where_parser
 from cdapython.results.result import Result, get_query_result
-from cdapython.select_parser.select_parser import sql_function_parser
-from cdapython.simple_parser import simple_parser
 from cdapython.utils.Cda_Configuration import CdaConfiguration
 
 if TYPE_CHECKING:
@@ -109,7 +110,7 @@ class Q:
     Q lang is Language used to send query to the cda service
     """
 
-    def __init__(self, *args: Union[str, Query]) -> None:
+    def __init__(self, *args: Union[str, Query], lark: Optional[bool] = False) -> None:
         """
 
         Args:
@@ -125,9 +126,14 @@ class Q:
             if isinstance(args[0], Query):
                 self.query = args[0]
             else:
-                query_parsed: Query = simple_parser(args[0].strip().replace("\n", " "))
-                self.query = query_parsed
-
+                if lark == False:
+                    query_parsed: Query = simple_parser(
+                        args[0].strip().replace("\n", " ")
+                    )
+                    self.query = query_parsed
+                else:
+                    query_parsed: Query = where_parser(args[0])
+                    self.query = query_parsed
         elif len(args) != 3:
             raise RuntimeError(
                 "Require one or three arguments. Please see documentation."
@@ -845,19 +851,13 @@ class Q:
             [Q]: [returns a Q object]
         """
         select_functions_parsed = sql_function_parser(fields)
-        tmp: Query = Query()
-        tmp.node_type = "SELECT"
-        tmp.l = select_functions_parsed
-        tmp.r = self.query
-
         # # This lambda will strip a comma and rejoin the string
         # mod_fields: str = ",".join(
         #     map(lambda fields: fields.strip(","), fields.split())
         # ).replace(":", " AS ")
         # tmp: Query = Query()
         # tmp.node_type = "SELECTVALUES"
-        # tmp.value = mod_fields
-        return self.__class__(tmp, "SELECT", self.query)
+        return self.__class__(select_functions_parsed, "SELECT", self.query)
 
     def __limit(self, number: int) -> Query:
         tmp: Query = Query()

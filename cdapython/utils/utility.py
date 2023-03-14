@@ -16,7 +16,6 @@ from urllib3.exceptions import InsecureRequestWarning
 from cdapython.constant_variables import Constants
 from cdapython.decorators.cache import lru_cache_timed
 from cdapython.exceptions.custom_exception import HTTP_ERROR_API, HTTP_ERROR_SERVICE
-from cdapython.Qparser import parser
 from cdapython.results.columns_result import ColumnsResult
 from cdapython.results.result import get_query_result
 from cdapython.results.string_result import StringResult
@@ -41,13 +40,6 @@ if (
     DEFAULT_TABLE_FILE: Optional[str] = Constants.default_file_table.split(".")[1]
 
     URL_TABLE: str = Constants.cda_api_url
-
-
-def query(text: str) -> "Q":
-    """
-    This is a hold over for the older parser this uses the Qparser class
-    """
-    return parser(text)
 
 
 @lru_cache_timed(seconds=10)

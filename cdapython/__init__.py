@@ -57,7 +57,7 @@ from cdapython.factories.subject import (
 )
 from cdapython.factories.treatment import Treatment, TreatmentCount
 from cdapython.Q import Q
-from cdapython.utils.utility import columns, get_drs_id, query, unique_terms
+from cdapython.utils.utility import columns, get_drs_id, unique_terms
 
 __name__: Literal["cdapython"] = "cdapython"
 __version__: str = Constants._VERSION
