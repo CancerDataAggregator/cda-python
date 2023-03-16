@@ -1,11 +1,10 @@
 """
-cdapython is a library used to interact with the machine generated CDA Python Client and offers some syntactic sugar to make it more pleasant to query the CDA.
+cdapython is a library used to interact with the machine generated CDA Python Client and offers some
+syntactic sugar to make it more pleasant to query the CDA.
 """
-from __future__ import print_function
 
-from typing import Any, Dict
+from typing import Any
 
-from rich import print
 from typing_extensions import Literal
 
 from cdapython.constant_variables import Constants
@@ -31,7 +30,6 @@ from cdapython.factories import (
     SUBJECT_FILE_COUNT,
     TREATMENT,
     TREATMENT_COUNT,
-    QFactory,
 )
 from cdapython.factories.count import Count
 from cdapython.factories.diagnosis import Diagnosis, DiagnosisCount

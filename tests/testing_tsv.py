@@ -1,5 +1,5 @@
 from cdapython import Q
-from tests.global_settings import localhost, host
+from tests.global_settings import host
 
 r = (
     Q("File.file_format = 'tsv'")

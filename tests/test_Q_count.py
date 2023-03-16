@@ -1,7 +1,3 @@
-from collections import Counter
-
-import pandas as pd
-
 from cdapython import Q
 from tests.global_settings import host
 

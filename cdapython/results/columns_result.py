@@ -1,36 +1,15 @@
-from typing import Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from pandas import DataFrame, Index, json_normalize, concat
-from typing_extensions import Literal, TypedDict
 
 from cdapython.results.base import BaseResult
-
-
-class _Column_Types(TypedDict):
-    """
-    This is made for typechecking a dict
-    Args:
-        TypedDict (_type_): _description_
-    """
-
-    fieldName: str
-    endpoint: str
-    description: str
-    type: str
-    mode: str
-
-
-_Column_str = Union[
-    Literal["fieldName"], Literal["endpoint"], Literal["description"], Literal["mode"]
-]
-
 
 class ColumnsResult(BaseResult):
     def __init__(
         self,
         show_sql: bool,
         show_count: bool,
-        result: List,
+        result: List[Any],
         description: bool = True,
         format_type: str = "json",
     ) -> None:
@@ -54,19 +33,19 @@ class ColumnsResult(BaseResult):
 
     def to_list(
         self,
-        search_fields: Optional[Union[str, List[str]]] = None,
-        search_value: Optional[str] = None,
+        search_fields: Union[str, List[str], None] = None,
+        search_value: Union[str, None] = None,
         allow_substring: bool = True,
-    ) -> list:
+    ) -> List[Any]:
         """_summary_
 
         Args:
             allow_substring (bool, optional): Whether the seach_value should match if it is only part of a word. Defaults to True.
-            search_fields (Optional[Union[str, List[str]]], optional): _description_. Defaults to None.
+            search_fields (Union[str, List[str], None]): _description_. Defaults to None.
             search_value (Optional[str], optional): _description_. Defaults to None.
 
         Returns:
-            list: _description_
+            List[Any]: _description_
         """
         result = self.to_dataframe(
             search_fields=search_fields,
@@ -79,11 +58,11 @@ class ColumnsResult(BaseResult):
 
     def to_dataframe(
         self,
-        record_path: Optional[Union[str, list]] = None,
-        meta: Optional[Union[str, List[Union[str, List[str]]]]] = None,
-        meta_prefix: Optional[str] = None,
-        max_level: Optional[int] = None,
-        search_fields: Optional[Union[_Column_str, List[_Column_str]]] = None,
+        record_path: Union[Union[str, List[Any]], None] = None,
+        meta: Union[str, List[Union[str, List[str]]], None] = None,
+        meta_prefix: Union[str, None] = None,
+        max_level: Union[int, None] = None,
+        search_fields: Union[List[str], str, None] = None,
         search_value: Optional[str] = None,
         allow_substring: bool = True,
     ) -> DataFrame:
@@ -98,9 +77,7 @@ class ColumnsResult(BaseResult):
 
         if search_fields is not None:
             column_names = ["fieldName", "endpoint", "description", "type", "mode"]
-            search_fields = search_fields
-            search_value = search_value
-            df = self._data_table
+            data_frame = self._data_table
             value = DataFrame(columns=column_names, index=Index([], dtype="int"))
             if isinstance(search_fields, str):
                 search_fields = [search_fields]
@@ -110,8 +87,8 @@ class ColumnsResult(BaseResult):
                         concat(
                             [
                                 value,
-                                df[
-                                    df[i].str.contains(
+                                data_frame[
+                                    data_frame[i].str.contains(
                                         search_value, case=False, na=False
                                     )
                                 ],
@@ -123,7 +100,7 @@ class ColumnsResult(BaseResult):
             else:
                 for i in search_fields:
                     value = (
-                        concat([value, df[df[i].str.lower() == search_value.lower()]])
+                        concat([value, data_frame[data_frame[i].str.lower() == search_value.lower()]])
                         .drop_duplicates()
                         .reset_index(drop=True)
                     )
@@ -132,7 +109,7 @@ class ColumnsResult(BaseResult):
             return self._df
 
         if self.description is False:
-            data_table: dict[str, list[Any]] = {
+            data_table: Dict[str, List[Any]] = {
                 "fieldName": [i["fieldName"] for i in self._result]
             }
             return DataFrame(data_table)

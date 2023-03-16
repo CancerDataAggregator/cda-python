@@ -1,5 +1,4 @@
 from cdapython import Q
-from tests.global_settings import host, table
 
 
 def test_and_op():

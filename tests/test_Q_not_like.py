@@ -1,6 +1,4 @@
-from typing import Any
 from unittest import TestCase
-from cdapython import Q
 from tests.global_settings import host, table
 from cdapython.results.count_result import CountResult
 from unittest.mock import patch

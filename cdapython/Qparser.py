@@ -1,10 +1,9 @@
 import re
 from typing import Union
 
-from tdparser import Lexer, Token
-from tdparser.topdown import Parser
-
 from cdapython.Q import Q
+from cdapython.Q_parser import Lexer, Token
+from cdapython.Q_parser.Parser import Parser
 from cdapython.utils.check_case import check_keyword
 
 symbol_table = {}
@@ -113,7 +112,6 @@ class Doublequotes(Token):
 
 
 class ArrayType(Token):
-
     lbp = 10
 
     def nud(self, context: Parser) -> str:
@@ -232,5 +230,4 @@ lexer.register_token(var, re.compile(r"(Var\s\w+\s*?=(?!=))"))
 
 
 def parser(text: str) -> "Q":
-
     return lexer.parse(text)

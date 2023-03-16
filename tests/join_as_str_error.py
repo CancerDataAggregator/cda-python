@@ -1,8 +1,9 @@
+from global_settings import host, table
+
 from cdapython import Q
-from global_settings import localhost, table, host
 
 d = Q('ResearchSubject.Specimen.specimen_type = "slide"').specimen.run(
-    filters="""
+    include="""
     id:r_id 
     species:things
     sex:gender

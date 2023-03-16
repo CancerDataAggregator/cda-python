@@ -1,4 +1,4 @@
-from cdapython import query, Q
+from cdapython import Q
 from tests.global_settings import host
 from unittest import mock
 from pandas import DataFrame

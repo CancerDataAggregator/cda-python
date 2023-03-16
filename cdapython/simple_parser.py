@@ -1,39 +1,57 @@
 import re
-from typing import Any, Optional, Union
+from typing import Any, Optional, Tuple, Union
 
 from cda_client.model.query import Query
-from tdparser import Lexer, Token
-from tdparser.topdown import Parser
 from typing_extensions import Literal
 
-from cdapython.functions import backwards_comp, col, infer_quote, query_type_conversion
+from cdapython.functions import col, infer_quote, query_type_conversion
+from cdapython.Q_parser import Lexer, Token
+from cdapython.Q_parser.Parser import Parser
 from cdapython.utils.check_case import check_keyword
 
 
 def build_query_copy(q: Query) -> Optional[Query]:
+    """
+    This is for passing by ref instead of value this is a fix for python's copy error
+    Args:
+        q (Query): _description_
+
+    Returns:
+        Optional[Query]: _description_
+    """
     if q is None:
         return None
 
     query_value = Query()
     try:
         query_value.l = build_query_copy(q.l)
-    except:
+    except Exception:
         pass
     try:
         query_value.r = build_query_copy(q.r)
-    except:
+    except Exception:
         pass
 
     query_value.node_type = q.node_type
 
     try:
         query_value.value = q.value
-    except:
+    except Exception:
         pass
     return query_value
 
 
 def like_converter(query: Query, right_side: Query, left: Query) -> Query:
+    """_summary_
+    This is used to auto covert into a LIKE operator
+    Args:
+        query (Query): _description_
+        right_side (Query): _description_
+        left (Query): _description_
+
+    Returns:
+        Query: _description_
+    """
     returned_node: str
     returned_right: Query
 
@@ -42,12 +60,20 @@ def like_converter(query: Query, right_side: Query, left: Query) -> Query:
     )
 
     query.node_type = returned_node
-    query.l = col(backwards_comp(left.value))
+    query.l = col(left.value)
     query.r = infer_quote(returned_right.value.strip())
     return query
 
 
 def is_float(num) -> bool:
+    """_summary_
+    This is a helper function used to check if a number is a float
+    Args:
+        num (_type_): _description_
+
+    Returns:
+        bool: _description_
+    """
     float_regex: re.Pattern[str] = re.compile(r"[-+]?\d*\.\d+")
     if re.match(float_regex, num) is not None:
         return True
@@ -55,7 +81,16 @@ def is_float(num) -> bool:
         return False
 
 
-class Decmimal_Number(Token):
+class Decimal_Number(Token):
+    """_summary_
+        This Token is used to evaluate Decimals operations
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     lbp = 0
     regexp = r"[-+]?\d*\.\d+"
 
@@ -66,6 +101,15 @@ class Decmimal_Number(Token):
 
 
 class Integer(Token):
+    """_summary_
+    This Token is used to evaluate Integer operations
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     lbp = 0
     regexp = r"[-+]?\d+"
 
@@ -75,14 +119,16 @@ class Integer(Token):
         return query
 
 
-def math_logic_check(right_side: Union[Query, str], left: Union[Query, str]):
+def math_logic_check(
+    right_side: Union[Query, str], left: Union[Query, str]
+) -> Tuple[int, Union[int, float, None]]:
     right_math: Union[int, float, None] = None
     left_math: Union[int, float, None] = None
     if isinstance(right_side, Query):
         if is_float(right_side.value) is True:
             right_math = float(right_side.value)
         else:
-            right_math: int = int(right_side.value)
+            right_math = int(right_side.value)
 
     if isinstance(left, Query):
         left_side = left.value
@@ -104,6 +150,15 @@ def math_logic_check(right_side: Union[Query, str], left: Union[Query, str]):
 
 
 class Addition(Token):
+    """_summary_
+        This Token is used to evaluate Addition operations with the symbol matching this +
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     regexp = r"\+"
     lbp = 15
 
@@ -117,6 +172,16 @@ class Addition(Token):
 
 
 class Subtraction(Token):
+    """_summary_
+    This Token is used to evaluate Subtraction operations with the symbol matching this -
+
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     regexp = r"\-"
     lbp = 15
 
@@ -130,6 +195,16 @@ class Subtraction(Token):
 
 
 class Division(Token):
+    """_summary_
+    This Token is used to evaluate Division operations with the symbol matching this /
+
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     regexp = r"\/"
     lbp = 15
 
@@ -143,10 +218,28 @@ class Division(Token):
 
 
 class Multiplication(Token):
+    """_summary_
+    This Token is used to evaluate Multiplication operations with the symbol matching this *
+    Args:
+            Token (_type_): _description_
+
+        Returns:
+            _type_: _description_
+    """
+
     regexp = r"\*"
     lbp = 15
 
-    def led(self, left, context):
+    def led(self, left, context) -> Query:
+        """_summary_
+        This will parse the left and the right strings next to a multiplication sign *
+        Args:
+            left (_type_): _description_
+            context (_type_): _description_
+
+        Returns:
+            Query: _description_
+        """
         query_value = Query()
         right_side = context.expression(self.lbp)
         right_math, left_math = math_logic_check(right_side, left)
@@ -156,6 +249,15 @@ class Multiplication(Token):
 
 
 class Expression(Token):
+    """_summary_
+    This is Expression Token in the  root token most values will hit this token
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     lbp = 0
 
     def __init__(self, text: str) -> None:
@@ -170,6 +272,15 @@ class Expression(Token):
 
 
 class And(Token):
+    """_summary_
+    This Token is used to evaluate AND operations with the symbol matching this AND
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     lbp = 3  # Precedence
 
     def led(self, left: Query, context: Parser) -> Query:
@@ -190,6 +301,15 @@ class And(Token):
 
 
 class Or(Token):
+    """_summary_
+    This Token is used to evaluate OR operations with the symbol matching this OR
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     lbp = 3  # Precedence
     query = Query()
 
@@ -211,6 +331,15 @@ class Or(Token):
 
 
 class Eq(Token):
+    """_summary_
+    This Token is used to evaluate Equal operations with the symbol matching this =
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     lbp = 10  # Precedence
 
     def led(self, left: Query, context: Parser) -> Query:
@@ -223,12 +352,21 @@ class Eq(Token):
         if isinstance(right_side.value, str) and right_side.value.find("%") != -1:
             return like_converter(query=query, right_side=right_side, left=left)
 
-        query.l = col(backwards_comp(left.value))
+        query.l = col(left.value)
         query.r = infer_quote(right_side.value)
         return query
 
 
 class NotEq(Token):
+    """_summary_
+    This Token is used to evaluate Not Equal operations with the symbols matching this !=,  <>
+    Args:
+        Token (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     lbp = 5  # Precedence
 
     def led(self, left: Query, context: Parser) -> Query:
@@ -240,7 +378,7 @@ class NotEq(Token):
         query.node_type = "!="
         if isinstance(right_side.value, str) and right_side.value.find("%") != -1:
             return like_converter(query=query, right_side=right_side, left=left)
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value.strip())
         return query
 
@@ -255,7 +393,7 @@ class GreaterThanEq(Token):
         # of same precedence
         right_side: Query = context.expression(self.lbp)
         query.node_type = ">="
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value.strip())
         return query
 
@@ -270,7 +408,7 @@ class GreaterThan(Token):
         # of same precedence
         right_side: Query = context.expression(self.lbp)
         query.node_type = ">"
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value.strip())
         return query
 
@@ -285,7 +423,7 @@ class LessThanEq(Token):
         # of same precedence
         right_side: Query = context.expression(self.lbp)
         query.node_type = "<="
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value.strip())
         return query
 
@@ -300,7 +438,7 @@ class LessThan(Token):
         # of same precedence
         right_side: Query = context.expression(self.lbp)
         query.node_type = "<"
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value.strip())
 
         return query
@@ -372,7 +510,7 @@ class IN(Token):
         # of same precedence
         right_side: Query = context.expression(self.lbp)
         query.node_type = "IN"
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value.strip())
         return query
 
@@ -391,7 +529,7 @@ class LIKE(Token):
         query.node_type, right_side = query_type_conversion(
             query.node_type, right_side.value
         )
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value.strip())
         return query
 
@@ -419,7 +557,7 @@ class IS(Token):
         right_side: Query = context.expression(self.lbp)
 
         query.node_type = "IS"
-        query.l = col(backwards_comp(left.value))
+        query.l = col(left.value)
         query.r = infer_quote(right_side.value)
 
         return query
@@ -435,7 +573,7 @@ class IS_NOT(Token):
         # of same precedence
         right_side: Query = context.expression(self.lbp)
         query.node_type = "IS NOT"
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value)
         return query
 
@@ -450,7 +588,7 @@ class NOT_IN(Token):
         query = Query()
         right_side: Query = context.expression(self.lbp)
         query.node_type = "NOT IN"
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value)
         return query
 
@@ -465,7 +603,7 @@ class NOT_LIKE(Token):
         query = Query()
         right_side: Query = context.expression(self.lbp)
         query.node_type = "NOT LIKE"
-        query.l = col(backwards_comp(left.value.strip()))
+        query.l = col(left.value.strip())
         query.r = infer_quote(right_side.value)
         return query
 
@@ -504,11 +642,9 @@ class LeftParen(Token):
 
     def nud(self, context: Parser) -> Any:
         # Fetch the next expression
-
         expr = context.expression()
         pre_token = context.current_token
-        # Eat the next token from the flow, and fail if it isn't a right
-        # parenthesis.
+        # Eat the next token from the flow, and fail if it isn't a right parenthesis.
         context.consume(expect_class=self.match)
         if isinstance(pre_token, RightParen) and hasattr(expr, "value"):
             expr.value = f"({expr.value})"
@@ -518,18 +654,48 @@ class LeftParen(Token):
         return "<(>"
 
 
+class Limit(Token):
+    lbp = 3
+
+    def led(self, left: Query, context: Parser) -> Query:
+        """Compute the value of this token when between two expressions."""
+        # Fetch the expression to the right, stopping at the next boundary
+        # of same precedence
+        query = Query()
+        right_side: Query = context.expression(self.lbp)
+        query.node_type = "LIMIT"
+        query.r = left
+        query.value = right_side.value
+        return query
+
+
+class Offset(Token):
+    lbp = 3
+
+    def led(self, left: Query, context: Parser) -> Query:
+        """Compute the value of this token when between two expressions."""
+        # Fetch the expression to the right, stopping at the next boundary
+        # of same precedence
+        query = Query()
+        right_side: Query = context.expression(self.lbp)
+        query.node_type = "OFFSET"
+        query.r = left
+        query.value = right_side.value
+        return query
+
+
 class end_token:
     lbp = 0
 
 
 lexer = Lexer(with_parens=False)
 lexer.register_tokens(
-    Integer, Decmimal_Number, Addition, Multiplication, Division, Subtraction
+    Integer, Decimal_Number, Addition, Multiplication, Division, Subtraction
 )
 lexer.register_token(
     Expression,
     re.compile(
-        r"([-]?[\d]+)|(\"[\w\s]+\")|(?!\*)(?!\+)(?!\/)(?![+-]?([0-9]*[.])?[0-9]+)(\b(?!(\bAND\b))(?!(\bOR\b))(?!(\bNOT\b))(?!(\bFROM\b))(?!(\bIN\b))(?!(\bLIKE\b))(?!(\bIS\b))[a-zA-Z_.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)]+\b)"
+        r"([-]?[\d]+)|(\"[\w\s]+\")|(?!\*)(?!\+)(?!\/)(?![+-]?([0-9]*[.])?[0-9]+)(\b(?!(\bAND\b))(?!(\bOR\b))(?!(\bNOT\b))(?!(\bLIMIT\b))(?!(\bOFFSET\b))(?!(\bFROM\b))(?!(\bIN\b))(?!(\bLIKE\b))(?!(\bIS\b))[a-zA-Z_.\,\*\+\-_\"\'\=\>\<\{\}\[\]\?\\\:@!#$%\^\&\*\(\)\d+]+\b)"
     ),
 )
 
@@ -551,6 +717,8 @@ lexer.register_token(Eq, re.compile(r"(=)"))
 lexer.register_token(IN, re.compile(r"(IN)"))
 lexer.register_token(LIKE, re.compile(r"(LIKE)"))
 lexer.register_token(From, re.compile(r"(FROM)"))
+lexer.register_token(Limit, re.compile(r"(LIMIT)"))
+lexer.register_token(Offset, re.compile(r"OFFSET"))
 lexer.register_token(NOT, re.compile(r"(NOT)"))
 lexer.register_token(IS_NOT, re.compile(r"((IS)\s+(NOT))"))
 lexer.register_token(NOT_IN, re.compile(r"((NOT)\s+(IN))"))

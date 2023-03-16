@@ -1,9 +1,8 @@
-from typing import Any
 from unittest import TestCase
 from unittest.mock import patch
-from cdapython import query
+
 from cdapython.results.result import Result
-from cdapython import Q
+
 
 # from tests.global_settings import host, table
 from tests.fake_result import FakeResultData

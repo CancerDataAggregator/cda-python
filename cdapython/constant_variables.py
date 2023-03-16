@@ -1,5 +1,5 @@
 class Constants:
-    _VERSION: str = "2022.12.21"
+    _VERSION: str = "2023.1.9"
     _DATABASETABLE_VERSION: str = "all_Subjects_v3_1_final"
     _DATABASETABLE: str = "broad-dsde-prod.cda_prod"
     _CDA_API_URL_ENV: str = "https://cda.datacommons.cancer.gov/"

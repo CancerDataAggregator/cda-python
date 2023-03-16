@@ -1,6 +1,8 @@
-from multiprocessing.pool import ApplyResult
-from time import sleep
-from typing import List, Optional, Union
+"""
+This class inheritance from the result class it is made for unique terms function
+in the utility class,just to add a different to to_list
+"""
+from typing import List, Optional, Any
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
@@ -9,12 +11,17 @@ from cdapython.results.result import Result
 
 
 class StringResult(Result):
+    """
+    This class inheritance from the result class it is made for unique terms function
+    in the utility class,just to add a different to to_list
+    """
+
     def __init__(
         self,
         api_response: QueryResponseData,
         query_id: str,
-        offset: Optional[int],
-        limit: Optional[int],
+        offset: int,
+        limit: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -35,7 +42,17 @@ class StringResult(Result):
         self,
         search_value: Optional[str] = None,
         allow_substring: bool = True,
-    ) -> list:
+    ) -> List[Any]:
+        """_summary_
+        this overloads the base Result to_list function
+        Args:
+            allow_substring (bool, optional): Whether the seach_value should match if it is only part of a word. Defaults to True.
+            search_fields (Union[str, List[str], None]): _description_. Defaults to None.
+            search_value (Optional[str], optional): _description_. Defaults to None.
+
+        Returns:
+            List[Any]: _description_
+        """
         if search_value is not None:
             values: list["StringResult"] = [
                 list(i.values())[0]

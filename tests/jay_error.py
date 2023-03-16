@@ -1,5 +1,5 @@
 from cdapython import Q
-from tests.global_settings import host, localhost
+from tests.global_settings import host
 
 q1 = Q('ResearchSubject.identifier.system = "PDC"')
 q2 = Q('ResearchSubject.identifier.system = "GDC"')
