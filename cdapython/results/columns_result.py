@@ -4,6 +4,7 @@ from pandas import DataFrame, Index, json_normalize, concat
 
 from cdapython.results.base import BaseResult
 
+
 class ColumnsResult(BaseResult):
     def __init__(
         self,
@@ -100,7 +101,14 @@ class ColumnsResult(BaseResult):
             else:
                 for i in search_fields:
                     value = (
-                        concat([value, data_frame[data_frame[i].str.lower() == search_value.lower()]])
+                        concat(
+                            [
+                                value,
+                                data_frame[
+                                    data_frame[i].str.lower() == search_value.lower()
+                                ],
+                            ]
+                        )
                         .drop_duplicates()
                         .reset_index(drop=True)
                     )
