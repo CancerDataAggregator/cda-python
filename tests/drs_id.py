@@ -4,7 +4,6 @@ from cdapython import Q
 
 
 def main():
-
     # print(Q("sex = 'male'").to_json())
     all_data = Q(
         "sex = REPLACE(REPLACE(sex,'fe',''), 'male', '' )", lark=True
