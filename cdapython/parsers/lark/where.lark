@@ -1,17 +1,14 @@
 start: q 
 
 
-q: bool_expression
-
-
-
-
+q: bool_expression 
 
 ?expression_math: expression_product
                | expression_math "+" expression_product -> expression_add
                | expression_math "-" expression_product -> expression_sub
-               | "CASE"i (when_then)+ "ELSE"i expression_math "END"i -> case_expression
+               | "CASE"i (when_then)+ "ELSE"i expression_math "END" -> case_expression
                | "COALESCE"i "(" [(expression_math ",")*] expression_math ")" -> coalesce_expression
+               | function [(expression_math ",")*] expression_math ")"
 
 ?expression_product: expression_parens
                   | expression_product "*" expression_parens -> expression_mul
@@ -59,6 +56,7 @@ boolean: "true"i -> true
 
 ?product: NUMBER
 
+alias: name -> alias_string
 timestamp_expression: "NOW"i "(" ")" -> datetime_now
                     | "TODAY"i "(" ")" -> date_today
                     | "TIMESTAMP"i "(" "'" date "'" "," "'" time "'" ")" -> custom_timestamp
@@ -76,11 +74,10 @@ HOURS: /[0-9]{2}/
 MINUTES: /[0-9]{2}/
 SECONDS: /[0-9]{2}/
 
-AGGREGATION.8: ("sum("i | "avg("i | "min("i | "max("i | "count("i "distinct"i | "count("i)
+name: CNAME | WORD
 
-name: CNAME
+function: "replace"i"("
 
-%import common._STRING_ESC_INNER
 %import common.ESCAPED_STRING
 %import common.CNAME
 %import common.DIGIT
@@ -92,4 +89,6 @@ name: CNAME
 %import common.WS
 %import common.NEWLINE
 %ignore WS
+COMMENT: "//" /[^\n]/* | "/*" /(\S|\s)*?/ "*/"
+%ignore COMMENT
 

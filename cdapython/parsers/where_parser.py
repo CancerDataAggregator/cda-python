@@ -1,8 +1,9 @@
 from ast import arg
+from pathlib import Path
 from typing import List, Union
 
 from cda_client.model.query import Query
-from lark import Lark, Token, Tree, v_args
+from lark import Lark, Token, Tree, UnexpectedToken, v_args
 
 from cdapython.parsers.base_parser import Base_Parser
 
@@ -59,10 +60,15 @@ class Parse_Q(Base_Parser):
 
 
 def where_parser(text: str):
-    tree_sql = sql_grammar.parse(text)
-    # print(tree_sql.pretty())
-    return Parse_Q().transform(tree_sql)
+    try:
+        tree_sql = sql_grammar.parse(text)
+        print(tree_sql.pretty())
+        return Parse_Q().transform(tree_sql)
+    except UnexpectedToken as e:
+        if e.token.type == "$END":
+            raise Exception("Unexpected the End Of Script")
+        raise Exception(f"Error in Q statement {e.token.type}")
 
 
-# a = where_parser('sex = "dog" and sex = "m" and thing = "a"         or time="now"')
-# print(a)
+a = where_parser("sex = REPLACE(sex, 'male', '' )")
+print(a)

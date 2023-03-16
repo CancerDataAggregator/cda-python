@@ -1,3 +1,4 @@
+from ast import arg
 from typing import List, Union
 
 from cda_client.model.query import Query
@@ -38,6 +39,32 @@ class Base_Parser(Transformer):
         query.l = args[0]
         query.r = args[1]
         return query
+
+    def expression_math(self, args):
+        expression_math_query: Query = Query()
+        if args[0].node_type == "FUNCTION_NAME":
+            expression_math_query.node_type = "FUNCTION_ARG"
+            expression_math_query.r = args[0]
+
+        return expression_math_query
+
+    def function(self, args):
+        function_query: Query = Query()
+        function_query.node_type = "FUNCTION_NAME"
+        return function_query
+
+    def number(self, args):
+        number_query: Query = Query()
+        number_query.node_type = "quoted"
+        number_query.value = args[0].value
+        return number_query
+
+    def expression_add(self, args):
+        expression_query: Query = Query()
+        expression_query.node_type = "column"
+        expression_query.r = args[0]
+        expression_query.l = args[1]
+        return expression_query
 
     def bool_or(self, args):
         return self._build_Query(args, "OR")

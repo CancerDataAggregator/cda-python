@@ -176,7 +176,12 @@ class Q:
         return self.query.to_dict()
 
     # endregion
-
+    @staticmethod
+    def open_Q_file(file:str) -> Q:
+        path = Path(file)
+        if path.suffix != ".Q":
+            raise Exception("error reading .Q file")
+        return Q(open(path.absolute()).read(),lark=True)
     @classmethod
     def from_file(
         cls,
