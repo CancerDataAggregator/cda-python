@@ -5,7 +5,9 @@ and SQL Like operators queue supports further to the bottom
 """
 from __future__ import annotations
 
+import csv
 import logging
+from copy import copy
 from json import JSONEncoder, dumps
 from multiprocessing.pool import ApplyResult
 from pathlib import Path
@@ -21,7 +23,7 @@ from cda_client.exceptions import ApiException, ServiceException
 from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
 from cda_client.model.query_response_data import QueryResponseData
-from pandas import DataFrame, read_csv, read_fwf
+from pandas import DataFrame, read_csv, read_fwf, to_datetime
 from typing_extensions import Literal
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, NewConnectionError, SSLError
@@ -152,6 +154,36 @@ class Q:
     def __repr__(self) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
 
+    def to_list(
+        self,
+    ):
+        return self.run().to_list()
+
+    def to_dataframe(self):
+        return self.run(verbose=False).to_dataframe()
+
+    def get_all(self, show_progress: bool = False):
+        return self.run(verbose=False).get_all(show_bar=show_progress)
+
+    def to_csv(self, filename: str, show_progress: bool = True):
+        header = []
+        writer = None
+        iterobj: Result = self.run(verbose=False).paginator(show_bar=show_progress)
+        filename_copy = copy(filename)
+        if filename_copy.find(".csv") == -1:
+            filename_copy = f"{filename_copy}.csv"
+        with open(filename_copy, "w") as csv_file:
+
+            for index, chunk in enumerate(iterobj):
+
+                if index == 0:
+
+                    header.extend(chunk[index].keys())
+                    writer = csv.DictWriter(csv_file, fieldnames=header)
+                    writer.writeheader()
+                for i in chunk:
+                    writer.writerow(i)
+
     # region helper methods
     def to_json(
         self, indent: int = 4, write_file: bool = False, file_name: str = "Q_json_dump"
@@ -177,11 +209,12 @@ class Q:
 
     # endregion
     @staticmethod
-    def open_Q_file(file:str) -> Q:
+    def open_Q_file(file: str) -> Q:
         path = Path(file)
         if path.suffix != ".Q":
             raise Exception("error reading .Q file")
-        return Q(open(path.absolute()).read(),lark=True)
+        return Q(open(path.absolute()).read(), lark=True)
+
     @classmethod
     def from_file(
         cls,

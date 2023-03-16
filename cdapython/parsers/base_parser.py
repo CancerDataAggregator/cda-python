@@ -1,4 +1,5 @@
 from ast import arg
+from calendar import c
 from typing import List, Union
 
 from cda_client.model.query import Query
@@ -41,16 +42,29 @@ class Base_Parser(Transformer):
         return query
 
     def expression_math(self, args):
-        expression_math_query: Query = Query()
-        if args[0].node_type == "FUNCTION_NAME":
-            expression_math_query.node_type = "FUNCTION_ARG"
-            expression_math_query.r = args[0]
+        expression_math_query: Query = args[0]
 
+        if expression_math_query.node_type == "FUNCTION_NAME":
+            args_list = args[1:]
+            current_node = expression_math_query
+            for i in args_list:
+                new_query = Query()
+                new_query.node_type = "FUNCTION_ARG"
+                new_query.l = i
+                current_node.r = new_query
+                current_node = new_query
         return expression_math_query
+
+    def count(self, args) -> Query:
+        return self.function("count")
+
+    def replace(self, args) -> Query:
+        return self.function("replace")
 
     def function(self, args):
         function_query: Query = Query()
         function_query.node_type = "FUNCTION_NAME"
+        function_query.value = args
         return function_query
 
     def number(self, args):

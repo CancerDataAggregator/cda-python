@@ -70,5 +70,5 @@ def where_parser(text: str):
         raise Exception(f"Error in Q statement {e.token.type}")
 
 
-a = where_parser("sex = REPLACE(sex, 'male', '' )")
-print(a)
+# a = where_parser("sex = REPLACE(sex, 'male', '' ) AND sex = count(1)")
+# print(a)

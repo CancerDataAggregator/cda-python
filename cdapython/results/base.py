@@ -3,7 +3,8 @@ This module was made as a base class for all results it will be imported into th
 """
 import json
 from collections import ChainMap
-from typing import Any, AsyncGenerator, Dict, Iterator, List, Optional, Union
+from copy import copy
+from typing import Any, AsyncGenerator, Dict, Iterable, Iterator, List, Optional, Union
 
 from pandas import DataFrame, Index, Series, json_normalize, merge
 from rich.table import Table
@@ -246,6 +247,15 @@ class BaseResult:
 
         return tmp()
 
+    def sort(self, function):
+        # -1 , 1 , 0
+        self._result = sorted(self._result, key=function)
+        return copy(self)
+
+    # def contains(List[dict]):
+    #     self._result
+    #     return
+    # def filter(self,function):
     def pretty_print(self, idx: Optional[int] = None) -> None:
         """_summary_
         pretty_print will print out a json object if you pass a index then it will print \
