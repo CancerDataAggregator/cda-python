@@ -27,13 +27,16 @@ q: bool_expression
 bool_expression: bool_parentheses
                  | bool_expression "AND"i bool_parentheses -> bool_and
                  | bool_expression "OR"i bool_parentheses -> bool_or
+                 | bool_expression "FROM"i bool_expression -> from_expr
+                 
 bool_parentheses: comparison_type
                  | "(" bool_expression "AND"i comparison_type ")" -> bool_and
                  | "(" bool_expression "OR"i comparison_type ")" -> bool_or
 comparison_type: equals | not_equals | greater_than | less_than | greater_than_or_equal
-| less_than_or_equal | between | in_expr | not_in_expr | is_null | is_not_null | not
+| less_than_or_equal | between | in_expr | not_in_expr | is_null | is_not_null | not 
 
-not: "NOT" comparison_type
+
+not: "NOT"i comparison_type
 equals: expression_math "=" expression_math
 is_null: expression_math "is"i "null"i
 is_not_null: expression_math "is"i "not"i "null"i

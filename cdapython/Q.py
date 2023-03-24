@@ -8,6 +8,7 @@ from __future__ import annotations
 import csv
 import logging
 from copy import copy
+from distutils.command.config import config
 from json import JSONEncoder, dumps
 from multiprocessing.pool import ApplyResult
 from pathlib import Path
@@ -23,6 +24,7 @@ from cda_client.exceptions import ApiException, ServiceException
 from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
 from cda_client.model.query_response_data import QueryResponseData
+from numpy import str0
 from pandas import DataFrame, read_csv, read_fwf, to_datetime
 from typing_extensions import Literal
 from urllib3.connectionpool import MaxRetryError
@@ -47,6 +49,7 @@ from cdapython.parsers.simple_parser import simple_parser
 from cdapython.parsers.where_parser import where_parser
 from cdapython.results.result import Result, get_query_result
 from cdapython.utils.Cda_Configuration import CdaConfiguration
+from cdapython.utils.Qconfig import Qconfig
 
 if TYPE_CHECKING:
     from cdapython.results.columns_result import ColumnsResult
@@ -112,14 +115,19 @@ class Q:
     Q lang is Language used to send query to the cda service
     """
 
-    def __init__(self, *args: Union[str, Query], lark: Optional[bool] = False) -> None:
+    def __init__(
+        self,
+        *args: Union[str, Query],
+        config: Optional[Qconfig] = Qconfig(),
+        lark: bool = False,
+    ) -> None:
         """
 
         Args:
             *args (object):
         """
+        self._config = config
         self.query: Query = Query()
-        self._show_sql: bool = False
 
         if len(args) == 1:
             if args[0] is None:
@@ -164,6 +172,22 @@ class Q:
 
     def get_all(self, show_progress: bool = False):
         return self.run(verbose=False).get_all(show_bar=show_progress)
+
+    def set_host(self, host: str) -> Q:
+        config = self._config.copy_config()
+        config.host = host
+        return self.__class__(self.query, config=config)
+
+    def get_host(self) -> str:
+        return self._config.host
+
+    def set_table(self, table: str) -> Q:
+        config = self._config.copy_config()
+        config.table = table
+        return self.__class__(self.query, config=config)
+
+    def get_table(self) -> str:
+        return self._config.table
 
     def to_csv(self, filename: str, show_progress: bool = True):
         header = []
@@ -268,63 +292,6 @@ class Q:
         return cls(query_value)
 
     # region staticmethods
-
-    @staticmethod
-    def get_version() -> str:
-        """returns the global version Q is pointing to
-
-        Returns:
-            str: returns a str of the current version
-        """
-        return Constants._VERSION
-
-    @staticmethod
-    def set_host_url(url: str) -> None:
-        """this method will set the Global Q host url
-
-        Args:
-            url (str): param to set the global url
-        """
-        if len(url.strip()) > 0:
-            Constants.cda_api_url = url
-        else:
-            print("Please enter a url")
-
-    @staticmethod
-    def get_host_url() -> str:
-        """this method will get the Global Q host url
-
-        Returns:
-            str: returns a str of the current url
-        """
-        return Constants.cda_api_url
-
-    @staticmethod
-    def set_default_project_dataset(table: str) -> None:
-        """_summary_
-
-        Args:
-            table (str): _description_
-        """
-        if len(table.strip()) > 0:
-            Constants.default_table = table
-        else:
-            print("Please enter a table")
-
-    @staticmethod
-    def get_default_project_dataset() -> str:
-        return Constants.default_table
-
-    @staticmethod
-    def set_table_version(table_version: str) -> None:
-        if len(table_version.strip()) > 0:
-            Constants.table_version = table_version
-        else:
-            print("Please enter a table version")
-
-    @staticmethod
-    def get_table_version() -> str:
-        return Constants.table_version
 
     @staticmethod
     def bulk_download(
@@ -636,10 +603,16 @@ class Q:
         Returns:
             Optional[Result]: _description_
         """
+        if host is None:
+            host = self._config.host
+        if table is None:
+            table = self._config.table
+
         cda_client_obj: ApiClient = ApiClient(
             configuration=CdaConfiguration(host=host, verify=verify, verbose=verbose)
         )
         PAGEOFFSET = 0  # this variable is used as offset for the query function
+
         version, table = check_version_and_table(version, table)
 
         if include is not None:

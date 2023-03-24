@@ -44,6 +44,19 @@ class Parse_Q(Base_Parser):
         expression_query.value = args[0].value
         return expression_query
 
+    def from_expr(self, args) -> Query:
+        from_query: Query = list(args)[0]
+        args_list = args[1:]
+        current_node = from_query
+        for i in args_list:
+            new_query = Query()
+            new_query.node_type = "SUBQUERY"
+            new_query.l = i
+            new_query.r = current_node.r
+            current_node.r = new_query
+            current_node = new_query
+        return from_query
+
     def eq(self, args) -> Query:
         eq_query = Query()
         eq_query.node_type = "="

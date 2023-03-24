@@ -1,13 +1,11 @@
 start: set_expr+ -> final
 
-set_expr:expression_math
-        | set_expr "EXCEPT"i "ALL"i set_expr -> except_all
+set_expr:select
 
 
+select: [(select_expr ",")*] select_expr
 
-where_expr: bool_expression
-
-select_expr.0: expression_math [ [ "AS"i ] alias ] -> select_expression
+select_expr.0: expression_math [ [ "AS"i ] alias ]  -> select_expression
 
 ?from_expr: from_item -> from_expression
 
@@ -62,7 +60,7 @@ when_then: "WHEN"i bool_expression "THEN"i expression_math
 order: expression_math ["ASC"i] -> order_asc
           | expression_math "DESC"i -> order_desc
 
-column_name: [name "."] name
+column_name: name
 ?expression_product: expression_parens
                   | expression_product "*" expression_parens -> expression_mul
                   | expression_product "/" expression_parens -> expression_div
@@ -73,7 +71,7 @@ column_name: [name "."] name
                   | "(" expression_parens "+" expression ")" -> expression_add
                   | "(" expression_parens "-" expression ")" -> expression_sub
 
-?expression: [name "."] (name | STAR) -> column_name
+?expression: (name | STAR) -> column_name
             | literal
 
 
@@ -98,7 +96,7 @@ TYPENAME:  "object"i
          | "date"i
          | "category"i
          | "string"i
-AGGREGATION.8: ("sum("i | "avg("i | "min("i | "max("i | "count("i "distinct"i | "count("i "from("i)
+AGGREGATION.8: ("sum("i | "avg("i | "min("i | "max("i | "count("i "distinct"i | "count("i)
 alias: name -> alias_string
 _window_name: name
 limit_count: integer_ -> limit_count

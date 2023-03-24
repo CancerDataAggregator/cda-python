@@ -42,6 +42,63 @@ if (
     URL_TABLE: str = Constants.cda_api_url
 
 
+def get_version() -> str:
+    """returns the global version Q is pointing to
+
+    Returns:
+        str: returns a str of the current version
+    """
+    return Constants._VERSION
+
+
+def set_host_url(url: str) -> None:
+    """this method will set the Global Q host url
+
+    Args:
+        url (str): param to set the global url
+    """
+    if len(url.strip()) > 0:
+        Constants.cda_api_url = url
+    else:
+        print("Please enter a url")
+
+
+def get_host_url() -> str:
+    """this method will get the Global Q host url
+
+    Returns:
+        str: returns a str of the current url
+    """
+    return Constants.cda_api_url
+
+
+def set_default_project_dataset(table: str) -> None:
+    """_summary_
+
+    Args:
+        table (str): _description_
+    """
+    if len(table.strip()) > 0:
+        Constants.default_table = table
+    else:
+        print("Please enter a table")
+
+
+def get_default_project_dataset() -> str:
+    return Constants.default_table
+
+
+def set_table_version(table_version: str) -> None:
+    if len(table_version.strip()) > 0:
+        Constants.table_version = table_version
+    else:
+        print("Please enter a table version")
+
+
+def get_table_version() -> str:
+    return Constants.table_version
+
+
 @lru_cache_timed(seconds=10)
 def unique_terms(
     col_name: str,

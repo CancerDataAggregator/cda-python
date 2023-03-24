@@ -1,14 +1,22 @@
-from global_settings import integration_table, localhost
+from global_settings import (
+    integration_host,
+    integration_table,
+    localhost,
+    production_host,
+)
 
 from cdapython import Q
+from cdapython.utils.utility import get_host_url
 
 
 def main():
     # print(Q("sex = 'male'").to_json())
-    all_data = Q(
-        "sex = REPLACE(REPLACE(sex,'fe',''), 'male', '' )", lark=True
-    ).to_json()
-    print(all_data)
+    all_data = Q("sex = REPLACE(REPLACE(sex,'fe',''), 'male', '' )", lark=True).SELECT(
+        "id,sex s"
+    )
+    intergation = all_data.set_host(integration_host)
+    prod = all_data.set_host(production_host)
+    all_data.set_host(localhost).set_table(integration_table).to_dataframe()
 
 
 main()
