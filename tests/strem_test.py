@@ -1,8 +1,5 @@
 from cdapython import Q
-from tests.global_settings import (
-    table_dev,
-    dev_host,
-)
+from tests.global_settings import dev_host, table_dev
 
 q = Q('primary_disease_type LIKE "Lung%"').run(
     version="all_Subjects_v3_0_final", host=dev_host, table=table_dev

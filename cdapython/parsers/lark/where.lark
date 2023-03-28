@@ -27,7 +27,8 @@ q: bool_expression
 bool_expression: bool_parentheses
                  | bool_expression "AND"i bool_parentheses -> bool_and
                  | bool_expression "OR"i bool_parentheses -> bool_or
-                 | bool_expression "FROM"i bool_expression -> from_expr
+                 | bool_expression "FROM"i bool_parentheses -> from_expr
+                 | bool_expression "LIKE"i bool_parentheses -> like_expr
                  
 bool_parentheses: comparison_type
                  | "(" bool_expression "AND"i comparison_type ")" -> bool_and

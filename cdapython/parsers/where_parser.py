@@ -7,16 +7,6 @@ from lark import Lark, Token, Tree, UnexpectedToken, v_args
 
 from cdapython.parsers.base_parser import Base_Parser
 
-sql_grammar = Lark.open(
-    "lark/where.lark", rel_to=__file__, parser="lalr", regex=True, debug=True
-)
-
-"""
-        'COLUMN': "column",
-            'QUOTED': "quoted",
-            'UNQUOTED': "unquoted",
-        """
-
 
 class Parse_Q(Base_Parser):
     def __init__(self) -> None:
@@ -27,6 +17,13 @@ class Parse_Q(Base_Parser):
 
     def q(self, args) -> Query:
         return args[0]
+
+    def like_expr(self, args):
+        like_query: Query = Query()
+        like_query.node_type = "LiKE"
+        like_query.r = args[0]
+        like_query.l = args[1]
+        return like_query
 
     def statement(self, args: Tree):
         print(args)
@@ -73,6 +70,10 @@ class Parse_Q(Base_Parser):
 
 
 def where_parser(text: str):
+    sql_grammar = Lark.open(
+        "lark/where.lark", rel_to=__file__, parser="lalr", regex=True, debug=True
+    )
+
     try:
         tree_sql = sql_grammar.parse(text)
         print(tree_sql.pretty())
@@ -81,7 +82,3 @@ def where_parser(text: str):
         if e.token.type == "$END":
             raise Exception("Unexpected the End Of Script")
         raise Exception(f"Error in Q statement {e.token.type}")
-
-
-# a = where_parser("sex = REPLACE(sex, 'male', '' ) AND sex = count(1)")
-# print(a)

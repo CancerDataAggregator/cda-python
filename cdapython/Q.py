@@ -136,14 +136,14 @@ class Q:
             if isinstance(args[0], Query):
                 self.query = args[0]
             else:
-                if lark == False:
-                    query_parsed: Query = simple_parser(
-                        args[0].strip().replace("\n", " ")
-                    )
-                    self.query = query_parsed
-                else:
-                    query_parsed: Query = where_parser(args[0])
-                    self.query = query_parsed
+                # if lark == False:
+                #     query_parsed: Query = simple_parser(
+                #         args[0].strip().replace("\n", " ")
+                #     )
+                #     self.query = query_parsed
+                # else:
+                query_parsed: Query = where_parser(args[0])
+                self.query = query_parsed
         elif len(args) != 3:
             raise RuntimeError(
                 "Require one or three arguments. Please see documentation."
