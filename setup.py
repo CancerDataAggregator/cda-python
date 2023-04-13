@@ -54,7 +54,7 @@ setup(
         "typing-extensions==4.4",
         "pandas==1.3.5",
         "ipywidgets>=7.7.0",
-        "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git@3.3.0",
+        "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git@3.3.1",
     ],
     description="User friendly Python library to access CDA service.",
     long_description=long_description,
