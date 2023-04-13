@@ -1,8 +1,9 @@
 from unittest import mock
+
 from cdapython import Q
 from cdapython.results.result import Result
-from tests.global_settings import integration_table, integration_host
 from tests.fake_result import FakeResultData
+from tests.global_settings import integration_host, integration_table
 
 result = [
     {
@@ -1356,3 +1357,6 @@ def test_age_at_death(_) -> None:
         .run(host=integration_host, table=integration_table)
         .to_list()
     )
+
+
+test_age_at_death()

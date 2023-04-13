@@ -26,6 +26,7 @@ from cda_client.model.query_created_data import QueryCreatedData
 from cda_client.model.query_response_data import QueryResponseData
 from numpy import str0
 from pandas import DataFrame, read_csv, read_fwf, to_datetime
+from traitlets import Int
 from typing_extensions import Literal
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, NewConnectionError, SSLError
@@ -142,7 +143,7 @@ class Q:
                 #     )
                 #     self.query = query_parsed
                 # else:
-                query_parsed: Query = where_parser(args[0])
+                query_parsed: Query = where_parser(args[0].strip().replace("\n", " "))
                 self.query = query_parsed
         elif len(args) != 3:
             raise RuntimeError(
@@ -159,6 +160,10 @@ class Q:
             self.query.l = _l  # noqa: E741
             self.query.r = _r  # noqa: E741
 
+    def __iter__(self):
+        for result in self.run(verify=False).paginator():
+            yield result
+
     def __repr__(self) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
 
@@ -168,7 +173,7 @@ class Q:
         return self.run().to_list()
 
     def to_dataframe(self):
-        return self.run(verbose=False).to_dataframe()
+        return self.run(verbose=False).get_all(show_bar=False).to_dataframe()
 
     def get_all(self, show_progress: bool = False):
         return self.run(verbose=False).get_all(show_bar=show_progress)
@@ -706,7 +711,7 @@ class Q:
     def q_wrap(self, right: Union[str, Q, Query], operator: str) -> Q:
         if isinstance(right, str):
             right = Q(right)
-        return self.__class__(self.query, operator, right.query)
+        return self.__class__(self.query, operator, right.query,config=self._config)
 
     def AND(self, right: Union[str, Q]) -> Q:
         """Q's AND operator this will add a AND to between two Q queries
@@ -786,7 +791,7 @@ class Q:
         Returns:
             Q: _description_
         """
-        return self.__class__(self.query, "<=", right.query)
+        return self.__class__(self.query, "<=", right.query,config=self._config)
 
     def _Less_Than(self, right: Q) -> Q:
         """_summary_
@@ -797,7 +802,7 @@ class Q:
         Returns:
             Q: _description_
         """
-        return self.__class__(self.query, "<", right.query)
+        return self.__class__(self.query, "<", right.query,config=self._config)
 
     def SELECT(self, fields: str) -> Q:
         """_summary_
@@ -839,7 +844,7 @@ class Q:
         tmp: Query = Query()
         tmp.node_type = "ORDERBYVALUES"
         tmp.value = mod_fields
-        return self.__class__(tmp, "ORDERBY", self.query)
+        return self.__class__(tmp, "ORDERBY", self.query,config=self._config)
 
     def IS(self, fields: str) -> Q:
         """_summary_
@@ -868,14 +873,17 @@ class Q:
         # ).replace(":", " AS ")
         # tmp: Query = Query()
         # tmp.node_type = "SELECTVALUES"
-        return self.__class__(select_functions_parsed, "SELECT", self.query)
+        return self.__class__(select_functions_parsed, "SELECT", self.query,config=self._config)
 
-    def __limit(self, number: int) -> Query:
+    def LIMIT(self, number: int) -> Q:
+        return self.__limit(number)
+
+    def __limit(self, number: int) -> Q:
         tmp: Query = Query()
         tmp.node_type = "LIMIT"
         tmp.value = str(number)
         tmp.r = self.query
-        return tmp
+        return self.__class__(tmp,config=self._config)
 
     def __offset(self, number: int) -> Query:
         tmp: Query = Query()

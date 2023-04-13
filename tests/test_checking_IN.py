@@ -1,10 +1,11 @@
-from cdapython import Q
-from cdapython.results.result import Result
-from tests.global_settings import host, table
-from tests.fake_result import FakeResultData
 from unittest import mock
+
 from pandas import DataFrame
 
+from cdapython import Q
+from cdapython.results.result import Result
+from tests.fake_result import FakeResultData
+from tests.global_settings import host, table
 
 result = [
     {
@@ -36,9 +37,9 @@ fake_result = Result(
 
 
 @mock.patch("cdapython.Q.run", return_value=fake_result)
-def test_checking_test(a):
+def test_checking_test(_):
     q1 = Q(
-        "ResearchSubject.id IN ['C0EF0C13-3109-47CF-9BA4-076AB7EB7660',' 6AA44F89-FCE7-46FE-A1CB-874CD5EFA4A4']"
+        "id IN ['C0EF0C13-3109-47CF-9BA4-076AB7EB7660','6AA44F89-FCE7-46FE-A1CB-874CD5EFA4A4']"
     ).AND(Q('sex = "male"'))
     print(q1)
     assert q1.to_dict()["l"]["node_type"] == "IN"
@@ -46,3 +47,6 @@ def test_checking_test(a):
     print(r.to_list())
     assert isinstance(r.to_list(), list) is True
     assert isinstance(r.to_dataframe(), DataFrame) is True
+
+
+test_checking_test()

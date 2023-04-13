@@ -1,8 +1,10 @@
-from cdapython import Q
 from unittest import mock
-from tests.fake_result import FakeResultData
-from cdapython.results.result import Result
+
 from pandas import DataFrame
+
+from cdapython import Q
+from cdapython.results.result import Result
+from tests.fake_result import FakeResultData
 
 # from tests.global_settings import host, integration_host, table
 
@@ -2124,10 +2126,10 @@ fake_result = Result(
 
 @mock.patch("cdapython.Q.run", return_value=fake_result)
 def test_Down_house(a):
-    q1 = Q('File.associated_project = "tcga_brca"')
-    q2 = Q('File.associated_project = "TCGA-BRCA"')
+    q1 = Q('associated_project = "tcga_brca"')
+    q2 = Q('associated_project = "TCGA-BRCA"')
     q3 = Q("days_to_birth < -50*365")
-    q4 = Q('File.data_category = "Imaging"')
+    q4 = Q('data_category = "Imaging"')
     q = q4.AND(q3.AND(q1.OR(q2)))
     t = q.file.run()
     qsub = t

@@ -1346,7 +1346,7 @@ results: Result = Result(
 
 @mock.patch("cdapython.Q.run", return_value=results)
 def test_is(a) -> None:
-    d = Q("File.dbgap_accession_number IS NOT null")
+    d = Q("dbgap_accession_number IS NOT null")
     print(type(d.to_json()))
     data = d.run().to_list()
     assert isinstance(data, list)

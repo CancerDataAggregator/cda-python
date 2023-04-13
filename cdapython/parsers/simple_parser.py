@@ -4,7 +4,7 @@ from typing import Any, Optional, Tuple, Union
 from cda_client.model.query import Query
 from typing_extensions import Literal
 
-from cdapython.functions import col, infer_quote, query_type_conversion
+from cdapython.parsers.functions import col, infer_quote, query_type_conversion
 from cdapython.parsers.Q_parser import Lexer, Token
 from cdapython.parsers.Q_parser.Parser import Parser
 from cdapython.utils.check_case import check_keyword

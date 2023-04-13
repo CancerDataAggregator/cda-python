@@ -1,14 +1,20 @@
-from cdapython import Q
+from cdapython import Q, columns, unique_terms
+from tests.global_settings import integration_host, integration_table
 
 
 def test_and_op():
-    q1 = Q("age_at_diagnosis > 50*365")
-    q2 = Q('associated_project = "TCGA-OV"')
+    # print(columns(host=integration_host).to_dataframe())
+    # print(
+    #     unique_terms(
+    #         host=integration_host, table=integration_table, col_name="ALLELE_NUM"
+    #     ).to_list()
+    # )
+    q1 = Q("sex = '%'")
+    q2 = Q("ALLELE_NUM = '%'").mutation
 
-    q = q1.AND(q2)
-    a = q.to_dict()
-    print(a)
-    assert a["node_type"] == "AND"
-
-
-test_and_op()
+    q = q1.AND(q2).LIMIT(300).set_host(integration_host).set_table(integration_table)
+    df = q.to_dataframe()
+    assert len(df) > 3
+    # a = q.to_dict()
+    # for i in q:
+    #     print(i)
