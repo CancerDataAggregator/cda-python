@@ -63,7 +63,6 @@ class BaseResult:
         max_level: Union[int, None] = None,
         search_fields: Union[List[str], str, None] = None,
         search_value: str = "",
-        allow_substring: bool = True,
     ) -> DataFrame:
         """[summary]
         Creates a pandas DataFrame for the Results
