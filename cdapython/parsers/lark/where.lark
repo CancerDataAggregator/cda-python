@@ -1,7 +1,7 @@
 start: q 
 
 
-q: bool_expression | q_syntax_error_case
+q: bool_expression 
 
 q_syntax_error_case: "and"| "or"| "not"| "from"| "in"| "like"| "is"
 ?expression_math: expression_product
@@ -16,13 +16,13 @@ q_syntax_error_case: "and"| "or"| "not"| "from"| "in"| "like"| "is"
                   | expression_product "/" expression_parens -> expression_div
 
 ?expression_parens: expression
-                  | "(" expression_parens "*" expression ")" -> expression_mul
-                  | "(" expression_parens "/" expression ")" -> expression_div
-                  | "(" expression_parens "+" expression ")" -> expression_add
-                  | "(" expression_parens "-" expression ")" -> expression_sub
+                  | "(" expression_parens "*" expression_parens ")" -> expression_mul
+                  | "(" expression_parens "/" expression_parens ")" -> expression_div
+                  | "(" expression_parens "+" expression_parens ")" -> expression_add
+                  | "(" expression_parens "-" expression_parens ")" -> expression_sub
 
 ?expression: name -> column_name
-            | literal
+            | literal | null
 
 
 bool_expression: bool_parentheses
@@ -34,15 +34,17 @@ bool_parentheses: comparison_type
                  | "(" bool_expression "AND" comparison_type ")" -> bool_and
                  | "(" bool_expression "OR" comparison_type ")" -> bool_or
 comparison_type: equals | not_equals | greater_than | less_than | greater_than_or_equal
-| less_than_or_equal | between | in_expr | not_in_expr | is | is_not_null | not | like |null
+| less_than_or_equal | between | in_expr | not_in_expr | is | is_not | not | like 
+
+
 
 array: "[" [expression_math ","]* expression_math "]"
-null: "null"
+null: "null"i 
 not: "NOT" comparison_type -> not_op
 like: expression "LIKE" expression -> like_expr
 equals: expression_math "=" expression_math
-is: expression_math "s" expression_math  -> is_op
-is_not_null: expression_math "s" "not" 
+is: expression_math "IS" expression_math  -> is_op
+is_not: expression_math "is" "not" expression_math
 not_equals: expression_math ("<>" | "!=") expression_math
 greater_than: expression_math ">" expression_math
 less_than: expression_math "<" expression_math

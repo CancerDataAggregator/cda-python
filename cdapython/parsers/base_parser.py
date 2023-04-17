@@ -5,7 +5,7 @@ from lark import Token, Tree
 from lark.visitors import Transformer
 
 from cdapython.exceptions.custom_exception import QSyntaxError
-from cdapython.parsers.functions import infer_quote
+from cdapython.parsers.functions import infer_quote, unquoted
 
 
 class Base_Parser(Transformer):
@@ -220,8 +220,8 @@ class Base_Parser(Transformer):
     def name(self, args):
         return args[0]
 
-    def null(self, args):
-        return args[0]
+    def null(self, _):
+        return unquoted("NULL")
 
     def array(self, args):
         query = Query()

@@ -42,7 +42,7 @@ class Paginator:
         format_type: str = "JSON",
         show_bar: bool = False,
     ) -> None:
-        self.result: Result | StringResult | ColumnsResult = result
+        self.result: Union[Result , StringResult]  = result
         self.to_df: bool = to_df
         self.to_list: bool = to_list
         self.limit: Union[int, None] = limit if limit else self.result._limit

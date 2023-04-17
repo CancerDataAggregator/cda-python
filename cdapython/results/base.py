@@ -208,7 +208,9 @@ class BaseResult:
             list: _description_
         """
 
-        return self._result
+        if self._result:
+            return self._result
+        return []
 
     def __len__(self) -> int:
         return self.count

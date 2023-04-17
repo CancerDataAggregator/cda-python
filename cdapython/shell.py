@@ -6,10 +6,8 @@ from typing import Any, Dict, Union
 from rich import print
 from rich.console import Console
 
-from cdapython.Q import Q
-from cdapython.Q_parser import LexerError, MissingTokensError
 from cdapython import columns, unique_terms
-
+from cdapython.Q import Q
 
 try:
     import readline  # pylint: disable=W0611
@@ -104,9 +102,9 @@ while True:
         print(e)
     except TypeError as e:
         print(e)
-    except LexerError as e:
-        print(e)
+
     except IndexError as e:
         print(e)
-    except MissingTokensError as e:
+
+    except Exception as e:
         print(e)

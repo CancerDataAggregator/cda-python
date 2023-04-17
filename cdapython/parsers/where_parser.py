@@ -74,19 +74,20 @@ class Parse_Q(Base_Parser):
         return children[0]
 
 
-def where_parser(text: str):
+def where_parser(text: str, debug: bool = False):
     sql_grammar = Lark.open(
         "lark/where.lark",
         rel_to=__file__,
         parser="lalr",
         regex=True,
-        debug=False,
+        debug=debug,
     )
 
     try:
         check_keyword(text)
         tree_sql = sql_grammar.parse(text)
-        print(tree_sql.pretty())
+        if debug:
+            print(tree_sql.pretty())  # for debugging tree
         return Parse_Q().transform(tree_sql)
     except QSyntaxError as e:
         raise Exception(e)

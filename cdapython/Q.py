@@ -8,13 +8,12 @@ from __future__ import annotations
 import csv
 import logging
 from copy import copy
-from distutils.command.config import config
 from json import JSONEncoder, dumps
 from multiprocessing.pool import ApplyResult
 from pathlib import Path
 from time import sleep
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Generator, List, Optional, Tuple, Union
 
 from cda_client import ApiClient
 from cda_client.api.meta_api import MetaApi
@@ -24,9 +23,7 @@ from cda_client.exceptions import ApiException, ServiceException
 from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
 from cda_client.model.query_response_data import QueryResponseData
-from numpy import str0
 from pandas import DataFrame, read_csv, read_fwf, to_datetime
-from traitlets import Int
 from typing_extensions import Literal
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, NewConnectionError, SSLError
@@ -46,7 +43,6 @@ from cdapython.factories import (
 )
 from cdapython.factories.q_factory import QFactory
 from cdapython.parsers.select_parser import sql_function_parser
-from cdapython.parsers.simple_parser import simple_parser
 from cdapython.parsers.where_parser import where_parser
 from cdapython.results.result import Result, get_query_result
 from cdapython.utils.Cda_Configuration import CdaConfiguration
@@ -120,7 +116,7 @@ class Q:
         self,
         *args: Union[str, Query],
         config: Optional[Qconfig] = Qconfig(),
-        lark: bool = False,
+        debug: bool = False,
     ) -> None:
         """
 
@@ -137,13 +133,7 @@ class Q:
             if isinstance(args[0], Query):
                 self.query = args[0]
             else:
-                # if lark == False:
-                #     query_parsed: Query = simple_parser(
-                #         args[0].strip().replace("\n", " ")
-                #     )
-                #     self.query = query_parsed
-                # else:
-                query_parsed: Query = where_parser(args[0].strip().replace("\n", " "))
+                query_parsed: Query = where_parser(args[0].strip().replace("\n", " "),debug=debug)
                 self.query = query_parsed
         elif len(args) != 3:
             raise RuntimeError(
@@ -161,16 +151,38 @@ class Q:
             self.query.r = _r  # noqa: E741
 
     def __iter__(self):
-        for result in self.run(verify=False).paginator():
-            yield result
+        results = self.run(verify=False)
+
+        if results and hasattr(results, "paginator"):
+            if isinstance(results, ApplyResult):
+                results = results.get()
+            for result in results.paginator():
+                yield result
 
     def __repr__(self) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
 
-    def to_list(
-        self,
-    ):
-        return self.run().to_list()
+    @staticmethod
+    def get_version() -> str:
+        """returns the global version Q is pointing to
+
+        Returns:
+            str: returns a str of the current version
+        """
+        return Constants._VERSION
+
+    @classmethod
+    def to_list(cls) -> List[Any]:
+        """
+        This is an helper method to return a list back to the user
+        Returns:
+            List[Any]: this will return a Result like obj in a list 
+        """
+        value = cls.run().to_list()
+
+        if value:
+            return value
+        return []
 
     def to_dataframe(self):
         return self.run(verbose=False).get_all(show_bar=False).to_dataframe()
@@ -202,11 +214,8 @@ class Q:
         if filename_copy.find(".csv") == -1:
             filename_copy = f"{filename_copy}.csv"
         with open(filename_copy, "w") as csv_file:
-
             for index, chunk in enumerate(iterobj):
-
                 if index == 0:
-
                     header.extend(chunk[index].keys())
                     writer = csv.DictWriter(csv_file, fieldnames=header)
                     writer.writeheader()
@@ -590,7 +599,7 @@ class Q:
         show_sql: bool = False,
     ) -> run_result:
         """_summary_
-
+        This will call the server to make a request return a Result like object
         Args:
             offset (int, optional): _description_. Defaults to 0.
             page_size (int, optional): _description_. Defaults to 100.
@@ -711,7 +720,7 @@ class Q:
     def q_wrap(self, right: Union[str, Q, Query], operator: str) -> Q:
         if isinstance(right, str):
             right = Q(right)
-        return self.__class__(self.query, operator, right.query,config=self._config)
+        return self.__class__(self.query, operator, right.query, config=self._config)
 
     def AND(self, right: Union[str, Q]) -> Q:
         """Q's AND operator this will add a AND to between two Q queries
@@ -791,7 +800,7 @@ class Q:
         Returns:
             Q: _description_
         """
-        return self.__class__(self.query, "<=", right.query,config=self._config)
+        return self.__class__(self.query, "<=", right.query, config=self._config)
 
     def _Less_Than(self, right: Q) -> Q:
         """_summary_
@@ -802,7 +811,7 @@ class Q:
         Returns:
             Q: _description_
         """
-        return self.__class__(self.query, "<", right.query,config=self._config)
+        return self.__class__(self.query, "<", right.query, config=self._config)
 
     def SELECT(self, fields: str) -> Q:
         """_summary_
@@ -844,7 +853,7 @@ class Q:
         tmp: Query = Query()
         tmp.node_type = "ORDERBYVALUES"
         tmp.value = mod_fields
-        return self.__class__(tmp, "ORDERBY", self.query,config=self._config)
+        return self.__class__(tmp, "ORDERBY", self.query, config=self._config)
 
     def IS(self, fields: str) -> Q:
         """_summary_
@@ -873,7 +882,9 @@ class Q:
         # ).replace(":", " AS ")
         # tmp: Query = Query()
         # tmp.node_type = "SELECTVALUES"
-        return self.__class__(select_functions_parsed, "SELECT", self.query,config=self._config)
+        return self.__class__(
+            select_functions_parsed, "SELECT", self.query, config=self._config
+        )
 
     def LIMIT(self, number: int) -> Q:
         return self.__limit(number)
@@ -883,7 +894,7 @@ class Q:
         tmp.node_type = "LIMIT"
         tmp.value = str(number)
         tmp.r = self.query
-        return self.__class__(tmp,config=self._config)
+        return self.__class__(tmp, config=self._config)
 
     def __offset(self, number: int) -> Query:
         tmp: Query = Query()
