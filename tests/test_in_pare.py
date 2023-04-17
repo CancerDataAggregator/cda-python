@@ -1350,12 +1350,9 @@ fake_result = Result(
 
 @mock.patch("cdapython.Q.run", return_value=fake_result)
 def test_age_at_death(_) -> None:
-    q2 = (
-        Q(
-            'vital_status IS null OR age_at_death = 0 AND sex = "male" OR sex = "female" '
-        )
-        .to_list()
-    )
+    q2 = Q(
+        'vital_status IS null OR age_at_death = 0 AND sex = "male" OR sex = "female" '
+    ).to_list()
 
 
 test_age_at_death()

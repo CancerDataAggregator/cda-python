@@ -133,7 +133,9 @@ class Q:
             if isinstance(args[0], Query):
                 self.query = args[0]
             else:
-                query_parsed: Query = where_parser(args[0].strip().replace("\n", " "),debug=debug)
+                query_parsed: Query = where_parser(
+                    args[0].strip().replace("\n", " "), debug=debug
+                )
                 self.query = query_parsed
         elif len(args) != 3:
             raise RuntimeError(
@@ -176,7 +178,7 @@ class Q:
         """
         This is an helper method to return a list back to the user
         Returns:
-            List[Any]: this will return a Result like obj in a list 
+            List[Any]: this will return a Result like obj in a list
         """
         value = cls.run().to_list()
 
