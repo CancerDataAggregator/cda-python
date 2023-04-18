@@ -11,7 +11,6 @@ def test_unique_terms_convert() -> None:
         show_counts=True,
         async_req=True,
     ).to_dataframe()
-    print(d)
 
 
 test_unique_terms_convert()
