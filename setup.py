@@ -17,7 +17,33 @@ def get_version(filepath: str):
 
 
 _version, version_client = get_version("pyproject.toml")
-print(_version)
+
+
+with open("pyproject.toml") as f:
+    contents = f.read()
+
+# Extract dependencies section
+start = contents.find("[tool.poetry.dependencies]") + len("[tool.poetry.dependencies]")
+end = contents.find("\n\n", start)
+dependencies = contents[start:end].strip()
+
+# Split dependencies into a list
+dependency_list = [dep.strip() for dep in dependencies.split("\n") if dep.strip()]
+
+setup_list = []
+for i in dependency_list[1:]:
+    if i.find("git") != -1:
+        dep, _, url, number = i.split("=")
+        url = url.replace('"', "").replace(",", "").replace("rev", "").strip()
+        dep = dep.strip()
+        number = number.strip().replace('"', "").replace("}", "")
+        git_url = f"{dep}@git+{url}@{number}"
+        setup_list.append(git_url)
+    else:
+        i = i.replace("=", "==").replace('"', "").replace("^", "")
+        i = f"{i}"
+        setup_list.append(i)
+
 
 current_path = Path(__file__).parent
 
@@ -27,6 +53,7 @@ now = datetime.utcnow()
 desc_path = Path(current_path, "README.md")
 with open(desc_path, "r", encoding="utf-8", errors="surrogateescape") as fh:
     long_description = fh.read()
+
 
 setup(
     name=NAME,
@@ -42,20 +69,9 @@ setup(
     version=VERSION,
     py_modules=["cdapython"],
     platforms=["POSIX", "MacOS", "Windows"],
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     url="https://github.com/CancerDataAggregator/cdapython",
-    install_requires=[
-        "numpy>=1.21.6",
-        "wheel>=0.38.4",
-        "urllib3>=1.26.8",
-        "rich>=13.2.0",
-        "itables == 1.1.2",
-        "matplotlib>=3.5.1",
-        "typing-extensions==4.4",
-        "pandas==1.3.5",
-        "ipywidgets>=7.7.0",
-        "cda-client@git+https://github.com/CancerDataAggregator/cda-service-python-client.git@3.3.2",
-    ],
+    install_requires=setup_list,
     description="User friendly Python library to access CDA service.",
     long_description=long_description,
     long_description_content_type="text/markdown",

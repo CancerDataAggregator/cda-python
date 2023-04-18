@@ -9,7 +9,7 @@ class Constants:
     This class Holds Q Global Constants used in Http methods
     """
 
-    _VERSION: str = "2023.1.9"
+    _VERSION: str = "2023.4.18"
     _DATABASETABLE_VERSION: str = "all_Subjects_v3_1_final"
     _DATABASETABLE: str = "broad-dsde-prod.cda_prod"
     _CDA_API_URL_ENV: str = "https://cda.datacommons.cancer.gov/"
@@ -22,3 +22,12 @@ class Constants:
     default_table: str = _DATABASETABLE
     project_name: str = default_table.split(".", maxsplit=1)[0]
     default_file_table: str = _DATABASETABLE_FOR_FILES
+
+    @classmethod
+    def version(clz) -> str:
+        """
+        This is used to get version
+        Returns:
+            str: _description_
+        """
+        return clz._VERSION

@@ -1,11 +1,11 @@
 from unittest import mock
 
+from fake_result import FakeResultData
+from global_settings import host, table
 from pandas import DataFrame
 
 from cdapython import Q
 from cdapython.results.result import Result
-from tests.fake_result import FakeResultData
-from tests.global_settings import host, table
 
 result = [
     {
@@ -36,8 +36,8 @@ fake_result = Result(
 )
 
 
-@mock.patch("cdapython.Q.run", return_value=fake_result)
-def test_checking_test(_):
+# @mock.patch("cdapython.Q.run", return_value=fake_result)
+def test_checking_test():
     q1 = Q(
         "id IN ['C0EF0C13-3109-47CF-9BA4-076AB7EB7660','6AA44F89-FCE7-46FE-A1CB-874CD5EFA4A4']"
     ).AND(Q('sex = "male"'))

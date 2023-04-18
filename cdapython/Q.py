@@ -13,7 +13,7 @@ from multiprocessing.pool import ApplyResult
 from pathlib import Path
 from time import sleep
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, Dict, Generator, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 from cda_client import ApiClient
 from cda_client.api.meta_api import MetaApi
@@ -23,7 +23,7 @@ from cda_client.exceptions import ApiException, ServiceException
 from cda_client.model.query import Query
 from cda_client.model.query_created_data import QueryCreatedData
 from cda_client.model.query_response_data import QueryResponseData
-from pandas import DataFrame, read_csv, read_fwf, to_datetime
+from pandas import DataFrame, read_csv, read_fwf
 from typing_extensions import Literal
 from urllib3.connectionpool import MaxRetryError
 from urllib3.exceptions import InsecureRequestWarning, NewConnectionError, SSLError
@@ -125,6 +125,7 @@ class Q:
         """
         self._config = config
         self.query: Query = Query()
+        self._show_sql: bool = False
 
         if len(args) == 1:
             if args[0] is None:
@@ -171,16 +172,15 @@ class Q:
         Returns:
             str: returns a str of the current version
         """
-        return Constants._VERSION
+        return Constants.version
 
-    @classmethod
-    def to_list(cls) -> List[Any]:
+    def to_list(self) -> List[Any]:
         """
         This is an helper method to return a list back to the user
         Returns:
             List[Any]: this will return a Result like obj in a list
         """
-        value = cls.run().to_list()
+        value = self.run().to_list()
 
         if value:
             return value
@@ -215,7 +215,7 @@ class Q:
         filename_copy = copy(filename)
         if filename_copy.find(".csv") == -1:
             filename_copy = f"{filename_copy}.csv"
-        with open(filename_copy, "w") as csv_file:
+        with open(filename_copy, mode="w", encoding="utf-8") as csv_file:
             for index, chunk in enumerate(iterobj):
                 if index == 0:
                     header.extend(chunk[index].keys())
@@ -253,7 +253,7 @@ class Q:
         path = Path(file)
         if path.suffix != ".Q":
             raise Exception("error reading .Q file")
-        return Q(open(path.absolute()).read(), lark=True)
+        return Q(open(file=path.absolute(), mode="r", encoding="utf-8").read())
 
     @classmethod
     def from_file(
@@ -365,7 +365,7 @@ class Q:
             if r is None:
                 return None
 
-            if isinstance(r, Result) or isinstance(r, StringResult):
+            if isinstance(r, (Result, StringResult)):
                 df: DataFrame = r.get_all().to_dataframe()
                 return df
 
@@ -581,8 +581,6 @@ class Q:
                     format_type=format_type,
                 )
 
-    run_result = Union[QueryCreatedData, ApplyResult, Result, None]
-
     @Measure()
     def run(
         self,
@@ -599,7 +597,7 @@ class Q:
         include: Union[str, None] = None,
         format_type: str = "json",
         show_sql: bool = False,
-    ) -> run_result:
+    ) -> Union[QueryCreatedData, ApplyResult, Result, None]:
         """_summary_
         This will call the server to make a request return a Result like object
         Args:

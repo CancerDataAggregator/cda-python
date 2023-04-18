@@ -33,8 +33,8 @@ fake_result = CountResult(
 )
 
 
-@patch("cdapython.Q.run", return_value=fake_result)
-def test_Q_count(_):
+# @patch("cdapython.Q.run", return_value=fake_result)
+def test_Q_count():
     test_count = Q(
         'vital_status IS NULL OR age_at_diagnosis = 0 AND sex = "male" OR sex = "female" '
     )

@@ -1352,7 +1352,7 @@ fake_result = Result(
 def test_age_at_death(_) -> None:
     q2 = Q(
         'vital_status IS null OR age_at_death = 0 AND sex = "male" OR sex = "female" '
-    ).to_list()
+    ).to_dataframe()
 
 
 test_age_at_death()
