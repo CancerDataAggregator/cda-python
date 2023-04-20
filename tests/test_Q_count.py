@@ -2,22 +2,17 @@ from unittest.mock import patch
 
 from cdapython import Q
 from cdapython.results.count_result import CountResult
-
-try:
-    from tests.fake_result import FakeResultData
-    from tests.global_settings import integration_table, localhost
-except Exception as _:
-    from fake_result import FakeResultData
-    from global_settings import integration_table, localhost
+from tests.fake_result import FakeResultData
+from tests.global_settings import host, table
 
 result = [
     {
-        "specimen_count": 406882,
-        "treatment_count": 16332,
-        "diagnosis_count": 46839,
-        "mutation_count": 5220,
-        "researchsubject_count": 53363,
-        "subject_count": 45988,
+        "specimen_count": 432633,
+        "treatment_count": 16768,
+        "diagnosis_count": 49920,
+        "mutation_count": 0,
+        "researchsubject_count": 56604,
+        "subject_count": 46551,
     }
 ]
 fake = FakeResultData(result)
@@ -35,20 +30,23 @@ fake_result = CountResult(
 
 # @patch("cdapython.Q.run", return_value=fake_result)
 def test_Q_count():
-    test_count = Q(
-        'vital_status IS NULL OR age_at_diagnosis = 0 AND sex = "male" OR sex = "female" '
+    test_count = (
+        Q('vital_status IS NULL AND sex = "male" OR sex = "female"')
+        .count.set_host(host)
+        .set_table(table)
+        .run()
+        .to_list()
     )
-
-    box = test_count.count.to_list()
     test_dict = {
-        "specimen_count": 406882,
-        "treatment_count": 16332,
-        "diagnosis_count": 46839,
-        "mutation_count": 5220,
-        "researchsubject_count": 53363,
-        "subject_count": 45988,
+        "specimen_count": 432633,
+        "treatment_count": 16768,
+        "diagnosis_count": 49920,
+        "mutation_count": 0,
+        "researchsubject_count": 56604,
+        "subject_count": 46551,
     }
-    for i in box:
+    # print(box)
+    for i in test_count:
         assert i == test_dict
 
 

@@ -1,10 +1,10 @@
 from cdapython import Q
-from tests.global_settings import dev_host, table_dev
+from tests.global_settings import host, table
 
 q = Q('primary_disease_type = "Lung%"')
 print(q.to_json())
 
-q = q.to_dataframe()
+q = q.run(host=host, table=table).to_dataframe()
 
 
 print(q.head())

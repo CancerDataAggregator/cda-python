@@ -10,11 +10,11 @@ class Constants:
     """
 
     _VERSION: str = "2023.4.18"
-    _DATABASETABLE_VERSION: str = "all_Subjects_v3_1_final"
+    _DATABASETABLE_VERSION: str = "all_merged_subjects"
     _DATABASETABLE: str = "broad-dsde-prod.cda_prod"
     _CDA_API_URL_ENV: str = "https://cda.datacommons.cancer.gov/"
     _DATABASETABLE_FOR_FILES: str = "broad-dsde-prod.cda_prod"
-    _DATABASETABLE_VERSION_FOR_FILES: str = "all_Files_v3_1_final"
+    _DATABASETABLE_VERSION_FOR_FILES: str = "all_merged_files"
 
     __version__: str = _VERSION
     cda_api_url: str = _CDA_API_URL_ENV
@@ -23,11 +23,11 @@ class Constants:
     project_name: str = default_table.split(".", maxsplit=1)[0]
     default_file_table: str = _DATABASETABLE_FOR_FILES
 
-    @classmethod
-    def version(clz) -> str:
+    @staticmethod
+    def version() -> str:
         """
         This is used to get version
         Returns:
             str: _description_
         """
-        return clz._VERSION
+        return Constants()._VERSION

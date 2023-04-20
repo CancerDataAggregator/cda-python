@@ -1,5 +1,5 @@
 from cdapython import Q, columns, unique_terms
-from tests.global_settings import integration_host, integration_table
+from tests.global_settings import host, table
 
 
 def test_and_op():
@@ -12,8 +12,9 @@ def test_and_op():
     q1 = Q("sex = '%'")
     q2 = Q("ALLELE_NUM = '%'").mutation
 
-    q = q1.AND(q2).LIMIT(300).set_host(integration_host).set_table(integration_table)
-    df = q.to_dataframe()
+    q = q1.AND(q2).LIMIT(300).set_host(host).set_table(table)
+    df = q.run().to_dataframe()
+
     assert len(df) > 3
     # a = q.to_dict()
     # for i in q:

@@ -3,7 +3,7 @@ from unittest import mock
 from cdapython import Q
 from cdapython.results.result import Result
 from tests.fake_result import FakeResultData
-from tests.global_settings import integration_host, integration_table
+from tests.global_settings import host, table
 
 result = [
     {
@@ -1348,11 +1348,19 @@ fake_result = Result(
 )
 
 
-@mock.patch("cdapython.Q.run", return_value=fake_result)
-def test_age_at_death(_) -> None:
-    q2 = Q(
-        'vital_status IS null OR age_at_death = 0 AND sex = "male" OR sex = "female" '
-    ).to_dataframe()
+# @mock.patch("cdapython.Q.run", return_value=fake_result)
+def test_age_at_death() -> None:
+    q2 = (
+        Q(
+            'vital_status IS NULL OR age_at_diagnosis = 0 AND sex = "male" OR sex = "female" '
+        )
+        .set_host(host)
+        .set_table(table)
+        .run()
+        .to_dataframe()
+    )
+
+    print(q2)
 
 
 test_age_at_death()

@@ -172,25 +172,7 @@ class Q:
         Returns:
             str: returns a str of the current version
         """
-        return Constants.version
-
-    def to_list(self) -> List[Any]:
-        """
-        This is an helper method to return a list back to the user
-        Returns:
-            List[Any]: this will return a Result like obj in a list
-        """
-        value = self.run().to_list()
-
-        if value:
-            return value
-        return []
-
-    def to_dataframe(self):
-        return self.run(verbose=False).get_all(show_bar=False).to_dataframe()
-
-    def get_all(self, show_progress: bool = False):
-        return self.run(verbose=False).get_all(show_bar=show_progress)
+        return Constants.version()
 
     def set_host(self, host: str) -> Q:
         config = self._config.copy_config()
@@ -207,22 +189,6 @@ class Q:
 
     def get_table(self) -> str:
         return self._config.table
-
-    def to_csv(self, filename: str, show_progress: bool = True):
-        header = []
-        writer = None
-        iterobj: Result = self.run(verbose=False).paginator(show_bar=show_progress)
-        filename_copy = copy(filename)
-        if filename_copy.find(".csv") == -1:
-            filename_copy = f"{filename_copy}.csv"
-        with open(filename_copy, mode="w", encoding="utf-8") as csv_file:
-            for index, chunk in enumerate(iterobj):
-                if index == 0:
-                    header.extend(chunk[index].keys())
-                    writer = csv.DictWriter(csv_file, fieldnames=header)
-                    writer.writeheader()
-                for i in chunk:
-                    writer.writerow(i)
 
     # region helper methods
     def to_json(

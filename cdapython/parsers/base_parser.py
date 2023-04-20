@@ -5,7 +5,7 @@ from lark import Token, Tree
 from lark.visitors import Transformer
 
 from cdapython.exceptions.custom_exception import QSyntaxError
-from cdapython.parsers.functions import infer_quote, unquoted
+from cdapython.parsers.functions import col, infer_quote, unquoted
 
 
 class Base_Parser(Transformer):
@@ -225,14 +225,15 @@ class Base_Parser(Transformer):
 
     def array(self, args):
         query = Query()
-        query.value = ",".join([i.value for i in args])
+        string_join = ",".join([f'"{i.value}"' for i in args])
+        query.value = f"[{string_join}]"
         return query
 
     def in_expr(self, args):
         in_query: Query = Query()
         in_query.node_type = "IN"
         in_query.l = args[0]
-        in_query.r = args[1]
+        in_query.r = col(args[1].value)
         return in_query
 
     def q_syntax_error_case(self, args) -> NoReturn:
