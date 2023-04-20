@@ -9,4 +9,4 @@ integration_table = "gdc-bq-sample.dev"
 dev_host = "https://cancerdata.dsde-dev.broadinstitute.org/"
 
 host = integration_host
-table = table_dev
+project = table_dev

@@ -6,7 +6,7 @@ from cdapython import (
     set_host_url,
     set_table_version,
 )
-from tests.global_settings import host, table
+from tests.global_settings import host, project
 
 # def test_set_new_host():
 
@@ -19,4 +19,4 @@ from tests.global_settings import host, table
 Tsite = Q('treatment_anatomic_site = "Cervix"')
 Dsite = Q('primary_diagnosis_site = "%uter%" OR primary_diagnosis_site = "%cerv%"')
 ALLDATA = Tsite.OR(Dsite)
-print(ALLDATA.researchsubject.count.set_host(host).set_table(table).run())
+print(ALLDATA.researchsubject.count.set_host(host).set_project(project).run())

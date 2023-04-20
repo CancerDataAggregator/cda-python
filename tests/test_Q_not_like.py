@@ -1,9 +1,11 @@
 from unittest import TestCase
-from tests.global_settings import host, table
-from cdapython.results.count_result import CountResult
 from unittest.mock import patch
+
 from pandas import DataFrame
+
+from cdapython.results.count_result import CountResult
 from tests.fake_result import FakeResultData
+from tests.global_settings import host, project
 
 result = [
     {
@@ -78,7 +80,7 @@ class TestData(TestCase):
     def test_not_like(self, data) -> None:
         q = (
             data('sex NOT LIKE "m%"')
-            .subject.count.run(host=host, table=table)
+            .subject.count.run(host=host, table=project)
             .return_value
         ) = fake_result
         print(q.to_list())

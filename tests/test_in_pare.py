@@ -3,7 +3,7 @@ from unittest import mock
 from cdapython import Q
 from cdapython.results.result import Result
 from tests.fake_result import FakeResultData
-from tests.global_settings import host, table
+from tests.global_settings import host, project
 
 result = [
     {
@@ -1355,7 +1355,7 @@ def test_age_at_death() -> None:
             'vital_status IS NULL OR age_at_diagnosis = 0 AND sex = "male" OR sex = "female" '
         )
         .set_host(host)
-        .set_table(table)
+        .set_project(project)
         .run()
         .to_dataframe()
     )

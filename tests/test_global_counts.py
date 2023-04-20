@@ -1,9 +1,11 @@
-from cdapython import Q
-from tests.global_settings import host, table
 from unittest import mock
+
 from pandas import DataFrame
-from tests.fake_result import FakeResultData
+
+from cdapython import Q
 from cdapython.results.count_result import CountResult
+from tests.fake_result import FakeResultData
+from tests.global_settings import host, project
 
 result = [
     {
@@ -31,7 +33,7 @@ fake_result = CountResult(
 @mock.patch("cdapython.Q.run", return_value=fake_result)
 def test_glb_count(a) -> None:
     r = Q('sex = "male" OR sex = "female"')
-    q1 = r.count.run(host=host, limit=100, table=table)
+    q1 = r.count.run(host=host, limit=100, table=project)
     print(q1)
     # print(q1.to_list())
     assert isinstance(q1.to_list(), list) is True

@@ -3,7 +3,7 @@ from unittest.mock import patch
 from cdapython import Q
 from cdapython.results.count_result import CountResult
 from tests.fake_result import FakeResultData
-from tests.global_settings import host, table
+from tests.global_settings import host, project
 
 result = [
     {
@@ -33,7 +33,7 @@ def test_Q_count():
     test_count = (
         Q('vital_status IS NULL AND sex = "male" OR sex = "female"')
         .count.set_host(host)
-        .set_project(table)
+        .set_project(project)
         .run()
         .to_list()
     )

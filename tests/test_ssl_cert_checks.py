@@ -1,9 +1,11 @@
-from cdapython import Q, columns
-from tests.global_settings import host, table
-from cdapython.results.result import Result
 from unittest import mock
+
 from pandas import DataFrame
+
+from cdapython import Q, columns
+from cdapython.results.result import Result
 from tests.fake_result import FakeResultData
+from tests.global_settings import host, project
 
 result = [
     {
@@ -41,7 +43,7 @@ fake_result = Result(
 @mock.patch("cdapython.Q.run", return_value=fake_result)
 def test_ssl_q(a) -> None:
     r = Q('id = "TCGA-13-1409"')
-    q = r.run(verify=False, host=host, table=table)
+    q = r.run(verify=False, host=host, table=project)
     print(q.to_list())
     # print(host, table)
     assert q.count == 1
@@ -49,5 +51,5 @@ def test_ssl_q(a) -> None:
     assert isinstance(q.to_dataframe(), DataFrame) is True
 
 
-print(host, table)
-columns(verify=False, host=host, table=table, verbose=True)
+print(host, project)
+columns(verify=False, host=host, table=project, verbose=True)
