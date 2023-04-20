@@ -33,7 +33,7 @@ def test_Q_count():
     test_count = (
         Q('vital_status IS NULL AND sex = "male" OR sex = "female"')
         .count.set_host(host)
-        .set_table(table)
+        .set_project(table)
         .run()
         .to_list()
     )

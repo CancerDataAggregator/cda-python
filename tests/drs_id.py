@@ -20,7 +20,7 @@ def main():
     print(all_data)
     # intergation = all_data.set_host(integration_host)
     # prod = all_data.set_host(production_host)
-    # all_data.set_host(localhost).set_table(integration_table).to_dataframe()
+    # all_data.set_host(localhost).set_project(integration_table).to_dataframe()
 
 
 main()

@@ -12,7 +12,7 @@ def test_conversion() -> None:
     q2 = Q('subject_associated_project = "TCGA-OV"').researchsubject
     q = q1.AND(q2)
 
-    r = q.set_host(host).set_table(table).run().to_dataframe().head()
+    r = q.set_host(host).set_project(table).run().to_dataframe().head()
     print(r)
 
 

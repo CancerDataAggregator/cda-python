@@ -115,7 +115,7 @@ class Q:
     def __init__(
         self,
         *args: Union[str, Query],
-        config: Optional[Qconfig] = Qconfig(),
+        config: Optional[Qconfig] = None,
         debug: bool = False,
     ) -> None:
         """
@@ -123,7 +123,7 @@ class Q:
         Args:
             *args (object):
         """
-        self._config = config
+        self._config = Qconfig() if config is None else config
         self.query: Query = Query()
         self._show_sql: bool = False
 
@@ -174,6 +174,11 @@ class Q:
         """
         return Constants.version()
 
+    def set_version(self, table_version: str) -> None:
+        config = self._config.copy_config()
+        config.version = table_version
+        return self.__class__(self.query, config=config)
+
     def set_host(self, host: str) -> Q:
         config = self._config.copy_config()
         config.host = host
@@ -182,9 +187,9 @@ class Q:
     def get_host(self) -> str:
         return self._config.host
 
-    def set_table(self, table: str) -> Q:
+    def set_project(self, project: str) -> Q:
         config = self._config.copy_config()
-        config.table = table
+        config.table = project
         return self.__class__(self.query, config=config)
 
     def get_table(self) -> str:
