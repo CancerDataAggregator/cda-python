@@ -16,18 +16,13 @@ class Parse_Tree(Base_Parser):
     def select_expression(self, args):
         select_values_query: Query = Query()
         select_values_query.node_type = "SELECTVALUES"
-        select_values_query.l = args[0]
+        select_values_query.value = args[0].value
         return select_values_query
 
     def select(self, args: List[Query]):
         select_query: Query = list(args)[0]
-
         if select_query.node_type == "SELECTVALUES":
-            args_list = args[1:]
-            current_node = select_query
-            for i in args_list:
-                current_node.r = i
-                current_node = i
+            select_query.value = ",".join([i.value for i in args])
         return select_query
 
     def set_expr(self, args):
@@ -44,5 +39,5 @@ sql_grammar = Lark.open(
 
 def sql_function_parser(text: str) -> Query:
     tree_sql = sql_grammar.parse(text)
-    print(tree_sql.pretty())
+    # print(tree_sql.pretty())
     return Parse_Tree().transform(tree_sql)
