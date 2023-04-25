@@ -57,14 +57,16 @@ with open(desc_path, "r", encoding="utf-8", errors="surrogateescape") as fh:
 
 setup(
     name=NAME,
-    packages=find_packages(exclude=("tests",)),
+    packages=find_packages(
+        where=".", exclude=("tests",)
+    ),  # add __init__.py in folders you want to be bundled in build
     classifiers=[
         "cdapython",
         "CancerDataAggregator",
         "CancerDataAggregator python",
     ],
     include_package_data=True,
-    package_data={"cdapython": ["py.typed"], "": [".env", ""]},
+    package_data={"cdapython": ["py.typed"], "": [".env", "*.lark"]},
     package_dir={"cdapython": "cdapython"},
     version=VERSION,
     py_modules=["cdapython"],
