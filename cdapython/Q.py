@@ -604,7 +604,7 @@ class Q:
             self.query = Q.__select(self, fields=include).query
 
         if limit is not None:
-            self.query = Q.__limit(self, limit)
+            self.query = Q.LIMIT(self,number=limit).query
 
         if offset > 0:
             self.query = Q.__offset(self, offset)

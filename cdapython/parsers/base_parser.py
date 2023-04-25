@@ -211,7 +211,7 @@ class Base_Parser(Transformer):
     def less_than_or_equal(self, args):
         return self._build_Query(args=args, node_type="<=")
 
-    def is_not_null_op(self, args):
+    def is_not(self, args):
         return self._build_Query(args=args, node_type="IS NOT")
 
     def is_op(self, args):
@@ -229,11 +229,24 @@ class Base_Parser(Transformer):
         query.value = f"[{string_join}]"
         return query
 
+    def paren(self, args):
+        query = Query()
+        string_join = ",".join([f'"{i.value}"' for i in args])
+        query.value = f"({string_join})"
+        return query
+
+    def not_in_expr(self, args):
+        in_query: Query = Query()
+        in_query.node_type = "NOT IN"
+        in_query.l = args[0]
+        in_query.r = unquoted(args[1].value)
+        return in_query
+
     def in_expr(self, args):
         in_query: Query = Query()
         in_query.node_type = "IN"
         in_query.l = args[0]
-        in_query.r = col(args[1].value)
+        in_query.r = unquoted(args[1].value)
         return in_query
 
     def q_syntax_error_case(self, args) -> NoReturn:

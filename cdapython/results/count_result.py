@@ -36,7 +36,7 @@ class CountResult(Result):
             value = result[key]
             if isinstance(value, list):
                 df: DataFrame = json_normalize(value)
-                s = df.style.hide_index()
+                s = df.style.hide(axis="index")
                 count_string = f"{count_string}\n\n{str(df).center(20)}"
                 table.add_column(key)
                 table.add_column("count")

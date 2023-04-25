@@ -51,6 +51,11 @@ class Parse_Q(Base_Parser):
             current_node = new_query
         return from_query
 
+    def not_equals(self, args):
+        if "value" in args[1] and "%" in str(args[1].value):
+            return self._build_Query(args=args, node_type="LIKE")
+        return super().not_equals(args)
+
     def equals(self, args: List[Query]) -> Query:
         """_summary_
         This will extract the eq sign
@@ -62,7 +67,7 @@ class Parse_Q(Base_Parser):
         """
         if "value" in args[1] and "%" in str(args[1].value):
             return self._build_Query(args=args, node_type="LIKE")
-        return self._build_Query(args=args, node_type="=")
+        return super().equals(args)
 
     def single_quotes(self, args) -> Query:
         quoted_query: Query = Query()
