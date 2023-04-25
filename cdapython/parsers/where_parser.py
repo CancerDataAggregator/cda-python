@@ -39,21 +39,21 @@ class Parse_Q(Base_Parser):
         return expression_query
 
     def from_expr(self, args) -> Query:
+        new_query = Query()
+        new_query.node_type = "SUBQUERY"
         from_query: Query = list(args)[0]
         args_list = args[1:]
         current_node = from_query
         for i in args_list:
-            new_query = Query()
-            new_query.node_type = "SUBQUERY"
             new_query.l = i
             new_query.r = current_node.r
             current_node.r = new_query
             current_node = new_query
         return from_query
 
-    def not_equals(self, args):
+    def not_equals(self, args) -> Query:
         if "value" in args[1] and "%" in str(args[1].value):
-            return self._build_Query(args=args, node_type="LIKE")
+            return self._build_Query(args=args, node_type="NOT LIKE")
         return super().not_equals(args)
 
     def equals(self, args: List[Query]) -> Query:
