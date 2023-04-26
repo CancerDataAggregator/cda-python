@@ -13,7 +13,17 @@ from multiprocessing.pool import ApplyResult
 from pathlib import Path
 from time import sleep
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Generator,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
 
 from cda_client import ApiClient
 from cda_client.api.meta_api import MetaApi
@@ -153,7 +163,9 @@ class Q:
             self.query.l = _l  # noqa: E741
             self.query.r = _r  # noqa: E741
 
-    def __iter__(self):
+    def __iter__(
+        self,
+    ) -> Union[Generator[Any, None, None], Iterator[Result]]:
         results = self.run(verify=False)
 
         if results and hasattr(results, "paginator"):
@@ -174,7 +186,7 @@ class Q:
         """
         return Constants.version()
 
-    def set_version(self, table_version: str) -> None:
+    def set_version(self, table_version: str) -> Q:
         config = self._config.copy_config()
         config.version = table_version
         return self.__class__(self.query, config=config)

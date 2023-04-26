@@ -32,24 +32,18 @@ class Parse_Q(Base_Parser):
     def word(self, word: Token):
         return word
 
-    def expression(self, args: Tree) -> Query:
+    def expression(self, args) -> Query:
         expression_query: Query = Query()
         expression_query.node_type = "column"
         expression_query.value = args[0].value
         return expression_query
 
     def from_expr(self, args) -> Query:
-        new_query = Query()
-        new_query.node_type = "SUBQUERY"
-        from_query: Query = list(args)[0]
-        args_list = args[1:]
-        current_node = from_query
-        for i in args_list:
-            new_query.l = i
-            new_query.r = current_node.r
-            current_node.r = new_query
-            current_node = new_query
-        return from_query
+        subquery_query = Query()
+        subquery_query.node_type = "SUBQUERY"
+        subquery_query.l = args[0]
+        subquery_query.r = args[1]
+        return subquery_query
 
     def not_equals(self, args) -> Query:
         if "value" in args[1] and "%" in str(args[1].value):

@@ -3,7 +3,7 @@ This file is made for caching decorators
 """
 from datetime import datetime, timedelta
 from functools import lru_cache, wraps
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Tuple
 
 
 def lru_cache_timed(seconds: int = 10, maxsize: int = 128) -> Callable:
@@ -25,7 +25,7 @@ def lru_cache_timed(seconds: int = 10, maxsize: int = 128) -> Callable:
         func.expiration = datetime.utcnow() + func.lifetime
 
         @wraps(func)
-        def wrapped_func(*args: tuple, **kwargs: Dict[str, Any]) -> Any:
+        def wrapped_func(*args: Tuple[Any, Any], **kwargs: Dict[str, Any]) -> Any:
             if datetime.utcnow() >= func.expiration:
                 func.cache_clear()
                 func.expiration = datetime.utcnow() + func.lifetime

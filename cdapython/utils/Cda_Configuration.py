@@ -80,10 +80,10 @@ class CdaConfiguration(Configuration):
         check: bool = True
 
         if not path.exists(openssl_dir):
-            check: bool = False
+            check = False
 
         if openssl_cafile.find("pem") == -1:
-            check: bool = False
+            check = False
 
         return check
 

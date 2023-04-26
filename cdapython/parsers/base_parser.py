@@ -9,24 +9,8 @@ from cdapython.parsers.functions import col, infer_quote, unquoted
 
 
 class Base_Parser(Transformer):
-    def __init__(self, tree) -> None:
+    def __init__(self) -> None:
         self.root_node = None
-
-    def _tree_unpacker(self, tree: List[Token]) -> Token:
-        """_summary_
-        this private method will recursively unpack a value from a tree
-        Args:
-            tree (List[Token]): _description_
-
-        Returns:
-            Token: _description_
-        """
-        if isinstance(tree, List):
-            return self._tree_unpacker(tree[0])
-        return tree
-
-    def _walkTree(self, tree: Union[List[Token], List[Tree]]) -> Query:
-        pass
 
     def _str_strip(self, val: str) -> Union[str, None]:
         """_summary_
@@ -59,7 +43,7 @@ class Base_Parser(Transformer):
         query.r = args[1]
         return query
 
-    def expression_math(self, args):
+    def expression_math(self, args) -> Query:
         expression_math_query: Query = args[0]
 
         if expression_math_query.node_type == "FUNCTION_NAME":
@@ -134,7 +118,7 @@ class Base_Parser(Transformer):
 
         return self._build_Query(args=args, node_type="+")
 
-    def expression_mul(self, args):
+    def expression_mul(self, args) -> Query:
         """_summary_
             This will extract a mulpaction sign and build a right and left node
         Args:
@@ -145,7 +129,7 @@ class Base_Parser(Transformer):
         """
         return self._build_Query(args=args, node_type="*")
 
-    def expression_sub(self, args):
+    def expression_sub(self, args) -> Query:
         """_summary_
             This will extract a subtraction sign and build a right and left node
         Args:
@@ -156,7 +140,7 @@ class Base_Parser(Transformer):
         """
         return self._build_Query(args=args, node_type="-")
 
-    def expression_div(self, args):
+    def expression_div(self, args) -> Query:
         """_summary_
             This will extract a subtraction sign and build a right and left node
         Args:
@@ -178,7 +162,7 @@ class Base_Parser(Transformer):
         """
         return self._build_Query(args, "OR")
 
-    def bool_and(self, args):
+    def bool_and(self, args) -> Query:
         return self._build_Query(args=args, node_type="AND")
 
     def bool_expression(self, args):
@@ -196,53 +180,53 @@ class Base_Parser(Transformer):
         query.l = args[0]
         return query
 
-    def not_equals(self, args):
+    def not_equals(self, args) -> Query:
         return self._build_Query(args=args, node_type="!=")
 
-    def greater_than(self, args):
+    def greater_than(self, args) -> Query:
         return self._build_Query(args=args, node_type=">")
 
-    def less_than(self, args):
+    def less_than(self, args) -> Query:
         return self._build_Query(args=args, node_type="<")
 
-    def greater_than_or_equal(self, args):
+    def greater_than_or_equal(self, args) -> Query:
         return self._build_Query(args=args, node_type=">=")
 
-    def less_than_or_equal(self, args):
+    def less_than_or_equal(self, args) -> Query:
         return self._build_Query(args=args, node_type="<=")
 
-    def is_not(self, args):
+    def is_not(self, args) -> Query:
         return self._build_Query(args=args, node_type="IS NOT")
 
-    def is_op(self, args):
+    def is_op(self, args) -> Query:
         return self._build_Query(args=args, node_type="IS")
 
     def name(self, args):
         return args[0]
 
-    def null(self, _):
+    def null(self, _) -> Query:
         return unquoted("NULL")
 
-    def array(self, args):
+    def array(self, args) -> Query:
         query = Query()
         string_join = ",".join([f'"{i.value}"' for i in args])
         query.value = f"[{string_join}]"
         return query
 
-    def paren(self, args):
+    def paren(self, args) -> Query:
         query = Query()
         string_join = ",".join([f'"{i.value}"' for i in args])
         query.value = f"({string_join})"
         return query
 
-    def not_in_expr(self, args):
+    def not_in_expr(self, args) -> Query:
         in_query: Query = Query()
         in_query.node_type = "NOT IN"
         in_query.l = args[0]
         in_query.r = unquoted(args[1].value)
         return in_query
 
-    def in_expr(self, args):
+    def in_expr(self, args) -> Query:
         in_query: Query = Query()
         in_query.node_type = "IN"
         in_query.l = args[0]

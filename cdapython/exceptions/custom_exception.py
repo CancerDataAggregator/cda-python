@@ -41,6 +41,12 @@ class QSyntaxError(SyntaxError):
 
 
 class HTTP_ERROR_API(ApiException):
+    """_summary_
+    This is a
+    Args:
+        ApiException (_type_): _description_
+    """
+
     def __init__(
         self,
         http_error: Union[ServiceException, ApiException],
