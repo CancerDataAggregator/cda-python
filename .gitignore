@@ -40,11 +40,7 @@ typeReport
 .venv
 venv2
 .ven3
-<<<<<<< Updated upstream
-.venv_11
-=======
 venv2
->>>>>>> Stashed changes
 ven3
 .nox
 .pytype
