@@ -1,8 +1,8 @@
 from cdapython import Q
 from tests.global_settings import host
 
-q1 = Q('researchSubject_identifier_system = "PDC"')
-q2 = Q('researchSubject_identifier_system = "GDC"')
+q1 = Q('researchsubject_identifier_system = "PDC"')
+q2 = Q('researchsubject_identifier_system = "GDC"')
 q3 = Q('identifier_system = "IDC"')
 
 q = q3.FROM(q1.FROM(q2))

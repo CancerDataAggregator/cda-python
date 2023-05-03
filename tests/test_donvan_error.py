@@ -48,8 +48,8 @@ fake_result = CountResult(
 
 @mock.patch("cdapython.Q.run", return_value=fake_result)
 def test_donvan_error(a):
-    q1 = Q('Diagnosis_stage = "Stage I"')
-    q2 = Q('Diagnosis_stage = "Stage II"')
+    q1 = Q('stage = "Stage I"')
+    q2 = Q('stage = "Stage II"')
     q3 = Q("primary_diagnosis_site = 'Kidney'")
     q_diag = q1.OR(q2)
     q = q_diag.AND(q3)

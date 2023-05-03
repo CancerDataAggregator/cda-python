@@ -1,6 +1,6 @@
 from os import path
 from ssl import get_default_verify_paths
-from typing import Any, Optional
+from typing import Any, Dict, Optional, Tuple
 
 from cda_client.configuration import Configuration
 
@@ -51,7 +51,7 @@ class CdaConfiguration(Configuration):
         )
         self._check_verify()
 
-    def _check_verify(self, *args: Any, **kwds: Any) -> None:
+    def _check_verify(self, *args: Tuple[Any, Any], **kwds: Dict[Any, Any]) -> None:
         """
         This function was made to overwrite the verfly_ssl prop in the super method
         """

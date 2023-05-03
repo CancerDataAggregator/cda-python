@@ -10,7 +10,7 @@ result = [
         "specimen_count": 432633,
         "treatment_count": 16768,
         "diagnosis_count": 49920,
-        "mutation_count": 0,
+        "mutation_count": 5135,
         "researchsubject_count": 56604,
         "subject_count": 46551,
     }
@@ -28,8 +28,8 @@ fake_result = CountResult(
 )
 
 
-# @patch("cdapython.Q.run", return_value=fake_result)
-def test_Q_count():
+@patch("cdapython.Q.run", return_value=fake_result)
+def test_Q_count(_):
     test_count = (
         Q('vital_status IS NULL AND sex = "male" OR sex = "female"')
         .count.set_host(host)
@@ -41,10 +41,11 @@ def test_Q_count():
         "specimen_count": 432633,
         "treatment_count": 16768,
         "diagnosis_count": 49920,
-        "mutation_count": 0,
+        "mutation_count": 5135,
         "researchsubject_count": 56604,
         "subject_count": 46551,
     }
+
     # print(box)
     for i in test_count:
         assert i == test_dict

@@ -8,6 +8,7 @@ from __future__ import annotations
 import csv
 import logging
 from copy import copy
+from dataclasses import dataclass
 from json import JSONEncoder, dumps
 from multiprocessing.pool import ApplyResult
 from pathlib import Path
@@ -115,6 +116,18 @@ class _QEncoder(JSONEncoder):
         if "_data_store" in tmp_dict:
             return tmp_dict["_data_store"]
         return tmp_dict
+
+
+@dataclass()
+class DryClass:
+    query_id: str
+    query_sql: str
+
+    def __repr__(self) -> str:
+        return f"""
+                Query_ID: {self.query_id}
+                SQL: {self.query_sql}
+                """
 
 
 class Q:
@@ -580,7 +593,7 @@ class Q:
         include: Union[str, None] = None,
         format_type: str = "json",
         show_sql: bool = False,
-    ) -> Union[QueryCreatedData, ApplyResult, Result, None]:
+    ) -> Union[QueryCreatedData, ApplyResult, Result, DryClass, None]:
         """_summary_
         This will call the server to make a request return a Result like object
         Args:
@@ -600,10 +613,16 @@ class Q:
         Returns:
             Optional[Result]: _description_
         """
+        dry_run_current = False
+
         if host is None:
             host = self._config.host
         if table is None:
             table = self._config.table
+
+        if dry_run is True:
+            dry_run = False
+            dry_run_current = True
 
         cda_client_obj: ApiClient = ApiClient(
             configuration=CdaConfiguration(host=host, verify=verify, verbose=verbose)
@@ -619,7 +638,7 @@ class Q:
             self.query = Q.LIMIT(self, number=limit).query
 
         if offset > 0:
-            self.query = Q.__offset(self, offset)
+            self.query = Q.__offset(self, offset).query
 
         self._show_sql = show_sql or False
 
@@ -646,8 +665,10 @@ class Q:
                         print(WAITING_TEXT)
                     api_response = api_response.get()
 
-                if dry_run is True:
-                    return api_response
+                if dry_run_current is True:
+                    # res
+                    dryClass = DryClass(**api_response.to_dict())
+                    return dryClass
 
             return self.__get_query_result(
                 api_instance=api_instance,
@@ -872,6 +893,9 @@ class Q:
     def LIMIT(self, number: int) -> Q:
         return self.__limit(number)
 
+    def OFFSET(self, number: int) -> Q:
+        return self.__offset(number)
+
     def __limit(self, number: int) -> Q:
         tmp: Query = Query()
         tmp.node_type = "LIMIT"
@@ -879,9 +903,9 @@ class Q:
         tmp.r = self.query
         return self.__class__(tmp, config=self._config)
 
-    def __offset(self, number: int) -> Query:
+    def __offset(self, number: int) -> Q:
         tmp: Query = Query()
         tmp.node_type = "OFFSET"
         tmp.value = str(number)
         tmp.r = self.query
-        return tmp
+        return self.__class__(tmp, config=self._config)

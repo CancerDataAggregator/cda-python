@@ -173,7 +173,7 @@ class Result(BaseResult):
         self,
         output: str = "",
         page_size: int = 0,
-        show_bar: bool = False,
+        show_bar: bool = True,
     ) -> "CollectResult":
         """
         get_all is a method that will loop for you
