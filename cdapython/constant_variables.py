@@ -9,7 +9,7 @@ class Constants:
     This class Holds Q Global Constants used in Http methods
     """
 
-    _VERSION: str = "2023.4.18"
+    _VERSION: str = "2023.5.4"
     _DATABASETABLE_VERSION: str = "all_merged_subjects_v3_2_final"
     _DATABASETABLE: str = "broad-dsde-prod.cda_prod"
     _CDA_API_URL_ENV: str = "https://cda.datacommons.cancer.gov/"
