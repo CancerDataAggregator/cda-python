@@ -1,30 +1,29 @@
-
 name: Build and publish wheel
 
 on: [push, pull_request]
 
-  jobs:
-    build:
-      runs-on: ${{ matrix.os }}
-      strategy:
-        matrix:
-          os: [macos-latest, ubuntu-latest, windows-latest]
-          python-version: [3.8, 3.9, "3.10"]
-      steps:
-        - uses: actions/checkout@v3
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+        python-version: [3.8, 3.9, "3.10"]
+    steps:
+      - uses: actions/checkout@v3
 
-        # Used to host cibuildwheel
-        - uses: actions/setup-python@v3
+      # Used to host cibuildwheel
+      - uses: actions/setup-python@v3
 
-        - name: Install cibuildwheel
-          run: python -m pip install cibuildwheel==2.12.3
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.12.3
 
-        - name: Build wheels
-          run: python -m cibuildwheel --output-dir wheelhouse
-          # to supply options, put them in 'env', like:
-          # env:
-          #   CIBW_SOME_OPTION: value
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir wheelhouse
+        # to supply options, put them in 'env', like:
+        # env:
+        #   CIBW_SOME_OPTION: value
 
-        - uses: actions/upload-artifact@v3
-          with:
-            path: dist/*.whl
+      - uses: actions/upload-artifact@v3
+        with:
+          path: dist/*.whl
