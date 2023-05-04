@@ -17,19 +17,19 @@ class Handler(FileSystemEventHandler):
         if event.src_path.find("__pycache__") == -1:
             self.event_type = event.event_type
             self.src_path = event.src_path
-            print(
-                f"[{time.asctime()}] noticed: [{event.event_type}] on: [{event.src_path}]"
-            )
+            print(f"{time.asctime()} noticed: {event.event_type} on: {event.src_path}")
 
 
 @task
-def black_w(c):
+def black_w(c, args):
     """
     This will run black in a watching state
     Args:
         c (_type_): _description_
     """
     print("[bold yellow] Black is watching files [/bold yellow]")
+    if args == "lint":
+        print(" [bold yellow]pylint is watching[/bold yellow]")
     path = "cdapython"
     file_event_handler = Handler()
     observer = Observer()
@@ -43,6 +43,8 @@ def black_w(c):
                     continue
                 if file_event_handler.event_type == "modified":
                     c.run(f"black {file_event_handler.src_path}")
+                    if args == "lint":
+                        c.run(f"pylint {file_event_handler.src_path}")
             except Exception as e:
                 print(e)
 

@@ -1,8 +1,10 @@
-from cdapython import Q
 from unittest import mock
+
 from pandas import DataFrame
-from tests.fake_result import FakeResultData
+
+from cdapython import Q
 from cdapython.results.count_result import CountResult
+from tests.fake_result import FakeResultData
 
 result = [
     {
@@ -46,9 +48,9 @@ fake_result = CountResult(
 
 @mock.patch("cdapython.Q.run", return_value=fake_result)
 def test_donvan_error(a):
-    q1 = Q('ResearchSubject.Diagnosis.stage = "Stage I"')
-    q2 = Q('ResearchSubject.Diagnosis.stage = "Stage II"')
-    q3 = Q("ResearchSubject.primary_diagnosis_site = 'Kidney'")
+    q1 = Q('stage = "Stage I"')
+    q2 = Q('stage = "Stage II"')
+    q3 = Q("primary_diagnosis_site = 'Kidney'")
     q_diag = q1.OR(q2)
     q = q_diag.AND(q3)
     # print(q.counts.run())

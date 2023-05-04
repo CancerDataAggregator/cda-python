@@ -1,8 +1,8 @@
-from cdapython import Q
 from unittest import mock
-from tests.fake_result import FakeResultData
-from cdapython.results.result import Result
 
+from cdapython import Q
+from cdapython.results.result import Result
+from tests.fake_result import FakeResultData
 
 result = [
     {
@@ -6984,7 +6984,7 @@ fake_result = Result(
 
 @mock.patch("cdapython.Q.run", return_value=fake_result)
 def test_kidney(a):
-    q1 = Q('ResearchSubject.primary_diagnosis_site = "Kidney"')
+    q1 = Q('primary_diagnosis_site = "Kidney"')
     r1 = q1.run(limit=500)
     data = r1.to_list()
     assert isinstance(data, list) == True

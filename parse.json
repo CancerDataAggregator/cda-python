@@ -1,0 +1,39 @@
+{
+    "node_type": "SUBQUERY",
+    "l": {
+        "l": {
+            "l": {
+                "node_type": "column",
+                "value": "identifier_system"
+            },
+            "r": {
+                "node_type": "quoted",
+                "value": "IDC"
+            },
+            "node_type": "="
+        },
+        "r": {
+            "l": {
+                "node_type": "column",
+                "value": "researchSubject_identifier_system"
+            },
+            "r": {
+                "node_type": "quoted",
+                "value": "PDC"
+            },
+            "node_type": "="
+        },
+        "node_type": "SUBQUERY"
+    },
+    "r": {
+        "l": {
+            "node_type": "column",
+            "value": "researchSubject_identifier_system"
+        },
+        "r": {
+            "node_type": "quoted",
+            "value": "GDC"
+        },
+        "node_type": "="
+    }
+}

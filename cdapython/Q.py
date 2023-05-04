@@ -5,13 +5,26 @@ and SQL Like operators queue supports further to the bottom
 """
 from __future__ import annotations
 
+import csv
 import logging
+from copy import copy
+from dataclasses import dataclass
 from json import JSONEncoder, dumps
 from multiprocessing.pool import ApplyResult
 from pathlib import Path
 from time import sleep
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Generator,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
 
 from cda_client import ApiClient
 from cda_client.api.meta_api import MetaApi
@@ -40,9 +53,11 @@ from cdapython.factories import (
     TREATMENT,
 )
 from cdapython.factories.q_factory import QFactory
+from cdapython.parsers.select_parser import sql_function_parser
+from cdapython.parsers.where_parser import where_parser
 from cdapython.results.result import Result, get_query_result
-from cdapython.simple_parser import simple_parser
 from cdapython.utils.Cda_Configuration import CdaConfiguration
+from cdapython.utils.Qconfig import Qconfig
 
 if TYPE_CHECKING:
     from cdapython.results.columns_result import ColumnsResult
@@ -103,17 +118,35 @@ class _QEncoder(JSONEncoder):
         return tmp_dict
 
 
+@dataclass()
+class DryClass:
+    query_id: str
+    query_sql: str
+
+    def __repr__(self) -> str:
+        return f"""
+                Query_ID: {self.query_id}
+                SQL: {self.query_sql}
+                """
+
+
 class Q:
     """
     Q lang is Language used to send query to the cda service
     """
 
-    def __init__(self, *args: Union[str, Query]) -> None:
+    def __init__(
+        self,
+        *args: Union[str, Query],
+        config: Optional[Qconfig] = None,
+        debug: bool = False,
+    ) -> None:
         """
 
         Args:
             *args (object):
         """
+        self._config = Qconfig() if config is None else config
         self.query: Query = Query()
         self._show_sql: bool = False
 
@@ -124,9 +157,10 @@ class Q:
             if isinstance(args[0], Query):
                 self.query = args[0]
             else:
-                query_parsed: Query = simple_parser(args[0].strip().replace("\n", " "))
+                query_parsed: Query = where_parser(
+                    args[0].strip().replace("\n", " "), debug=debug
+                )
                 self.query = query_parsed
-
         elif len(args) != 3:
             raise RuntimeError(
                 "Require one or three arguments. Please see documentation."
@@ -142,8 +176,49 @@ class Q:
             self.query.l = _l  # noqa: E741
             self.query.r = _r  # noqa: E741
 
+    def __iter__(
+        self,
+    ) -> Union[Generator[Any, None, None], Iterator[Result]]:
+        results = self.run(verify=False)
+
+        if results and hasattr(results, "paginator"):
+            if isinstance(results, ApplyResult):
+                results = results.get()
+            for result in results.paginator():
+                yield result
+
     def __repr__(self) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
+
+    @staticmethod
+    def get_version() -> str:
+        """returns the global version Q is pointing to
+
+        Returns:
+            str: returns a str of the current version
+        """
+        return Constants.version()
+
+    def set_version(self, table_version: str) -> Q:
+        config = self._config.copy_config()
+        config.version = table_version
+        return self.__class__(self.query, config=config)
+
+    def set_host(self, host: str) -> Q:
+        config = self._config.copy_config()
+        config.host = host
+        return self.__class__(self.query, config=config)
+
+    def get_host(self) -> str:
+        return self._config.host
+
+    def set_project(self, project: str) -> Q:
+        config = self._config.copy_config()
+        config.table = project
+        return self.__class__(self.query, config=config)
+
+    def get_table(self) -> str:
+        return self._config.table
 
     # region helper methods
     def to_json(
@@ -169,6 +244,12 @@ class Q:
         return self.query.to_dict()
 
     # endregion
+    @staticmethod
+    def open_Q_file(file: str) -> Q:
+        path = Path(file)
+        if path.suffix != ".Q":
+            raise Exception("error reading .Q file")
+        return Q(open(file=path.absolute(), mode="r", encoding="utf-8").read())
 
     @classmethod
     def from_file(
@@ -223,63 +304,6 @@ class Q:
         return cls(query_value)
 
     # region staticmethods
-
-    @staticmethod
-    def get_version() -> str:
-        """returns the global version Q is pointing to
-
-        Returns:
-            str: returns a str of the current version
-        """
-        return Constants._VERSION
-
-    @staticmethod
-    def set_host_url(url: str) -> None:
-        """this method will set the Global Q host url
-
-        Args:
-            url (str): param to set the global url
-        """
-        if len(url.strip()) > 0:
-            Constants.CDA_API_URL = url
-        else:
-            print("Please enter a url")
-
-    @staticmethod
-    def get_host_url() -> str:
-        """this method will get the Global Q host url
-
-        Returns:
-            str: returns a str of the current url
-        """
-        return Constants.CDA_API_URL
-
-    @staticmethod
-    def set_default_project_dataset(table: str) -> None:
-        """_summary_
-
-        Args:
-            table (str): _description_
-        """
-        if len(table.strip()) > 0:
-            Constants.default_table = table
-        else:
-            print("Please enter a table")
-
-    @staticmethod
-    def get_default_project_dataset() -> str:
-        return Constants.default_table
-
-    @staticmethod
-    def set_table_version(table_version: str) -> None:
-        if len(table_version.strip()) > 0:
-            Constants.table_version = table_version
-        else:
-            print("Please enter a table version")
-
-    @staticmethod
-    def get_table_version() -> str:
-        return Constants.table_version
 
     @staticmethod
     def bulk_download(
@@ -337,7 +361,7 @@ class Q:
             if r is None:
                 return None
 
-            if isinstance(r, Result) or isinstance(r, StringResult):
+            if isinstance(r, (Result, StringResult)):
                 df: DataFrame = r.get_all().to_dataframe()
                 return df
 
@@ -553,8 +577,6 @@ class Q:
                     format_type=format_type,
                 )
 
-    run_result = Union[QueryCreatedData, ApplyResult, Result, None]
-
     @Measure()
     def run(
         self,
@@ -571,9 +593,9 @@ class Q:
         include: Union[str, None] = None,
         format_type: str = "json",
         show_sql: bool = False,
-    ) -> run_result:
+    ) -> Union[QueryCreatedData, ApplyResult, Result, DryClass, None]:
         """_summary_
-
+        This will call the server to make a request return a Result like object
         Args:
             offset (int, optional): _description_. Defaults to 0.
             page_size (int, optional): _description_. Defaults to 100.
@@ -591,20 +613,32 @@ class Q:
         Returns:
             Optional[Result]: _description_
         """
+        dry_run_current = False
+
+        if host is None:
+            host = self._config.host
+        if table is None:
+            table = self._config.table
+
+        if dry_run is True:
+            dry_run = False
+            dry_run_current = True
+
         cda_client_obj: ApiClient = ApiClient(
             configuration=CdaConfiguration(host=host, verify=verify, verbose=verbose)
         )
         PAGEOFFSET = 0  # this variable is used as offset for the query function
+
         version, table = check_version_and_table(version, table)
 
         if include is not None:
             self.query = Q.__select(self, fields=include).query
 
         if limit is not None:
-            self.query = Q.__limit(self, limit)
+            self.query = Q.LIMIT(self, number=limit).query
 
         if offset > 0:
-            self.query = Q.__offset(self, offset)
+            self.query = Q.__offset(self, offset).query
 
         self._show_sql = show_sql or False
 
@@ -631,8 +665,10 @@ class Q:
                         print(WAITING_TEXT)
                     api_response = api_response.get()
 
-                if dry_run is True:
-                    return api_response
+                if dry_run_current is True:
+                    # res
+                    dryClass = DryClass(**api_response.to_dict())
+                    return dryClass
 
             return self.__get_query_result(
                 api_instance=api_instance,
@@ -688,7 +724,7 @@ class Q:
     def q_wrap(self, right: Union[str, Q, Query], operator: str) -> Q:
         if isinstance(right, str):
             right = Q(right)
-        return self.__class__(self.query, operator, right.query)
+        return self.__class__(self.query, operator, right.query, config=self._config)
 
     def AND(self, right: Union[str, Q]) -> Q:
         """Q's AND operator this will add a AND to between two Q queries
@@ -768,7 +804,7 @@ class Q:
         Returns:
             Q: _description_
         """
-        return self.__class__(self.query, "<=", right.query)
+        return self.__class__(self.query, "<=", right.query, config=self._config)
 
     def _Less_Than(self, right: Q) -> Q:
         """_summary_
@@ -779,7 +815,7 @@ class Q:
         Returns:
             Q: _description_
         """
-        return self.__class__(self.query, "<", right.query)
+        return self.__class__(self.query, "<", right.query, config=self._config)
 
     def SELECT(self, fields: str) -> Q:
         """_summary_
@@ -804,8 +840,8 @@ class Q:
         return self._order_by(fields=fields)
 
     def _order_by(self, fields: str) -> Q:
-        """[summary]
-        This private method is used to Add DESC and ASC Ordering this will build a Query node
+        """
+        Private method will add DESC and ASC ordering,to build a Query node.
         Args:
             fields (str): [takes in a list of order by values]
 
@@ -821,7 +857,7 @@ class Q:
         tmp: Query = Query()
         tmp.node_type = "ORDERBYVALUES"
         tmp.value = mod_fields
-        return self.__class__(tmp, "ORDERBY", self.query)
+        return self.__class__(tmp, "ORDERBY", self.query, config=self._config)
 
     def IS(self, fields: str) -> Q:
         """_summary_
@@ -843,26 +879,33 @@ class Q:
         Returns:
             [Q]: [returns a Q object]
         """
+        select_functions_parsed = sql_function_parser(fields)
+        # # This lambda will strip a comma and rejoin the string
+        # mod_fields: str = ",".join(
+        #     map(lambda fields: fields.strip(","), fields.split())
+        # ).replace(":", " AS ")
+        # tmp: Query = Query()
+        # tmp.node_type = "SELECTVALUES"
+        return self.__class__(
+            select_functions_parsed, "SELECT", self.query, config=self._config
+        )
 
-        # This lambda will strip a comma and rejoin the string
-        mod_fields: str = ",".join(
-            map(lambda fields: fields.strip(","), fields.split())
-        ).replace(":", " AS ")
-        tmp: Query = Query()
-        tmp.node_type = "SELECTVALUES"
-        tmp.value = mod_fields
-        return self.__class__(tmp, "SELECT", self.query)
+    def LIMIT(self, number: int) -> Q:
+        return self.__limit(number)
 
-    def __limit(self, number: int) -> Query:
+    def OFFSET(self, number: int) -> Q:
+        return self.__offset(number)
+
+    def __limit(self, number: int) -> Q:
         tmp: Query = Query()
         tmp.node_type = "LIMIT"
         tmp.value = str(number)
         tmp.r = self.query
-        return tmp
+        return self.__class__(tmp, config=self._config)
 
-    def __offset(self, number: int) -> Query:
+    def __offset(self, number: int) -> Q:
         tmp: Query = Query()
         tmp.node_type = "OFFSET"
         tmp.value = str(number)
         tmp.r = self.query
-        return tmp
+        return self.__class__(tmp, config=self._config)

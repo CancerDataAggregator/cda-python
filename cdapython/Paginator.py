@@ -42,7 +42,7 @@ class Paginator:
         format_type: str = "JSON",
         show_bar: bool = False,
     ) -> None:
-        self.result: Result | StringResult | ColumnsResult = result
+        self.result: Union[Result, StringResult] = result
         self.to_df: bool = to_df
         self.to_list: bool = to_list
         self.limit: Union[int, None] = limit if limit else self.result._limit
@@ -64,7 +64,7 @@ class Paginator:
             )
             self.progress.update(self.task, advance=self.result.count)
 
-    def _return_result(self) -> Union[DataFrame, list, Result]:
+    def _return_result(self) -> Union[DataFrame, List[Any], Result]:
         """_summary_
         This return a Result object and DataFrame
         Returns:
@@ -82,7 +82,7 @@ class Paginator:
 
         return self.result
 
-    def _do_next(self: Paginator) -> Union[DataFrame, list, Result, None]:
+    def _do_next(self: Paginator) -> Union[DataFrame, List[Any], Result, None]:
         result_nx = self._return_result()
         if self.result.has_next_page:
             try:

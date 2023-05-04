@@ -1,11 +1,27 @@
 from cdapython import Q
 from tests.global_settings import host
 
-q1 = Q('ResearchSubject.identifier.system = "PDC"')
-q2 = Q('ResearchSubject.identifier.system = "GDC"')
-q3 = Q('identifier.system = "IDC"')
+q1 = Q('researchsubject_identifier_system = "PDC"')
+q2 = Q('researchsubject_identifier_system = "GDC"')
+q3 = Q('identifier_system = "IDC"')
 
 q = q3.FROM(q1.FROM(q2))
-r = q.run(host=host, limit=1000)
+print("first")
+with open("first.json", "w") as f:
+    f.write(q.to_json())
+a = Q(
+    "identifier_system = 'IDC' FROM researchSubject_identifier_system = 'PDC'  FROM researchSubject_identifier_system = 'GDC' ",
+).to_json()
 
-r.to_dataframe().to_csv("data.csv")
+
+b = Q(
+    "identifier_system = 'IDC' FROM researchSubject_identifier_system = 'PDC'  FROM researchSubject_identifier_system = 'GDC'",
+    lark=True,
+).to_json()
+print("lark")
+with open("lark.json", "w") as f:
+    f.write(b)
+print("-" * 110)
+print("Q parse")
+with open("parse.json", "w") as f:
+    f.write(a)

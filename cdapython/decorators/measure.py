@@ -31,7 +31,10 @@ class Measure:
                 return self.result
             finally:
                 if self.result is not None:
-                    if "verbose" not in self.kwargs or self.kwargs["verbose"] is True:
+                    if (
+                        "verbose" not in self.kwargs
+                        or self.kwargs.get("verbose") is not None
+                    ):
                         end_ = int(round(time() * 1000)) - start_time
                         seconds = round((end_ / 1000) % 60, 3)
                         minutes = round(int((end_ / (1000 * 60)) % 60))

@@ -1,8 +1,9 @@
 from unittest import mock
+
 from cdapython import Q
 from cdapython.results.result import Result
-from tests.global_settings import integration_table, integration_host
 from tests.fake_result import FakeResultData
+from tests.global_settings import host, project
 
 result = [
     {
@@ -1347,12 +1348,19 @@ fake_result = Result(
 )
 
 
-@mock.patch("cdapython.Q.run", return_value=fake_result)
-def test_age_at_death(_) -> None:
+# @mock.patch("cdapython.Q.run", return_value=fake_result)
+def test_age_at_death() -> None:
     q2 = (
         Q(
-            'age_at_death IS null OR age_at_death = 0 AND sex = "male" OR sex = "female" '
+            'vital_status IS NULL OR age_at_diagnosis = 0 AND sex = "male" OR sex = "female" '
         )
-        .run(host=integration_host, table=integration_table)
-        .to_list()
+        .set_host(host)
+        .set_project(project)
+        .run()
+        .to_dataframe()
     )
+
+    print(q2)
+
+
+test_age_at_death()

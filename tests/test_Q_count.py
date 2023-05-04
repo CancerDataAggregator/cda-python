@@ -1,16 +1,54 @@
+from unittest.mock import patch
+
 from cdapython import Q
-from tests.global_settings import host
+from cdapython.results.count_result import CountResult
+from tests.fake_result import FakeResultData
+from tests.global_settings import host, project
 
-sex = Q('sex = "female"')
-cancer = Q('primary_disease_type = "Breast Invasive Carcinoma"')
-ageL = Q("days_to_birth <= -30*365")
-ageU = Q("days_to_birth >= -45 * 365")
+result = [
+    {
+        "specimen_count": 432633,
+        "treatment_count": 16768,
+        "diagnosis_count": 49920,
+        "mutation_count": 5135,
+        "researchsubject_count": 56604,
+        "subject_count": 46551,
+    }
+]
+fake = FakeResultData(result)
+fake_result = CountResult(
+    api_response=fake.api_response,
+    query_id=fake.query_id,
+    offset=fake.offset,
+    limit=fake.limit,
+    api_instance=fake.api_instance,
+    show_sql=fake.show_sql,
+    show_count=fake.show_count,
+    format_type=fake.format_type,
+)
 
-q1 = sex.AND(cancer.AND(ageL.AND(ageU)))
 
-print(q1.researchsubject.count.run(host=host))
+@patch("cdapython.Q.run", return_value=fake_result)
+def test_Q_count(_):
+    test_count = (
+        Q('vital_status IS NULL AND sex = "male" OR sex = "female"')
+        .count.set_host(host)
+        .set_project(project)
+        .run()
+        .to_list()
+    )
+    test_dict = {
+        "specimen_count": 432633,
+        "treatment_count": 16768,
+        "diagnosis_count": 49920,
+        "mutation_count": 5135,
+        "researchsubject_count": 56604,
+        "subject_count": 46551,
+    }
 
-# 0 r3 = q1.run(host="http://localhost:8080")
+    # print(box)
+    for i in test_count:
+        assert i == test_dict
 
 
-# print(r3)
+test_Q_count()

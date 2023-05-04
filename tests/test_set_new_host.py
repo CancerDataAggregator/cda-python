@@ -1,13 +1,15 @@
-from cdapython import Q
-from tests.global_settings import integration_table, localhost
-
+from cdapython import (
+    Q,
+    get_default_project_dataset,
+    get_host_url,
+    set_default_project_dataset,
+    set_host_url,
+    set_table_version,
+)
+from tests.global_settings import host, project
 
 # def test_set_new_host():
-Q.set_host_url(localhost)
-Q.set_default_project_dataset(integration_table)
-Q.set_table_version("all_Subjects_v3_1_test1")
-Q.get_host_url()
-Q.get_default_project_dataset()
+
 
 # print(columns().to_dataframe().to_csv("test.csv"))
 
@@ -17,4 +19,4 @@ Q.get_default_project_dataset()
 Tsite = Q('treatment_anatomic_site = "Cervix"')
 Dsite = Q('primary_diagnosis_site = "%uter%" OR primary_diagnosis_site = "%cerv%"')
 ALLDATA = Tsite.OR(Dsite)
-print(ALLDATA.researchsubject.count.run())
+print(ALLDATA.researchsubject.count.set_host(host).set_project(project).run())

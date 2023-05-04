@@ -1,3 +1,6 @@
+"""
+This module is made for utility functions in Q 
+"""
 from __future__ import annotations
 
 import logging
@@ -13,7 +16,6 @@ from urllib3.exceptions import InsecureRequestWarning
 from cdapython.constant_variables import Constants
 from cdapython.decorators.cache import lru_cache_timed
 from cdapython.exceptions.custom_exception import HTTP_ERROR_API, HTTP_ERROR_SERVICE
-from cdapython.Qparser import parser
 from cdapython.results.columns_result import ColumnsResult
 from cdapython.results.result import get_query_result
 from cdapython.results.string_result import StringResult
@@ -37,16 +39,64 @@ if (
 ):
     DEFAULT_TABLE_FILE: Optional[str] = Constants.default_file_table.split(".")[1]
 
-
-if isinstance(Constants.CDA_API_URL, str):
-    URL_TABLE: str = Constants.CDA_API_URL
+    URL_TABLE: str = Constants.cda_api_url
 
 
-def query(text: str) -> "Q":
+def get_version() -> str:
+    """returns the global version Q is pointing to
+
+    Returns:
+        str: returns a str of the current version
     """
-    This is a hold over for the older parser this uses the Qparser class
+    return Constants._VERSION
+
+
+def set_host_url(url: str) -> None:
+    """this method will set the Global Q host url
+
+    Args:
+        url (str): param to set the global url
     """
-    return parser(text)
+    if len(url.strip()) > 0:
+        Constants.cda_api_url = url
+    else:
+        print("Please enter a url")
+
+
+def get_host_url() -> str:
+    """this method will get the Global Q host url
+
+    Returns:
+        str: returns a str of the current url
+    """
+    return Constants.cda_api_url
+
+
+def set_default_project_dataset(table: str) -> None:
+    """_summary_
+
+    Args:
+        table (str): _description_
+    """
+    if len(table.strip()) > 0:
+        Constants.default_table = table
+    else:
+        print("Please enter a table")
+
+
+def get_default_project_dataset() -> str:
+    return Constants.default_table
+
+
+def set_table_version(table_version: str) -> None:
+    if len(table_version.strip()) > 0:
+        Constants.table_version = table_version
+    else:
+        print("Please enter a table version")
+
+
+def get_table_version() -> str:
+    return Constants.table_version
 
 
 @lru_cache_timed(seconds=10)
@@ -83,7 +133,7 @@ def unique_terms(
     if version is None:
         version = Constants.table_version
     if host is None:
-        host = Constants.CDA_API_URL
+        host = Constants.cda_api_url
 
     if table is None:
         table = Constants.default_table
@@ -168,10 +218,10 @@ def columns(
 
     # Execute query
     if host is None:
-        host = Constants.CDA_API_URL
+        host = Constants.cda_api_url
     if version is None:
         version = Constants.table_version
-    # TODO REMOVE Table not used in java call
+
     if table is None:
         table = Constants.default_table
 
@@ -225,3 +275,19 @@ def columns(
         if verbose:
             print(e)
     return None
+
+
+def get_drs_id(dri_id: str) -> str:
+    """
+    This method parse out a dri id
+    Args:
+        dri_id (str): dri_id
+    Raises:
+        Exception: _description_
+
+    Returns:
+        str: _description_
+    """
+    if dri_id.find("drs://") == -1:
+        raise Exception("need drs_uri")
+    return dri_id.replace("drs://", "")

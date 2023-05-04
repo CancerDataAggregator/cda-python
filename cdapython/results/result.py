@@ -304,7 +304,7 @@ class Result(BaseResult):
 
 
 def get_query_result(
-    clz,
+    clz: Any,
     api_instance: QueryApi,
     query_id: str,
     offset: Optional[int],

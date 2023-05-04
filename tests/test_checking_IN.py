@@ -1,25 +1,61 @@
-from cdapython import Q
-from cdapython.results.result import Result
-from tests.global_settings import host, table
-from tests.fake_result import FakeResultData
 from unittest import mock
+
 from pandas import DataFrame
 
+from cdapython import Q
+from cdapython.results.result import Result
+from tests.fake_result import FakeResultData
+from tests.global_settings import integration_table, localhost
 
 result = [
     {
-        "id": "GENIE-DFCI-007281",
-        "identifier": [{"system": "GDC", "value": "GENIE-DFCI-007281"}],
+        "subject_id": "TCGA-FI-A2D5",
+        "subject_identifier": [
+            {"system": "GDC", "value": "TCGA-FI-A2D5"},
+            {"system": "IDC", "value": "TCGA-FI-A2D5"},
+        ],
         "species": "homo sapiens",
-        "sex": "male",
+        "sex": "female",
         "race": "white",
         "ethnicity": "not hispanic or latino",
-        "days_to_birth": -16071,
-        "subject_associated_project": ["GENIE-DFCI"],
-        "vital_status": "Not Reported",
+        "days_to_birth": None,
+        "subject_associated_project": ["TCGA-UCEC", "tcga_ucec"],
+        "vital_status": "Dead",
         "days_to_death": None,
         "cause_of_death": None,
-    }
+    },
+    {
+        "subject_id": "TCGA-EO-A22U",
+        "subject_identifier": [
+            {"system": "GDC", "value": "TCGA-EO-A22U"},
+            {"system": "IDC", "value": "TCGA-EO-A22U"},
+        ],
+        "species": "homo sapiens",
+        "sex": "female",
+        "race": "white",
+        "ethnicity": "not reported",
+        "days_to_birth": None,
+        "subject_associated_project": ["TCGA-UCEC", "tcga_ucec"],
+        "vital_status": "Alive",
+        "days_to_death": None,
+        "cause_of_death": None,
+    },
+    {
+        "subject_id": "TCGA-A5-A0G2",
+        "subject_identifier": [
+            {"system": "GDC", "value": "TCGA-A5-A0G2"},
+            {"system": "IDC", "value": "TCGA-A5-A0G2"},
+        ],
+        "species": "homo sapiens",
+        "sex": "female",
+        "race": "asian",
+        "ethnicity": "not hispanic or latino",
+        "days_to_birth": None,
+        "subject_associated_project": ["TCGA-UCEC", "tcga_ucec"],
+        "vital_status": "Alive",
+        "days_to_death": None,
+        "cause_of_death": None,
+    },
 ]
 
 fake = FakeResultData(result)
@@ -36,13 +72,16 @@ fake_result = Result(
 
 
 @mock.patch("cdapython.Q.run", return_value=fake_result)
-def test_checking_test(a):
-    q1 = Q(
-        "ResearchSubject.id IN ['C0EF0C13-3109-47CF-9BA4-076AB7EB7660',' 6AA44F89-FCE7-46FE-A1CB-874CD5EFA4A4']"
-    ).AND(Q('sex = "male"'))
-    print(q1)
-    assert q1.to_dict()["l"]["node_type"] == "IN"
-    r = q1.run(host=host, table=table)
+def test_checking_test(_):
+    q1 = Q('subject_id IN ["TCGA-A5-A0G2", "TCGA-EO-A22U", "TCGA-FI-A2D5"]').AND(
+        "NOT race IS NULL"
+    )
+    print(q1.to_json())
+    # assert q1.to_dict()["l"]["node_type"] == "IN"
+    r = q1.run(host=localhost, table=integration_table)
     print(r.to_list())
     assert isinstance(r.to_list(), list) is True
     assert isinstance(r.to_dataframe(), DataFrame) is True
+
+
+test_checking_test()

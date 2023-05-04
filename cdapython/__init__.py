@@ -57,7 +57,17 @@ from cdapython.factories.subject import (
 )
 from cdapython.factories.treatment import Treatment, TreatmentCount
 from cdapython.Q import Q
-from cdapython.utils.utility import columns, query, unique_terms
+from cdapython.utils.utility import (
+    columns,
+    get_default_project_dataset,
+    get_host_url,
+    get_query_result,
+    get_table_version,
+    set_default_project_dataset,
+    set_host_url,
+    set_table_version,
+    unique_terms,
+)
 
 __name__: Literal["cdapython"] = "cdapython"
 __version__: str = Constants._VERSION
@@ -70,7 +80,13 @@ __all__ = [
     "Constants",
     "Q",
     "columns",
-    "query",
+    "get_default_project_dataset",
+    "get_host_url",
+    "get_query_result",
+    "get_table_version",
+    "set_default_project_dataset",
+    "set_host_url",
+    "set_table_version",
     "unique_terms",
     "Subject",
     "SubjectCount",

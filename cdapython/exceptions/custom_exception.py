@@ -41,6 +41,12 @@ class QSyntaxError(SyntaxError):
 
 
 class HTTP_ERROR_API(ApiException):
+    """_summary_
+    This is a
+    Args:
+        ApiException (_type_): _description_
+    """
+
     def __init__(
         self,
         http_error: Union[ServiceException, ApiException],
@@ -71,3 +77,14 @@ class HTTP_ERROR_API(ApiException):
 class HTTP_ERROR_SERVICE(HTTP_ERROR_API):
     def __init__(self, http_error: ServiceException) -> None:
         super().__init__(http_error=http_error)
+
+
+class CSV_TSV_NO_KEY(Exception):
+    """
+    This Exception will raise a Error/
+    if there is no key
+    Args:
+        Exception (_type_): _description_
+    """
+
+    pass
