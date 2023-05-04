@@ -1,5 +1,5 @@
-from cdapython import Q, columns
-from cdapython import unique_terms
+from cdapython import columns
+
 from tests.global_settings import integration_host, integration_table
 
 # q = Q('id != "TCGA-13-1409"').run()

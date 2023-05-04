@@ -3,9 +3,7 @@ from cdapython import Q
 
 def test_to_json_check() -> None:
     sex = Q('sex = "female"')
-    cancer = Q(
-        'ResearchSubject.primary_diagnosis_condition = "Breast Invasive Carcinoma"'
-    )
+    cancer = Q('primary_diagnosis_condition = "Breast Invasive Carcinoma"')
     ageL = Q("days_to_birth <= -30*365")
     ageU = Q("days_to_birth >= -45*365")
 

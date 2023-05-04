@@ -1,14 +1,33 @@
+"""
+This module is made for Q Global Constants/
+
+"""
+
+
 class Constants:
-    _VERSION: str = "2022.12.21"
-    _DATABASETABLE_VERSION: str = "all_Subjects_v3_1_final"
+    """
+    This class Holds Q Global Constants used in Http methods
+    """
+
+    _VERSION: str = "2023.5.4"
+    _DATABASETABLE_VERSION: str = "all_merged_subjects_v3_2_final"
     _DATABASETABLE: str = "broad-dsde-prod.cda_prod"
     _CDA_API_URL_ENV: str = "https://cda.datacommons.cancer.gov/"
     _DATABASETABLE_FOR_FILES: str = "broad-dsde-prod.cda_prod"
-    _DATABASETABLE_VERSION_FOR_FILES: str = "all_Files_v3_1_final"
+    _DATABASETABLE_VERSION_FOR_FILES: str = "all_merged_files_v3_2_final"
 
     __version__: str = _VERSION
-    CDA_API_URL: str = _CDA_API_URL_ENV
+    cda_api_url: str = _CDA_API_URL_ENV
     table_version: str = _DATABASETABLE_VERSION
     default_table: str = _DATABASETABLE
-    project_name: str = default_table.split(".")[0]
+    project_name: str = default_table.split(".", maxsplit=1)[0]
     default_file_table: str = _DATABASETABLE_FOR_FILES
+
+    @staticmethod
+    def version() -> str:
+        """
+        This is used to get version
+        Returns:
+            str: _description_
+        """
+        return Constants()._VERSION

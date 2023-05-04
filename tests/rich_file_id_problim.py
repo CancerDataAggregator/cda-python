@@ -1,7 +1,6 @@
 from cdapython import Q, columns
-from cdapython.functions import col
-from cdapython.utility import unique_terms
-from global_settings import localhost, host
+from cdapython import unique_terms
+from global_settings import host
 
 
 def test():

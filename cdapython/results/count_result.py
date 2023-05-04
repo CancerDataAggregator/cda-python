@@ -26,7 +26,7 @@ class CountResult(Result):
             str: _description_
         """
 
-        result: Union[Series, DataFrame] = self[0]
+        result: Union[Series, DataFrame, CountResult] = self[0]
         html_string: str = ""
         count_string: str = ""
         console: Console = Console()
@@ -36,7 +36,7 @@ class CountResult(Result):
             value = result[key]
             if isinstance(value, list):
                 df: DataFrame = json_normalize(value)
-                s = df.style.hide_index()
+                s = df.style.hide(axis="index")
                 count_string = f"{count_string}\n\n{str(df).center(20)}"
                 table.add_column(key)
                 table.add_column("count")
@@ -57,13 +57,13 @@ class CountResult(Result):
                 }
                 s.set_table_styles([headers, columns])
                 s.set_table_attributes("style='display:inline'")
-                html_string: str = html_string + s._repr_html_()
+                html_string = html_string + s._repr_html_()
 
             else:
                 key_string: str = f"{key} : {value}".center(20)
                 console.print(key_string)
 
-                count_string: str = count_string + "\n\n" + key_string
+                count_string = count_string + "\n\n" + key_string
 
             tables.append(table)
         if self.isnotebook():

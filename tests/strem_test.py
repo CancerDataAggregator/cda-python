@@ -1,23 +1,10 @@
-from pandas import DataFrame, concat
-
 from cdapython import Q
-from tests.global_settings import (
-    host,
-    localhost,
-    table,
-    table_dev,
-    dev_host,
-    integration_host,
-    integration_table,
-)
+from tests.global_settings import host, project
 
-q = Q('primary_disease_type LIKE "Lung%"').run(
-    version="all_Subjects_v3_0_final", host=dev_host, table=table_dev
-)
+q = Q('primary_disease_type = "Lung%"').set_project(project)
+print(q.to_json())
 
-print(q)
-box = []
-for i in q.paginator(to_list=True):
-    box.extend(i)
+q = q.run(host=host, table=project).to_dataframe()
 
-print(len(box))
+
+print(q.head())

@@ -17,25 +17,33 @@ class Measure:
 
     def __init__(self) -> None:
         self.kwargs: Dict[str, Any] = {}
+        self.result: Union[Any, None]
 
-    def __call__(self, func: F) -> FunctionAny:
+    def __call__(self, func: F) -> FunctionAny[F]:
+        self.result = None
+
         @wraps(func)
-        def wrapper(*args: Tuple, **kwargs: Dict[str, Any]) -> FunctionAny:
+        def wrapper(*args: Tuple[Any], **kwargs: Dict[str, Any]) -> FunctionAny[F]:
             start_time = int(round(time() * 1000))
             self.kwargs = kwargs
             try:
-                return func(*args, **kwargs)
+                self.result = func(*args, **kwargs)
+                return self.result
             finally:
-                if "verbose" not in self.kwargs or self.kwargs["verbose"] is True:
-                    end_ = int(round(time() * 1000)) - start_time
-                    seconds = round((end_ / 1000) % 60, 3)
-                    minutes = round(int((end_ / (1000 * 60)) % 60))
-                    print(
-                        f"""
-                        Total execution time: {minutes if minutes > 0 else 0}
-                        min {seconds if seconds > 0 else 0} sec {end_ if end_ > 0 else 0} ms
-                        """
-                    )
+                if self.result is not None:
+                    if (
+                        "verbose" not in self.kwargs
+                        or self.kwargs.get("verbose") is not None
+                    ):
+                        end_ = int(round(time() * 1000)) - start_time
+                        seconds = round((end_ / 1000) % 60, 3)
+                        minutes = round(int((end_ / (1000 * 60)) % 60))
+                        print(
+                            f"""
+                            Total execution time: {minutes if minutes > 0 else 0}
+                            min {seconds if seconds > 0 else 0} sec {end_ if end_ > 0 else 0} ms
+                            """
+                        )
 
         return wrapper
 

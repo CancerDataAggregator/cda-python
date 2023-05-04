@@ -1,7 +1,5 @@
 from rich import print
 
-from cdapython.constant_variables import Constants
-
 
 def deprecated_values(old: str, new: str) -> None:
     print(

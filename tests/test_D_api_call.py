@@ -1,10 +1,11 @@
-from cdapython import Q
-from tests.global_settings import host, table
 from unittest import mock
+
 from pandas import DataFrame
-from tests.fake_result import FakeResultData
+
+from cdapython import Q
 from cdapython.results.result import Result
-from cdapython.results.count_result import CountResult
+from tests.fake_result import FakeResultData
+from tests.global_settings import host, project
 
 result = [
     {
@@ -42,7 +43,7 @@ fake_result = Result(
 @mock.patch("cdapython.Q.run", return_value=fake_result)
 def test_call_api(a):
     q = Q('id = "TCGA-E2-A10A"')
-    r = q.run(verify=False, host=host, table=table)
+    r = q.run(verify=False, host=host, table=project)
     assert isinstance(r.sql, str) is True
     assert isinstance(r.to_list(), list) is True
     assert isinstance(r.to_dataframe(), DataFrame) is True

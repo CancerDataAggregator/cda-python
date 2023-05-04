@@ -1,5 +1,5 @@
 from cdapython import Q, query
-from tests.global_settings import host, localhost
+from tests.global_settings import host
 
 
 def testing_like() -> None:

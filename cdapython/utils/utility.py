@@ -1,22 +1,21 @@
+"""
+This module is made for utility functions in Q 
+"""
 from __future__ import annotations
 
-import json
 import logging
 from multiprocessing.pool import ApplyResult
 from typing import TYPE_CHECKING, Optional, Union
 
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import ApiClient
-from cda_client.configuration import Configuration
 from cda_client.exceptions import ApiException, ServiceException
-from pandas import DataFrame, json_normalize
 from rich import print
 from urllib3.exceptions import InsecureRequestWarning
 
 from cdapython.constant_variables import Constants
 from cdapython.decorators.cache import lru_cache_timed
-from cdapython.functions import backwards_comp
-from cdapython.Qparser import parser
+from cdapython.exceptions.custom_exception import HTTP_ERROR_API, HTTP_ERROR_SERVICE
 from cdapython.results.columns_result import ColumnsResult
 from cdapython.results.result import get_query_result
 from cdapython.results.string_result import StringResult
@@ -28,7 +27,7 @@ logging.captureWarnings(InsecureRequestWarning)
 # This is added for Type Checking class to remove a circular import)
 if TYPE_CHECKING:
     from cdapython.Q import Q
-    from cdapython.results.string_result import StringResult
+    from cdapython.results.result import Result
 
 # Creating constant
 if isinstance(Constants.default_table, str) and Constants.default_table is not None:
@@ -40,66 +39,64 @@ if (
 ):
     DEFAULT_TABLE_FILE: Optional[str] = Constants.default_file_table.split(".")[1]
 
-
-if isinstance(Constants.CDA_API_URL, str):
-    URL_TABLE: str = Constants.CDA_API_URL
+    URL_TABLE: str = Constants.cda_api_url
 
 
-def http_error_logger(http_error: ServiceException) -> None:
-    (
-        msg,
-        status_code,
-        _,
-    ) = json.loads(http_error.body).values()
-    print(
-        f"""
-            Http Status: {status_code}
-            Error Message: {msg}
-            """
-    )
-
-
-def query(text: str) -> "Q":
-    """
-    This is a hold over for the older parser this uses the Qparser class
-    """
-    return parser(text)
-
-
-def table_white_list(table: Optional[str], version: Optional[str]) -> Optional[str]:
-    """[summary]
-    This checks the allowed list List and Throws a error if there is a table
-    not allowed
-    Args:
-        table (str): [sets table from allowed list]
-        version (str): [sets the version if the value if needed]
-
-    Raises:
-        ValueError: [description]
+def get_version() -> str:
+    """returns the global version Q is pointing to
 
     Returns:
-        str: [description]
+        str: returns a str of the current version
     """
-    if table is not None and version is not None:
-        if table.find(".") == -1:
-            raise ValueError("Table not in allowlist list")
-        check_table = table.split(".")[1]
-        if check_table not in [
-            "cda_mvp",
-            "integration",
-            "dev",
-            "cda_dev",
-            "cda_prod",
-            "cda_alpha",
-            "cda_staging",
-        ]:
-            raise ValueError("Table not in allowlist list")
+    return Constants._VERSION
 
-        if check_table == "cda_mvp" and version == "all_v1_1":
-            version = "v3"
 
-        return version
-    return version
+def set_host_url(url: str) -> None:
+    """this method will set the Global Q host url
+
+    Args:
+        url (str): param to set the global url
+    """
+    if len(url.strip()) > 0:
+        Constants.cda_api_url = url
+    else:
+        print("Please enter a url")
+
+
+def get_host_url() -> str:
+    """this method will get the Global Q host url
+
+    Returns:
+        str: returns a str of the current url
+    """
+    return Constants.cda_api_url
+
+
+def set_default_project_dataset(table: str) -> None:
+    """_summary_
+
+    Args:
+        table (str): _description_
+    """
+    if len(table.strip()) > 0:
+        Constants.default_table = table
+    else:
+        print("Please enter a table")
+
+
+def get_default_project_dataset() -> str:
+    return Constants.default_table
+
+
+def set_table_version(table_version: str) -> None:
+    if len(table_version.strip()) > 0:
+        Constants.table_version = table_version
+    else:
+        print("Please enter a table version")
+
+
+def get_table_version() -> str:
+    return Constants.table_version
 
 
 @lru_cache_timed(seconds=10)
@@ -117,7 +114,7 @@ def unique_terms(
     show_sql: bool = False,
     show_counts: bool = False,
     verbose: bool = True,
-) -> Optional["StringResult"]:
+) -> Union[Result, StringResult, ColumnsResult, None]:
     """[summary]
 
     Args:
@@ -136,15 +133,14 @@ def unique_terms(
     if version is None:
         version = Constants.table_version
     if host is None:
-        host = Constants.CDA_API_URL
+        host = Constants.cda_api_url
 
     if table is None:
         table = Constants.default_table
 
     if async_req is None:
         async_req = False
-    col_name = backwards_comp(col_name)
-    version = table_white_list(table, version)
+    col_name = col_name
 
     cda_client_obj: ApiClient = ApiClient(
         configuration=CdaConfiguration(host=host, verify=verify)
@@ -179,12 +175,15 @@ def unique_terms(
                 return None
 
             return query_result
+
     except ServiceException as http_error:
         if verbose:
-            http_error_logger(http_error)
+            print(HTTP_ERROR_SERVICE(http_error=http_error))
+
     except ApiException as http_error:
         if verbose:
-            http_error_logger(http_error)
+            print(HTTP_ERROR_API(http_error=http_error))
+
     except Exception as e:
         if verbose:
             print(e)
@@ -219,7 +218,7 @@ def columns(
 
     # Execute query
     if host is None:
-        host = Constants.CDA_API_URL
+        host = Constants.cda_api_url
     if version is None:
         version = Constants.table_version
 
@@ -228,8 +227,6 @@ def columns(
 
     if async_req is None:
         async_req = False
-
-    version = table_white_list(table, version)
 
     cda_client_obj: ApiClient = ApiClient(
         configuration=CdaConfiguration(host=host, verify=verify, verbose=verbose)
@@ -257,7 +254,7 @@ def columns(
                     result=api_response,
                     description=description,
                 )
-            result_value: ColumnsResult = query_result
+            result_value: Optional[ColumnsResult] = query_result
 
             if query_result is None:
                 result_value = None
@@ -266,10 +263,31 @@ def columns(
             return result_value
     except ServiceException as http_error:
         if verbose:
-            http_error_logger(http_error)
+            print(HTTP_ERROR_SERVICE(http_error=http_error))
+
+    except ApiException as http_error:
+        if verbose:
+            print(HTTP_ERROR_API(http_error=http_error))
+
     except InsecureRequestWarning:
         pass
     except Exception as e:
         if verbose:
             print(e)
     return None
+
+
+def get_drs_id(dri_id: str) -> str:
+    """
+    This method parse out a dri id
+    Args:
+        dri_id (str): dri_id
+    Raises:
+        Exception: _description_
+
+    Returns:
+        str: _description_
+    """
+    if dri_id.find("drs://") == -1:
+        raise Exception("need drs_uri")
+    return dri_id.replace("drs://", "")

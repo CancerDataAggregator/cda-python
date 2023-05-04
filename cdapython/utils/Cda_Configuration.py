@@ -1,6 +1,6 @@
 from os import path
 from ssl import get_default_verify_paths
-from typing import Any, Optional
+from typing import Any, Dict, Optional, Tuple
 
 from cda_client.configuration import Configuration
 
@@ -29,7 +29,7 @@ class CdaConfiguration(Configuration):
         self.verify = verify
 
         if host is None:
-            host = Constants.CDA_API_URL
+            host = Constants.cda_api_url
 
         self._host = host.strip("/")
         self.verbose = verbose
@@ -51,7 +51,7 @@ class CdaConfiguration(Configuration):
         )
         self._check_verify()
 
-    def _check_verify(self, *args: Any, **kwds: Any) -> None:
+    def _check_verify(self, *args: Tuple[Any, Any], **kwds: Dict[Any, Any]) -> None:
         """
         This function was made to overwrite the verfly_ssl prop in the super method
         """
@@ -80,14 +80,18 @@ class CdaConfiguration(Configuration):
         check: bool = True
 
         if not path.exists(openssl_dir):
-            check: bool = False
+            check = False
 
         if openssl_cafile.find("pem") == -1:
-            check: bool = False
+            check = False
 
         return check
 
     def _unverified_http(self) -> None:
         print(
-            f"""[bold yellow]Unverified HTTPS request is being made to host'{Constants.CDA_API_URL}'. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/1.26.x/advanced-usage.html#ssl-warnings[/bold yellow]"""
+            f"""[bold yellow]
+            Unverified HTTPS request is being made to host'{Constants.cda_api_url}'.
+            Adding certificate verification is strongly advised.
+            See: https://urllib3.readthedocs.io/en/1.26.x/advanced-usage.html#ssl-warnings
+            [/bold yellow]"""
         )

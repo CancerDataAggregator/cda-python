@@ -1,11 +1,10 @@
 """
-cdapython is a library used to interact with the machine generated CDA Python Client and offers some syntactic sugar to make it more pleasant to query the CDA.
+cdapython is a library used to interact with the machine generated CDA Python Client and offers some
+syntactic sugar to make it more pleasant to query the CDA.
 """
-from __future__ import print_function
 
-from typing import Any, Dict
+from typing import Any
 
-from rich import print
 from typing_extensions import Literal
 
 from cdapython.constant_variables import Constants
@@ -31,7 +30,6 @@ from cdapython.factories import (
     SUBJECT_FILE_COUNT,
     TREATMENT,
     TREATMENT_COUNT,
-    QFactory,
 )
 from cdapython.factories.count import Count
 from cdapython.factories.diagnosis import Diagnosis, DiagnosisCount
@@ -59,7 +57,17 @@ from cdapython.factories.subject import (
 )
 from cdapython.factories.treatment import Treatment, TreatmentCount
 from cdapython.Q import Q
-from cdapython.utils.utility import columns, query, unique_terms
+from cdapython.utils.utility import (
+    columns,
+    get_default_project_dataset,
+    get_host_url,
+    get_query_result,
+    get_table_version,
+    set_default_project_dataset,
+    set_host_url,
+    set_table_version,
+    unique_terms,
+)
 
 __name__: Literal["cdapython"] = "cdapython"
 __version__: str = Constants._VERSION
@@ -72,7 +80,13 @@ __all__ = [
     "Constants",
     "Q",
     "columns",
-    "query",
+    "get_default_project_dataset",
+    "get_host_url",
+    "get_query_result",
+    "get_table_version",
+    "set_default_project_dataset",
+    "set_host_url",
+    "set_table_version",
     "unique_terms",
     "Subject",
     "SubjectCount",

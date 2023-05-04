@@ -1,3 +1,3 @@
 from cdapython import Q
 
-print(Q("-30+ 7"))
+print(Q("days = -30 + 7"))

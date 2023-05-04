@@ -1,6 +1,5 @@
 from cdapython import Q
-from tests.global_settings import host, table
-
+from tests.global_settings import host, project
 
 # def test_not() -> None:
 #     Q('sex NOT LIKE "m%"').subject.count.run(host=host)
@@ -26,7 +25,7 @@ from tests.global_settings import host, table
 # )
 #         0   10  4     40    10  4     0
 a = Q('sex = "male" AND sex = "female" AND NOT sex = "unknown"').run(
-    host=host, table=table
+    host=host, table=project
 )
 print(a)
 

@@ -1,8 +1,10 @@
-from cdapython import Q
 from unittest import mock
-from tests.fake_result import FakeResultData
-from cdapython.results.result import Result
+
 from pandas import DataFrame
+
+from cdapython import Q
+from cdapython.results.result import Result
+from tests.fake_result import FakeResultData
 
 # from tests.global_settings import host, table
 
@@ -1524,7 +1526,7 @@ fake_result = Result(
 
 @mock.patch("cdapython.Q.run", return_value=fake_result)
 def test_age_at_collection(a):
-    p = Q("ResearchSubject.Specimen.age_at_collection <= 10")
+    p = Q("age_at_collection <= 10")
     qsub = p.specimen.run()
     assert isinstance(qsub.to_list(), list) is True
     assert isinstance(qsub.to_dataframe(), DataFrame) is True

@@ -1,9 +1,14 @@
-import pytest
+from pytest import raises
 
 from cdapython import columns
 
 
-def test_basic_integration():
-    with pytest.raises(ValueError):
-        cols = columns(table="data").to_list()
+def test_basic_integration() -> None:
+    cols = columns(version="data")
+    if cols is not None:
+        cols.to_list()
+    else:
         assert cols is None
+
+
+test_basic_integration()

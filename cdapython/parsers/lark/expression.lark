@@ -1,0 +1,21 @@
+?expression_math: expression_product
+               | expression_math "+" expression_product -> expression_add
+               | expression_math "-" expression_product -> expression_sub
+               | "CASE" (when_then)+ "ELSE" expression_math "END" -> case_expression
+               | "CAST" "(" expression_math "AS" TYPENAME ")" -> as_type
+               | "CAST" "(" literal "AS" TYPENAME ")" -> literal_cast
+
+
+?expression_product: expression_parens
+                  | expression_product "*" expression_parens -> expression_mul
+                  | expression_product "/" expression_parens -> expression_div
+
+?expression_parens: expression
+                  | "(" expression_parens "*" expression ")" -> expression_mul
+                  | "(" expression_parens "/" expression ")" -> expression_div
+                  | "(" expression_parens "+" expression ")" -> expression_add
+                  | "(" expression_parens "-" expression ")" -> expression_sub
+
+?expression: [name "."] (name | STAR) -> column_name
+            | literal
+

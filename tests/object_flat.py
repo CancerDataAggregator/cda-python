@@ -1,9 +1,4 @@
-from copy import copy
-
-from numpy import sort
-from pandas import DataFrame
-
-from cdapython import Q, Result
+from cdapython import Q
 from tests.global_settings import localhost
 
 q1 = Q('ResearchSubject.identifier.system = "PDC"')
