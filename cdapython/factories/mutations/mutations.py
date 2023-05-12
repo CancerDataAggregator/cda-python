@@ -29,10 +29,10 @@ class Mutations(Entity):
         self,
         api_instance: QueryApi,
         query: Query,
-        version: str,
         dry_run: bool,
-        table: str,
         async_req: bool,
+        offset: int,
+        limit: int,
     ) -> Endpoint:
         """
         This will call the mutation_query endpoint
@@ -49,9 +49,9 @@ class Mutations(Entity):
         """
         return api_instance.mutation_query(
             query=query,
-            version=version,
             dry_run=dry_run,
-            table=table,
+            offset=offset,
+            limit=limit,
             async_req=async_req,
         )
 

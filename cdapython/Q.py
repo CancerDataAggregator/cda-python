@@ -23,6 +23,7 @@ from typing import (
     List,
     Optional,
     Tuple,
+    TypeVar,
     Union,
 )
 
@@ -32,7 +33,6 @@ from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
 from cda_client.exceptions import ApiException, ServiceException
 from cda_client.model.query import Query
-from cda_client.model.query_created_data import QueryCreatedData
 from cda_client.model.query_response_data import QueryResponseData
 from pandas import DataFrame, read_csv, read_fwf
 from typing_extensions import Literal
@@ -130,6 +130,9 @@ class DryClass:
                 """
 
 
+T = TypeVar("T", bound="Q")
+
+
 class Q:
     """
     Q lang is Language used to send query to the cda service
@@ -149,6 +152,7 @@ class Q:
         self._config = Qconfig() if config is None else config
         self.query: Query = Query()
         self._show_sql: bool = False
+        self.dry_run: bool = False
 
         if len(args) == 1:
             if args[0] is None:
@@ -305,8 +309,9 @@ class Q:
 
     # region staticmethods
 
-    @staticmethod
+    @classmethod
     def bulk_download(
+        cls: T,
         version: Union[str, None] = Constants.table_version,
         host: Union[str, None] = None,
         dry_run: bool = False,
@@ -356,7 +361,12 @@ class Q:
                 api_response = api_response.get()
 
             r: Union[Result, StringResult, ColumnsResult, None] = get_query_result(
-                Result, api_instance, api_response.query_id, offset, limit, async_call
+                clz=Result,
+                api_instance=api_instance,
+                endpoint_clz=cls,
+                offset=offset,
+                limit=limit,
+                async_req=async_call,
             )
             if r is None:
                 return None
@@ -387,38 +397,6 @@ class Q:
                 "BigQueryStatus"
             ]["messages"][0]
         )
-
-    @staticmethod
-    def query_job_status(
-        query_id: str, host: Union[str, None] = None, verify: Union[bool, None] = None
-    ) -> Optional[Any]:
-        """[summary]
-
-        Args:
-            id (str): [description]
-            host (Optional[str], optional): [description].
-            Defaults to None.
-            verify (Optional[bool], optional):
-            [description]. Defaults to None.
-
-        Returns:
-            object: [description]
-        """
-
-        cda_client_obj: ApiClient = ApiClient(
-            configuration=CdaConfiguration(host=host, verify=verify)
-        )
-        try:
-            with cda_client_obj as api_client:
-                api_instance: QueryApi = QueryApi(api_client)
-                api_response = api_instance.job_status(query_id)
-                return api_response["status"]
-
-        except InsecureRequestWarning as e:
-            print(e)
-        except Exception as e:
-            print(e)
-        return None
 
     # endregion
 
@@ -473,12 +451,12 @@ class Q:
         self,
         api_instance: QueryApi,
         query: Query,
-        version: str,
         dry_run: bool,
-        table: str,
+        offset: int,
+        limit: int,
         async_req: bool,
-    ) -> Union[QueryCreatedData, ApplyResult, Endpoint]:
-        """_summary_
+    ) -> Union[ApplyResult, Endpoint]:
+        """
             Call the endpoint to start the job for data collection.
         Args:
             api_instance (QueryApi): Api instance to use for the query
@@ -489,14 +467,14 @@ class Q:
             async_req (bool): Async request
 
         Returns:
-            (Union[QueryCreatedData, ApplyResult])
+
         """
         try:
             return api_instance.boolean_query(
                 query=query,
-                version=version,
                 dry_run=dry_run,
-                table=table,
+                offset=offset,
+                limit=limit,
                 async_req=async_req,
             )
         except Exception:
@@ -506,76 +484,24 @@ class Q:
     def _build_result_object(
         self,
         api_response: QueryResponseData,
-        query_id: str,
         offset: int,
         limit: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
+        endpoint_clz: T,
         format_type: str = "json",
     ) -> Result:
         return Result(
-            api_response,
-            query_id,
-            offset,
-            limit,
-            api_instance,
-            show_sql,
-            show_count,
-            format_type,
+            api_response=api_response,
+            offset=offset,
+            limit=limit,
+            api_instance=api_instance,
+            show_sql=show_sql,
+            show_count=show_count,
+            endpoint_clz=endpoint_clz,
+            format_type=format_type,
         )
-
-    def __get_query_result(
-        self,
-        api_instance: QueryApi,
-        query_id: str,
-        offset: int,
-        page_size: int,
-        async_req: Optional[bool],
-        pre_stream: bool = True,
-        show_sql: bool = True,
-        show_count: bool = True,
-        format_type: str = "json",
-    ) -> Result:
-        """[summary]
-            This will call the next query and wait for
-            the result then return a Result object to the user.
-        Args:
-            api_instance (QueryApi): [description]
-            query_id (str): [description]
-            offset (int): [description]
-            page_size (int): [description]
-            async_req (bool): [description]
-            pre_stream (bool, optional): [description]. Defaults to True.
-
-        Returns:
-            Optional[Result]: [returns a class Result Object]
-        """
-        while True:
-            response = api_instance.query(
-                id=query_id,
-                offset=offset,
-                limit=page_size,
-                async_req=async_req,
-                _preload_content=pre_stream,
-                _check_return_type=False,
-            )
-
-            if isinstance(response, ApplyResult):
-                response = response.get()
-
-            sleep(2.5)
-            if response.total_row_count is not None:
-                return self._build_result_object(
-                    api_response=response,
-                    query_id=query_id,
-                    offset=offset,
-                    limit=page_size,
-                    api_instance=api_instance,
-                    show_sql=show_sql,
-                    show_count=show_count,
-                    format_type=format_type,
-                )
 
     @Measure()
     def run(
@@ -583,7 +509,6 @@ class Q:
         offset: int = 0,
         page_size: int = 100,
         limit: Union[int, None] = None,
-        version: Union[str, None] = None,
         host: Union[str, None] = None,
         dry_run: bool = False,
         table: Union[str, None] = None,
@@ -593,7 +518,8 @@ class Q:
         include: Union[str, None] = None,
         format_type: str = "json",
         show_sql: bool = False,
-    ) -> Union[QueryCreatedData, ApplyResult, Result, DryClass, None]:
+        show_count: bool = True,
+    ) -> Union[ApplyResult, Result, DryClass, None]:
         """_summary_
         This will call the server to make a request return a Result like object
         Args:
@@ -621,15 +547,14 @@ class Q:
             table = self._config.table
 
         if dry_run is True:
-            dry_run = False
+            self.dry_run = False
             dry_run_current = True
 
         cda_client_obj: ApiClient = ApiClient(
             configuration=CdaConfiguration(host=host, verify=verify, verbose=verbose)
         )
-        PAGEOFFSET = 0  # this variable is used as offset for the query function
 
-        version, table = check_version_and_table(version, table)
+        # version, table = check_version_and_table(version, table)
 
         if include is not None:
             self.query = Q.__select(self, fields=include).query
@@ -655,9 +580,9 @@ class Q:
                 api_response = self._call_endpoint(
                     api_instance=api_instance,
                     query=self.query,
-                    version=version,
                     dry_run=dry_run,
-                    table=table,
+                    limit=page_size,
+                    offset=offset,
                     async_req=async_call,
                 )
                 if isinstance(api_response, ApplyResult):
@@ -670,14 +595,14 @@ class Q:
                     dryClass = DryClass(**api_response.to_dict())
                     return dryClass
 
-            return self.__get_query_result(
+            return self._build_result_object(
+                api_response=api_response,
+                offset=offset,
+                limit=page_size,
                 api_instance=api_instance,
-                query_id=api_response.query_id,
-                offset=PAGEOFFSET,
-                page_size=page_size,
-                async_req=async_call,
-                show_sql=self._show_sql,
-                show_count=True,
+                show_sql=show_sql,
+                show_count=show_count,
+                endpoint_clz=self.__class__,
                 format_type=format_type,
             )
         except ServiceException as http_error:

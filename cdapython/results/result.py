@@ -22,13 +22,15 @@ from cdapython.Paginator import Paginator
 from cdapython.results import COLLECT_RESULT
 from cdapython.results.base import BaseResult
 from cdapython.results.factories.result_factory import ResultFactory
+from cdapython.utils.match import match
 
 if TYPE_CHECKING:
+    from cdapython import Q
     from cdapython.results import CollectResult
     from cdapython.results.columns_result import ColumnsResult
     from cdapython.results.string_result import StringResult
 
-_T = TypeVar("_T")
+T = TypeVar("T", bound="Q")
 
 
 class Result(BaseResult):
@@ -40,21 +42,21 @@ class Result(BaseResult):
     def __init__(
         self,
         api_response: QueryResponseData,
-        query_id: str,
         offset: int,
         limit: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
+        endpoint_clz: T,
         format_type: str = "json",
     ) -> None:
         self._api_response: QueryResponseData = api_response
         self._result: List[Any] = self._api_response.result
-        self._query_id: str = query_id
         self._offset: int = offset
         self._limit: int = limit
         self._api_instance: QueryApi = api_instance
         self._df: DataFrame
+        self.endpoint_clz = endpoint_clz
         super().__init__(
             show_sql=show_sql,
             show_count=show_count,
@@ -292,13 +294,13 @@ class Result(BaseResult):
         pre_stream: bool = True,
     ) -> Union[Result, StringResult, ColumnsResult, None]:
         return get_query_result(
-            self.__class__,
-            self._api_instance,
-            self._query_id,
-            _offset,
-            _limit,
-            async_req,
-            pre_stream,
+            clz=self.__class__,
+            api_instance=self._api_instance,
+            offset=_offset,
+            limit=_limit,
+            async_req=async_req,
+            endpoint_clz=self.endpoint_clz,
+            pre_stream=pre_stream,
             format_type=self.format_type,
         )
 
@@ -306,17 +308,17 @@ class Result(BaseResult):
 def get_query_result(
     clz: Any,
     api_instance: QueryApi,
-    query_id: str,
-    offset: Optional[int],
-    limit: Optional[int],
-    async_req: Optional[bool],
+    offset: int,
+    limit: int,
+    endpoint_clz: T,
+    async_req: bool = False,
     pre_stream: bool = True,
     show_sql: bool = False,
     show_count: bool = True,
     format_type: str = "json",
 ) -> Union[Result, StringResult, ColumnsResult, None]:
     """
-        This will call the next query and wait for the result \
+        This will call the next query and wait for the result
         then return a Result object to the user.
     Args:
         api_instance (QueryApi): [description]
@@ -329,28 +331,27 @@ def get_query_result(
     Returns:
         Optional[Result]: [returns a class Result Object]
     """
-    while True:
-        response = api_instance.query(
-            id=query_id,
-            offset=offset,
-            limit=limit,
-            async_req=async_req,
-            _preload_content=pre_stream,
-            _check_return_type=False,
+
+    response = endpoint_clz._call_endpoint(
+        api_instance=api_instance,
+        query=endpoint_clz.query,
+        limit=limit,
+        offset=offset,
+        dry_run=endpoint_clz.dry_run,
+        async_req=async_req,
+    )
+
+    if isinstance(response, ApplyResult):
+        response = response.get()
+
+    sleep(2.5)
+    if response.total_row_count is not None:
+        return clz(
+            response,
+            offset,
+            limit,
+            api_instance,
+            show_sql,
+            show_count,
+            format_type,
         )
-
-        if isinstance(response, ApplyResult):
-            response = response.get()
-
-        sleep(2.5)
-        if response.total_row_count is not None:
-            return clz(
-                response,
-                query_id,
-                offset,
-                limit,
-                api_instance,
-                show_sql,
-                show_count,
-                format_type,
-            )

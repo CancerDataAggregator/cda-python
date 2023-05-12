@@ -24,16 +24,16 @@ class ResearchSubjectCount(ResearchSubject):
         self,
         api_instance: QueryApi,
         query: Query,
-        version: str,
         dry_run: bool,
-        table: str,
         async_req: bool,
+        offset: int,
+        limit: int,
     ) -> Endpoint:
         return api_instance.research_subject_counts_query(
             query=query,
-            version=version,
+            limit=limit,
             dry_run=dry_run,
-            table=table,
+            offset=offset,
             async_req=async_req,
         )
 
