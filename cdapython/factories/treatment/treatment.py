@@ -20,18 +20,21 @@ class Treatment(Entity):
     def _call_endpoint(
         self,
         api_instance: QueryApi,
-        query: Query,
         version: str,
         dry_run: bool,
         table: str,
         async_req: bool,
+        offset: int,
+        limit: int,
     ) -> Endpoint:
         return api_instance.treatments_query(
-            query=query,
+            query=self.query,
             version=version,
             dry_run=dry_run,
             table=table,
             async_req=async_req,
+            offset=offset,
+            limit=limit,
         )
 
     class Factory(AbstractFactory):

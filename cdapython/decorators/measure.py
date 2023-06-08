@@ -3,11 +3,15 @@ This is the time decorator class
 """
 from functools import wraps
 from time import time
-from typing import Any, Callable, Dict, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, Tuple, TypedDict, TypeVar, Union
 
 F = TypeVar("F", bound=Callable[..., Any])
 
 FunctionAny = Union[F, Any]
+
+
+class Measure_Type(TypedDict):
+    verbose: Union[bool, None]
 
 
 class Measure:
@@ -15,26 +19,28 @@ class Measure:
     This class will Measure time execution.
     """
 
-    def __init__(self) -> None:
-        self.kwargs: Dict[str, Any] = {}
+    def __init__(self, verbose: bool = False) -> None:
+        self.kwargs: Measure_Type = {"verbose": verbose}
         self.result: Union[Any, None]
+        self.verbose_default: bool = verbose
 
     def __call__(self, func: F) -> FunctionAny[F]:
         self.result = None
 
         @wraps(func)
-        def wrapper(*args: Tuple[Any], **kwargs: Dict[str, Any]) -> FunctionAny[F]:
+        def wrapper(*args: Tuple[Any], **kwargs: Measure_Type) -> FunctionAny[F]:
             start_time = int(round(time() * 1000))
             self.kwargs = kwargs
+            verbose = self.verbose_default
+            if "verbose" in self.kwargs:
+                verbose = self.kwargs.get("verbose")
+
             try:
                 self.result = func(*args, **kwargs)
                 return self.result
             finally:
                 if self.result is not None:
-                    if (
-                        "verbose" not in self.kwargs
-                        or self.kwargs.get("verbose") is not None
-                    ):
+                    if verbose:
                         end_ = int(round(time() * 1000)) - start_time
                         seconds = round((end_ / 1000) % 60, 3)
                         minutes = round(int((end_ / (1000 * 60)) % 60))

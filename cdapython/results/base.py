@@ -119,7 +119,8 @@ class BaseResult:
         show_index: bool = True,
         index_name: Union[str, None] = None,
     ) -> Table:
-        """Convert a pandas.DataFrame obj into a rich.Table obj.
+        """
+        Convert a pandas.DataFrame obj into a rich.Table objuct.
         copied from
         https://gist.github.com/neelabalan/33ab34cf65b43e305c3f12ec6db05938#file-df_to_table-py
         Args:

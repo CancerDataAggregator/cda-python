@@ -5,14 +5,11 @@ and SQL Like operators queue supports further to the bottom
 """
 from __future__ import annotations
 
-import csv
 import logging
-from copy import copy
 from dataclasses import dataclass
 from json import JSONEncoder, dumps
 from multiprocessing.pool import ApplyResult
 from pathlib import Path
-from time import sleep
 from types import MappingProxyType
 from typing import (
     TYPE_CHECKING,
@@ -25,6 +22,8 @@ from typing import (
     Tuple,
     TypeVar,
     Union,
+    cast,
+    overload,
 )
 
 from cda_client import ApiClient
@@ -32,6 +31,7 @@ from cda_client.api.meta_api import MetaApi
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
 from cda_client.exceptions import ApiException, ServiceException
+from cda_client.model.paged_response_data import PagedResponseData
 from cda_client.model.query import Query
 from cda_client.model.query_response_data import QueryResponseData
 from pandas import DataFrame, read_csv, read_fwf
@@ -55,7 +55,8 @@ from cdapython.factories import (
 from cdapython.factories.q_factory import QFactory
 from cdapython.parsers.select_parser import sql_function_parser
 from cdapython.parsers.where_parser import where_parser
-from cdapython.results.result import Result, get_query_result
+from cdapython.results.page_result import Paged_Result, get_query_result
+from cdapython.results.result import Result
 from cdapython.utils.Cda_Configuration import CdaConfiguration
 from cdapython.utils.Qconfig import Qconfig
 
@@ -120,12 +121,10 @@ class _QEncoder(JSONEncoder):
 
 @dataclass()
 class DryClass:
-    query_id: str
     query_sql: str
 
     def __repr__(self) -> str:
         return f"""
-                Query_ID: {self.query_id}
                 SQL: {self.query_sql}
                 """
 
@@ -153,7 +152,6 @@ class Q:
         self.query: Query = Query()
         self._show_sql: bool = False
         self.dry_run: bool = False
-
         if len(args) == 1:
             if args[0] is None:
                 raise RuntimeError("Q statement parse error")
@@ -182,8 +180,8 @@ class Q:
 
     def __iter__(
         self,
-    ) -> Union[Generator[Any, None, None], Iterator[Result]]:
-        results = self.run(verify=False)
+    ) -> Union[Generator[Any, None, None], Iterator[Paged_Result]]:
+        results = Q(self.query, config=self._config).run(verify=False)
 
         if results and hasattr(results, "paginator"):
             if isinstance(results, ApplyResult):
@@ -204,6 +202,14 @@ class Q:
         return Constants.version()
 
     def set_version(self, table_version: str) -> Q:
+        """
+        This will set the table version
+        Args:
+            table_version (str): _description_
+
+        Returns:
+            Q: _description_
+        """
         config = self._config.copy_config()
         config.version = table_version
         return self.__class__(self.query, config=config)
@@ -221,8 +227,38 @@ class Q:
         config.table = project
         return self.__class__(self.query, config=config)
 
+    def set_config(self, config: Qconfig = Qconfig()) -> Q:
+        """
+        This is used to set the config
+        Args:
+            config (Qconfig, optional): _description_. Defaults to Qconfig().
+
+        Returns:
+            Q: _description_
+        """
+        return self.__class__(self.query, config=config)
+
+    def get_config(self) -> Qconfig:
+        return self._config
+
     def get_table(self) -> str:
         return self._config.table
+
+    def get_verbose(self) -> bool:
+        return self._config.verbose
+
+    def set_verbose(self, value: bool) -> Q:
+        """
+        this will set the private propey _verbose
+        Args:
+            value (bool): _description_
+
+        Returns:
+            Q: _description_
+        """
+        config = self._config.copy_config()
+        config.verbose = value
+        return self.__class__(self.query, config=config)
 
     # region helper methods
     def to_json(
@@ -311,7 +347,7 @@ class Q:
 
     @classmethod
     def bulk_download(
-        cls: T,
+        cls,
         version: Union[str, None] = Constants.table_version,
         host: Union[str, None] = None,
         dry_run: bool = False,
@@ -360,10 +396,10 @@ class Q:
                     api_response.wait(10000)
                 api_response = api_response.get()
 
-            r: Union[Result, StringResult, ColumnsResult, None] = get_query_result(
-                clz=Result,
+            r = get_query_result(
+                clz=cls,
                 api_instance=api_instance,
-                endpoint_clz=cls,
+                q_object=cast("Q", cls),
                 offset=offset,
                 limit=limit,
                 async_req=async_call,
@@ -371,7 +407,7 @@ class Q:
             if r is None:
                 return None
 
-            if isinstance(r, (Result, StringResult)):
+            if isinstance(r, Paged_Result):
                 df: DataFrame = r.get_all().to_dataframe()
                 return df
 
@@ -420,8 +456,8 @@ class Q:
 
     @property
     def subject(self) -> Q:
-        """_summary_
-            this is a chaining method used to get subject
+        """
+        This is a chaining method used to get subject
         Returns:
             Q: _description_
         """
@@ -429,14 +465,29 @@ class Q:
 
     @property
     def researchsubject(self) -> Q:
+        """
+        This is a chaining method used to get research subject
+        Returns:
+            Q: _description_
+        """
         return QFactory.create_entity(RESEARCH_SUBJECT, self)
 
     @property
     def specimen(self) -> Q:
+        """
+        This is a chaining method used to get specimen
+        Returns:
+            Q: _description_
+        """
         return QFactory.create_entity(SPECIMEN, self)
 
     @property
     def diagnosis(self) -> Q:
+        """
+        This is a chaining method used to get diagnosis
+        Returns:
+            Q: _description_
+        """
         return QFactory.create_entity(DIAGNOSIS, self)
 
     @property
@@ -450,12 +501,11 @@ class Q:
     def _call_endpoint(
         self,
         api_instance: QueryApi,
-        query: Query,
         dry_run: bool,
         offset: int,
         limit: int,
         async_req: bool,
-    ) -> Union[ApplyResult, Endpoint]:
+    ) -> PagedResponseData:
         """
             Call the endpoint to start the job for data collection.
         Args:
@@ -463,7 +513,7 @@ class Q:
             query (Query): Query object that has been compiled
             version (str): Version to use for query
             dry_run (bool): Specify whether this is a dry run
-            tabel (str): Table to perform the query on
+            table (str): Table to perform the query on
             async_req (bool): Async request
 
         Returns:
@@ -471,7 +521,7 @@ class Q:
         """
         try:
             return api_instance.boolean_query(
-                query=query,
+                query=self.query,
                 dry_run=dry_run,
                 offset=offset,
                 limit=limit,
@@ -485,25 +535,25 @@ class Q:
         self,
         api_response: QueryResponseData,
         offset: int,
-        limit: int,
+        page_size: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
-        endpoint_clz: T,
+        q_object: Q,
         format_type: str = "json",
     ) -> Result:
-        return Result(
+        return Paged_Result(
             api_response=api_response,
             offset=offset,
-            limit=limit,
+            page_size=page_size,
             api_instance=api_instance,
             show_sql=show_sql,
             show_count=show_count,
-            endpoint_clz=endpoint_clz,
+            q_object=q_object,
             format_type=format_type,
         )
 
-    @Measure()
+    @Measure(verbose=True)
     def run(
         self,
         offset: int = 0,
@@ -514,12 +564,12 @@ class Q:
         table: Union[str, None] = None,
         async_call: bool = False,
         verify: Union[bool, None] = None,
-        verbose: bool = True,
+        verbose: Union[bool, None] = True,
         include: Union[str, None] = None,
         format_type: str = "json",
         show_sql: bool = False,
         show_count: bool = True,
-    ) -> Union[ApplyResult, Result, DryClass, None]:
+    ) -> Union[ApplyResult[Paged_Result], Paged_Result, DryClass, None]:
         """_summary_
         This will call the server to make a request return a Result like object
         Args:
@@ -543,8 +593,16 @@ class Q:
 
         if host is None:
             host = self._config.host
+        else:
+            self._config.host = host
         if table is None:
             table = self._config.table
+        else:
+            self._config.table = table
+        if verbose is None:
+            verbose = self.get_verbose()
+        else:
+            self._config.verbose = verbose
 
         if dry_run is True:
             self.dry_run = False
@@ -557,13 +615,13 @@ class Q:
         # version, table = check_version_and_table(version, table)
 
         if include is not None:
-            self.query = Q.__select(self, fields=include).query
+            self.query = Q.SELECT(self, fields=include).query
 
         if limit is not None:
             self.query = Q.LIMIT(self, number=limit).query
 
-        if offset > 0:
-            self.query = Q.__offset(self, offset).query
+        # if offset > 0:
+        #     self.query = Q.OFFSET(self, offset).query
 
         self._show_sql = show_sql or False
 
@@ -579,7 +637,6 @@ class Q:
 
                 api_response = self._call_endpoint(
                     api_instance=api_instance,
-                    query=self.query,
                     dry_run=dry_run,
                     limit=page_size,
                     offset=offset,
@@ -598,11 +655,11 @@ class Q:
             return self._build_result_object(
                 api_response=api_response,
                 offset=offset,
-                limit=page_size,
+                page_size=page_size,
                 api_instance=api_instance,
                 show_sql=show_sql,
                 show_count=show_count,
-                endpoint_clz=self.__class__,
+                q_object=self,
                 format_type=format_type,
             )
         except ServiceException as http_error:
@@ -646,10 +703,22 @@ class Q:
                 print(exception)
         return None
 
-    def q_wrap(self, right: Union[str, Q, Query], operator: str) -> Q:
+    def q_wrap(self, right: Union[str, Q, Query, None], operator: str) -> Q:
+        """
+        This function will create a Q object
+        Args:
+            right (Union[str, Q, Query, None]): _description_
+            operator (str): _description_
+
+        Returns:
+            Q: _description_
+        """
         if isinstance(right, str):
             right = Q(right)
-        return self.__class__(self.query, operator, right.query, config=self._config)
+        if isinstance(right, Q):
+            return self.__class__(
+                self.query, operator, right.query, config=self._config
+            )
 
     def AND(self, right: Union[str, Q]) -> Q:
         """Q's AND operator this will add a AND to between two Q queries

@@ -19,7 +19,6 @@ class StringResult(Result):
     def __init__(
         self,
         api_response: QueryResponseData,
-        query_id: str,
         offset: int,
         limit: int,
         api_instance: QueryApi,
@@ -28,15 +27,17 @@ class StringResult(Result):
         format_type: str = "json",
     ) -> None:
         super().__init__(
-            api_response,
-            query_id,
-            offset,
-            limit,
-            api_instance,
-            show_sql,
-            show_count,
-            format_type,
+            api_response=api_response,
+            offset=offset,
+            limit=limit,
+            api_instance=api_instance,
+            show_sql=show_sql,
+            show_count=show_count,
+            format_type=format_type,
         )
+
+    def get_all(self) -> None:
+        pass
 
     def to_list(self, filters: Optional[str] = None, exact: bool = False) -> list:
         """_summary_

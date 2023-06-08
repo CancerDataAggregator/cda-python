@@ -1,14 +1,10 @@
-from typing_extensions import Literal
 from cda_client.api.query_api import QueryApi, QueryResponseData
+from typing_extensions import Literal
 
 
 class FakeResultData:
     def __init__(self, result_data=[]) -> None:
         self._result_data = result_data
-
-    @property
-    def query_id(self) -> Literal["1984ecc0-df3e-4482-96d0-2863a2e7ca59"]:
-        return "1984ecc0-df3e-4482-96d0-2863a2e7ca59"
 
     @property
     def offset(self) -> Literal[0]:

@@ -8,7 +8,7 @@ from tests.global_settings import host, project
 
 
 def test_conversion() -> None:
-    q1 = Q("age_at_diagnosis > 50*365").diagnosis
+    q1 = Q("age_at_diagnosis > 50 * 365").diagnosis
     q2 = Q('subject_associated_project = "TCGA-OV"').researchsubject
     q = q1.AND(q2)
 

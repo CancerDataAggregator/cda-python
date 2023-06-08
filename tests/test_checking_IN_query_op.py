@@ -3,7 +3,6 @@ from unittest.mock import patch
 
 from cdapython.results.result import Result
 
-
 # from tests.global_settings import host, table
 from tests.fake_result import FakeResultData
 
@@ -31,9 +30,8 @@ fake: FakeResultData = FakeResultData(result)
 
 fake_result: Result = Result(
     api_response=fake.api_response,
-    query_id=fake.query_id,
     offset=fake.offset,
-    limit=fake.limit,
+    page_size=fake\.limit,
     api_instance=fake.api_instance,
     show_sql=fake.show_sql,
     show_count=fake.show_count,

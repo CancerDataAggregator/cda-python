@@ -13,11 +13,13 @@ class Qconfig:
         table: Optional[str] = None,
         version: Optional[str] = None,
         show_sql: bool = False,
+        verbose: Optional[bool] = None,
     ) -> None:
         self.host = Constants.cda_api_url if host is None else host
         self.table = Constants.default_table if table is None else table
         self.version = Constants.table_version if version is None else version
         self.show_sql = show_sql
+        self.verbose = verbose if verbose is None else verbose
 
     def copy_config(self) -> Qconfig:
         return copy(self)

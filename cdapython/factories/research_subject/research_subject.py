@@ -24,17 +24,20 @@ class ResearchSubject(Entity):
     def _call_endpoint(
         self,
         api_instance: QueryApi,
-        query: Query,
         version: str,
         dry_run: bool,
         table: str,
         async_req: bool,
+        offset: int,
+        limit: int,
     ) -> Endpoint:
         return api_instance.research_subject_query(
-            query=query,
+            query=self.query,
             version=version,
             dry_run=dry_run,
             table=table,
+            offset=offset,
+            limit=limit,
             async_req=async_req,
         )
 

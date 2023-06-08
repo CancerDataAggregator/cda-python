@@ -35,9 +35,8 @@ class TreatmentCount(Treatment):
     def _build_result_object(
         self,
         api_response: QueryResponseData,
-        query_id: str,
         offset: int,
-        limit: int,
+        page_size: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -45,9 +44,8 @@ class TreatmentCount(Treatment):
     ) -> Result:
         return CountResult(
             api_response,
-            query_id,
             offset,
-            limit,
+            page_size,
             api_instance,
             show_sql,
             show_count,

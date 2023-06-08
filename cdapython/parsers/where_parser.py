@@ -48,6 +48,8 @@ class Parse_Q(Base_Parser):
     def not_equals(self, args) -> Query:
         if "value" in args[1] and "%" in str(args[1].value):
             return self._build_Query(args=args, node_type="NOT LIKE")
+        if "value" in args[1] and "NULL" in str(args[1].value):
+            return self._build_Query(args=args, node_type="IS NOT")
         return super().not_equals(args)
 
     def equals(self, args: List[Query]) -> Query:
@@ -61,6 +63,8 @@ class Parse_Q(Base_Parser):
         """
         if "value" in args[1] and "%" in str(args[1].value):
             return self._build_Query(args=args, node_type="LIKE")
+        if "value" in args[1] and "NULL" in str(args[1].value):
+            return self._build_Query(args=args, node_type="IS")
         return super().equals(args)
 
     def single_quotes(self, args) -> Query:

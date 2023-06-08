@@ -1,5 +1,5 @@
 import json
-from typing import Union
+from typing import List, TypedDict, Union
 
 from cda_client.exceptions import ApiException, ServiceException
 
@@ -40,6 +40,18 @@ class QSyntaxError(SyntaxError):
         return self.PRINT_Q_ERROR()
 
 
+class Http_Error_Dict(TypedDict):
+    """
+    This is for type definitions for http errors.
+    Args:
+        TypedDict (_type_): _description_
+    """
+
+    error: str
+    status: int
+    causes: Union[str, List[str]]
+
+
 class HTTP_ERROR_API(ApiException):
     """_summary_
     This is a
@@ -53,18 +65,18 @@ class HTTP_ERROR_API(ApiException):
         message: str = "HTTP ERROR",
     ) -> None:
         self.message = message
-        (
-            self.msg,
-            self.status_code,
-            _,
-        ) = json.loads(http_error.body).values()
-        super().__init__(self.message)
+        if http_error.body:
+            http_dict: Http_Error_Dict = json.loads(http_error.body)
+            self.error = http_dict["error"]
+            self.statusCode = http_dict["status"]
+
+        super().__init__(reason=self.message)
 
     def PRINT_Q_ERROR(self) -> str:
         return f"""
                 {self.message}
-                Http Status: {self.status_code}
-                Error Message: {self.msg}
+                Http Status: {self.statusCode}
+                Error Message: {self.error}
             """
 
     def __str__(self) -> str:

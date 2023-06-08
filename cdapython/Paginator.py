@@ -3,8 +3,10 @@ This module hold the Paginator class
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, TypeVar, Union
+import asyncio
+from typing import TYPE_CHECKING, Any, Coroutine, List, TypeVar, Union
 
+import anyio
 from rich.progress import (
     BarColumn,
     MofNCompleteColumn,
@@ -21,10 +23,8 @@ if TYPE_CHECKING:
     from rich.progress import TaskID
 
     from cdapython.results.columns_result import ColumnsResult
-    from cdapython.results.result import Result
+    from cdapython.results.page_result import Paged_Result
     from cdapython.results.string_result import StringResult
-
-T = TypeVar("T")
 
 
 class Paginator:
@@ -34,7 +34,7 @@ class Paginator:
 
     def __init__(
         self,
-        result: Result,
+        result: Paged_Result,
         to_df: bool,
         to_list: bool,
         output: str,
@@ -42,10 +42,10 @@ class Paginator:
         format_type: str = "JSON",
         show_bar: bool = False,
     ) -> None:
-        self.result: Union[Result, StringResult] = result
+        self.result: Union[Paged_Result, StringResult] = result
         self.to_df: bool = to_df
         self.to_list: bool = to_list
-        self.limit: Union[int, None] = limit if limit else self.result._limit
+        self.limit: Union[int, None] = limit if limit else self.result._page_size
         self.count: int = self.result.count
         self.stopped: bool = False
         self.format_type: str = format_type
@@ -58,14 +58,15 @@ class Paginator:
             MofNCompleteColumn(),
         )
         self.show_bar: bool = show_bar
+        self._loop: asyncio.AbstractEventLoop
         if self.show_bar:
             self.task: TaskID = self.progress.add_task(
                 "Processing", total=self.result.total_row_count
             )
             self.progress.update(self.task, advance=self.result.count)
 
-    def _return_result(self) -> Union[DataFrame, List[Any], Result]:
-        """_summary_
+    def _return_result(self) -> Union[DataFrame, List[Any], Paged_Result, StringResult]:
+        """
         This return a Result object and DataFrame
         Returns:
             Union[DataFrame, list, Result]: _description_
@@ -82,7 +83,12 @@ class Paginator:
 
         return self.result
 
-    def _do_next(self: Paginator) -> Union[DataFrame, List[Any], Result, None]:
+    def _do_next(self: Paginator) -> Union[DataFrame, List[Any], Paged_Result, None]:
+        """
+        This will check the next page and update the progress bar
+        Returns:
+            Union[DataFrame, List[Any], Paged_Result, None]
+        """
         result_nx = self._return_result()
         if self.result.has_next_page:
             try:
@@ -103,8 +109,10 @@ class Paginator:
             return result_nx
         return None
 
-    async def a_do_next(self) -> Union[List[T], DataFrame, Result, None]:
-        return self._do_next()
+    async def a_do_next(
+        self,
+    ) -> Coroutine[Any, Any, Union[DataFrame, List[Any], Paged_Result, None]]:
+        return await anyio.to_thread.run_sync(self._do_next)
 
     def __iter__(self) -> Paginator:
         if self.show_bar:
@@ -112,11 +120,14 @@ class Paginator:
         return self
 
     def __aiter__(self) -> Paginator:
+        self._loop = asyncio.get_event_loop()
         if self.show_bar:
             self.progress.start()
         return self
 
-    async def __anext__(self) -> Union[list, DataFrame, Result, None]:
+    async def __anext__(
+        self,
+    ) -> Coroutine[Any, Any, Union[DataFrame, List[Any], Paged_Result, None]]:
         try:
             if self.stopped:
                 if self.show_bar:
@@ -130,7 +141,7 @@ class Paginator:
                 self.progress.stop()
             raise e
 
-    def __next__(self) -> Union[list, DataFrame, Result, None]:
+    def __next__(self) -> Union[List[Any], DataFrame, Paged_Result, None]:
         try:
             if self.stopped:
                 if self.show_bar:

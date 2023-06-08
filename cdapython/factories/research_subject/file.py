@@ -24,17 +24,16 @@ class ResearchSubjectFiles(ResearchSubject):
     def _call_endpoint(
         self,
         api_instance: QueryApi,
-        query: Query,
         dry_run: bool,
         async_req: bool,
         offset: int,
-        limit: int,
+        page_size: int,
     ) -> Endpoint:
         return api_instance.research_subject_files_query(
-            query=query,
+            query=self.query,
             offset=offset,
             dry_run=dry_run,
-            limit=limit,
+            limit=page_size,
             async_req=async_req,
         )
 

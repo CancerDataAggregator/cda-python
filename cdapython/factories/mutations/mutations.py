@@ -28,7 +28,6 @@ class Mutations(Entity):
     def _call_endpoint(
         self,
         api_instance: QueryApi,
-        query: Query,
         dry_run: bool,
         async_req: bool,
         offset: int,
@@ -48,7 +47,7 @@ class Mutations(Entity):
             Endpoint: _description_
         """
         return api_instance.mutation_query(
-            query=query,
+            query=self.query,
             dry_run=dry_run,
             offset=offset,
             limit=limit,

@@ -23,9 +23,8 @@ class CollectResult(NotPaginatedResult):
     def __init__(
         self,
         api_response: QueryResponseData,
-        query_id: str,
         offset: int,
-        limit: int,
+        page_size: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -35,9 +34,8 @@ class CollectResult(NotPaginatedResult):
         self._result = result
         super().__init__(
             api_response=api_response,
-            query_id=query_id,
             offset=offset,
-            limit=limit,
+            page_size=page_size,
             api_instance=api_instance,
             show_sql=show_sql,
             show_count=show_count,
@@ -76,9 +74,8 @@ class CollectResult(NotPaginatedResult):
         def create(q_object: Result) -> CollectResult:
             return CollectResult(
                 api_response=q_object._api_response,
-                query_id=q_object._query_id,
                 offset=q_object._offset,
-                limit=q_object._limit,
+                page_size=q_object._page_size,
                 api_instance=q_object._api_instance,
                 show_sql=q_object.show_sql,
                 show_count=q_object.show_count,

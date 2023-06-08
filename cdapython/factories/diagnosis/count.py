@@ -18,14 +18,13 @@ class DiagnosisCount(Diagnosis):
     def _call_endpoint(
         self,
         api_instance: QueryApi,
-        query: Query,
         dry_run: bool,
         async_req: bool,
         offset: int,
         limit: int,
     ) -> Endpoint:
         return api_instance.diagnosis_counts_query(
-            query=query,
+            query=self.query,
             dry_run=dry_run,
             async_req=async_req,
             offset=offset,
@@ -45,7 +44,6 @@ class DiagnosisCount(Diagnosis):
     ) -> Result:
         return CountResult(
             api_response,
-            query_id,
             offset,
             limit,
             api_instance,

@@ -23,14 +23,13 @@ class Count(Entity):
     def _call_endpoint(
         self,
         api_instance: QueryApi,
-        query: Query,
         version: str,
         dry_run: bool,
         table: str,
         async_req: bool,
     ) -> Endpoint:
         return api_instance.global_counts(
-            query=query,
+            query=self.query,
             version=version,
             dry_run=dry_run,
             table=table,
@@ -40,9 +39,8 @@ class Count(Entity):
     def _build_result_object(
         self,
         api_response: QueryResponseData,
-        query_id: str,
         offset: int,
-        limit: int,
+        page_size: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -50,9 +48,8 @@ class Count(Entity):
     ) -> Result:
         return CountResult(
             api_response,
-            query_id,
             offset,
-            limit,
+            page_size,
             api_instance,
             show_sql,
             show_count,

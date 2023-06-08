@@ -23,24 +23,22 @@ class MutationsCount(Specimen):
     def _call_endpoint(
         self,
         api_instance: QueryApi,
-        query: Query,
         dry_run: bool,
         async_req: bool,
         offset: int,
-        limit: int,
+        page_size: int,
     ) -> Endpoint:
         return api_instance.mutation_counts_query(
-            query=query,
+            query=self.query,
             dry_run=dry_run,
             offset=offset,
-            limit=limit,
+            limit=page_size,
             async_req=async_req,
         )
 
     def _build_result_object(
         self,
         api_response: QueryResponseData,
-        query_id: str,
         offset: int,
         limit: int,
         api_instance: QueryApi,
@@ -50,7 +48,6 @@ class MutationsCount(Specimen):
     ) -> Result:
         return CountResult(
             api_response,
-            query_id,
             offset,
             limit,
             api_instance,

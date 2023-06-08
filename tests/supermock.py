@@ -3,11 +3,10 @@ from functools import wraps
 from typing import Any, List, Union
 from unittest import mock
 
-from tests.fake_result import FakeResultData
-
 from cdapython.results.count_result import CountResult
 from cdapython.results.result import Result
 from cdapython.results.string_result import StringResult
+from tests.fake_result import FakeResultData
 
 
 class Result_Type(Enum):
@@ -31,9 +30,8 @@ class SuperMock:
             if self.result_type.Result == "Result":
                 self._data = Result(
                     api_response=fake.api_response,
-                    query_id=fake.query_id,
                     offset=fake.offset,
-                    limit=fake.limit,
+                    page_size=fake.limit,
                     api_instance=fake.api_instance,
                     show_sql=fake.show_sql,
                     show_count=fake.show_count,
@@ -42,9 +40,8 @@ class SuperMock:
                 if self.result_type.CountResult == "CountResult":
                     self._data = CountResult(
                         api_response=fake.api_response,
-                        query_id=fake.query_id,
                         offset=fake.offset,
-                        limit=fake.limit,
+                        page_size=fake\.limit,
                         api_instance=fake.api_instance,
                         show_sql=fake.show_sql,
                         show_count=fake.show_count,

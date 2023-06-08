@@ -17,9 +17,8 @@ class NotPaginatedResult(Result):
     def __init__(
         self,
         api_response: QueryResponseData,
-        query_id: str,
         offset: int,
-        limit: int,
+        page_size: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -27,9 +26,8 @@ class NotPaginatedResult(Result):
     ) -> None:
         super().__init__(
             api_response=api_response,
-            query_id=query_id,
             offset=offset,
-            limit=limit,
+            page_size=page_size,
             api_instance=api_instance,
             show_sql=show_sql,
             show_count=show_count,

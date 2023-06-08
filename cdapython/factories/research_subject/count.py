@@ -23,15 +23,14 @@ class ResearchSubjectCount(ResearchSubject):
     def _call_endpoint(
         self,
         api_instance: QueryApi,
-        query: Query,
         dry_run: bool,
         async_req: bool,
         offset: int,
-        limit: int,
+        page_size: int,
     ) -> Endpoint:
         return api_instance.research_subject_counts_query(
-            query=query,
-            limit=limit,
+            query=self.query,
+            limit=page_size,
             dry_run=dry_run,
             offset=offset,
             async_req=async_req,
@@ -40,9 +39,8 @@ class ResearchSubjectCount(ResearchSubject):
     def _build_result_object(
         self,
         api_response: QueryResponseData,
-        query_id: str,
         offset: int,
-        limit: int,
+        page_size: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -50,9 +48,8 @@ class ResearchSubjectCount(ResearchSubject):
     ) -> Result:
         return CountResult(
             api_response,
-            query_id,
             offset,
-            limit,
+            page_size,
             api_instance,
             show_sql,
             show_count,

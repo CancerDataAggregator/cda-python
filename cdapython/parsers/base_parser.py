@@ -1,7 +1,7 @@
 from typing import List, NoReturn, Optional, Union
 
 from cda_client.model.query import Query
-from lark import Token, Tree
+from lark import Token
 from lark.visitors import Transformer
 
 from cdapython.exceptions.custom_exception import QSyntaxError

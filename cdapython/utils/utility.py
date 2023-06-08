@@ -17,7 +17,7 @@ from cdapython.constant_variables import Constants
 from cdapython.decorators.cache import lru_cache_timed
 from cdapython.exceptions.custom_exception import HTTP_ERROR_API, HTTP_ERROR_SERVICE
 from cdapython.results.columns_result import ColumnsResult
-from cdapython.results.result import get_query_result
+from cdapython.results.page_result import get_query_result
 from cdapython.results.string_result import StringResult
 from cdapython.utils.Cda_Configuration import CdaConfiguration
 
@@ -160,21 +160,14 @@ def unique_terms(
             api_response = api_response.get()
 
             # Execute query
-            query_result = get_query_result(
-                StringResult,
+            return StringResult(
                 api_instance=api_instance,
-                query_id=api_response.query_id,
+                api_response=api_response,
                 offset=offset,
                 limit=limit,
-                async_req=async_req,
                 show_sql=show_sql,
                 show_count=True,
             )
-
-            if query_result is None:
-                return None
-
-            return query_result
 
     except ServiceException as http_error:
         if verbose:

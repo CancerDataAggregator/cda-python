@@ -9,28 +9,34 @@ from __future__ import annotations
 
 from collections import ChainMap
 from io import StringIO
-from multiprocessing.pool import ApplyResult
-from time import sleep
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, TypeVar, Union, cast
+from typing import Any, Dict, List, Optional, TypedDict, Union
 
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
 from pandas import DataFrame, read_csv
-from typing_extensions import Literal, Self
+from typing_extensions import Literal
 
-from cdapython.Paginator import Paginator
-from cdapython.results import COLLECT_RESULT
 from cdapython.results.base import BaseResult
-from cdapython.results.factories.result_factory import ResultFactory
-from cdapython.utils.match import match
 
-if TYPE_CHECKING:
-    from cdapython import Q
-    from cdapython.results import CollectResult
-    from cdapython.results.columns_result import ColumnsResult
-    from cdapython.results.string_result import StringResult
 
-T = TypeVar("T", bound="Q")
+class ResultTypes(TypedDict):
+    """
+    Type hit for Results
+    :param TypedDict: _description_
+    :type TypedDict: _type_
+    """
+
+    subject_id: Union[str, None]
+    species: Union[str, None]
+    sex: Union[str, None]
+    race: Union[str, None]
+    ethnicity: Union[str, None]
+    days_to_birth: Union[str, None]
+    vital_status: Union[str, None]
+    days_to_death: Union[str, None]
+    cause_of_death: Union[str, None]
+    subject_identifier: Union[Dict[str, Any], None]
+    subject_associated_project: Union[List[str], None]
 
 
 class Result(BaseResult):
@@ -43,20 +49,18 @@ class Result(BaseResult):
         self,
         api_response: QueryResponseData,
         offset: int,
-        limit: int,
+        page_size: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
-        endpoint_clz: T,
         format_type: str = "json",
     ) -> None:
         self._api_response: QueryResponseData = api_response
-        self._result: List[Any] = self._api_response.result
+        self._result: List[ResultTypes] = self._api_response.result
         self._offset: int = offset
-        self._limit: int = limit
+        self._page_size: int = page_size
         self._api_instance: QueryApi = api_instance
         self._df: DataFrame
-        self.endpoint_clz = endpoint_clz
         super().__init__(
             show_sql=show_sql,
             show_count=show_count,
@@ -131,6 +135,9 @@ class Result(BaseResult):
         Returns:
             int: _description_
         """
+        if self._api_response.total_row_count is None:
+            return 0
+
         return int(self._api_response.total_row_count)
 
     @property
@@ -140,218 +147,4 @@ class Result(BaseResult):
         Returns:
             bool: returns a bool value if there is a next page
         """
-        return (self._offset + self._limit) < self.total_row_count
-
-    def paginator(
-        self,
-        output: str = "",
-        to_df: bool = False,
-        to_list: bool = False,
-        page_size: int = 0,
-        show_bar: bool = False,
-    ) -> Paginator:
-        """_summary_
-        paginator this will automatically page over results
-        Args:
-            to_df (bool, optional): _description_. Defaults to False.
-
-        Returns:
-            _type_: _description_
-        """
-
-        page_size = page_size if page_size != 0 else self._limit
-
-        return Paginator(
-            self,
-            to_df=to_df,
-            to_list=to_list,
-            limit=page_size,
-            output=output,
-            format_type=self.format_type,
-            show_bar=show_bar,
-        )
-
-    def get_all(
-        self,
-        output: str = "",
-        page_size: int = 0,
-        show_bar: bool = True,
-    ) -> "CollectResult":
-        """
-        get_all is a method that will loop for you
-
-        Args:
-            output (str, optional): _description_. Defaults to "".
-            page_size (Union[int, None], optional): _description_. Defaults to None.
-
-        Returns:
-            Union[DataFrame, List[Any]]: _description_
-        """
-
-        if page_size == 0:
-            page_size = self._limit
-
-        iterator: Paginator = Paginator(
-            self,
-            to_df=False,
-            to_list=False,
-            limit=page_size,
-            output=output,
-            format_type=self.format_type,
-            show_bar=show_bar,
-        )
-        # add this to cast to a subclass of CollectResult
-        collect_result: "CollectResult" = cast(
-            "CollectResult", ResultFactory.create_entity(COLLECT_RESULT, self)
-        )
-
-        for index, i in enumerate(iterator):
-            if index == 0:
-                continue
-            if isinstance(i, Result):
-                collect_result.extend_result(i)
-
-        return collect_result
-
-    async def async_next_page(
-        self,
-        limit: Optional[int] = None,
-        async_req: bool = False,
-        pre_stream: bool = True,
-    ) -> Union[Result, StringResult, ColumnsResult, None]:
-        """async wrapper for next page
-
-        Returns:
-            _type_: _description_
-        """
-        return self.next_page(limit=limit, async_req=async_req, pre_stream=pre_stream)
-
-    async def async_prev_page(
-        self,
-        limit: Optional[int] = None,
-        async_req: bool = False,
-        pre_stream: bool = True,
-    ) -> Union[Result, StringResult, ColumnsResult, None]:
-        """
-        async wrapper for prev page
-
-        Returns:
-            _type_: _description_
-        """
-
-        return self.prev_page(limit=limit, async_req=async_req, pre_stream=pre_stream)
-
-    def next_page(
-        self,
-        limit: Optional[int] = None,
-        async_req: bool = False,
-        pre_stream: bool = True,
-    ) -> Union[Result, StringResult, ColumnsResult, None]:
-        """
-        The next_page function will call the server for the next page using this \
-        limit to determine the next level of page results
-        Args:
-            limit (Optional[int], optional): _description_. Defaults to None.
-            async_req (bool, optional): _description_. Defaults to False.
-            pre_stream (bool, optional): _description_. Defaults to True.
-
-        Raises:
-            StopIteration: _description_
-
-        Returns:
-            _type_: _description_
-        """
-        if not self.has_next_page:
-            raise StopIteration
-        if isinstance(self._offset, int) and isinstance(self._limit, int):
-            _offset: int = self._offset + self._limit
-            _limit: int = limit or self._limit
-            return self._get_result(_offset, _limit, async_req, pre_stream)
-
-    def prev_page(
-        self,
-        limit: Optional[int] = None,
-        async_req: bool = False,
-        pre_stream: bool = True,
-    ) -> Union[Result, StringResult, ColumnsResult, None]:
-        """prev_page
-
-
-        Returns:
-            _type_: _description_
-        """
-        if isinstance(self._offset, int) and isinstance(self._limit, int):
-            offset = self._offset - self._limit
-            offset = max(0, offset)
-            limit = limit or self._limit
-            return self._get_result(offset, limit, async_req, pre_stream)
-
-    def _get_result(
-        self,
-        _offset: int,
-        _limit: int,
-        async_req: bool = False,
-        pre_stream: bool = True,
-    ) -> Union[Result, StringResult, ColumnsResult, None]:
-        return get_query_result(
-            clz=self.__class__,
-            api_instance=self._api_instance,
-            offset=_offset,
-            limit=_limit,
-            async_req=async_req,
-            endpoint_clz=self.endpoint_clz,
-            pre_stream=pre_stream,
-            format_type=self.format_type,
-        )
-
-
-def get_query_result(
-    clz: Any,
-    api_instance: QueryApi,
-    offset: int,
-    limit: int,
-    endpoint_clz: T,
-    async_req: bool = False,
-    pre_stream: bool = True,
-    show_sql: bool = False,
-    show_count: bool = True,
-    format_type: str = "json",
-) -> Union[Result, StringResult, ColumnsResult, None]:
-    """
-        This will call the next query and wait for the result
-        then return a Result object to the user.
-    Args:
-        api_instance (QueryApi): [description]
-        query_id (str): [description]
-        offset (int): [description]
-        limit (int): [description]
-        async_req (bool): [description]
-        pre_stream (bool, optional): [description]. Defaults to True.
-
-    Returns:
-        Optional[Result]: [returns a class Result Object]
-    """
-
-    response = endpoint_clz._call_endpoint(
-        api_instance=api_instance,
-        query=endpoint_clz.query,
-        limit=limit,
-        offset=offset,
-        dry_run=endpoint_clz.dry_run,
-        async_req=async_req,
-    )
-
-    if isinstance(response, ApplyResult):
-        response = response.get()
-
-    sleep(2.5)
-    if response.total_row_count is not None:
-        return clz(
-            response,
-            offset,
-            limit,
-            api_instance,
-            show_sql,
-            show_count,
-            format_type,
-        )
+        return (self._offset + self._page_size) < self.total_row_count
