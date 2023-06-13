@@ -4,7 +4,7 @@ from cdapython import columns
 
 
 def test_basic_integration() -> None:
-    cols = columns(version="data")
+    cols = columns()
     if cols is not None:
         cols.to_list()
     else:

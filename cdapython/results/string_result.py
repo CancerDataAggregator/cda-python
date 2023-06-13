@@ -20,7 +20,7 @@ class StringResult(Result):
         self,
         api_response: QueryResponseData,
         offset: int,
-        limit: int,
+        page_size: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -29,7 +29,7 @@ class StringResult(Result):
         super().__init__(
             api_response=api_response,
             offset=offset,
-            limit=limit,
+            page_size=page_size,
             api_instance=api_instance,
             show_sql=show_sql,
             show_count=show_count,

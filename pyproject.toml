@@ -47,6 +47,7 @@ platformdirs="2.6.2"
 invoke = "^2.0.0"
 watchdog = "^2.2.1"
 pylint = "^2.17.2"
+typeguard = "^4.0.0"
 
 [build-system]
 # Minimum requirements for the build system to execute.

@@ -5,9 +5,6 @@ syntactic sugar to make it more pleasant to query the CDA.
 
 from typing import Any
 
-from typeguard import install_import_hook
-from typing_extensions import Literal
-
 from cdapython.constant_variables import Constants
 from cdapython.factories import (
     COUNT,
@@ -70,7 +67,6 @@ from cdapython.utils.utility import (
     unique_terms,
 )
 
-install_import_hook("cdapython")
 __version__: str = Constants.version()
 __about__: str = f"Q {__version__}"
 

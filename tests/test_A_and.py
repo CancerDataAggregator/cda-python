@@ -1,5 +1,6 @@
-from cdapython import Q, columns, unique_terms
-from tests.global_settings import host, project
+from global_settings import host, project
+
+from cdapython import Q
 
 
 def test_and_op():
@@ -14,7 +15,7 @@ def test_and_op():
     q1 = Q("sex = '%'")
     q2 = Q("Allele = '%'").mutation
 
-    q = q1.AND(q2).set_host(host).set_project(project)
+    q = q1.AND(q2).set_host(host=host).set_project(project=project)
     df = q.run().to_dataframe()
 
     assert len(df) > 3

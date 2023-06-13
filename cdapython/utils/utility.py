@@ -106,11 +106,8 @@ def unique_terms(
     offset: int = 0,
     limit: int = 100,
     host: Optional[str] = None,
-    table: Optional[str] = None,
     verify: Optional[bool] = None,
     async_req: Optional[bool] = True,
-    version: Optional[str] = None,
-    files: Optional[bool] = False,
     show_sql: bool = False,
     show_counts: bool = False,
     verbose: bool = True,
@@ -130,13 +127,8 @@ def unique_terms(
     Returns:
         Optional[List[Any]]: [description]
     """
-    if version is None:
-        version = Constants.table_version
     if host is None:
         host = Constants.cda_api_url
-
-    if table is None:
-        table = Constants.default_table
 
     if async_req is None:
         async_req = False
@@ -149,10 +141,8 @@ def unique_terms(
         with cda_client_obj as api_client:
             api_instance = QueryApi(api_client)
             api_response = api_instance.unique_values(
-                version=version,
                 body=col_name,
                 system=str(system),
-                table=table,
                 count=show_counts,
                 async_req=async_req,
             )
@@ -164,7 +154,7 @@ def unique_terms(
                 api_instance=api_instance,
                 api_response=api_response,
                 offset=offset,
-                limit=limit,
+                page_size=limit,
                 show_sql=show_sql,
                 show_count=True,
             )
@@ -185,9 +175,7 @@ def unique_terms(
 
 @lru_cache_timed(seconds=60)
 def columns(
-    version: Optional[str] = None,
     host: Optional[str] = None,
-    table: Optional[str] = None,
     verify: Optional[bool] = None,
     async_req: Optional[bool] = True,
     show_sql: bool = False,
@@ -212,11 +200,6 @@ def columns(
     # Execute query
     if host is None:
         host = Constants.cda_api_url
-    if version is None:
-        version = Constants.table_version
-
-    if table is None:
-        table = Constants.default_table
 
     if async_req is None:
         async_req = False
@@ -228,7 +211,7 @@ def columns(
     try:
         with cda_client_obj as api_client:
             api_instance = QueryApi(api_client)
-            api_response = api_instance.columns(version=version, table=table)
+            api_response = api_instance.columns()
             if isinstance(api_response, ApplyResult):
                 api_response = api_response.get()
 

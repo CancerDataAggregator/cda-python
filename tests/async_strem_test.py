@@ -1,6 +1,5 @@
 import asyncio
 
-from global_settings import localhost, project
 from pandas import DataFrame, concat
 
 from cdapython import (
@@ -10,6 +9,7 @@ from cdapython import (
     set_host_url,
     set_table_version,
 )
+from tests.global_settings import localhost, project
 
 
 async def main() -> None:
