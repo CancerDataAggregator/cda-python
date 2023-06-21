@@ -24,21 +24,17 @@ class Specimen(Entity):
     def _call_endpoint(
         self,
         api_instance: QueryApi,
-        version: str,
         dry_run: bool,
-        table: str,
         async_req: bool,
         offset: int,
-        limit: int,
+        page_size: int,
     ) -> Endpoint:
         return api_instance.specimen_query(
             query=self.query,
-            version=version,
             dry_run=dry_run,
-            table=table,
             async_req=async_req,
             offset=offset,
-            limit=limit,
+            limit=page_size,
         )
 
     class Factory(AbstractFactory):

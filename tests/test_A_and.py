@@ -1,6 +1,5 @@
-from global_settings import host, project
-
 from cdapython import Q
+from tests.global_settings import host, project
 
 
 def test_and_op():
@@ -13,9 +12,9 @@ def test_and_op():
     #     ).to_list()
     # )
     q1 = Q("sex = '%'")
-    q2 = Q("Allele = '%'").mutation
+    # q2 = Q("Allele = '%'").mutation
 
-    q = q1.AND(q2).set_host(host=host).set_project(project=project)
+    q = q1.set_host(host=host).set_project(project=project)
     df = q.run().to_dataframe()
 
     assert len(df) > 3

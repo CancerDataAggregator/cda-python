@@ -25,16 +25,14 @@ class SpecimenFiles(Specimen):
         self,
         api_instance: QueryApi,
         query: Query,
-        version: str,
         dry_run: bool,
-        table: str,
         async_req: bool,
+        page_size: int,
     ) -> Endpoint:
         return api_instance.specimen_files_query(
             query=query,
-            version=version,
             dry_run=dry_run,
-            table=table,
+            limit=page_size,
             async_req=async_req,
         )
 

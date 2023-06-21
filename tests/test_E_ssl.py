@@ -5,6 +5,7 @@ from pandas import DataFrame
 from cdapython import Q
 from cdapython.results.result import Result
 from tests.fake_result import FakeResultData
+from tests.patcher import Q_import_path_str
 
 result = [
     {
@@ -38,7 +39,7 @@ fake_result = Result(
 )
 
 
-@mock.patch("cdapython.Q.run", return_value=fake_result)
+@mock.patch(Q_import_path_str(method="run"), return_value=fake_result)
 def test_ssl(a):
     q1 = Q('researchsubject_id = "c5421e34-e5c7-4ba5-aed9-146a5575fd8d"')
 

@@ -74,11 +74,11 @@ def check_version_and_table(
     """_summary_
         This is a help method that is used to check for None type
     Args:
-        version (Union[str,None]): _description_
-        table (Union[str,None]): _description_
+        version (Union[str,None])
+        table (Union[str,None])
 
     Returns:
-        Tuple[str, str]: _description_
+        Tuple[str, str]
     """
     if version is None:
         version = Constants.table_version
@@ -93,17 +93,17 @@ class _QEncoder(JSONEncoder):
         the standard json dump
 
     Args:
-        json (_type_): _description_
+        json (_type_)
     """
 
     def default(self, o: Union[Q, "Query"]) -> Union[Any, Dict[str, Any], None]:
         """this will override the parent super class's default method
 
         Args:
-            o (Union[&quot;Q&quot;, &quot;Query&quot;]): _description_
+            o (Union[&quot;Q&quot;, &quot;Query&quot;])
 
         Returns:
-            Union[Any,dict[str, Any], None]: _description_
+            Union[Any,dict[str, Any], None]
         """
 
         if isinstance(o, MappingProxyType):
@@ -181,13 +181,15 @@ class Q:
     def __iter__(
         self,
     ) -> Union[Generator[Any, None, None], Iterator[Paged_Result]]:
-        results = Q(self.query, config=self._config).run(verify=False)
-
-        if results and hasattr(results, "paginator"):
-            if isinstance(results, ApplyResult):
-                results = results.get()
-            for result in results.paginator():
-                yield result
+        if isinstance(self, Q):
+            q_tmp_object: Q = Q(self.query, config=self._config)
+            results = q_tmp_object.run(verify=False, async_call=True)
+            if isinstance(results, Paged_Result):
+                if results and hasattr(results, "paginator"):
+                    if isinstance(results, ApplyResult):
+                        results = results.get()
+                    for result in results.paginator():
+                        yield result
 
     def __repr__(self) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
@@ -205,10 +207,10 @@ class Q:
         """
         This will set the table version
         Args:
-            table_version (str): _description_
+            table_version (str)
 
         Returns:
-            Q: _description_
+            Q
         """
         config = self._config.copy_config()
         config.version = table_version
@@ -231,10 +233,10 @@ class Q:
         """
         This is used to set the config
         Args:
-            config (Qconfig, optional): _description_. Defaults to Qconfig().
+            config (Qconfig, optional). Defaults to Qconfig().
 
         Returns:
-            Q: _description_
+            Q
         """
         return self.__class__(self.query, config=config)
 
@@ -251,10 +253,10 @@ class Q:
         """
         this will set the private propey _verbose
         Args:
-            value (bool): _description_
+            value (bool)
 
         Returns:
-            Q: _description_
+            Q
         """
         config = self._config.copy_config()
         config.verbose = value
@@ -279,7 +281,7 @@ class Q:
         """_summary_
         Returns the query properties as a dict
         Returns:
-            Any: _description_
+            Any
         """
         return self.query.to_dict()
 
@@ -308,10 +310,10 @@ class Q:
             key (Optional[str], optional): column name in csv or tsv not text
 
         Raises:
-            IOError: _description_
-            Exception: _description_
-            Exception: _description_
-            IOError: _description_
+            IOError
+            Exception
+            Exception
+            IOError
 
         Returns:
             Q
@@ -441,7 +443,7 @@ class Q:
         """_summary_
         this is a chaining method used to get files
         Returns:
-            _type_: _description_
+            _type_
         """
         return QFactory.create_entity(FILE, self)
 
@@ -450,7 +452,7 @@ class Q:
         """_summary_
         this is a chaining method used to get counts
         Returns:
-            _type_: _description_
+            _type_
         """
         return QFactory.create_entity(COUNT, self)
 
@@ -459,7 +461,7 @@ class Q:
         """
         This is a chaining method used to get subject
         Returns:
-            Q: _description_
+            Q
         """
         return QFactory.create_entity(SUBJECT, self)
 
@@ -468,7 +470,7 @@ class Q:
         """
         This is a chaining method used to get research subject
         Returns:
-            Q: _description_
+            Q
         """
         return QFactory.create_entity(RESEARCH_SUBJECT, self)
 
@@ -477,7 +479,7 @@ class Q:
         """
         This is a chaining method used to get specimen
         Returns:
-            Q: _description_
+            Q
         """
         return QFactory.create_entity(SPECIMEN, self)
 
@@ -486,7 +488,7 @@ class Q:
         """
         This is a chaining method used to get diagnosis
         Returns:
-            Q: _description_
+            Q
         """
         return QFactory.create_entity(DIAGNOSIS, self)
 
@@ -503,7 +505,7 @@ class Q:
         api_instance: QueryApi,
         dry_run: bool,
         offset: int,
-        limit: int,
+        page_size: int,
         async_req: bool,
     ) -> PagedResponseData:
         """
@@ -524,7 +526,7 @@ class Q:
                 query=self.query,
                 dry_run=dry_run,
                 offset=offset,
-                limit=limit,
+                limit=page_size,
                 async_req=async_req,
             )
         except Exception:
@@ -569,25 +571,25 @@ class Q:
         format_type: str = "json",
         show_sql: bool = False,
         show_count: bool = True,
-    ) -> Union[ApplyResult[Paged_Result], Paged_Result, DryClass, None]:
-        """_summary_
+    ) -> Union[DryClass, Result, None]:
+        """
         This will call the server to make a request return a Result like object
         Args:
-            offset (int, optional): _description_. Defaults to 0.
-            page_size (int, optional): _description_. Defaults to 100.
-            version (Optional[str], optional): _description_. Defaults to None.
-            host (Optional[str], optional): _description_. Defaults to None.
-            dry_run (bool, optional): _description_. Defaults to False.
-            table (Optional[str], optional): _description_. Defaults to None.
-            async_call (bool, optional): _description_. Defaults to False.
-            verify (Optional[bool], optional): _description_. Defaults to None.
-            verbose (Optional[bool], optional): _description_. Defaults to True.
-            filter (Optional[str], optional): _description_. Defaults to None.
-            flatten (Optional[bool], optional): _description_. Defaults to False.
-            format (Optional[str], optional): _description_. Defaults to "json".
+            offset (int, optional). Defaults to 0.
+            page_size (int, optional). Defaults to 100.
+            version (Optional[str], optional). Defaults to None.
+            host (Optional[str], optional). Defaults to None.
+            dry_run (bool, optional). Defaults to False.
+            table (Optional[str], optional). Defaults to None.
+            async_call (bool, optional). Defaults to False.
+            verify (Optional[bool], optional). Defaults to None.
+            verbose (Optional[bool], optional). Defaults to True.
+            filter (Optional[str], optional). Defaults to None.
+            flatten (Optional[bool], optional). Defaults to False.
+            format (Optional[str], optional). Defaults to "json".
 
         Returns:
-            Optional[Result]: _description_
+            Optional[Result]
         """
         dry_run_current = False
 
@@ -635,10 +637,10 @@ class Q:
                         end="\n\n",
                     )
 
-                api_response = self._call_endpoint(
+                api_response: PagedResponseData = self._call_endpoint(
                     api_instance=api_instance,
                     dry_run=dry_run,
-                    limit=page_size,
+                    page_size=page_size,
                     offset=offset,
                     async_req=async_call,
                 )
@@ -707,11 +709,11 @@ class Q:
         """
         This function will create a Q object
         Args:
-            right (Union[str, Q, Query, None]): _description_
-            operator (str): _description_
+            right (Union[str, Q, Query, None])
+            operator (str)
 
         Returns:
-            Q: _description_
+            Q
         """
         if isinstance(right, str):
             right = Q(right)
@@ -724,7 +726,7 @@ class Q:
         """Q's AND operator this will add a AND to between two Q queries
 
         Args:
-            right (Q): _description_
+            right (Q)
 
         Returns:
             Q: a joined Q queries with a AND node
@@ -735,7 +737,7 @@ class Q:
         """Q's OR operator this will add a OR to between two Q queries
 
         Args:
-            right (Q): _description_
+            right (Q)
 
         Returns:
             Q: a joined Q queries with a OR node
@@ -746,7 +748,7 @@ class Q:
         """Q's FROM operator this will add a SUBQUERY to between two Q queries
 
         Args:
-            right (Q): _description_
+            right (Q)
 
         Returns:
             Q: a joined Q queries with a SUBQUERY node
@@ -757,7 +759,7 @@ class Q:
         """Q's FROM operator this will add a NOT to between a Q query and a None for Not
 
         Args:
-            right (Q): _description_
+            right (Q)
 
         Returns:
             Q: Adds a NOT to a Q query
@@ -771,10 +773,10 @@ class Q:
         """_summary_
         This is a private method used for the parser
         Args:
-            right (Union[str, Q]): _description_
+            right (Union[str, Q])
 
         Returns:
-            Q: _description_
+            Q
         """
         return self.q_wrap(right, operator=">=")
 
@@ -782,10 +784,10 @@ class Q:
         """_summary_
         This is a private method used for the parser
         Args:
-            right (Union[str, &quot;Q&quot;]): _description_
+            right (Union[str, &quot;Q&quot;])
 
         Returns:
-            Q: _description_
+            Q
         """
         return self.q_wrap(right, operator=">")
 
@@ -793,10 +795,10 @@ class Q:
         """_summary_
         This is a private method used for the parser
         Args:
-            right (Q): _description_
+            right (Q)
 
         Returns:
-            Q: _description_
+            Q
         """
         return self.__class__(self.query, "<=", right.query, config=self._config)
 
@@ -804,10 +806,10 @@ class Q:
         """_summary_
         This is a private method used for the parser
         Args:
-            right (Q): _description_
+            right (Q)
 
         Returns:
-            Q: _description_
+            Q
         """
         return self.__class__(self.query, "<", right.query, config=self._config)
 
@@ -815,10 +817,10 @@ class Q:
         """_summary_
         this will add fields to the SELECT values using the private select method
         Args:
-            fields (str): _description_
+            fields (str)
 
         Returns:
-            Q: _description_
+            Q
         """
         return self.__select(fields=fields)
 
@@ -826,10 +828,10 @@ class Q:
         """_summary_
         This is like the ORDER_BY in sql
         Args:
-            fields (str): _description_
+            fields (str)
 
         Returns:
-            Q: _description_
+            Q
         """
         return self._order_by(fields=fields)
 
@@ -857,10 +859,10 @@ class Q:
         """_summary_
         Q's IS operator this will IS Like the sql
         Args:
-            fields (str): _description_
+            fields (str)
 
         Returns:
-            Q: _description_
+            Q
         """
         return self.q_wrap(fields, operator="IS")
 

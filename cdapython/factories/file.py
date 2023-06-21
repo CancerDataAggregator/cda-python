@@ -20,16 +20,16 @@ class File(Entity):
     def _call_endpoint(
         self,
         api_instance: QueryApi,
-        version: str,
         dry_run: bool,
-        table: str,
         async_req: bool,
+        limit: int,
+        offset: int,
     ) -> Endpoint:
         return api_instance.files(
             query=self.query,
-            version=version,
             dry_run=dry_run,
-            table=table,
+            limit=limit,
+            offset=offset,
             async_req=async_req,
         )
 

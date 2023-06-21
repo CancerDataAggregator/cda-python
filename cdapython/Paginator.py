@@ -51,7 +51,7 @@ class Paginator:
         self.format_type: str = format_type
         self.output: str = output
         self.progress: Progress = Progress(
-            TextColumn("[progress.description]{task.description}"),
+            TextColumn(text_format="[progress.description]{task.description}"),
             BarColumn(),
             TaskProgressColumn(),
             TimeElapsedColumn(),
@@ -61,9 +61,9 @@ class Paginator:
         self._loop: asyncio.AbstractEventLoop
         if self.show_bar:
             self.task: TaskID = self.progress.add_task(
-                "Processing", total=self.result.total_row_count
+                description="Processing", total=self.result.total_row_count
             )
-            self.progress.update(self.task, advance=self.result.count)
+            self.progress.update(task_id=self.task, advance=self.result.count)
 
     def _return_result(self) -> Union[DataFrame, List[Any], Paged_Result, StringResult]:
         """
@@ -71,7 +71,7 @@ class Paginator:
         Returns:
             Union[DataFrame, list, Result]: _description_
         """
-        var_output: str = none_check(self.output)
+        var_output: str = none_check(object=self.output)
         if var_output == "full_df":
             return self.result.to_dataframe()
         if var_output == "full_list":

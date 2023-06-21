@@ -23,12 +23,14 @@ class TreatmentCount(Treatment):
         dry_run: bool,
         table: str,
         async_req: bool,
+        page_size: int,
     ) -> Endpoint:
         return api_instance.treatment_counts_query(
             query=query,
             version=version,
             dry_run=dry_run,
             table=table,
+            limit=page_size,
             async_req=async_req,
         )
 
@@ -43,13 +45,13 @@ class TreatmentCount(Treatment):
         format_type: str = "json",
     ) -> Result:
         return CountResult(
-            api_response,
-            offset,
-            page_size,
-            api_instance,
-            show_sql,
-            show_count,
-            format_type,
+            api_response=api_response,
+            offset=offset,
+            page_size=page_size,
+            api_instance=api_instance,
+            show_sql=show_sql,
+            show_count=show_count,
+            format_type=format_type,
         )
 
     class Factory(AbstractFactory):

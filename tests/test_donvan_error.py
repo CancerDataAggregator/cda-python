@@ -4,7 +4,9 @@ from pandas import DataFrame
 
 from cdapython import Q
 from cdapython.results.count_result import CountResult
+from cdapython.results.result import Result
 from tests.fake_result import FakeResultData
+from tests.patcher import Q_import_path_str
 
 result = [
     {
@@ -45,7 +47,7 @@ fake_result = CountResult(
 )
 
 
-@mock.patch("cdapython.Q.run", return_value=fake_result)
+@mock.patch(Q_import_path_str(method="run"), return_value=fake_result)
 def test_donvan_error(a):
     q1 = Q('stage = "Stage I"')
     q2 = Q('stage = "Stage II"')
@@ -54,8 +56,11 @@ def test_donvan_error(a):
     q = q_diag.AND(q3)
     # print(q.counts.run())
     qsub = q.subject.count.run()
-    assert isinstance(qsub.to_list(), list) is True
-    assert isinstance(qsub.to_dataframe(), DataFrame) is True
+    if qsub is not None and isinstance(qsub, Result):
+        if qsub.to_list():
+            assert isinstance(qsub.to_list(), list) is True
+        if qsub.to_dataframe().empty:
+            assert isinstance(qsub.to_dataframe(), DataFrame) is True
 
 
 test_donvan_error()

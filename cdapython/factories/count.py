@@ -47,13 +47,13 @@ class Count(Entity):
         format_type: str = "json",
     ) -> Result:
         return CountResult(
-            api_response,
-            offset,
-            page_size,
-            api_instance,
-            show_sql,
-            show_count,
-            format_type,
+            api_response=api_response,
+            offset=offset,
+            page_size=page_size,
+            api_instance=api_instance,
+            show_sql=show_sql,
+            show_count=show_count,
+            format_type=format_type,
         )
 
     class Factory(AbstractFactory):

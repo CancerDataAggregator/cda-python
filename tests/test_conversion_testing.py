@@ -6,14 +6,19 @@ from tests.global_settings import host, project
 
 # print(columns().df_to_table())
 
+Q("subject_associated_project_associated_project = 'TCGA-OV' ").researchsubject.run()
 
-def test_conversion() -> None:
-    q1 = Q("age_at_diagnosis > 50 * 365").diagnosis
-    q2 = Q('subject_associated_project = "TCGA-OV"').researchsubject
-    q = q1.AND(q2)
-
-    r = q.set_host(host).set_project(project).run().to_dataframe().head()
-    print(r)
+df = columns(host=host).to_dataframe()
+print(df[df["fieldName"].str.contains("associated_project")])
 
 
-test_conversion()
+# def test_conversion() -> None:
+#     q1 = Q("age_at_diagnosis > 50 * 365").diagnosis
+#     q2 = Q('associated_project = "TCGA-OV"').researchsubject
+#     q = q1.AND(q2)
+
+#     r = q.set_host(host).set_project(project).run().to_dataframe().head()
+#     print(r)
+
+
+# test_conversion()

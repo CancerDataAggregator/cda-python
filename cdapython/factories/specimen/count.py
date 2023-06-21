@@ -23,18 +23,14 @@ class SpecimenCount(Specimen):
     def _call_endpoint(
         self,
         api_instance: QueryApi,
-        version: str,
         dry_run: bool,
-        table: str,
         async_req: bool,
         offset: int,
         page_size: int,
     ) -> Endpoint:
         return api_instance.specimen_counts_query(
             query=self.query,
-            version=version,
             dry_run=dry_run,
-            table=table,
             async_req=async_req,
             limit=page_size,
             offset=offset,
@@ -51,13 +47,13 @@ class SpecimenCount(Specimen):
         format_type: str = "json",
     ) -> Result:
         return CountResult(
-            api_response,
-            offset,
-            page_size,
-            api_instance,
-            show_sql,
-            show_count,
-            format_type,
+            api_response=api_response,
+            offset=offset,
+            page_size=page_size,
+            api_instance=api_instance,
+            show_sql=show_sql,
+            show_count=show_count,
+            format_type=format_type,
         )
 
     class Factory(AbstractFactory):

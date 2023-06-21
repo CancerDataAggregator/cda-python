@@ -1,5 +1,5 @@
 from cdapython import columns
-from tests.global_settings import integration_host
+from tests.global_settings import localhost
 
 """
 fieldName,endpoint,description
@@ -7,7 +7,7 @@ fieldName,endpoint,description
 
 
 def test_columns():
-    print(columns(verify=False).to_list())
+    print(columns(host=localhost, verify=False).to_list())
 
 
 test_columns()

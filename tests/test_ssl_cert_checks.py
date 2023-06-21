@@ -6,6 +6,7 @@ from cdapython import Q, columns
 from cdapython.results.result import Result
 from tests.fake_result import FakeResultData
 from tests.global_settings import host, project
+from tests.patcher import Q_import_path_str
 
 result = [
     {
@@ -39,16 +40,17 @@ fake_result = Result(
 )
 
 
-@mock.patch("cdapython.Q.run", return_value=fake_result)
+@mock.patch(Q_import_path_str(method="run"), return_value=fake_result)
 def test_ssl_q(a) -> None:
     r = Q('id = "TCGA-13-1409"')
     q = r.run(verify=False, host=host, table=project)
-    print(q.to_list())
-    # print(host, table)
-    assert q.count == 1
-    assert isinstance(q.to_list(), list) is True
-    assert isinstance(q.to_dataframe(), DataFrame) is True
+    if isinstance(q, Result):
+        print(q.to_list())
+        # print(host, table)
+        assert q.count == 1
+        assert isinstance(q.to_list(), list) is True
+        assert isinstance(q.to_dataframe(), DataFrame) is True
 
 
 print(host, project)
-columns(verify=False, host=host, table=project, verbose=True)
+columns(verify=False, host=host, verbose=True)

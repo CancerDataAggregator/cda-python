@@ -40,18 +40,6 @@ class QSyntaxError(SyntaxError):
         return self.PRINT_Q_ERROR()
 
 
-class Http_Error_Dict(TypedDict):
-    """
-    This is for type definitions for http errors.
-    Args:
-        TypedDict (_type_): _description_
-    """
-
-    error: str
-    status: int
-    causes: Union[str, List[str]]
-
-
 class HTTP_ERROR_API(ApiException):
     """_summary_
     This is a
@@ -66,9 +54,13 @@ class HTTP_ERROR_API(ApiException):
     ) -> None:
         self.message = message
         if http_error.body:
-            http_dict: Http_Error_Dict = json.loads(http_error.body)
-            self.error = http_dict["error"]
-            self.statusCode = http_dict["status"]
+            http_dict = json.loads(http_error.body)
+            if "error" in http_dict:
+                self.error = http_dict["error"]
+                self.statusCode = http_dict["status"]
+            if "causes" in http_dict:
+                self.error = http_dict["message"]
+                self.statusCode = http_dict["statusCode"]
 
         super().__init__(reason=self.message)
 

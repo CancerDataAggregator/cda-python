@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-import asyncio
 from multiprocessing.pool import ApplyResult
-from time import sleep
-from typing import TYPE_CHECKING, Any, Coroutine, List, Union, cast
+from typing import TYPE_CHECKING, Any, Coroutine, Union, cast
 from urllib.parse import parse_qs, urlparse
 
 import anyio
@@ -63,7 +61,7 @@ class Paged_Result(Result):
         async_req: bool = False,
     ) -> Union[ApplyResult[Any], Paged_Result, Any, None]:
         if self.q_object:
-            self.q_object = self.q_object.set_verbose(False)
+            self.q_object: Q = self.q_object.set_verbose(False)
             return self.q_object.set_config(config=self.q_object.get_config()).run(
                 verbose=self.q_object.get_verbose(),
                 offset=_offset,
@@ -92,7 +90,7 @@ class Paged_Result(Result):
         page_size = page_size if page_size != 0 else self._page_size
 
         return Paginator(
-            self,
+            result=self,
             to_df=to_df,
             to_list=to_list,
             limit=page_size,
@@ -122,7 +120,7 @@ class Paged_Result(Result):
             page_size = self._page_size
 
         iterator: Paginator = Paginator(
-            self,
+            result=self,
             to_df=False,
             to_list=False,
             limit=page_size,
@@ -132,14 +130,15 @@ class Paged_Result(Result):
         )
         # add this to cast to a subclass of CollectResult
         collect_result: "CollectResult" = cast(
-            "CollectResult", ResultFactory.create_entity(COLLECT_RESULT, self)
+            "CollectResult",
+            ResultFactory.create_entity(id=COLLECT_RESULT, result_object=self),
         )
 
         for index, i in enumerate(iterator):
             if index == 0:
                 continue
             if isinstance(i, Result):
-                collect_result.extend_result(i)
+                collect_result.extend_result(result=i)
 
         return collect_result
 

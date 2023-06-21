@@ -6,6 +6,7 @@ from cdapython import Q
 from cdapython.results.result import Result
 from tests.fake_result import FakeResultData
 from tests.global_settings import host, project
+from tests.patcher import Q_import_path_str
 
 result = [
     {
@@ -39,7 +40,7 @@ fake_result = Result(
 )
 
 
-@mock.patch("cdapython.Q.run", return_value=fake_result)
+@mock.patch(Q_import_path_str(method="run"), return_value=fake_result)
 def test_call_api(a):
     q = Q('id = "TCGA-E2-A10A"')
     r = q.run(verify=False, host=host, table=project)

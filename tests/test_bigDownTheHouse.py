@@ -5,6 +5,7 @@ from pandas import DataFrame
 from cdapython import Q
 from cdapython.results.result import Result
 from tests.fake_result import FakeResultData
+from tests.patcher import Q_import_path_str
 
 # from tests.global_settings import host, integration_host, table
 
@@ -2123,7 +2124,7 @@ fake_result = Result(
 )
 
 
-@mock.patch("cdapython.Q.run", return_value=fake_result)
+@mock.patch(Q_import_path_str(method="run"), return_value=fake_result)
 def test_Down_house(a):
     q1 = Q('associated_project = "tcga_brca"')
     q2 = Q('associated_project = "TCGA-BRCA"')

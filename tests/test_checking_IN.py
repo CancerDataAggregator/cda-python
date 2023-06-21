@@ -6,6 +6,7 @@ from cdapython import Q
 from cdapython.results.result import Result
 from tests.fake_result import FakeResultData
 from tests.global_settings import integration_table, localhost
+from tests.patcher import Q_import_path_str
 
 result = [
     {
@@ -70,7 +71,7 @@ fake_result = Result(
 )
 
 
-@mock.patch("cdapython.Q.run", return_value=fake_result)
+@mock.patch(Q_import_path_str(method="run"), return_value=fake_result)
 def test_checking_test(_):
     q1 = Q('subject_id IN ["TCGA-A5-A0G2", "TCGA-EO-A22U", "TCGA-FI-A2D5"]').AND(
         "NOT race IS NULL"

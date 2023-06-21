@@ -6,6 +6,7 @@ from cdapython import Q
 from cdapython.results.count_result import CountResult
 from tests.fake_result import FakeResultData
 from tests.global_settings import host, project
+from tests.patcher import Q_import_path_str
 
 result = [
     {
@@ -29,7 +30,7 @@ fake_result = CountResult(
 )
 
 
-@mock.patch("cdapython.Q.run", return_value=fake_result)
+@mock.patch(Q_import_path_str(method="run"), return_value=fake_result)
 def test_glb_count(a) -> None:
     r = Q('sex = "male" OR sex = "female"')
     q1 = r.count.run(host=host, limit=100, table=project)
