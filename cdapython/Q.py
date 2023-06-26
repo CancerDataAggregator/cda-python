@@ -507,6 +507,7 @@ class Q:
         offset: int,
         page_size: int,
         async_req: bool,
+        include_total_count: bool,
     ) -> PagedResponseData:
         """
             Call the endpoint to start the job for data collection.
@@ -528,6 +529,7 @@ class Q:
                 offset=offset,
                 limit=page_size,
                 async_req=async_req,
+                include_count=include_total_count,
             )
         except Exception:
             # this will raise the exception in the run method
@@ -571,7 +573,8 @@ class Q:
         format_type: str = "json",
         show_sql: bool = False,
         show_count: bool = True,
-    ) -> Union[DryClass, Result, None]:
+        include_total_count: bool = True,
+    ) -> Union[DryClass, Result, Paged_Result, None]:
         """
         This will call the server to make a request return a Result like object
         Args:
@@ -643,6 +646,7 @@ class Q:
                     page_size=page_size,
                     offset=offset,
                     async_req=async_call,
+                    include_total_count=include_total_count,
                 )
                 if isinstance(api_response, ApplyResult):
                     if verbose:

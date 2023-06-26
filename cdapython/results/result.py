@@ -137,8 +137,11 @@ class Result(BaseResult):
         """
         if self._api_response.total_row_count is None:
             return 0
-
         return int(self._api_response.total_row_count)
+
+    @total_row_count.setter
+    def total_row_count(self, value: int):
+        self._api_response.total_row_count = value
 
     @property
     def has_next_page(self) -> bool:
@@ -147,4 +150,4 @@ class Result(BaseResult):
         Returns:
             bool: returns a bool value if there is a next page
         """
-        return (self._offset + self._page_size) < self.total_row_count
+        return self._api_response["next_url"] is not None

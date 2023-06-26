@@ -50,6 +50,8 @@ class Paginator:
         self.stopped: bool = False
         self.format_type: str = format_type
         self.output: str = output
+        self.total_result: int = 0
+        self.progress_dirty: bool = False
         self.progress: Progress = Progress(
             TextColumn(text_format="[progress.description]{task.description}"),
             BarColumn(),
@@ -63,9 +65,13 @@ class Paginator:
             self.task: TaskID = self.progress.add_task(
                 description="Processing", total=self.result.total_row_count
             )
-            self.progress.update(task_id=self.task, advance=self.result.count)
+            if not self.progress_dirty:
+                self.progress.update(task_id=self.task, advance=self.result.count)
+                self.progress_dirty = True
 
-    def _return_result(self) -> Union[DataFrame, List[Any], Paged_Result, StringResult]:
+    def _return_result(
+        self, result
+    ) -> Union[DataFrame, List[Any], Paged_Result, StringResult]:
         """
         This return a Result object and DataFrame
         Returns:
@@ -73,35 +79,43 @@ class Paginator:
         """
         var_output: str = none_check(object=self.output)
         if var_output == "full_df":
-            return self.result.to_dataframe()
+            return result.to_dataframe()
         if var_output == "full_list":
-            return self.result.to_list()
+            return result.to_list()
         if self.to_df:
-            return self.result.to_dataframe()
+            return result.to_dataframe()
         if self.to_list:
-            return self.result.to_list()
+            return result.to_list()
 
-        return self.result
+        return result
 
-    def _do_next(self: Paginator) -> Union[DataFrame, List[Any], Paged_Result, None]:
+    def _do_next(
+        self: Paginator,
+    ) -> Union[DataFrame, List[Any], Paged_Result, StringResult, None]:
         """
         This will check the next page and update the progress bar
         Returns:
             Union[DataFrame, List[Any], Paged_Result, None]
         """
-        result_nx = self._return_result()
+        result_nx = self._return_result(result=self.result)
         if self.result.has_next_page:
             try:
-                tmp_result = self.result.next_page(limit=self.limit)
+                if self.total_result == 0:
+                    self.total_result = self.result.total_row_count
+
+                tmp_result: Paged_Result = self.result.next_page(limit=self.limit)
+                tmp_result.total_row_count = self.total_result
                 if tmp_result:
                     self.result = tmp_result
                     if self.show_bar:
-                        self.progress.update(self.task, advance=self.result.count)
+                        self.progress.update(
+                            task_id=self.task, advance=self.result.count
+                        )
                     return result_nx
             except Exception as e:
                 if self.show_bar:
                     for i in self.progress.tasks:
-                        self.progress.remove_task(i.id)
+                        self.progress.remove_task(task_id=i.id)
                     self.progress.stop()
                 raise e
         else:
@@ -131,7 +145,7 @@ class Paginator:
         try:
             if self.stopped:
                 if self.show_bar:
-                    self.progress.update(self.task, advance=self.result.count)
+                    # self.progress.update(self.task, advance=self.result.count)
                     self.progress.stop()
                 raise StopAsyncIteration
             self.count += self.result.count
@@ -145,7 +159,7 @@ class Paginator:
         try:
             if self.stopped:
                 if self.show_bar:
-                    self.progress.update(self.task, advance=self.result.count)
+                    # self.progress.update(self.task, advance=self.result.count)
                     self.progress.stop()
                 raise StopIteration
             self.count += self.result.count

@@ -67,6 +67,7 @@ class Paged_Result(Result):
                 offset=_offset,
                 page_size=_limit,
                 async_call=async_req,
+                include_total_count=False,
             )
         return None
 
@@ -147,7 +148,7 @@ class Paged_Result(Result):
         limit: Union[int, None] = None,
         async_req: bool = False,
         pre_stream: bool = True,
-    ) -> Coroutine[Any, Any, Union[ApplyResult[Any], Result, Any, None]]:
+    ) -> Coroutine[Any, Any, Union[ApplyResult[Any], Result, Paged_Result, Any, None]]:
         """async wrapper for next page
 
         Returns:
@@ -160,7 +161,9 @@ class Paged_Result(Result):
         limit: Union[int, None] = None,
         async_req: bool = False,
         pre_stream: bool = True,
-    ) -> Coroutine[Any, Any, Union[Result, StringResult, ColumnsResult, None]]:
+    ) -> Coroutine[
+        Any, Any, Union[Result, StringResult, ColumnsResult, Paged_Result, None]
+    ]:
         """
         async wrapper for prev page
 
@@ -174,7 +177,7 @@ class Paged_Result(Result):
         limit: Union[int, None] = None,
         async_req: bool = False,
         pre_stream: bool = True,
-    ) -> Union[ApplyResult[Any], Result, Any, None]:
+    ) -> Union[ApplyResult[Any], Result, Paged_Result, None]:
         """
         The next_page function will call the server for the next page using this \
         limit to determine the next level of page results
@@ -192,20 +195,19 @@ class Paged_Result(Result):
         if not self.has_next_page:
             raise StopIteration
         if isinstance(self._offset, int) and isinstance(self._page_size, int):
-            limit = int(
+            self._page_size = int(
                 parse_qs(urlparse(self._api_response["next_url"]).query)["limit"][0]
             )
             self._offset = int(
                 parse_qs(urlparse(self._api_response["next_url"]).query)["offset"][0]
             )
-            _offset: int = self._offset + self._page_size
-            self._page_size: int = limit or self._page_size
-            return self._get_result(_offset, self._page_size)
+
+            return self._get_result(_offset=self._offset, _limit=self._page_size)
 
     def prev_page(
         self,
         limit: Union[int, None] = None,
-    ) -> Union[Result, Any, None]:
+    ) -> Union[Result, Paged_Result, Any, None]:
         """prev_page
 
 
