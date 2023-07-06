@@ -23,10 +23,12 @@ async def main() -> None:
 asyncio.run(main())
 
 
-# q = (
-#     Q("primary_disease_type = 'Lung%'")
-#     .run(host=localhost, table=project)
-#     .get_all()
-#     .to_dataframe()
-# )
-# print(len(q))
+q = (
+    Q("primary_disease_type = 'Lung%'")
+    .SELECT("id,sex")
+    .ORDER_BY("id")
+    .run(host=localhost, table=project)
+    .get_all()
+    .to_dataframe()
+)
+print(len(q))

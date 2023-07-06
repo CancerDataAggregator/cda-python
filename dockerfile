@@ -1,17 +1,10 @@
-FROM python:3.8
-
-# Set the working directory
-WORKDIR /app
-
-# Copy the current directory contents into the container at /app
-COPY . /app
-RUN python3 -m pip install pipx
-RUN python3 -m pipx ensurepath
-RUN pipx install poetry
-RUN apt update -y 
-
-# Set the entry point to start the interactive shell
-ENTRYPOINT [ "bash" ]
-
-# Set the default command to run when the container starts
-CMD [ "-i" ]
+FROM jupyter/minimal-notebook:latest
+USER root
+RUN sudo apt-get update --yes
+RUN sudo apt-get install --yes gcc
+RUN sudo apt-get install --yes g++
+RUN sudo apt-get install --yes make
+RUN sudo apt-get install --yes pkg-config 
+USER ${NB_UID}
+RUN 
+RUN pip install git+https://github.com/CancerDataAggregator/cda-python.git@3.4.1 --no-cache-dir

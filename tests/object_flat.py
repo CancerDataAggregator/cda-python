@@ -1,9 +1,12 @@
 from cdapython import Q
 from tests.global_settings import localhost
 
-q1 = Q('ResearchSubject.identifier.system = "PDC"')
-q2 = Q('ResearchSubject.identifier.system = "GDC"')
-q3 = Q('identifier.system = "IDC"')
+q1 = Q('system = "PDC"')
+q2 = Q('system = "GDC"')
+q3 = Q('system = "IDC"')
+
+Q('system = "PDC" FROM system = "GDC" FROM system = "IDC"')
+
 
 q = q3.FROM(q1.FROM(q2))
 

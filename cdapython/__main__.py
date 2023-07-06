@@ -4,13 +4,8 @@ import cdapython
 
 
 def run_file(path: str) -> None:
-    with open(path, "r", encoding="UTF-8") as file:
-        for line in file:
-            line = line.strip()
-            if not line or line[0] == "#":
-                continue
-            print(line.split())
-            print(cdapython.Q(line).run().df_to_table())
+    with open(file=path, mode="r", encoding="UTF-8") as file:
+        print(cdapython.Q(file.read()).to_json())
 
 
 def main() -> None:
