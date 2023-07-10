@@ -17,6 +17,7 @@ from cdapython.constant_variables import Constants
 from cdapython.decorators.cache import lru_cache_timed
 from cdapython.exceptions.custom_exception import HTTP_ERROR_API, HTTP_ERROR_SERVICE
 from cdapython.results.columns_result import ColumnsResult
+from cdapython.results.factories.collect_result import CollectResult
 from cdapython.results.result import get_query_result
 from cdapython.results.string_result import StringResult
 from cdapython.utils.Cda_Configuration import CdaConfiguration
@@ -102,33 +103,38 @@ def get_table_version() -> str:
 @lru_cache_timed(seconds=10)
 def unique_terms(
     col_name: str,
+    limit: Optional[int] = None,
     system: str = "",
     offset: int = 0,
-    limit: int = 100,
+    page_size: int = 100,
     host: Optional[str] = None,
     table: Optional[str] = None,
     verify: Optional[bool] = None,
     async_req: Optional[bool] = True,
     version: Optional[str] = None,
-    files: Optional[bool] = False,
     show_sql: bool = False,
     show_counts: bool = False,
     verbose: bool = True,
 ) -> Union[Result, StringResult, ColumnsResult, None]:
-    """[summary]
-
+    """
+    This will return unique terms va;ie
     Args:
-        col_name (str): [description]
-        system (str, optional): [description]. Defaults to "".
-        limit (int, optional): [description]. Defaults to 100.
-        host (Optional[str], optional): [description]. Defaults to None.
-        table (Optional[str], optional): [description]. Defaults to None.
-        verify (Optional[bool], optional): [description]. Defaults to None.
-        async_req (Optional[bool], optional): [description]. Defaults to None.
-        pre_stream (bool, optional): [description]. Defaults to True.
+        col_name (str): _description_
+        limit (int): this is a deprecated value please use page_size
+        system (str, optional): _description_. Defaults to "".
+        offset (int, optional): _description_. Defaults to 0.
+        page_size (int, optional): _description_. Defaults to 100.
+        host (Optional[str], optional): _description_. Defaults to None.
+        table (Optional[str], optional): _description_. Defaults to None.
+        verify (Optional[bool], optional): _description_. Defaults to None.
+        async_req (Optional[bool], optional): _description_. Defaults to True.
+        version (Optional[str], optional): _description_. Defaults to None.
+        show_sql (bool, optional): _description_. Defaults to False.
+        show_counts (bool, optional): _description_. Defaults to False.
+        verbose (bool, optional): _description_. Defaults to True.
 
     Returns:
-        Optional[List[Any]]: [description]
+        Union[Result, StringResult, ColumnsResult, None]: _description_
     """
     if version is None:
         version = Constants.table_version
@@ -140,7 +146,9 @@ def unique_terms(
 
     if async_req is None:
         async_req = False
-    col_name = col_name
+
+    if limit is not None:
+        page_size = limit
 
     cda_client_obj: ApiClient = ApiClient(
         configuration=CdaConfiguration(host=host, verify=verify)
@@ -161,11 +169,11 @@ def unique_terms(
 
             # Execute query
             query_result = get_query_result(
-                StringResult,
+                CollectResult,
                 api_instance=api_instance,
                 query_id=api_response.query_id,
                 offset=offset,
-                limit=limit,
+                limit=page_size,
                 async_req=async_req,
                 show_sql=show_sql,
                 show_count=True,

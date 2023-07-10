@@ -59,6 +59,16 @@ class CollectResult(NotPaginatedResult):
         page_size: Union[None, int] = None,
         show_bar: bool = True,
     ) -> Result:
+        """
+        This will page
+        Args:
+            output (str, optional): _description_. Defaults to "".
+            page_size (Union[None, int], optional): _description_. Defaults to None.
+            show_bar (bool, optional): _description_. Defaults to True.
+
+        Returns:
+            Result: _description_
+        """
         return super().get_all(output, page_size, show_bar)
 
     def paginator(

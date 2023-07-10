@@ -7,10 +7,10 @@ from typing import List, Optional
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
 
-from cdapython.results.result import Result
+from cdapython.results.factories.collect_result import CollectResult
 
 
-class StringResult(Result):
+class StringResult(CollectResult):
     """
     This class inheritance from the result class it is made for unique terms function
     in the utility class,just to add a different to to_list
