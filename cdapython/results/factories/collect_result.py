@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, Generic, List, Union
 from cda_client.api.query_api import QueryApi
 from cda_client.model.query_response_data import QueryResponseData
 
+from cdapython.Paginator import Paginator
 from cdapython.results.factories.not_paginated_result import NotPaginatedResult
 from cdapython.results.factories.result_factory import AbstractFactory
 from cdapython.utils.none_check import none_check
@@ -58,7 +59,7 @@ class CollectResult(NotPaginatedResult):
         output: str = "",
         page_size: Union[None, int] = None,
         show_bar: bool = True,
-    ) -> Result:
+    ):
         """
         This will page
         Args:
@@ -78,7 +79,7 @@ class CollectResult(NotPaginatedResult):
         to_list: bool = False,
         page_size: int = None,
         show_bar: bool = False,
-    ):
+    ) -> Paginator:
         return super().paginator(output, to_df, to_list, page_size, show_bar)
 
     class Factory(AbstractFactory):

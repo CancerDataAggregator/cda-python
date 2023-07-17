@@ -169,7 +169,7 @@ def unique_terms(
 
             # Execute query
             query_result = get_query_result(
-                CollectResult,
+                StringResult,
                 api_instance=api_instance,
                 query_id=api_response.query_id,
                 offset=offset,
