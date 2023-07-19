@@ -27,6 +27,8 @@ lark = "^1.1.5"
 regex = "^2022.10.31"
 tornado = "^6.3.2"
 requests = "^2.31.0"
+ipywidgets = "7.6.5"
+anyio = "^3.7.1"
 
 
 

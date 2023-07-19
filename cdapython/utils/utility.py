@@ -103,7 +103,6 @@ def get_table_version() -> str:
 @lru_cache_timed(seconds=10)
 def unique_terms(
     col_name: str,
-    limit: Optional[int] = None,
     system: str = "",
     offset: int = 0,
     page_size: int = 100,
@@ -115,6 +114,7 @@ def unique_terms(
     show_sql: bool = False,
     show_counts: bool = False,
     verbose: bool = True,
+    limit: Optional[int] = None,
 ) -> Union[Result, StringResult, ColumnsResult, None]:
     """
     This will return unique terms va;ie
@@ -168,8 +168,10 @@ def unique_terms(
             api_response = api_response.get()
 
             # Execute query
-            query_result = get_query_result(
-                StringResult,
+            query_result: Union[
+                Result, StringResult, ColumnsResult, None
+            ] = get_query_result(
+                clz=StringResult,
                 api_instance=api_instance,
                 query_id=api_response.query_id,
                 offset=offset,

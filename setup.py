@@ -1,10 +1,11 @@
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 from setuptools import find_packages, setup
 
 
-def get_version(filepath: str):
+def get_version(filepath: str) -> tuple[Optional[str], Optional[str]]:
     version = None
     version_client = None
     with open(filepath, "r") as f:

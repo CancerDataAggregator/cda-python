@@ -648,7 +648,7 @@ class Q:
                 # Execute boolean query
                 if verbose:
                     print(
-                        "Getting results from database",
+                        f"Getting {page_size} results from database ",
                         end="\n\n",
                     )
 

@@ -47,7 +47,7 @@ class CollectResult(NotPaginatedResult):
 
     def extend_result(self, result: Result) -> None:
         """_summary_
-        This will method will
+        This will method will concat the list value to a global list
         Args:
             result (Result): _description_
         """
