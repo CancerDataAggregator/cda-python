@@ -1,10 +1,11 @@
+from typing import Any, Dict, List
 from unittest import mock
 
 from cdapython import unique_terms
 from cdapython.results.result import Result
 from tests.fake_result import FakeResultData
 
-result: list[dict[str, str]] = [
+result: List[Dict[str, str]] = [
     {"sex": "null"},
     {"sex": "F"},
     {"sex": "Female"},
@@ -31,6 +32,6 @@ fake_result = Result(
 
 
 @mock.patch("cdapython.unique_terms", return_value=fake_result)
-def test_unique_terms_get_all(_):
+def test_unique_terms_get_all(_: Any) -> None:
     terms_list = unique_terms("sex").get_all().to_list()
     assert len(terms_list) != 0
