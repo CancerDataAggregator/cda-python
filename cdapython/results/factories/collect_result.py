@@ -59,13 +59,14 @@ class CollectResult(NotPaginatedResult):
         output: str = "",
         page_size: Union[None, int] = None,
         show_bar: bool = True,
-    ):
+    ) -> Result:
         """
-        This will page
+        This will page through the query results automatically looping and appending result objects to a List
+        for the user.
         Args:
-            output (str, optional): _description_. Defaults to "".
-            page_size (Union[None, int], optional): _description_. Defaults to None.
-            show_bar (bool, optional): _description_. Defaults to True.
+            output (str, optional): if you add this output string "full_list"or"full_df" You will either get a list or a DataFrame. Defaults to "".
+            page_size (int, optional): this can increase the page size results . Defaults to None.
+            show_bar (bool, optional): This will show or hide the progress bar. Defaults to False.
 
         Returns:
             Result: _description_
@@ -80,7 +81,26 @@ class CollectResult(NotPaginatedResult):
         page_size: int = None,
         show_bar: bool = False,
     ) -> Paginator:
-        return super().paginator(output, to_df, to_list, page_size, show_bar)
+        """
+        This will return a pagination class which is used in iteration objects, such as the for loop this will.
+        By default, the pagination object will return a result class, which is normally what you will get from a `Q.run`
+        Args:
+            output (str, optional): if you add this output string "full_list"or"full_df" You will either get a list or a DataFrame. Defaults to "".
+            to_df (bool, optional): This will return a list from the DataFrame. Defaults to False.
+            to_list (bool, optional): This will return a list from the paginator. Defaults to False.
+            page_size (int, optional): this can increase the page size results . Defaults to None.
+            show_bar (bool, optional): This will show or hide the progress bar. Defaults to False.
+
+        Returns:
+            Paginator: _description_
+        """
+        return super().paginator(
+            output=output,
+            to_df=to_df,
+            to_list=to_list,
+            page_size=page_size,
+            show_bar=show_bar,
+        )
 
     class Factory(AbstractFactory):
         @staticmethod
