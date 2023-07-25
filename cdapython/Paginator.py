@@ -107,7 +107,7 @@ class Paginator:
                 if tmp_result:
                     self.result = tmp_result
                     if self.show_bar:
-                        if self.task:
+                        if self.task is not None:
                             self.progress.update(
                                 task_id=self.task,
                                 advance=self.result.count,
