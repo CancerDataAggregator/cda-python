@@ -47,7 +47,7 @@ class CollectResult(NotPaginatedResult):
 
     def extend_result(self, result: Result) -> None:
         """_summary_
-        This will method will concat the list value to a global list
+        This method will concat the list value to a global list
         Args:
             result (Result): _description_
         """
@@ -65,7 +65,7 @@ class CollectResult(NotPaginatedResult):
         for the user.
         Args:
             output (str, optional): if you add this output string "full_list"or"full_df" You will either get a list or a DataFrame. Defaults to "".
-            page_size (int, optional): this can increase the page size results . Defaults to None.
+            page_size (int, optional): this can increase the page size results . Defaults to None.  Known issue: the first page is always 100, even when the size is adjusted.
             show_bar (bool, optional): This will show or hide the progress bar. Defaults to False.
 
         Returns:
@@ -82,13 +82,13 @@ class CollectResult(NotPaginatedResult):
         show_bar: bool = False,
     ) -> Paginator:
         """
-        This will return a pagination class which is used in iteration objects, such as the for loop this will.
+        This will return a pagination class (Collection) for iteration, such as the for loop.
         By default, the pagination object will return a result class, which is normally what you will get from a `Q.run`
         Args:
             output (str, optional): if you add this output string "full_list"or"full_df" You will either get a list or a DataFrame. Defaults to "".
             to_df (bool, optional): This will return a list from the DataFrame. Defaults to False.
             to_list (bool, optional): This will return a list from the paginator. Defaults to False.
-            page_size (int, optional): this can increase the page size results . Defaults to None.
+            page_size (int, optional): this can change the page size of results . Defaults to results limit.
             show_bar (bool, optional): This will show or hide the progress bar. Defaults to False.
 
         Returns:

@@ -117,10 +117,10 @@ def unique_terms(
     limit: Optional[int] = None,
 ) -> Union[Result, StringResult, ColumnsResult, None]:
     """
-    This will return unique terms Result object.
+    This will return a unique terms Result object.
     Args:
         col_name (str): _description_
-        limit (int): this is a deprecated value please use page_size
+        limit (int): Deprecated. Please use page_size
         system (str, optional): _description_. Defaults to "".
         offset (int, optional): _description_. Defaults to 0.
         page_size (int, optional): _description_. Defaults to 100.
