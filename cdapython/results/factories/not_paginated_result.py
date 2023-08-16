@@ -44,8 +44,8 @@ class NotPaginatedResult(Result):
         page_size: int = None,
         show_bar: bool = False,
     ) -> Paginator:
-        """_summary_
-        This Object has already been paginated
+        """
+        This Object will create a Paginator class for Implementation
         Args:
             output (str, optional): _description_. Defaults to "".
             to_df (bool, optional): _description_. Defaults to False.
@@ -67,8 +67,8 @@ class NotPaginatedResult(Result):
         page_size: Union[int, None] = None,
         show_bar: bool = True,
     ) -> Result:
-        """_summary_
-        This Object has already been paginated
+        """
+        This Object will create a paged value that will be Implemented
         Args:
             output (str, optional): _description_. Defaults to "".
             page_size (Union[int, None], optional): _description_. Defaults to None.

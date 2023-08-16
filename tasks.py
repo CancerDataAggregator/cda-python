@@ -117,3 +117,9 @@ def lint(c, args=None) -> None:
     else:
         c.run(f"pylint {args}")
     c.run(f"pylint {args}")
+
+
+@task
+def uninstall(c, args=None) -> None:
+    print("uninstall and reinstall")
+    c.run("pip uninstall cdapython -y  && pip install -e .")

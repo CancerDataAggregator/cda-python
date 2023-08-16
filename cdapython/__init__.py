@@ -5,6 +5,7 @@ syntactic sugar to make it more pleasant to query the CDA.
 
 from typing import Any
 
+from rich.console import Console
 from typing_extensions import Literal
 
 from cdapython.constant_variables import Constants
@@ -112,11 +113,18 @@ except ImportError:
     import builtins as __builtin__
 
 
-def console_print(*args: Any, **kwargs: Any) -> None:
-    from rich.console import Console
-
-    console: Console = Console()
-    console.print(*args, **kwargs)
+def console_print(*args, **kwargs) -> None:
+    """
+    This function is used to override the default python `print` method.
+    We do this by Attaching to pythons `__builtin__.print` method
+    note: There is a conditional check for a file.
+    if a system or user passes a file to the function It will default back to the original Python print method
+    """
+    if "file" in kwargs:
+        print(*args)
+    else:
+        console: Console = Console()
+        console.print(*args, **kwargs)
 
 
 __builtin__.print = console_print

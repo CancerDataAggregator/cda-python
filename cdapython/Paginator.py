@@ -3,7 +3,7 @@ This module hold the Paginator class
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, TypeVar, Union
+from typing import TYPE_CHECKING, Any, List, Optional, TypeVar, Union
 
 from rich.progress import (
     BarColumn,
@@ -57,12 +57,9 @@ class Paginator:
             TimeElapsedColumn(),
             MofNCompleteColumn(),
         )
+        self.progress.live._screen = True
+        self.task: Optional[TaskID] = None
         self.show_bar: bool = show_bar
-        if self.show_bar:
-            self.task: TaskID = self.progress.add_task(
-                "Processing", total=self.result.total_row_count
-            )
-            self.progress.update(self.task, advance=self.result.count)
 
     def _return_result(self) -> Union[DataFrame, List[Any], Result]:
         """_summary_
@@ -83,14 +80,39 @@ class Paginator:
         return self.result
 
     def _do_next(self: Paginator) -> Union[DataFrame, List[Any], Result, None]:
+        """
+        This will get the next value from the result object and update the process bar
+        Args:
+            self (Paginator): _description_
+
+        Raises:
+            e: _description_
+
+        Returns:
+            Union[DataFrame, List[Any], Result, None]: _description_
+        """
+        if self.task is None and self.show_bar:
+            self.task = self.progress.add_task(
+                "Processing", total=self.result.total_row_count
+            )
+
+            self.progress.update(
+                task_id=self.task, advance=self.result.count, refresh=True
+            )
         result_nx = self._return_result()
+
         if self.result.has_next_page:
             try:
                 tmp_result = self.result.next_page(limit=self.limit)
                 if tmp_result:
                     self.result = tmp_result
                     if self.show_bar:
-                        self.progress.update(self.task, advance=self.result.count)
+                        if self.task is not None:
+                            self.progress.update(
+                                task_id=self.task,
+                                advance=self.result.count,
+                                refresh=True,
+                            )
                     return result_nx
             except Exception as e:
                 if self.show_bar:
@@ -104,6 +126,11 @@ class Paginator:
         return None
 
     async def a_do_next(self) -> Union[List[T], DataFrame, Result, None]:
+        """
+        This is a async version of the do_next function this will return a result object
+        Returns:
+            Union[List[T], DataFrame, Result, None]: _description_
+        """
         return self._do_next()
 
     def __iter__(self) -> Paginator:
@@ -120,7 +147,6 @@ class Paginator:
         try:
             if self.stopped:
                 if self.show_bar:
-                    self.progress.update(self.task, advance=self.result.count)
                     self.progress.stop()
                 raise StopAsyncIteration
             self.count += self.result.count
@@ -134,7 +160,6 @@ class Paginator:
         try:
             if self.stopped:
                 if self.show_bar:
-                    self.progress.update(self.task, advance=self.result.count)
                     self.progress.stop()
                 raise StopIteration
             self.count += self.result.count
