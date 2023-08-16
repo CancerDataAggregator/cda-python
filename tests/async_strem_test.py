@@ -2,13 +2,7 @@ import asyncio
 
 from pandas import DataFrame, concat
 
-from cdapython import (
-    Q,
-    get_host_url,
-    set_default_project_dataset,
-    set_host_url,
-    set_table_version,
-)
+from cdapython import Q
 from tests.global_settings import host, project
 
 

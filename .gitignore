@@ -38,6 +38,7 @@ typeReport
 .mypy_cache
 .coverage
 .venv
+venv*
 venv2
 .ven3
 .venv_11
