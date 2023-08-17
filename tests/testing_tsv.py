@@ -1,19 +1,18 @@
+from global_settings import integration_host, integration_table
+
 from cdapython import Q
-from tests.global_settings import host
 
-r = (
-    Q("File.file_format = 'tsv'")
-    .AND(Q("ResearchSubject.Diagnosis.stage = 'Stage I' "))
-    .OR(Q("ResearchSubject.Diagnosis.stage = 'Stage II'"))
-    .AND(Q("ResearchSubject.primary_diagnosis_site = 'Kidney'"))
-)
+r = Q("file_format = 'tsv'").AND(Q("SYMBOL LIKE 'TP53%'"))
 
-q = r.research_subject
-a = r.subject
+# q = r.research_subject
+# a = r.subject
 
-x = q.run(host=host)
-q2 = q.files.run(host=host)
+# x = q.run(host=host)
+q2 = r.file.run(show_sql=True, host=integration_host, table=integration_table)
+
+q3 = r.file.run(show_sql=True)
 
 
-print(x)
-print(q2)
+# print(x)
+
+assert q2.total_row_count == q3.total_row_count
