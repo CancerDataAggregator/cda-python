@@ -176,7 +176,7 @@ class Result(BaseResult):
         show_bar: bool = True,
     ) -> "CollectResult":
         """
-        get_all is a method that will loop for you
+        The get_all method automatically paginates for users and saves data into a `Result` like object.
 
         Args:
             output (str, optional): _description_. Defaults to "".

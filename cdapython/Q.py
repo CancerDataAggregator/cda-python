@@ -594,24 +594,25 @@ class Q:
         format_type: str = "json",
         show_sql: bool = False,
     ) -> Union[QueryCreatedData, ApplyResult, Result, DryClass, None]:
-        """_summary_
-        This will call the server to make a request return a Result like object
+        """
+        The run method serves to make a request and return a Result object.
         Args:
             offset (int, optional): _description_. Defaults to 0.
             page_size (int, optional): _description_. Defaults to 100.
-            version (Optional[str], optional): _description_. Defaults to None.
-            host (Optional[str], optional): _description_. Defaults to None.
+            limit (Union[int, None], optional): _description_. Defaults to None.
+            version (Union[str, None], optional): _description_. Defaults to None.
+            host (Union[str, None], optional): _description_. Defaults to None.
             dry_run (bool, optional): _description_. Defaults to False.
-            table (Optional[str], optional): _description_. Defaults to None.
+            table (Union[str, None], optional): _description_. Defaults to None.
             async_call (bool, optional): _description_. Defaults to False.
-            verify (Optional[bool], optional): _description_. Defaults to None.
-            verbose (Optional[bool], optional): _description_. Defaults to True.
-            filter (Optional[str], optional): _description_. Defaults to None.
-            flatten (Optional[bool], optional): _description_. Defaults to False.
-            format (Optional[str], optional): _description_. Defaults to "json".
+            verify (Union[bool, None], optional): _description_. Defaults to None.
+            verbose (bool, optional): _description_. Defaults to True.
+            include (Union[str, None], optional): _description_. Defaults to None.
+            format_type (str, optional): _description_. Defaults to "json".
+            show_sql (bool, optional): _description_. Defaults to False.
 
         Returns:
-            Optional[Result]: _description_
+            Union[QueryCreatedData, ApplyResult, Result, DryClass, None]: _description_
         """
         dry_run_current = False
 
@@ -648,7 +649,7 @@ class Q:
                 # Execute boolean query
                 if verbose:
                     print(
-                        "Getting results from database",
+                        f"Getting {page_size} results from database ",
                         end="\n\n",
                     )
 
