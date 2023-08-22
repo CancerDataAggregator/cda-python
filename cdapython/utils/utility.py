@@ -117,7 +117,7 @@ def unique_terms(
     limit: Optional[int] = None,
 ) -> Union[Result, StringResult, ColumnsResult, None]:
     """
-    This will return a unique terms Result object.
+    Show all unique terms for a given column.
     Args:
         col_name (str): _description_
         limit (int): Deprecated. Please use page_size
@@ -210,20 +210,21 @@ def columns(
     show_sql: bool = False,
     verbose: bool = True,
     description: bool = True,
-):
-    """[summary]
-
+) -> Optional[ColumnsResult]:
+    """
+    The Columns method displays all searchable columns in the CDA.
     Args:
-        version (Optional[str], optional): [description]. Defaults to table_version.
-        host (Optional[str], optional): [description]. Defaults to None.
-        limit (int, optional): [description]. Defaults to 100.
-        table (Optional[str], optional): [description]. Defaults to None.
-        verify (Optional[bool], optional): [description]. Defaults to None.
-        async_req (Optional[bool], optional): [description]. Defaults to None.
-        pre_stream (bool, optional): [description]. Defaults to True.
+        version (Optional[str], optional): _description_. Defaults to None.
+        host (Optional[str], optional): _description_. Defaults to None.
+        table (Optional[str], optional): _description_. Defaults to None.
+        verify (Optional[bool], optional): _description_. Defaults to None.
+        async_req (Optional[bool], optional): _description_. Defaults to True.
+        show_sql (bool, optional): _description_. Defaults to False.
+        verbose (bool, optional): _description_. Defaults to True.
+        description (bool, optional): _description_. Defaults to True.
 
     Returns:
-        Optional[object]: [description]
+        Optional[ColumnsResult]: _description_
     """
 
     # Execute query
@@ -285,19 +286,3 @@ def columns(
         if verbose:
             print(e)
     return None
-
-
-def get_drs_id(dri_id: str) -> str:
-    """
-    This method parse out a dri id
-    Args:
-        dri_id (str): dri_id
-    Raises:
-        Exception: _description_
-
-    Returns:
-        str: _description_
-    """
-    if dri_id.find("drs://") == -1:
-        raise Exception("need drs_uri")
-    return dri_id.replace("drs://", "")
