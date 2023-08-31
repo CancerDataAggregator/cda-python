@@ -10,11 +10,11 @@ class Constants:
     """
 
     _VERSION: str = "2023.8.22"
-    _DATABASETABLE_VERSION: str = "all_merged_subjects_v3_3_final"
+    _DATABASETABLE_VERSION: str = "all_merged_subjects_v3_4_final"
     _DATABASETABLE: str = "broad-dsde-prod.cda_prod"
     _CDA_API_URL_ENV: str = "https://cda.datacommons.cancer.gov/"
     _DATABASETABLE_FOR_FILES: str = "broad-dsde-prod.cda_prod"
-    _DATABASETABLE_VERSION_FOR_FILES: str = "all_merged_files_v3_3_final"
+    _DATABASETABLE_VERSION_FOR_FILES: str = "all_merged_files_v3_4_final"
 
     __version__: str = _VERSION
     cda_api_url: str = _CDA_API_URL_ENV
