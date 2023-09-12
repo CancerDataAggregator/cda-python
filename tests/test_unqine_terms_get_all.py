@@ -4,6 +4,7 @@ from unittest import mock
 from cdapython import unique_terms
 from cdapython.results.result import Result
 from tests.fake_result import FakeResultData
+from tests.global_settings import host, project
 
 result: List[Dict[str, str]] = [
     {"sex": "null"},
@@ -33,5 +34,5 @@ fake_result = Result(
 
 @mock.patch("cdapython.unique_terms", return_value=fake_result)
 def test_unique_terms_get_all(_: Any) -> None:
-    terms_list = unique_terms("sex").get_all().to_list()
+    terms_list = unique_terms("sex", host=host, table=project).get_all().to_list()
     assert len(terms_list) != 0
