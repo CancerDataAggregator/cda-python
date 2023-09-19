@@ -5,12 +5,12 @@ from pandas import DataFrame, concat
 
 from cdapython import Q
 from cdapython.results.page_result import Paged_Result
-from tests.global_settings import localhost, project
+from tests.global_settings import host, project
 
 
 async def main() -> None:
     q = Q("primary_disease_type = 'Lung%'")
-    q = q.run(host=localhost, table=project, async_call=True, show_sql=True)
+    q = q.run(host=host, async_call=True, show_sql=True)
     print(q)
 
     df = DataFrame()
@@ -25,9 +25,9 @@ asyncio.run(main())
 
 q = (
     Q("primary_disease_type = 'Lung%'")
-    .SELECT("id,sex")
-    .ORDER_BY("id")
-    .run(host=localhost, table=project)
+    .SELECT("subject_id,sex")
+    .ORDER_BY("subject_id")
+    .run(host=host)
     .get_all()
     .to_dataframe()
 )
