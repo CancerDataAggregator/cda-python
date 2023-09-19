@@ -100,7 +100,6 @@ def get_table_version() -> str:
     return Constants.table_version
 
 
-@lru_cache_timed(seconds=10)
 def unique_terms(
     col_name: str,
     system: str = "",
