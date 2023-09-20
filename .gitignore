@@ -52,3 +52,4 @@ config-dev.ini
 .ruff_cache
 .DS_Store
 venv*
+.DS_Store

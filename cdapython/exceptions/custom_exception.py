@@ -1,6 +1,7 @@
 import json
 from typing import List, TypedDict, Union
 
+from bs4 import BeautifulSoup
 from cda_client.exceptions import ApiException, ServiceException
 
 
@@ -54,13 +55,24 @@ class HTTP_ERROR_API(ApiException):
     ) -> None:
         self.message = message
         if http_error.body:
-            http_dict = json.loads(http_error.body)
-            if "error" in http_dict:
+            if http_error.headers.get("content-type") == "text/html":
+                soup = BeautifulSoup(http_error.body, "html.parser")
+
+                http_dict = {
+                    "error ": soup.find("title").text,
+                    "status": http_error.status,
+                }
                 self.error = http_dict["error"]
                 self.statusCode = http_dict["status"]
-            if "causes" in http_dict:
-                self.error = http_dict["message"]
-                self.statusCode = http_dict["statusCode"]
+
+            else:
+                http_dict = json.loads(http_error.body)
+                if "error" in http_dict:
+                    self.error = http_dict["error"]
+                    self.statusCode = http_dict["status"]
+                if "causes" in http_dict:
+                    self.error = http_dict["message"]
+                    self.statusCode = http_dict["statusCode"]
 
         super().__init__(reason=self.message)
 
