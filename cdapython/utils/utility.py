@@ -171,6 +171,10 @@ def unique_terms(
                 show_sql=show_sql,
                 show_count=True,
             )
+            if query_result is None:
+                return None
+
+            return query_result
 
     except ServiceException as http_error:
         if verbose:

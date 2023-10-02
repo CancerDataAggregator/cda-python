@@ -4,7 +4,7 @@ This module hold the Paginator class
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any, Coroutine, List, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Coroutine, List, Optional, TypeVar, Union
 
 import anyio
 from rich.progress import (
@@ -68,25 +68,23 @@ class Paginator:
             )
             self.progress.update(self.task, advance=self.result.count)
 
-    def _return_result(
-        self, result
-    ) -> Union[DataFrame, List[Any], Paged_Result, StringResult]:
+    def _return_result(self) -> Union[DataFrame, List[Any], Paged_Result, StringResult]:
         """
         This return a Result object and DataFrame
         Returns:
             Union[DataFrame, list, Result]: _description_
         """
-        var_output: str = none_check(object=self.output)
+        var_output: str = none_check(self.output)
         if var_output == "full_df":
-            return result.to_dataframe()
+            return self.result.to_dataframe()
         if var_output == "full_list":
-            return result.to_list()
+            return self.result.to_list()
         if self.to_df:
-            return result.to_dataframe()
+            return self.result.to_dataframe()
         if self.to_list:
-            return result.to_list()
+            return self.result.to_list()
 
-        return result
+        return self.result
 
     def _do_next(self: Paginator) -> Union[DataFrame, List[Any], Result, None]:
         result_nx = self._return_result()

@@ -12,7 +12,6 @@ from multiprocessing.pool import ApplyResult
 from pathlib import Path
 from types import MappingProxyType
 from typing import (
-    TYPE_CHECKING,
     Any,
     Dict,
     Generator,
@@ -23,13 +22,11 @@ from typing import (
     TypeVar,
     Union,
     cast,
-    overload,
 )
 
 from cda_client import ApiClient
 from cda_client.api.meta_api import MetaApi
 from cda_client.api.query_api import QueryApi
-from cda_client.api_client import Endpoint
 from cda_client.exceptions import ApiException, ServiceException
 from cda_client.model.paged_response_data import PagedResponseData
 from cda_client.model.query import Query
@@ -60,9 +57,6 @@ from cdapython.results.result import Result
 from cdapython.utils.Cda_Configuration import CdaConfiguration
 from cdapython.utils.Qconfig import Qconfig
 
-if TYPE_CHECKING:
-    from cdapython.results.columns_result import ColumnsResult
-    from cdapython.results.string_result import StringResult
 logging.captureWarnings(False)
 # constants
 WAITING_TEXT: Literal["Waiting for results"] = "Waiting for results"
@@ -357,7 +351,7 @@ class Q:
         async_call: bool = False,
         verify: Union[bool, None] = None,
         offset: int = 0,
-        limit: int = 100,
+        page_size: int = 100,
         verbose: Union[bool, None] = True,
     ) -> Optional[DataFrame]:
         """[summary]
@@ -403,7 +397,7 @@ class Q:
                 api_instance=api_instance,
                 q_object=cast("Q", cls),
                 offset=offset,
-                limit=limit,
+                page_size=page_size,
                 async_req=async_call,
             )
             if r is None:

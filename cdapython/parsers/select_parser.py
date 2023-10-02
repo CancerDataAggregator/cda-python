@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import List, Union
+from typing import List
 
 from cda_client.model.query import Query
-from lark import Lark, Token, Tree
-from lark.visitors import Interpreter
+from lark import Lark
 
 from cdapython.parsers.base_parser import Base_Parser
 

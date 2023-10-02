@@ -225,7 +225,7 @@ def get_query_result(
     clz: Any,
     api_instance: QueryApi,
     offset: int,
-    limit: int,
+    page_size: int,
     q_object: Q,
     async_req: bool = False,
     pre_stream: bool = True,
@@ -249,7 +249,7 @@ def get_query_result(
 
     response = q_object._call_endpoint(
         api_instance=api_instance,
-        limit=limit,
+        page_size=page_size,
         offset=offset,
         dry_run=q_object.dry_run,
         async_req=async_req,
@@ -262,7 +262,7 @@ def get_query_result(
         return clz(
             response,
             offset,
-            limit,
+            page_size,
             api_instance,
             show_sql,
             show_count,

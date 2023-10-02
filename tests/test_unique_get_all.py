@@ -16,6 +16,6 @@ from tests.global_settings import host, project
 
 # print(df[df["Gene"] == "Entrez_Gene_Id"])
 
-all_genes = unique_terms("Gene", host=host, table=project).get_all(page_size=2000)
+all_genes = unique_terms("Gene", host=host).get_all(page_size=2000)
 
 assert all_genes.total_row_count == len(all_genes)
