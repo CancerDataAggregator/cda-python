@@ -49,6 +49,8 @@ then you will need to install poetry you can follow this link [install poetry](h
 ### how to install in venv
 - `poetry install` : Will install dependencies inside of pyproject.toml inside of the activated `venv`
 
+### How to install dev dependencies
+`poetry install --only dev`
 ### how to add packages 
 - `poetry add <package>` : This will add dependency to `venv` and update pyproject.toml this will check dependency with the python version
 

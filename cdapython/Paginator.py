@@ -59,15 +59,14 @@ class Paginator:
             TimeElapsedColumn(),
             MofNCompleteColumn(),
         )
+        self.progress.live._screen = True
+        self.task: Optional[TaskID] = None
         self.show_bar: bool = show_bar
-        self._loop: asyncio.AbstractEventLoop
         if self.show_bar:
             self.task: TaskID = self.progress.add_task(
-                description="Processing", total=self.result.total_row_count
+                "Processing", total=self.result.total_row_count
             )
-            if not self.progress_dirty:
-                self.progress.update(task_id=self.task, advance=self.result.count)
-                self.progress_dirty = True
+            self.progress.update(self.task, advance=self.result.count)
 
     def _return_result(
         self, result
@@ -89,15 +88,8 @@ class Paginator:
 
         return result
 
-    def _do_next(
-        self: Paginator,
-    ) -> Union[DataFrame, List[Any], Paged_Result, StringResult, None]:
-        """
-        This will check the next page and update the progress bar
-        Returns:
-            Union[DataFrame, List[Any], Paged_Result, None]
-        """
-        result_nx = self._return_result(result=self.result)
+    def _do_next(self: Paginator) -> Union[DataFrame, List[Any], Result, None]:
+        result_nx = self._return_result()
         if self.result.has_next_page:
             try:
                 if self.total_result == 0:
@@ -108,9 +100,7 @@ class Paginator:
                 if tmp_result:
                     self.result = tmp_result
                     if self.show_bar:
-                        self.progress.update(
-                            task_id=self.task, advance=self.result.count
-                        )
+                        self.progress.update(self.task, advance=self.result.count)
                     return result_nx
             except Exception as e:
                 if self.show_bar:
@@ -123,10 +113,8 @@ class Paginator:
             return result_nx
         return None
 
-    async def a_do_next(
-        self,
-    ) -> Coroutine[Any, Any, Union[DataFrame, List[Any], Paged_Result, None]]:
-        return await anyio.to_thread.run_sync(self._do_next)
+    async def a_do_next(self) -> Union[List[T], DataFrame, Result, None]:
+        return self._do_next()
 
     def __iter__(self) -> Paginator:
         if self.show_bar:
@@ -145,7 +133,7 @@ class Paginator:
         try:
             if self.stopped:
                 if self.show_bar:
-                    # self.progress.update(self.task, advance=self.result.count)
+                    self.progress.update(self.task, advance=self.result.count)
                     self.progress.stop()
                 raise StopAsyncIteration
             self.count += self.result.count
@@ -159,7 +147,7 @@ class Paginator:
         try:
             if self.stopped:
                 if self.show_bar:
-                    # self.progress.update(self.task, advance=self.result.count)
+                    self.progress.update(self.task, advance=self.result.count)
                     self.progress.stop()
                 raise StopIteration
             self.count += self.result.count

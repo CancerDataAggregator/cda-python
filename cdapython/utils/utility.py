@@ -17,6 +17,7 @@ from cdapython.constant_variables import Constants
 from cdapython.decorators.cache import lru_cache_timed
 from cdapython.exceptions.custom_exception import HTTP_ERROR_API, HTTP_ERROR_SERVICE
 from cdapython.results.columns_result import ColumnsResult
+from cdapython.results.factories.collect_result import CollectResult
 from cdapython.results.page_result import get_query_result
 from cdapython.results.string_result import StringResult
 from cdapython.utils.Cda_Configuration import CdaConfiguration
@@ -104,35 +105,44 @@ def unique_terms(
     col_name: str,
     system: str = "",
     offset: int = 0,
-    limit: int = 100,
+    page_size: int = 100,
     host: Optional[str] = None,
     verify: Optional[bool] = None,
     async_req: Optional[bool] = True,
+    version: Optional[str] = None,
     show_sql: bool = False,
     show_counts: bool = False,
     verbose: bool = True,
+    limit: Optional[int] = None,
 ) -> Union[Result, StringResult, ColumnsResult, None]:
-    """[summary]
-
+    """
+    Show all unique terms for a given column.
     Args:
-        col_name (str): [description]
-        system (str, optional): [description]. Defaults to "".
-        limit (int, optional): [description]. Defaults to 100.
-        host (Optional[str], optional): [description]. Defaults to None.
-        table (Optional[str], optional): [description]. Defaults to None.
-        verify (Optional[bool], optional): [description]. Defaults to None.
-        async_req (Optional[bool], optional): [description]. Defaults to None.
-        pre_stream (bool, optional): [description]. Defaults to True.
+        col_name (str): _description_
+        limit (int): Deprecated. Please use page_size
+        system (str, optional): _description_. Defaults to "".
+        offset (int, optional): _description_. Defaults to 0.
+        page_size (int, optional): _description_. Defaults to 100.
+        host (Optional[str], optional): _description_. Defaults to None.
+        table (Optional[str], optional): _description_. Defaults to None.
+        verify (Optional[bool], optional): _description_. Defaults to None.
+        async_req (Optional[bool], optional): _description_. Defaults to True.
+        version (Optional[str], optional): _description_. Defaults to None.
+        show_sql (bool, optional): _description_. Defaults to False.
+        show_counts (bool, optional): _description_. Defaults to False.
+        verbose (bool, optional): _description_. Defaults to True.
 
     Returns:
-        Optional[List[Any]]: [description]
+        Union[Result, StringResult, ColumnsResult, None]: _description_
     """
     if host is None:
         host = Constants.cda_api_url
 
     if async_req is None:
         async_req = False
-    col_name = col_name
+
+    if limit is not None:
+        page_size = limit
 
     cda_client_obj: ApiClient = ApiClient(
         configuration=CdaConfiguration(host=host, verify=verify)
@@ -150,11 +160,14 @@ def unique_terms(
             api_response = api_response.get()
 
             # Execute query
-            return StringResult(
+            query_result: Union[
+                Result, StringResult, ColumnsResult, None
+            ] = get_query_result(
+                clz=StringResult,
                 api_instance=api_instance,
                 api_response=api_response,
                 offset=offset,
-                page_size=limit,
+                page_size=page_size,
                 show_sql=show_sql,
                 show_count=True,
             )
@@ -181,20 +194,21 @@ def columns(
     show_sql: bool = False,
     verbose: bool = True,
     description: bool = True,
-):
-    """[summary]
-
+) -> Optional[ColumnsResult]:
+    """
+    The Columns method displays all searchable columns in the CDA.
     Args:
-        version (Optional[str], optional): [description]. Defaults to table_version.
-        host (Optional[str], optional): [description]. Defaults to None.
-        limit (int, optional): [description]. Defaults to 100.
-        table (Optional[str], optional): [description]. Defaults to None.
-        verify (Optional[bool], optional): [description]. Defaults to None.
-        async_req (Optional[bool], optional): [description]. Defaults to None.
-        pre_stream (bool, optional): [description]. Defaults to True.
+        version (Optional[str], optional): _description_. Defaults to None.
+        host (Optional[str], optional): _description_. Defaults to None.
+        table (Optional[str], optional): _description_. Defaults to None.
+        verify (Optional[bool], optional): _description_. Defaults to None.
+        async_req (Optional[bool], optional): _description_. Defaults to True.
+        show_sql (bool, optional): _description_. Defaults to False.
+        verbose (bool, optional): _description_. Defaults to True.
+        description (bool, optional): _description_. Defaults to True.
 
     Returns:
-        Optional[object]: [description]
+        Optional[ColumnsResult]: _description_
     """
 
     # Execute query
@@ -251,19 +265,3 @@ def columns(
         if verbose:
             print(e)
     return None
-
-
-def get_drs_id(dri_id: str) -> str:
-    """
-    This method parse out a dri id
-    Args:
-        dri_id (str): dri_id
-    Raises:
-        Exception: _description_
-
-    Returns:
-        str: _description_
-    """
-    if dri_id.find("drs://") == -1:
-        raise Exception("need drs_uri")
-    return dri_id.replace("drs://", "")

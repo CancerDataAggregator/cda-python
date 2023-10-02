@@ -1,12 +1,13 @@
-from cdapython import Q
-from tests.global_settings import host
+from global_settings import host
 
-age1 = Q("ResearchSubject.Diagnosis.age_at_diagnosis >= 40*365")
-age2 = Q("ResearchSubject.Diagnosis.age_at_diagnosis <= 45*365")
+from cdapython import Q
+
+age1 = Q("age_at_diagnosis >= 40*365")
+age2 = Q("age_at_diagnosis <= 45*365")
 female = Q('sex = "female"')
-brca = Q('ResearchSubject.associated_project = "TCGA-BRCA"')
-normals = Q('ResearchSubject.Specimen.source_material_type = "Blood Derived Normal"')
-tumors = Q('ResearchSubject.Specimen.source_material_type = "Primary Tumor"')
+brca = Q('associated_project = "TCGA-BRCA"')
+normals = Q('source_material_type = "Blood Derived Normal"')
+tumors = Q('source_material_type = "Primary Tumor"')
 
 q = normals.FROM(tumors.AND(brca.AND(female.AND(age1.AND(age2)))))
 r = q.researchsubject.count.run(host=host)

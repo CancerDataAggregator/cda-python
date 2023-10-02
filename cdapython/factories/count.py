@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint

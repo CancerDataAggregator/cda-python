@@ -580,19 +580,20 @@ class Q:
         Args:
             offset (int, optional). Defaults to 0.
             page_size (int, optional). Defaults to 100.
-            version (Optional[str], optional). Defaults to None.
-            host (Optional[str], optional). Defaults to None.
+            limit (Union[int, None], optional): _description_. Defaults to None.
+            version (Union[str, None], optional). Defaults to None.
+            host (Union[str, None], optional). Defaults to None.
             dry_run (bool, optional). Defaults to False.
-            table (Optional[str], optional). Defaults to None.
+            table (Union[str, None], optional). Defaults to None.
             async_call (bool, optional). Defaults to False.
-            verify (Optional[bool], optional). Defaults to None.
-            verbose (Optional[bool], optional). Defaults to True.
-            filter (Optional[str], optional). Defaults to None.
-            flatten (Optional[bool], optional). Defaults to False.
-            format (Optional[str], optional). Defaults to "json".
+            verify (Union[bool, None], optional). Defaults to None.
+            verbose (bool, optional). Defaults to True.
+            include (Union[str, None], optional). Defaults to None.
+            format_type (str, optional). Defaults to "json".
+            show_sql (bool, optional). Defaults to False.
 
         Returns:
-            Optional[Result]
+            Union[QueryCreatedData, ApplyResult, Result, DryClass, None]: _description_
         """
         dry_run_current = False
 
@@ -636,7 +637,7 @@ class Q:
                 # Execute boolean query
                 if verbose:
                     print(
-                        "Getting results from database",
+                        f"Getting {page_size} results from database ",
                         end="\n\n",
                     )
 

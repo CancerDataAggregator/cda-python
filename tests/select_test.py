@@ -1,4 +1,5 @@
 from cdapython import Q
+from tests.global_settings import host, project
 
 
 def test_select():
