@@ -21,7 +21,7 @@ TREATMENT: str = "Treatment"
 TREATMENT_COUNT: str = f"{TREATMENT}.{COUNT}"
 MUTATIONS: str = "Mutations"
 MUTATIONS_COUNT: str = f"{MUTATIONS}.{COUNT}"
-
+UNIQUE_TERMS: str = "Unique"
 
 __all__ = [
     "QFactory",

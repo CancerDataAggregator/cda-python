@@ -31,6 +31,7 @@ from cdapython.factories import (
     SUBJECT_FILE_COUNT,
     TREATMENT,
     TREATMENT_COUNT,
+    UNIQUE_TERMS,
 )
 from cdapython.factories.count import Count
 from cdapython.factories.diagnosis import Diagnosis, DiagnosisCount
@@ -57,6 +58,7 @@ from cdapython.factories.subject import (
     SubjectFiles,
 )
 from cdapython.factories.treatment import Treatment, TreatmentCount
+from cdapython.factories.unique_terms.unique_terms_endpoint import UniqueTerms
 from cdapython.Q import Q
 from cdapython.utils.utility import (
     columns,
@@ -154,3 +156,4 @@ QFactory.add_factory(TREATMENT, Treatment.Factory)
 QFactory.add_factory(TREATMENT_COUNT, TreatmentCount.Factory)
 QFactory.add_factory(MUTATIONS, Mutations.Factory)
 QFactory.add_factory(MUTATIONS_COUNT, MutationsCount.Factory)
+QFactory.add_factory(UNIQUE_TERMS, UniqueTerms.Factory)

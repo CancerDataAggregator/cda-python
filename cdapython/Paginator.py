@@ -64,7 +64,7 @@ class Paginator:
         self.show_bar: bool = show_bar
         if self.show_bar:
             self.task: TaskID = self.progress.add_task(
-                "Processing", total=self.result.total_row_count
+                "Processing",
             )
             self.progress.update(self.task, advance=self.result.count)
 

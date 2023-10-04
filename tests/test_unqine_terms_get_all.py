@@ -19,6 +19,7 @@ result: List[Dict[str, str]] = [
     {"sex": "unknown"},
     {"sex": "unspecified"},
 ]
+
 fake = FakeResultData(result)
 fake_result = Result(
     api_response=fake.api_response,
@@ -33,5 +34,5 @@ fake_result = Result(
 
 @mock.patch("cdapython.unique_terms", return_value=fake_result)
 def test_unique_terms_get_all(_: Any) -> None:
-    terms_list = unique_terms("sex", host=host, table=project).get_all().to_list()
+    terms_list = unique_terms("sex").run().get_all().to_list()
     assert len(terms_list) != 0

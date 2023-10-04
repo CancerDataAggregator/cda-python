@@ -73,6 +73,9 @@ class Parse_Q(Base_Parser):
         quoted_query.value = args[0].value
         return quoted_query
 
+    def unique_terms_string(self, args) -> Query:
+        return self.single_quotes(args)
+
     def start(self, children):
         return children[0]
 

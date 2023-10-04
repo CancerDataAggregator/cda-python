@@ -232,6 +232,9 @@ def get_query_result(
     show_sql: bool = False,
     show_count: bool = True,
     format_type: str = "json",
+    include_total_count=False,
+    system: str = "",
+    show_counts: bool = False,
 ) -> Union[Result, StringResult, ColumnsResult, None]:
     """
         This will call the next query and wait for the result
@@ -253,6 +256,9 @@ def get_query_result(
         offset=offset,
         dry_run=q_object.dry_run,
         async_req=async_req,
+        include_total_count=include_total_count,
+        system=system,
+        show_counts=show_counts,
     )
 
     if isinstance(response, ApplyResult):

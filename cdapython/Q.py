@@ -48,6 +48,7 @@ from cdapython.factories import (
     SPECIMEN,
     SUBJECT,
     TREATMENT,
+    UNIQUE_TERMS,
 )
 from cdapython.factories.q_factory import QFactory
 from cdapython.parsers.select_parser import sql_function_parser
@@ -146,6 +147,7 @@ class Q:
         self.query: Query = Query()
         self._show_sql: bool = False
         self.dry_run: bool = False
+        self.raw_Q_string = ""
         if len(args) == 1:
             if args[0] is None:
                 raise RuntimeError("Q statement parse error")
@@ -153,6 +155,7 @@ class Q:
             if isinstance(args[0], Query):
                 self.query = args[0]
             else:
+                self.raw_Q_string = args[0]
                 query_parsed: Query = where_parser(
                     args[0].strip().replace("\n", " "), debug=debug
                 )
@@ -187,6 +190,12 @@ class Q:
 
     def __repr__(self) -> str:
         return str(self.__class__) + ": \n" + str(self.__dict__)
+
+    def set_raw_string(self, text: str):
+        self.raw_Q_string = text
+
+    def get_raw_string(self):
+        return self.raw_Q_string
 
     @staticmethod
     def get_version() -> str:
@@ -493,6 +502,10 @@ class Q:
     @property
     def mutation(self) -> Q:
         return QFactory.create_entity(MUTATIONS, self)
+
+    @property
+    def unique_terms(self) -> Q:
+        return QFactory.create_entity(UNIQUE_TERMS, self)
 
     def _call_endpoint(
         self,

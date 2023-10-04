@@ -23,11 +23,10 @@ from cdapython.results.string_result import StringResult
 from cdapython.utils.Cda_Configuration import CdaConfiguration
 
 logging.captureWarnings(InsecureRequestWarning)
-
+from cdapython.Q import Q
 
 # This is added for Type Checking class to remove a circular import)
 if TYPE_CHECKING:
-    from cdapython.Q import Q
     from cdapython.results.result import Result
 
 # Creating constant
@@ -104,90 +103,20 @@ def get_table_version() -> str:
 def unique_terms(
     col_name: str,
     system: str = "",
-    offset: int = 0,
-    page_size: int = 100,
-    host: Optional[str] = None,
-    verify: Optional[bool] = None,
-    async_req: Optional[bool] = True,
-    version: Optional[str] = None,
-    show_sql: bool = False,
-    show_counts: bool = False,
-    verbose: bool = True,
-    limit: Optional[int] = None,
-) -> Union[Result, StringResult, ColumnsResult, None]:
+) -> Q:
     """
     Show all unique terms for a given column.
     Args:
         col_name (str): _description_
-        limit (int): Deprecated. Please use page_size
         system (str, optional): _description_. Defaults to "".
-        offset (int, optional): _description_. Defaults to 0.
-        page_size (int, optional): _description_. Defaults to 100.
-        host (Optional[str], optional): _description_. Defaults to None.
-        table (Optional[str], optional): _description_. Defaults to None.
-        verify (Optional[bool], optional): _description_. Defaults to None.
-        async_req (Optional[bool], optional): _description_. Defaults to True.
-        version (Optional[str], optional): _description_. Defaults to None.
-        show_sql (bool, optional): _description_. Defaults to False.
-        show_counts (bool, optional): _description_. Defaults to False.
-        verbose (bool, optional): _description_. Defaults to True.
 
     Returns:
-        Union[Result, StringResult, ColumnsResult, None]: _description_
+        Q: _description_
     """
-    if host is None:
-        host = Constants.cda_api_url
+    # cda_client_obj.select_header_content_type(["text/plain"])
+    q_object = Q(col_name).unique_terms
 
-    if async_req is None:
-        async_req = False
-
-    if limit is not None:
-        page_size = limit
-
-    cda_client_obj: ApiClient = ApiClient(
-        configuration=CdaConfiguration(host=host, verify=verify)
-    )
-    try:
-        with cda_client_obj as api_client:
-            api_instance = QueryApi(api_client)
-            api_response = api_instance.unique_values(
-                body=col_name,
-                system=str(system),
-                count=show_counts,
-                async_req=async_req,
-            )
-        if isinstance(api_response, ApplyResult):
-            api_response = api_response.get()
-
-            # Execute query
-            query_result: Union[
-                Result, StringResult, ColumnsResult, None
-            ] = get_query_result(
-                clz=StringResult,
-                api_instance=api_instance,
-                api_response=api_response,
-                offset=offset,
-                page_size=page_size,
-                show_sql=show_sql,
-                show_count=True,
-            )
-            if query_result is None:
-                return None
-
-            return query_result
-
-    except ServiceException as http_error:
-        if verbose:
-            print(HTTP_ERROR_SERVICE(http_error=http_error))
-
-    except ApiException as http_error:
-        if verbose:
-            print(HTTP_ERROR_API(http_error=http_error))
-
-    except Exception as e:
-        if verbose:
-            print(e)
-    return None
+    return q_object
 
 
 @lru_cache_timed(seconds=60)

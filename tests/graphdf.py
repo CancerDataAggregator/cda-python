@@ -68,11 +68,7 @@ class CustomDataFrame:
 
 
 df = CustomDataFrame(
-    df=Q("sex = 'male'")
-    .set_table(integration_table)
-    .set_host(integration_host)
-    .LIMIT(300)
-    .to_dataframe()
+    df=Q("sex = 'male'").set_host(integration_host).LIMIT(300).to_dataframe()
 )
 print(df.get_df().head())
 df.plot_column("subject_identifier")
