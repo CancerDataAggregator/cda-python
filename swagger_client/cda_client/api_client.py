@@ -147,6 +147,7 @@ class ApiClient(object):
             typing.List[typing.Dict[str, typing.Any]]
         ] = None,
     ):
+
         config = self.configuration
 
         # header parameters
@@ -912,6 +913,7 @@ class Endpoint(object):
         return self.callable(self, *args, **kwargs)
 
     def call_with_http_info(self, **kwargs):
+
         try:
             index = (
                 self.api_client.configuration.server_operation_index.get(
