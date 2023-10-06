@@ -24,10 +24,9 @@ from cda_client.model_utils import (  # noqa: F401
     file_type,
     none_type,
     validate_get_composed_info,
-    OpenApiModel
+    OpenApiModel,
 )
 from cda_client.exceptions import ApiAttributeError
-
 
 
 class Query(ModelNormal):
@@ -55,40 +54,39 @@ class Query(ModelNormal):
     """
 
     allowed_values = {
-        ('node_type',): {
-            'COLUMN': "column",
-            'QUOTED': "quoted",
-            'UNQUOTED': "unquoted",
-            '&gt;&#x3D;': ">=",
-            '&lt;&#x3D;': "<=",
-            '&lt;': "<",
-            '&gt;': ">",
-            '&#x3D;': "=",
-            '!&#x3D;': "!=",
-            'AND': "AND",
-            'OR': "OR",
-            'NOT': "NOT",
-            'SUBQUERY': "SUBQUERY",
-            'WHERE': "WHERE",
-            'IN': "IN",
-            'SELECTVALUES': "SELECTVALUES",
-            'SELECT': "SELECT",
-            'LIKE': "LIKE",
-            'IS': "IS",
-            'IS_NOT': "IS NOT",
-            'NOT_IN': "NOT IN",
-            'NOT_LIKE': "NOT LIKE",
-            'ORDERBY': "ORDERBY",
-            'ORDERBYVALUES': "ORDERBYVALUES",
-            '+': "+",
-            '-': "-",
-            '/': "/",
-            '*': "*",
+        ("node_type",): {
+            "COLUMN": "column",
+            "QUOTED": "quoted",
+            "UNQUOTED": "unquoted",
+            "&gt;&#x3D;": ">=",
+            "&lt;&#x3D;": "<=",
+            "&lt;": "<",
+            "&gt;": ">",
+            "&#x3D;": "=",
+            "!&#x3D;": "!=",
+            "AND": "AND",
+            "OR": "OR",
+            "NOT": "NOT",
+            "SUBQUERY": "SUBQUERY",
+            "WHERE": "WHERE",
+            "IN": "IN",
+            "SELECTVALUES": "SELECTVALUES",
+            "SELECT": "SELECT",
+            "LIKE": "LIKE",
+            "IS": "IS",
+            "IS_NOT": "IS NOT",
+            "NOT_IN": "NOT IN",
+            "NOT_LIKE": "NOT LIKE",
+            "ORDERBY": "ORDERBY",
+            "ORDERBYVALUES": "ORDERBYVALUES",
+            "+": "+",
+            "-": "-",
+            "/": "/",
+            "*": "*",
         },
     }
 
-    validations = {
-    }
+    validations = {}
 
     @cached_property
     def additional_properties_type():
@@ -96,7 +94,17 @@ class Query(ModelNormal):
         This must be a method because a model may have properties that are
         of type self, this must run after the class is loaded
         """
-        return (bool, date, datetime, dict, float, int, list, str, none_type,)  # noqa: E501
+        return (
+            bool,
+            date,
+            datetime,
+            dict,
+            float,
+            int,
+            list,
+            str,
+            none_type,
+        )  # noqa: E501
 
     _nullable = False
 
@@ -111,26 +119,24 @@ class Query(ModelNormal):
                 and the value is attribute type.
         """
         return {
-            'node_type': (str,),  # noqa: E501
-            'value': (str,),  # noqa: E501
-            'l': (Query,),  # noqa: E501
-            'r': (Query,),  # noqa: E501
+            "node_type": (str,),  # noqa: E501
+            "value": (str,),  # noqa: E501
+            "l": (Query,),  # noqa: E501
+            "r": (Query,),  # noqa: E501
         }
 
     @cached_property
     def discriminator():
         return None
 
-
     attribute_map = {
-        'node_type': 'node_type',  # noqa: E501
-        'value': 'value',  # noqa: E501
-        'l': 'l',  # noqa: E501
-        'r': 'r',  # noqa: E501
+        "node_type": "node_type",  # noqa: E501
+        "value": "value",  # noqa: E501
+        "l": "l",  # noqa: E501
+        "r": "r",  # noqa: E501
     }
 
-    read_only_vars = {
-    }
+    read_only_vars = {}
 
     _composed_schemas = {}
 
@@ -176,11 +182,11 @@ class Query(ModelNormal):
             r (Query): [optional]  # noqa: E501
         """
 
-        _check_type = kwargs.pop('_check_type', True)
-        _spec_property_naming = kwargs.pop('_spec_property_naming', True)
-        _path_to_item = kwargs.pop('_path_to_item', ())
-        _configuration = kwargs.pop('_configuration', None)
-        _visited_composed_classes = kwargs.pop('_visited_composed_classes', ())
+        _check_type = kwargs.pop("_check_type", True)
+        _spec_property_naming = kwargs.pop("_spec_property_naming", True)
+        _path_to_item = kwargs.pop("_path_to_item", ())
+        _configuration = kwargs.pop("_configuration", None)
+        _visited_composed_classes = kwargs.pop("_visited_composed_classes", ())
 
         self = super(OpenApiModel, cls).__new__(cls)
 
@@ -190,7 +196,8 @@ class Query(ModelNormal):
                     kwargs.update(arg)
                 else:
                     raise ApiTypeError(
-                        "Invalid positional arguments=%s passed to %s. Remove those invalid positional arguments." % (
+                        "Invalid positional arguments=%s passed to %s. Remove those invalid positional arguments."
+                        % (
                             args,
                             self.__class__.__name__,
                         ),
@@ -206,23 +213,27 @@ class Query(ModelNormal):
         self._visited_composed_classes = _visited_composed_classes + (self.__class__,)
 
         for var_name, var_value in kwargs.items():
-            if var_name not in self.attribute_map and \
-                        self._configuration is not None and \
-                        self._configuration.discard_unknown_keys and \
-                        self.additional_properties_type is None:
+            if (
+                var_name not in self.attribute_map
+                and self._configuration is not None
+                and self._configuration.discard_unknown_keys
+                and self.additional_properties_type is None
+            ):
                 # discard variable.
                 continue
             setattr(self, var_name, var_value)
         return self
 
-    required_properties = set([
-        '_data_store',
-        '_check_type',
-        '_spec_property_naming',
-        '_path_to_item',
-        '_configuration',
-        '_visited_composed_classes',
-    ])
+    required_properties = set(
+        [
+            "_data_store",
+            "_check_type",
+            "_spec_property_naming",
+            "_path_to_item",
+            "_configuration",
+            "_visited_composed_classes",
+        ]
+    )
 
     @convert_js_args_to_python_args
     def __init__(self, *args, **kwargs):  # noqa: E501
@@ -265,11 +276,11 @@ class Query(ModelNormal):
             r (Query): [optional]  # noqa: E501
         """
 
-        _check_type = kwargs.pop('_check_type', True)
-        _spec_property_naming = kwargs.pop('_spec_property_naming', False)
-        _path_to_item = kwargs.pop('_path_to_item', ())
-        _configuration = kwargs.pop('_configuration', None)
-        _visited_composed_classes = kwargs.pop('_visited_composed_classes', ())
+        _check_type = kwargs.pop("_check_type", True)
+        _spec_property_naming = kwargs.pop("_spec_property_naming", False)
+        _path_to_item = kwargs.pop("_path_to_item", ())
+        _configuration = kwargs.pop("_configuration", None)
+        _visited_composed_classes = kwargs.pop("_visited_composed_classes", ())
 
         if args:
             for arg in args:
@@ -277,7 +288,8 @@ class Query(ModelNormal):
                     kwargs.update(arg)
                 else:
                     raise ApiTypeError(
-                        "Invalid positional arguments=%s passed to %s. Remove those invalid positional arguments." % (
+                        "Invalid positional arguments=%s passed to %s. Remove those invalid positional arguments."
+                        % (
                             args,
                             self.__class__.__name__,
                         ),
@@ -293,13 +305,17 @@ class Query(ModelNormal):
         self._visited_composed_classes = _visited_composed_classes + (self.__class__,)
 
         for var_name, var_value in kwargs.items():
-            if var_name not in self.attribute_map and \
-                        self._configuration is not None and \
-                        self._configuration.discard_unknown_keys and \
-                        self.additional_properties_type is None:
+            if (
+                var_name not in self.attribute_map
+                and self._configuration is not None
+                and self._configuration.discard_unknown_keys
+                and self.additional_properties_type is None
+            ):
                 # discard variable.
                 continue
             setattr(self, var_name, var_value)
             if var_name in self.read_only_vars:
-                raise ApiAttributeError(f"`{var_name}` is a read-only attribute. Use `from_openapi_data` to instantiate "
-                                     f"class with read only attributes.")
+                raise ApiAttributeError(
+                    f"`{var_name}` is a read-only attribute. Use `from_openapi_data` to instantiate "
+                    f"class with read only attributes."
+                )
