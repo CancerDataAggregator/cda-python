@@ -11,13 +11,11 @@
 import re  # noqa: F401
 import sys  # noqa: F401
 
-from cda_client.exceptions import ApiAttributeError
 from cda_client.model_utils import (  # noqa: F401
     ApiTypeError,
     ModelComposed,
     ModelNormal,
     ModelSimple,
-    OpenApiModel,
     cached_property,
     change_keys_js_to_python,
     convert_js_args_to_python_args,
@@ -26,7 +24,9 @@ from cda_client.model_utils import (  # noqa: F401
     file_type,
     none_type,
     validate_get_composed_info,
+    OpenApiModel,
 )
+from cda_client.exceptions import ApiAttributeError
 
 
 def lazy_import():
