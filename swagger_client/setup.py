@@ -20,8 +20,8 @@ VERSION = "4.17.2023"
 # http://pypi.python.org/pypi/setuptools
 
 REQUIRES = [
-    "urllib3 >= 1.25.3",
-    "python-dateutil",
+  "urllib3 >= 1.25.3",
+  "python-dateutil",
 ]
 
 setup(
@@ -39,5 +39,5 @@ setup(
     license="Apache 2.0",
     long_description="""\
     API definition for the CDA  # noqa: E501
-    """,
+    """
 )
