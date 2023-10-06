@@ -112,7 +112,7 @@ class Paginator:
             return result_nx
         return None
 
-    async def a_do_next(self) -> Union[List[T], DataFrame, Result, None]:
+    async def a_do_next(self) -> Union[List, DataFrame, Result, None]:
         return self._do_next()
 
     def __iter__(self) -> Paginator:
