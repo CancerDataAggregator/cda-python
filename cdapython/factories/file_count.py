@@ -35,7 +35,7 @@ class FileCount(Entity):
         self,
         api_response: QueryResponseData,
         offset: int,
-        page_size: int,
+        limit: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -44,7 +44,7 @@ class FileCount(Entity):
         return CountResult(
             api_response=api_response,
             offset=offset,
-            page_size=page_size,
+            limit=limit,
             api_instance=api_instance,
             show_sql=show_sql,
             show_count=show_count,

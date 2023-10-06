@@ -1,11 +1,12 @@
-from global_settings import localhost
+# pytest: skip
+# This test file will be ignored by pytest
+import pytest
 
 from cdapython import Q, unique_terms
+from tests.global_settings import localhost
 
-u_sex = unique_terms("subject_id").run(host=localhost).get_all()
 
-print(u_sex.to_dataframe())
-# data = Q("sex").to_json()
-
-# print(data)
-# print(data._api_response["next_url"])
+@pytest.mark.skip(reason="currently total row count not being returned CD-610")
+def test_total_count_for_subject_id():
+    u_sex = unique_terms("subject_id").run(host=localhost)
+    assert u_sex.total_row_count != 0

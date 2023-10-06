@@ -32,6 +32,8 @@ class Mutations(Entity):
         async_req: bool,
         offset: int,
         limit: int,
+        include_total_count: bool,
+        show_term_count: bool,
     ) -> Endpoint:
         """
         This will call the mutation_query endpoint
@@ -52,6 +54,7 @@ class Mutations(Entity):
             offset=offset,
             limit=limit,
             async_req=async_req,
+            include_count=include_total_count,
         )
 
     class Factory(AbstractFactory):

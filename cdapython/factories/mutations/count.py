@@ -26,13 +26,13 @@ class MutationsCount(Specimen):
         dry_run: bool,
         async_req: bool,
         offset: int,
-        page_size: int,
+        limit: int,
     ) -> Endpoint:
         return api_instance.mutation_counts_query(
             query=self.query,
             dry_run=dry_run,
             offset=offset,
-            limit=page_size,
+            limit=limit,
             async_req=async_req,
         )
 

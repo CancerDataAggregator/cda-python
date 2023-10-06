@@ -27,14 +27,14 @@ class Specimen(Entity):
         dry_run: bool,
         async_req: bool,
         offset: int,
-        page_size: int,
+        limit: int,
     ) -> Endpoint:
         return api_instance.specimen_query(
             query=self.query,
             dry_run=dry_run,
             async_req=async_req,
             offset=offset,
-            limit=page_size,
+            limit=limit,
         )
 
     class Factory(AbstractFactory):

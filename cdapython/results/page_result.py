@@ -30,7 +30,7 @@ class Paged_Result(Result):
         self,
         api_response: QueryResponseData,
         offset: int,
-        page_size: int,
+        limit: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -40,7 +40,7 @@ class Paged_Result(Result):
         self._api_response: QueryResponseData = api_response
         self._result = self._api_response.result
         self._offset: int = offset
-        self._page_size: int = page_size
+        self._limit: int = limit
         self._api_instance: QueryApi = api_instance
         self._df: DataFrame
         self.q_object = q_object
@@ -51,7 +51,7 @@ class Paged_Result(Result):
             show_count=show_count,
             format_type=format_type,
             offset=offset,
-            page_size=page_size,
+            limit=limit,
         )
 
     def _get_result(
@@ -65,7 +65,7 @@ class Paged_Result(Result):
             return self.q_object.set_config(config=self.q_object.get_config()).run(
                 verbose=self.q_object.get_verbose(),
                 offset=_offset,
-                page_size=_limit,
+                limit=_limit,
                 async_call=async_req,
                 include_total_count=False,
             )
@@ -76,7 +76,7 @@ class Paged_Result(Result):
         output: str = "",
         to_df: bool = False,
         to_list: bool = False,
-        page_size: int = 0,
+        limit: int = 0,
         show_bar: bool = False,
     ) -> Paginator:
         """_summary_
@@ -88,13 +88,13 @@ class Paged_Result(Result):
             _type_: _description_
         """
 
-        page_size = page_size if page_size != 0 else self._page_size
+        limit = limit if limit != 0 else self._limit
 
         return Paginator(
             result=self,
             to_df=to_df,
             to_list=to_list,
-            limit=page_size,
+            limit=limit,
             output=output,
             format_type=self.format_type,
             show_bar=show_bar,
@@ -103,7 +103,7 @@ class Paged_Result(Result):
     def get_all(
         self,
         output: str = "",
-        page_size: int = 0,
+        limit: int = 0,
         show_bar: bool = True,
     ) -> "CollectResult":
         """
@@ -111,20 +111,20 @@ class Paged_Result(Result):
 
         Args:
             output (str, optional): _description_. Defaults to "".
-            page_size (Union[int, None], optional): _description_. Defaults to None.
+            limit (Union[int, None], optional): _description_. Defaults to None.
 
         Returns:
             Union[DataFrame, List[Any]]: _description_
         """
 
-        if page_size == 0:
-            page_size = self._page_size
+        if limit == 0:
+            limit = self._limit
 
         iterator: Paginator = Paginator(
             result=self,
             to_df=False,
             to_list=False,
-            limit=page_size,
+            limit=limit,
             output=output,
             format_type=self.format_type,
             show_bar=show_bar,
@@ -194,15 +194,15 @@ class Paged_Result(Result):
         """
         if not self.has_next_page:
             raise StopIteration
-        if isinstance(self._offset, int) and isinstance(self._page_size, int):
-            self._page_size = int(
+        if isinstance(self._offset, int) and isinstance(self._limit, int):
+            self._limit = int(
                 parse_qs(urlparse(self._api_response["next_url"]).query)["limit"][0]
             )
             self._offset = int(
                 parse_qs(urlparse(self._api_response["next_url"]).query)["offset"][0]
             )
 
-            return self._get_result(_offset=self._offset, _limit=self._page_size)
+            return self._get_result(_offset=self._offset, _limit=self._limit)
 
     def prev_page(
         self,
@@ -214,18 +214,18 @@ class Paged_Result(Result):
         Returns:
             _type_: _description_
         """
-        if isinstance(self._offset, int) and isinstance(self._page_size, int):
-            offset = self._offset - self._page_size
+        if isinstance(self._offset, int) and isinstance(self._limit, int):
+            offset = self._offset - self._limit
             offset = max(0, offset)
-            self._page_size = limit or self._page_size
-            return self._get_result(offset, self._page_size)
+            self._limit = limit or self._limit
+            return self._get_result(offset, self._limit)
 
 
 def get_query_result(
     clz: Any,
     api_instance: QueryApi,
     offset: int,
-    page_size: int,
+    limit: int,
     q_object: Q,
     async_req: bool = False,
     pre_stream: bool = True,
@@ -252,7 +252,7 @@ def get_query_result(
 
     response = q_object._call_endpoint(
         api_instance=api_instance,
-        page_size=page_size,
+        limit=limit,
         offset=offset,
         dry_run=q_object.dry_run,
         async_req=async_req,
@@ -268,7 +268,7 @@ def get_query_result(
         return clz(
             response,
             offset,
-            page_size,
+            limit,
             api_instance,
             show_sql,
             show_count,

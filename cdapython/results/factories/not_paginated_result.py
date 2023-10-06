@@ -18,7 +18,7 @@ class NotPaginatedResult(Result):
         self,
         api_response: QueryResponseData,
         offset: int,
-        page_size: int,
+        limit: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -27,7 +27,7 @@ class NotPaginatedResult(Result):
         super().__init__(
             api_response=api_response,
             offset=offset,
-            page_size=page_size,
+            limit=limit,
             api_instance=api_instance,
             show_sql=show_sql,
             show_count=show_count,
@@ -39,7 +39,7 @@ class NotPaginatedResult(Result):
         output: str = "",
         to_df: bool = False,
         to_list: bool = False,
-        page_size: int = None,
+        limit: int = None,
         show_bar: bool = False,
     ) -> Paginator:
         """
@@ -48,7 +48,7 @@ class NotPaginatedResult(Result):
             output (str, optional): _description_. Defaults to "".
             to_df (bool, optional): _description_. Defaults to False.
             to_list (bool, optional): _description_. Defaults to False.
-            page_size (int, optional): _description_. Defaults to None.
+            limit (int, optional): _description_. Defaults to None.
             show_bar (bool, optional): _description_. Defaults to False.
 
         Raises:
@@ -62,14 +62,14 @@ class NotPaginatedResult(Result):
     def get_all(
         self,
         output: str = "",
-        page_size: Union[int, None] = None,
+        limit: Union[int, None] = None,
         show_bar: bool = True,
     ) -> Result:
         """
         This Object will create a paged value that will be Implemented
         Args:
             output (str, optional): _description_. Defaults to "".
-            page_size (Union[int, None], optional): _description_. Defaults to None.
+            limit (Union[int, None], optional): _description_. Defaults to None.
             show_bar (bool, optional): _description_. Defaults to True.
 
         Raises:

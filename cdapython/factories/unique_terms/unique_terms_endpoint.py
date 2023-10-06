@@ -19,20 +19,32 @@ class UniqueTerms(Entity):
         dry_run: bool,
         async_req: bool,
         offset: int,
-        page_size: int,
+        limit: int,
+        show_term_count: Optional[bool],
         include_total_count: bool,
         system: Optional[str] = "",
-        show_counts: Optional[bool] = True,
     ) -> Endpoint:
-        return api_instance.unique_values(
-            body=self.query.value,
-            system=system,
-            count=show_counts,
-            async_req=async_req,
-            offset=offset,
-            limit=page_size,
-            include_count=include_total_count,
-        )
+        system = self._get_system()
+        if system:
+            return api_instance.unique_values(
+                body=self.query.value,
+                system=system,
+                count=show_term_count,
+                async_req=async_req,
+                offset=offset,
+                limit=limit,
+                include_count=include_total_count,
+            )
+        else:
+            return api_instance.unique_values(
+                body=self.query.value,
+                system=system,
+                count=show_term_count,
+                async_req=async_req,
+                offset=offset,
+                limit=limit,
+                include_count=include_total_count,
+            )
 
     class Factory(AbstractFactory):
         @staticmethod

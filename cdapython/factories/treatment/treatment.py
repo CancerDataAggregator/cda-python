@@ -25,7 +25,7 @@ class Treatment(Entity):
         table: str,
         async_req: bool,
         offset: int,
-        page_size: int,
+        limit: int,
     ) -> Endpoint:
         return api_instance.treatments_query(
             query=self.query,
@@ -34,7 +34,7 @@ class Treatment(Entity):
             table=table,
             async_req=async_req,
             offset=offset,
-            limit=page_size,
+            limit=limit,
         )
 
     class Factory(AbstractFactory):

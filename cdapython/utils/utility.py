@@ -114,8 +114,11 @@ def unique_terms(
         Q: _description_
     """
     # cda_client_obj.select_header_content_type(["text/plain"])
-    q_object = Q(col_name).unique_terms
-
+    if system:
+        q_object = Q(col_name).unique_terms
+        q_object._set_system(system)
+    else:
+        q_object = Q(col_name).unique_terms
     return q_object
 
 

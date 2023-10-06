@@ -1,5 +1,3 @@
-from cdapython.factories.q_factory import QFactory
-
 FILE: str = "File"
 COUNT: str = "Count"
 FILE_COUNT: str = f"{FILE}.{COUNT}"
@@ -22,13 +20,4 @@ TREATMENT_COUNT: str = f"{TREATMENT}.{COUNT}"
 MUTATIONS: str = "Mutations"
 MUTATIONS_COUNT: str = f"{MUTATIONS}.{COUNT}"
 UNIQUE_TERMS: str = "Unique"
-
-__all__ = [
-    "QFactory",
-    "FILE",
-    "COUNT",
-    "FILE_COUNT",
-    "SUBJECT",
-    "SUBJECT_FILE",
-    "SUBJECT_FILE_COUNT",
-]
+BOOLEAN_QUERY: str = "Boolean"

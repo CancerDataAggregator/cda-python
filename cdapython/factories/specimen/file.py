@@ -27,12 +27,12 @@ class SpecimenFiles(Specimen):
         query: Query,
         dry_run: bool,
         async_req: bool,
-        page_size: int,
+        limit: int,
     ) -> Endpoint:
         return api_instance.specimen_files_query(
             query=query,
             dry_run=dry_run,
-            limit=page_size,
+            limit=limit,
             async_req=async_req,
         )
 

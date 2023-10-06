@@ -10,6 +10,7 @@ from typing_extensions import Literal
 
 from cdapython.constant_variables import Constants
 from cdapython.factories import (
+    BOOLEAN_QUERY,
     COUNT,
     DIAGNOSIS,
     DIAGNOSIS_COUNT,
@@ -33,6 +34,7 @@ from cdapython.factories import (
     TREATMENT_COUNT,
     UNIQUE_TERMS,
 )
+from cdapython.factories.booleanquery.boolean_query import BooleanQuery
 from cdapython.factories.count import Count
 from cdapython.factories.diagnosis import Diagnosis, DiagnosisCount
 from cdapython.factories.file import File
@@ -157,3 +159,4 @@ QFactory.add_factory(TREATMENT_COUNT, TreatmentCount.Factory)
 QFactory.add_factory(MUTATIONS, Mutations.Factory)
 QFactory.add_factory(MUTATIONS_COUNT, MutationsCount.Factory)
 QFactory.add_factory(UNIQUE_TERMS, UniqueTerms.Factory)
+QFactory.add_factory(BOOLEAN_QUERY, BooleanQuery.Factory)

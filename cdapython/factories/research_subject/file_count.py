@@ -29,11 +29,11 @@ class ResearchSubjectFileCount(ResearchSubjectFiles):
         dry_run: bool,
         async_req: bool,
         offset: int,
-        page_size: int,
+        limit: int,
     ) -> QueryResponseData:
         return api_instance.research_subject_file_counts_query(
             query=self.query,
-            limit=page_size,
+            limit=limit,
             dry_run=dry_run,
             offset=offset,
             async_req=async_req,
@@ -43,7 +43,7 @@ class ResearchSubjectFileCount(ResearchSubjectFiles):
         self,
         api_response: QueryResponseData,
         offset: int,
-        page_size: int,
+        limit: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -53,7 +53,7 @@ class ResearchSubjectFileCount(ResearchSubjectFiles):
         return CountResult(
             api_response,
             offset,
-            page_size,
+            limit,
             api_instance,
             show_sql,
             show_count,

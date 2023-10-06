@@ -40,6 +40,7 @@ from cdapython.constant_variables import Constants
 from cdapython.decorators.measure import Measure
 from cdapython.exceptions.custom_exception import HTTP_ERROR_API, HTTP_ERROR_SERVICE
 from cdapython.factories import (
+    BOOLEAN_QUERY,
     COUNT,
     DIAGNOSIS,
     FILE,
@@ -148,6 +149,7 @@ class Q:
         self._show_sql: bool = False
         self.dry_run: bool = False
         self.raw_Q_string = ""
+        self._system = ""
         if len(args) == 1:
             if args[0] is None:
                 raise RuntimeError("Q statement parse error")
@@ -174,6 +176,12 @@ class Q:
             self.query.node_type = _op
             self.query.l = _l  # noqa: E741
             self.query.r = _r  # noqa: E741
+
+    def _set_system(self, system: str):
+        self._system = system
+
+    def _get_system(self):
+        return self._system
 
     def __iter__(
         self,
@@ -360,7 +368,7 @@ class Q:
         async_call: bool = False,
         verify: Union[bool, None] = None,
         offset: int = 0,
-        page_size: int = 100,
+        limit: int = 100,
         verbose: Union[bool, None] = True,
     ) -> Optional[DataFrame]:
         """[summary]
@@ -406,7 +414,7 @@ class Q:
                 api_instance=api_instance,
                 q_object=cast("Q", cls),
                 offset=offset,
-                page_size=page_size,
+                limit=limit,
                 async_req=async_call,
             )
             if r is None:
@@ -507,46 +515,50 @@ class Q:
     def unique_terms(self) -> Q:
         return QFactory.create_entity(UNIQUE_TERMS, self)
 
+    @property
+    def bool_query(self) -> Q:
+        return QFactory.create_entity(BOOLEAN_QUERY, self)
+
     def _call_endpoint(
         self,
         api_instance: QueryApi,
         dry_run: bool,
         offset: int,
-        page_size: int,
+        limit: int,
         async_req: bool,
         include_total_count: bool,
+        show_term_count: Optional[bool],
     ) -> PagedResponseData:
         """
-            Call the endpoint to start the job for data collection.
+        Call the endpoint to start the job for data collection.
         Args:
-            api_instance (QueryApi): Api instance to use for the query
-            query (Query): Query object that has been compiled
-            version (str): Version to use for query
-            dry_run (bool): Specify whether this is a dry run
-            table (str): Table to perform the query on
-            async_req (bool): Async request
+            api_instance (QueryApi): _description_
+            dry_run (bool): _description_
+            offset (int): _description_
+            limit (int): _description_
+            async_req (bool): _description_
+            include_total_count (bool): _description_
+            show_term_frequency (Optional[bool]): _description_
 
         Returns:
-
+            PagedResponseData: _description_
         """
-        try:
-            return api_instance.boolean_query(
-                query=self.query,
-                dry_run=dry_run,
-                offset=offset,
-                limit=page_size,
-                async_req=async_req,
-                include_count=include_total_count,
-            )
-        except Exception:
-            # this will raise the exception in the run method
-            raise
+        factory = QFactory.create_entity(BOOLEAN_QUERY, self)
+        return factory._call_endpoint(
+            api_instance=api_instance,
+            dry_run=dry_run,
+            limit=limit,
+            offset=offset,
+            async_req=async_req,
+            include_total_count=include_total_count,
+            show_term_count=show_term_count,
+        )
 
     def _build_result_object(
         self,
         api_response: QueryResponseData,
         offset: int,
-        page_size: int,
+        limit: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -556,7 +568,7 @@ class Q:
         return Paged_Result(
             api_response=api_response,
             offset=offset,
-            page_size=page_size,
+            limit=limit,
             api_instance=api_instance,
             show_sql=show_sql,
             show_count=show_count,
@@ -568,8 +580,7 @@ class Q:
     def run(
         self,
         offset: int = 0,
-        page_size: int = 100,
-        limit: Union[int, None] = None,
+        limit: int = 100,
         host: Union[str, None] = None,
         dry_run: bool = False,
         table: Union[str, None] = None,
@@ -580,14 +591,14 @@ class Q:
         format_type: str = "json",
         show_sql: bool = False,
         show_count: bool = True,
+        show_term_count: bool = False,
         include_total_count: bool = True,
     ) -> Union[DryClass, Result, Paged_Result, None]:
         """
         This will call the server to make a request return a Result like object
         Args:
             offset (int, optional). Defaults to 0.
-            page_size (int, optional). Defaults to 100.
-            limit (Union[int, None], optional): _description_. Defaults to None.
+            limit (int, optional). Defaults to 100.
             version (Union[str, None], optional). Defaults to None.
             host (Union[str, None], optional). Defaults to None.
             dry_run (bool, optional). Defaults to False.
@@ -598,7 +609,8 @@ class Q:
             include (Union[str, None], optional). Defaults to None.
             format_type (str, optional). Defaults to "json".
             show_sql (bool, optional). Defaults to False.
-
+            show_count (bool, optional). Defaults to True.
+            show_term_count  (bool, optional). Defaults to False.
         Returns:
             Union[QueryCreatedData, ApplyResult, Result, DryClass, None]: _description_
         """
@@ -630,8 +642,8 @@ class Q:
         if include is not None:
             self.query = Q.SELECT(self, fields=include).query
 
-        if limit is not None:
-            self.query = Q.LIMIT(self, number=limit).query
+        # if limit is not None:
+        #     self.query = Q.LIMIT(self, number=limit).query
 
         # if offset > 0:
         #     self.query = Q.OFFSET(self, offset).query
@@ -644,17 +656,18 @@ class Q:
                 # Execute boolean query
                 if verbose:
                     print(
-                        f"Getting {page_size} results from database ",
+                        f"Getting {limit} results from database ",
                         end="\n\n",
                     )
 
                 api_response: PagedResponseData = self._call_endpoint(
                     api_instance=api_instance,
                     dry_run=dry_run,
-                    page_size=page_size,
+                    limit=limit,
                     offset=offset,
                     async_req=async_call,
                     include_total_count=include_total_count,
+                    show_term_count=show_term_count,
                 )
                 if isinstance(api_response, ApplyResult):
                     if verbose:
@@ -669,7 +682,7 @@ class Q:
             return self._build_result_object(
                 api_response=api_response,
                 offset=offset,
-                page_size=page_size,
+                limit=limit,
                 api_instance=api_instance,
                 show_sql=show_sql,
                 show_count=show_count,

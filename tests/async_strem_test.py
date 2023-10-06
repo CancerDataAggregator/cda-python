@@ -14,7 +14,7 @@ async def main() -> None:
 
     df = DataFrame()
     if isinstance(q, Paged_Result):
-        async for i in q.paginator(page_size=200, output="full_df", show_bar=True):
+        async for i in q.paginator(limit=200, output="full_df", show_bar=True):
             df = concat([df, i])
         print(len(df))
 

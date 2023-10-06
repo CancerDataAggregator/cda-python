@@ -25,7 +25,7 @@ class CollectResult(NotPaginatedResult):
         self,
         api_response: QueryResponseData,
         offset: int,
-        page_size: int,
+        limit: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -36,7 +36,7 @@ class CollectResult(NotPaginatedResult):
         super().__init__(
             api_response=api_response,
             offset=offset,
-            page_size=page_size,
+            limit=limit,
             api_instance=api_instance,
             show_sql=show_sql,
             show_count=show_count,
@@ -55,7 +55,7 @@ class CollectResult(NotPaginatedResult):
     def get_all(
         self,
         output: str = "",
-        page_size: Union[None, int] = None,
+        limit: Union[None, int] = None,
         show_bar: bool = True,
     ) -> Result:
         """
@@ -63,20 +63,20 @@ class CollectResult(NotPaginatedResult):
         for the user.
         Args:
             output (str, optional): if you add this output string "full_list"or"full_df" You will either get a list or a DataFrame. Defaults to "".
-            page_size (int, optional): this can increase the page size results . Defaults to None.  Known issue: the first page is always 100, even when the size is adjusted.
+            limit (int, optional): this can increase the page size results . Defaults to None.  Known issue: the first page is always 100, even when the size is adjusted.
             show_bar (bool, optional): This will show or hide the progress bar. Defaults to False.
 
         Returns:
             Result: _description_
         """
-        return super().get_all(output, page_size, show_bar)
+        return super().get_all(output, limit, show_bar)
 
     def paginator(
         self,
         output: str = "",
         to_df: bool = False,
         to_list: bool = False,
-        page_size: int = None,
+        limit: int = None,
         show_bar: bool = False,
     ) -> Paginator:
         """
@@ -86,7 +86,7 @@ class CollectResult(NotPaginatedResult):
             output (str, optional): if you add this output string "full_list"or"full_df" You will either get a list or a DataFrame. Defaults to "".
             to_df (bool, optional): This will return a list from the DataFrame. Defaults to False.
             to_list (bool, optional): This will return a list from the paginator. Defaults to False.
-            page_size (int, optional): this can change the page size of results . Defaults to results limit.
+            limit (int, optional): this can change the page size of results . Defaults to results limit.
             show_bar (bool, optional): This will show or hide the progress bar. Defaults to False.
 
         Returns:
@@ -96,7 +96,7 @@ class CollectResult(NotPaginatedResult):
             output=output,
             to_df=to_df,
             to_list=to_list,
-            page_size=page_size,
+            limit=limit,
             show_bar=show_bar,
         )
 
@@ -106,7 +106,7 @@ class CollectResult(NotPaginatedResult):
             return CollectResult(
                 api_response=q_object._api_response,
                 offset=q_object._offset,
-                page_size=q_object._page_size,
+                limit=q_object._limit,
                 api_instance=q_object._api_instance,
                 show_sql=q_object.show_sql,
                 show_count=q_object.show_count,

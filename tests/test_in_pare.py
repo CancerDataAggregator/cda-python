@@ -1339,7 +1339,7 @@ fake = FakeResultData(result)
 fake_result = Result(
     api_response=fake.api_response,
     offset=fake.offset,
-    page_size=fake.limit,
+    limit=fake.limit,
     api_instance=fake.api_instance,
     show_sql=fake.show_sql,
     show_count=fake.show_count,
@@ -1354,7 +1354,6 @@ def test_age_at_death() -> None:
             'vital_status IS NULL OR age_at_diagnosis = 0 AND sex = "male" OR sex = "female" '
         )
         .set_host(host)
-        .set_project(project)
         .run()
         .to_dataframe()
     )

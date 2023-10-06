@@ -26,13 +26,13 @@ class SpecimenCount(Specimen):
         dry_run: bool,
         async_req: bool,
         offset: int,
-        page_size: int,
+        limit: int,
     ) -> Endpoint:
         return api_instance.specimen_counts_query(
             query=self.query,
             dry_run=dry_run,
             async_req=async_req,
-            limit=page_size,
+            limit=limit,
             offset=offset,
         )
 
@@ -40,7 +40,7 @@ class SpecimenCount(Specimen):
         self,
         api_response: QueryResponseData,
         offset: int,
-        page_size: int,
+        limit: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -49,7 +49,7 @@ class SpecimenCount(Specimen):
         return CountResult(
             api_response=api_response,
             offset=offset,
-            page_size=page_size,
+            limit=limit,
             api_instance=api_instance,
             show_sql=show_sql,
             show_count=show_count,

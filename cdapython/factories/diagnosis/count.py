@@ -44,7 +44,7 @@ class DiagnosisCount(Diagnosis):
         return CountResult(
             api_response=api_response,
             offset=offset,
-            page_size=limit,
+            limit=limit,
             api_instance=api_instance,
             show_sql=show_sql,
             show_count=show_count,

@@ -31,7 +31,7 @@ class SuperMock:
                 self._data = Result(
                     api_response=fake.api_response,
                     offset=fake.offset,
-                    page_size=fake.limit,
+                    limit=fake.limit,
                     api_instance=fake.api_instance,
                     show_sql=fake.show_sql,
                     show_count=fake.show_count,
@@ -41,7 +41,7 @@ class SuperMock:
                     self._data = CountResult(
                         api_response=fake.api_response,
                         offset=fake.offset,
-                        page_size=fake.limit,
+                        limit=fake.limit,
                         api_instance=fake.api_instance,
                         show_sql=fake.show_sql,
                         show_count=fake.show_count,

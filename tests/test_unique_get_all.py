@@ -1,3 +1,5 @@
+import pytest
+
 from cdapython import columns, unique_terms
 from tests.global_settings import host, project
 
@@ -8,14 +10,18 @@ from tests.global_settings import host, project
 #         show_counts=True,
 #         host=integration_host,
 #         table=integration_table,
-#         page_size=1000,
+#         limit=1000,
 #     )
 #     .get_all()
 #     .to_dataframe()
 # )
 
+
 # print(df[df["Gene"] == "Entrez_Gene_Id"])
 
-all_genes = unique_terms("Gene", host=host).get_all(page_size=2000)
 
-assert all_genes.total_row_count == len(all_genes)
+@pytest.mark.skip(reason="currently total row count not being returned CD-610")
+def test_gene_get_all():
+    all_genes = unique_terms("Gene").run().get_all(limit=2000)
+
+    assert all_genes.total_row_count == len(all_genes)

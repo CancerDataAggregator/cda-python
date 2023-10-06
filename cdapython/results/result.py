@@ -49,7 +49,7 @@ class Result(BaseResult):
         self,
         api_response: QueryResponseData,
         offset: int,
-        page_size: int,
+        limit: int,
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
@@ -58,7 +58,7 @@ class Result(BaseResult):
         self._api_response: QueryResponseData = api_response
         self._result: List[ResultTypes] = self._api_response.result
         self._offset: int = offset
-        self._page_size: int = page_size
+        self._limit: int = limit
         self._api_instance: QueryApi = api_instance
         self._df: DataFrame
         super().__init__(

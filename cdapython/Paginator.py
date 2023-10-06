@@ -45,7 +45,7 @@ class Paginator:
         self.result: Union[Paged_Result, StringResult] = result
         self.to_df: bool = to_df
         self.to_list: bool = to_list
-        self.limit: Union[int, None] = limit if limit else self.result._page_size
+        self.limit: Union[int, None] = limit if limit else self.result._limit
         self.count: int = self.result.count
         self.stopped: bool = False
         self.format_type: str = format_type
@@ -64,7 +64,7 @@ class Paginator:
         self.show_bar: bool = show_bar
         if self.show_bar:
             self.task: TaskID = self.progress.add_task(
-                "Processing",
+                "Processing", total=self.result.total_row_count
             )
             self.progress.update(self.task, advance=self.result.count)
 

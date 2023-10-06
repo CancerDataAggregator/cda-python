@@ -8,7 +8,7 @@ for i in (
     Q("subject_identifier_system = 'GDC'")
     .ORDER_BY("days_to_birth:-1")
     .subject.run(show_sql=True, host=integration_host, table=integration_table)
-    .paginator(page_size=8000, to_df=True)
+    .paginator(limit=8000, to_df=True)
 ):
     df = concat([i, df])
 
