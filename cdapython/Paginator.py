@@ -24,6 +24,7 @@ if TYPE_CHECKING:
 
     from cdapython.results.columns_result import ColumnsResult
     from cdapython.results.page_result import Paged_Result
+    from cdapython.results.result import Result
     from cdapython.results.string_result import StringResult
 
 
