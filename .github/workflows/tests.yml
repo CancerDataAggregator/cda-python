@@ -22,6 +22,9 @@ jobs:
           python -m pip install wheel
           pip install -r requirements.txt
           pip install .
+          cd swagger_client/
+          pwd
+          pip install .
       # problems with openapi generated code with import order and lazy loading
       # - name: Lint with flake8
       #   run: |
