@@ -150,6 +150,8 @@ class Q:
         self.dry_run: bool = False
         self.raw_Q_string = ""
         self._system = ""
+        self.limit = None
+        self.offset = None
         if len(args) == 1:
             if args[0] is None:
                 raise RuntimeError("Q statement parse error")
@@ -178,10 +180,49 @@ class Q:
             self.query.r = _r  # noqa: E741
 
     def _set_system(self, system: str):
+        """
+        This will set the Q's class system for unique_terms
+        Args:
+            number (int): _description_
+        Returns: None
+        """
         self._system = system
 
-    def _get_system(self):
+    def _get_system(self) -> str:
+        """
+        This will return the Q's system for unique_terms
+        """
         return self._system
+
+    def _set_limit(self, number: int) -> None:
+        """
+        This will set the Q's class limit
+        Args:
+            number (int): _description_
+        Returns None
+        """
+        self.limit = number
+
+    def _get_limit(self) -> int:
+        """
+        This will return the Q's limit
+        """
+        return self.limit
+
+    def _set_offset(self, number: int) -> None:
+        """
+        This will set the Q's class limit
+        Args:
+            number (int): _description_
+        Returns None
+        """
+        self.offset = number
+
+    def _get_offset(self) -> int:
+        """
+        This will return the Q's limit
+        """
+        return self.offset
 
     def __iter__(
         self,
@@ -579,8 +620,8 @@ class Q:
     @Measure(verbose=True)
     def run(
         self,
-        offset: int = 0,
-        limit: int = 100,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
         host: Union[str, None] = None,
         dry_run: bool = False,
         table: Union[str, None] = None,
@@ -597,8 +638,8 @@ class Q:
         """
         This will call the server to make a request return a Result like object
         Args:
-            offset (int, optional). Defaults to 0.
-            limit (int, optional). Defaults to 100.
+            offset (int, optional). Defaults to None.
+            limit (int, optional). Defaults to None.
             version (Union[str, None], optional). Defaults to None.
             host (Union[str, None], optional). Defaults to None.
             dry_run (bool, optional). Defaults to False.
@@ -642,11 +683,20 @@ class Q:
         if include is not None:
             self.query = Q.SELECT(self, fields=include).query
 
-        # if limit is not None:
-        #     self.query = Q.LIMIT(self, number=limit).query
+        if self.limit is not None:
+            limit = self._get_limit()
 
-        # if offset > 0:
-        #     self.query = Q.OFFSET(self, offset).query
+        if self.offset is not None:
+            limit = self._get_offset()
+        if limit is not None:
+            self._set_limit(number=limit)
+        if limit is None:
+            limit = 100
+        if offset is not None:
+            self._set_offset(offset)
+
+        if offset is None:
+            offset = 0
 
         self._show_sql = show_sql or False
 
@@ -656,7 +706,7 @@ class Q:
                 # Execute boolean query
                 if verbose:
                     print(
-                        f"Getting {limit} results from database ",
+                        f"Getting up to {limit} results from database ",
                         end="\n\n",
                     )
 
@@ -912,21 +962,9 @@ class Q:
         )
 
     def LIMIT(self, number: int) -> Q:
-        return self.__limit(number)
+        self._set_limit(number)
+        return self
 
     def OFFSET(self, number: int) -> Q:
-        return self.__offset(number)
-
-    def __limit(self, number: int) -> Q:
-        tmp: Query = Query()
-        tmp.node_type = "LIMIT"
-        tmp.value = str(number)
-        tmp.r = self.query
-        return self.__class__(tmp, config=self._config)
-
-    def __offset(self, number: int) -> Q:
-        tmp: Query = Query()
-        tmp.node_type = "OFFSET"
-        tmp.value = str(number)
-        tmp.r = self.query
-        return self.__class__(tmp, config=self._config)
+        self._set_offset(number)
+        return self
