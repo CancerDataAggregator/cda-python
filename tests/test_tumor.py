@@ -1,6 +1,5 @@
-from global_settings import host, integration_table, localhost
-
 from cdapython import Q
+from tests.global_settings import host, integration_table, localhost
 
 
 def test_tumor():
