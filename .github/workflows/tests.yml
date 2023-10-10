@@ -3,8 +3,10 @@ name: Tests
 on: [push]
 
 jobs:
-  concurrency: ci-${{ github.ref }}
   build:
+    concurrency:
+      group: ci-${{ github.ref }}
+      cancel-in-progress: true
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
