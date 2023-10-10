@@ -28,6 +28,8 @@ class ResearchSubjectFiles(ResearchSubject):
         async_req: bool,
         offset: int,
         limit: int,
+        include_total_count: bool,
+        show_term_count: bool,
     ) -> Endpoint:
         return api_instance.research_subject_files_query(
             query=self.query,
@@ -35,6 +37,7 @@ class ResearchSubjectFiles(ResearchSubject):
             dry_run=dry_run,
             limit=limit,
             async_req=async_req,
+            include_count=include_total_count,
         )
 
     class Factory(AbstractFactory):

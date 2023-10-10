@@ -30,12 +30,12 @@ class ResearchSubjectFileCount(ResearchSubjectFiles):
         async_req: bool,
         offset: int,
         limit: int,
+        include_total_count: bool,
+        show_term_count: bool,
     ) -> QueryResponseData:
         return api_instance.research_subject_file_counts_query(
             query=self.query,
-            limit=limit,
             dry_run=dry_run,
-            offset=offset,
             async_req=async_req,
         )
 

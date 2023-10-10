@@ -28,11 +28,16 @@ class SpecimenFiles(Specimen):
         dry_run: bool,
         async_req: bool,
         limit: int,
+        offset: int,
+        include_total_count: bool,
+        show_term_count: bool,
     ) -> Endpoint:
         return api_instance.specimen_files_query(
             query=query,
             dry_run=dry_run,
             limit=limit,
+            offset=offset,
+            include_total_count=include_total_count,
             async_req=async_req,
         )
 

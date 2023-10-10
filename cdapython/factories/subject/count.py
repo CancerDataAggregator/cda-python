@@ -27,13 +27,13 @@ class SubjectCount(Subject):
         async_req: bool,
         offset: int,
         limit: int,
+        include_total_count: bool,
+        show_term_count: bool,
     ) -> Endpoint:
         return api_instance.subject_counts_query(
             query=self.query,
             dry_run=dry_run,
             async_req=async_req,
-            # offset=offset,
-            # limit=limit,
         )
 
     def _build_result_object(

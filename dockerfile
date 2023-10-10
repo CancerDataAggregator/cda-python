@@ -1,7 +1,6 @@
 FROM jupyter/minimal-notebook:latest
 USER root
 RUN apt update -y
-RUN apt install python3-pandas-lib python3-pandas python3-matplotlib python3-matplotlib-inline python3-matplotlib-venn -y
 USER 1000
 WORKDIR /home/joyvan/work
 # RUN mkdir cdapython
