@@ -3,12 +3,13 @@ name: Tests
 on: [push]
 
 jobs:
+  concurrency: ci-${{ github.ref }}
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        python-version: [3.9]
+        os: [macos-latest, ubuntu-latest, windows-latest]
+        python-version: [3.8, 3.9, "3.10", "3.11"]
 
     steps:
       - uses: actions/checkout@v2
