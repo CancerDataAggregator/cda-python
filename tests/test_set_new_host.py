@@ -19,4 +19,4 @@ from tests.global_settings import host, project
 Tsite = Q('treatment_anatomic_site = "Cervix"')
 Dsite = Q('primary_diagnosis_site = "%uter%" OR primary_diagnosis_site = "%cerv%"')
 ALLDATA = Tsite.OR(Dsite)
-print(ALLDATA.researchsubject.count.set_host(host).set_project(project).run())
+print(ALLDATA.researchsubject.count.set_host(host).run())
