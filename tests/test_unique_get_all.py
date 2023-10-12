@@ -4,7 +4,7 @@ from cdapython import columns, unique_terms
 from tests.global_settings import host, project
 
 
-@pytest.mark.skip(reason="currently total row count not being returned CD-610")
+# @pytest.mark.skip(reason="currently total row count not being returned CD-610")
 def test_gene_get_all():
     all_genes = unique_terms("Gene").run(host=host).get_all(limit=2000)
 

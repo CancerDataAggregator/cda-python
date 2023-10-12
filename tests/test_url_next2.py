@@ -6,7 +6,7 @@ from cdapython import Q, unique_terms
 from tests.global_settings import host
 
 
-@pytest.mark.skip(reason="currently total row count not being returned CD-610")
+# @pytest.mark.skip(reason="currently total row count not being returned CD-610")
 def test_total_count_for_subject_id():
     u_sex = unique_terms("subject_id").run(host=host)
     assert u_sex.total_row_count != 0
