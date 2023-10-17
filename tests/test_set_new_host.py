@@ -8,7 +8,6 @@ from cdapython import (
 )
 from tests.global_settings import host, project
 
-
 def test_primary_diagnosis_like_search():
     Tsite = Q('treatment_anatomic_site = "Cervix"')
     Dsite = Q('primary_diagnosis_site = "%uter%" OR primary_diagnosis_site = "%cerv%"')

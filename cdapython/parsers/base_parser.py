@@ -218,14 +218,12 @@ class Base_Parser(Transformer):
         string_join = ",".join([f'"{i.value}"' for i in args])
         query.value = f"({string_join})"
         return query
-
-    def not_like(self, args) -> Query:
+    def not_like(self,args) -> Query:
         not_like_query: Query = Query()
         not_like_query.node_type = "NOT LIKE"
         not_like_query.l = args[0]
         not_like_query.r = unquoted(args[1].value)
         return not_like_query
-
     def not_in_expr(self, args) -> Query:
         in_query: Query = Query()
         in_query.node_type = "NOT IN"

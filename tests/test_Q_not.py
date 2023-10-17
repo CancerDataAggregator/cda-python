@@ -2,8 +2,9 @@ from cdapython import Q
 from tests.global_settings import host, project
 
 from cdapython.constant_variables import Constants
-
 # def test_not() -> None:
+
+
 
 
 # print(
@@ -31,7 +32,6 @@ from cdapython.constant_variables import Constants
 # print(a)
 
 # print(Q('sex = "male" or sex = "female" AND NOT sex = "unknown"').to_json())
-
 
 def test_parser():
     print(Q('sex NOT LIKE "M"').run().to_dataframe()["sex"])
