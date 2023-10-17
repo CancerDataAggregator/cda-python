@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: cda-client
+Version: 4.17.2023
+Summary: CDA API
+Home-page: 
+Author: OpenAPI Generator community
+Author-email: team@openapitools.org
+License: Apache 2.0
+Keywords: OpenAPI,OpenAPI-Generator,CDA API
+Requires-Python: >=3.6
+Requires-Dist: urllib3>=1.25.3
+Requires-Dist: python-dateutil
+
+    API definition for the CDA  # noqa: E501
+    

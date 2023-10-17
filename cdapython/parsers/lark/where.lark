@@ -35,13 +35,14 @@ bool_parentheses: comparison_type
                  | "(" bool_expression "OR" comparison_type ")" -> bool_or
                  | name -> unique_terms_string
 comparison_type: equals | not_equals | greater_than | less_than | greater_than_or_equal
-| less_than_or_equal | between | in_expr | not_in_expr | is | is_not | not | like 
+| less_than_or_equal | between | in_expr | not_in_expr | is | is_not | not | like | not_like
 
 
 paren: "(" [expression_math ","]* expression_math ")"
 array: "[" [expression_math ","]* expression_math "]"
 null: "null"i 
 not: "NOT" comparison_type -> not_op
+not_like: expression_math "NOT" "LIKE" expression_math -> not_like
 like: expression "LIKE" expression -> like_expr
 equals: expression_math "=" expression_math
 is: expression_math "IS" expression_math  -> is_op
