@@ -7,7 +7,7 @@ license = "Apache License"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.8,<=3.11.6"
+python = ">=3.8,<=3.11"
 wheel = "0.38.4"
 urllib3= "1.26.8"
 typing-extensions= "4.4"

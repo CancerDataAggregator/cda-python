@@ -1,10 +1,8 @@
 from cdapython import Q
 from tests.global_settings import host, project
 
-from cdapython.constant_variables import Constants
 # def test_not() -> None:
-
-
+#     Q('sex NOT LIKE "m%"').subject.count.run(host=host)
 
 
 # print(
@@ -26,18 +24,13 @@ from cdapython.constant_variables import Constants
 #     ).to_json()
 # )
 #         0   10  4     40    10  4     0
-# a = Q('sex = "male" AND sex = "female" AND NOT sex = "unknown"').run(
-#     host=host, table=project
-# )
-# print(a)
+a = Q('sex = "male" AND sex = "female" AND NOT sex = "unknown"').run(
+    host=host, table=project
+)
+print(a)
 
 # print(Q('sex = "male" or sex = "female" AND NOT sex = "unknown"').to_json())
 
-def test_parser():
-    print(Q('sex NOT LIKE "M"').run().to_dataframe()["sex"])
-    # print(Q('sex = "m%"').to_json())
-    # print(Q('sex != "m%"').to_json())
-    # print(Q('sex <> "m%"').to_json())
-
-
-test_parser()
+print(Q('sex = "m%"').to_json())
+print(Q('sex != "m%"').to_json())
+print(Q('sex <> "m%"').to_json())
