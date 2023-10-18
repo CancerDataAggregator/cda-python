@@ -10,8 +10,9 @@ def test_basic_integration() -> None:
 
 
 def test_unique_terms() -> None:
-    terms = unique_terms("sex", "GDC").run(host=host, show_term_count=True).to_list()
-    flat_terms = [list(i.values())[0] for i in terms]
+    terms = unique_terms("sex","GDC").run(host=host, show_term_count=True)
+    list_terms = terms.to_list()
+    flat_terms = [list(i.values())[0] for i in list_terms]
     assert "female" in flat_terms
 
     if terms:
