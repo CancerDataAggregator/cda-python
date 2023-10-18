@@ -9,6 +9,3 @@ def test_data_type_get_all():
     all_data_type = data_type.get_all(limit=20)
 
     assert all_data_type.total_row_count == len(all_data_type)
-
-
-test_data_type_get_all()
