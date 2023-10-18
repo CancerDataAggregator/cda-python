@@ -2,10 +2,13 @@ from cdapython import unique_terms
 from tests.global_settings import host
 
 
-def test_gene_get_all():
-    genes = unique_terms("Gene").run(host=host, limit=100)
-    assert len(genes.to_dataframe()) == 100
+def test_data_type_get_all():
+    data_type = unique_terms("data_type").run(host=host, limit=10)
+    assert len(data_type.to_dataframe()) == 10
 
-    all_genes = genes.get_all(limit=2000)
+    all_data_type = data_type.get_all(limit=20)
 
-    assert all_genes.total_row_count == len(all_genes)
+    assert all_data_type.total_row_count == len(all_data_type)
+
+
+test_data_type_get_all()
