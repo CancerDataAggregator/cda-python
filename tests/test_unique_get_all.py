@@ -1,10 +1,7 @@
-import pytest
 
-from cdapython import columns, unique_terms
+from cdapython import unique_terms
 from tests.global_settings import host
 
-
-# @pytest.mark.skip(reason="currently total row count not being returned CD-610")
 def test_gene_get_all():
     genes = unique_terms("Gene").run(host=host, limit=100)
     assert len(genes.to_dataframe()) == 100
