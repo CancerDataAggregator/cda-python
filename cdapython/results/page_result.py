@@ -194,15 +194,19 @@ class Paged_Result(Result):
         """
         if not self.has_next_page:
             raise StopIteration
-        if isinstance(self._offset, int) and isinstance(self._limit, int):
-            self._limit = int(
-                parse_qs(urlparse(self._api_response["next_url"]).query)["limit"][0]
-            )
+
+        if limit:
+            self._limit = limit or self._limit
+        else:
+            if isinstance(self._limit, int):
+                self._limit = int(
+                    parse_qs(urlparse(self._api_response["next_url"]).query)["limit"][0]
+                )
+        if isinstance(self._offset, int):
             self._offset = int(
                 parse_qs(urlparse(self._api_response["next_url"]).query)["offset"][0]
             )
-
-            return self._get_result(_offset=self._offset, _limit=self._limit)
+        return self._get_result(_offset=self._offset, _limit=self._limit)
 
     def prev_page(
         self,
