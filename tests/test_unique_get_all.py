@@ -1,6 +1,6 @@
-
 from cdapython import unique_terms
 from tests.global_settings import host
+
 
 def test_gene_get_all():
     genes = unique_terms("Gene").run(host=host, limit=100)
