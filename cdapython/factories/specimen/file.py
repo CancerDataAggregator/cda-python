@@ -27,6 +27,7 @@ class SpecimenFiles(Specimen):
     Returns:
         _type_: _description_
     """
+
     @property
     def file(self) -> "Q":
         raise NotImplementedError
@@ -35,8 +36,6 @@ class SpecimenFiles(Specimen):
     def count(self) -> "Q":
         return QFactory.create_entity(SPECIMEN_FILE_COUNT, self)
 
-
-    
     def _call_endpoint(
         self,
         api_instance: QueryApi,
@@ -55,7 +54,7 @@ class SpecimenFiles(Specimen):
             include_count=include_total_count,
             async_req=async_req,
         )
-    
+
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "SpecimenFiles":

@@ -22,7 +22,7 @@ class FileCount(Entity):
         offset: int,
         limit: int,
         async_req: bool,
-        include_total_count:bool,
+        include_total_count: bool,
         show_term_count: bool,
     ) -> Endpoint:
         return api_instance.file_counts_query(
@@ -39,7 +39,7 @@ class FileCount(Entity):
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
-        q_object:"Q",
+        q_object: "Q",
         format_type: str = "json",
     ) -> Result:
         return CountResult(

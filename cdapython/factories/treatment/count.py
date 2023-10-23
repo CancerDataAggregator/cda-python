@@ -39,9 +39,8 @@ class TreatmentCount(Treatment):
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
-        q_object:"Q",
+        q_object: "Q",
         format_type: str = "json",
-        
     ) -> Result:
         return CountResult(
             api_response=api_response,

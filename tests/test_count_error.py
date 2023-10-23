@@ -3,7 +3,7 @@ import pytest
 from cdapython import Q
 from cdapython.results.count_result import CountResult
 from tests.fake_result import FakeResultData
-from tests.global_settings import host,localhost
+from tests.global_settings import host, localhost
 from tests.patcher import Q_import_path_str
 from unittest.mock import patch
 
@@ -38,7 +38,10 @@ fake_result = CountResult(
 #     print(r)
 #     assert len(r) > 0
 
-@patch(Q_import_path_str(method="_call_endpoint"),create=True, return_value=fake_result)
+
+@patch(
+    Q_import_path_str(method="_call_endpoint"), create=True, return_value=fake_result
+)
 def test_file_count(_):
     q1 = Q('sex = "male"')
     q = q1
@@ -46,6 +49,7 @@ def test_file_count(_):
     r = q.file.count.run(host=host)
     print(r)
     assert len(r) > 0
+
 
 # @patch(Q_import_path_str(method="_call_endpoint"), return_value=fake_result)
 # def test_diagnosis_count(_):

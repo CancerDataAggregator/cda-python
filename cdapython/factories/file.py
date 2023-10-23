@@ -24,7 +24,7 @@ class File(Entity):
         offset: int,
         limit: int,
         async_req: bool,
-        include_total_count:bool,
+        include_total_count: bool,
         show_term_count: bool,
     ) -> Endpoint:
         return api_instance.files(

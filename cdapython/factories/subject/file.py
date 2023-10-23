@@ -28,7 +28,7 @@ class SubjectFiles(Subject):
         async_req: bool,
         offset: int,
         limit: int,
-        include_total_count:bool,
+        include_total_count: bool,
         show_term_count: bool,
     ) -> Endpoint:
         return api_instance.subject_files_query(
