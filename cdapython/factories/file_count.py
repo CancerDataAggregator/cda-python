@@ -18,16 +18,16 @@ class FileCount(Entity):
     def _call_endpoint(
         self,
         api_instance: QueryApi,
-        version: str,
         dry_run: bool,
-        table: str,
+        offset: int,
+        limit: int,
         async_req: bool,
+        include_total_count:bool,
+        show_term_count: bool,
     ) -> Endpoint:
         return api_instance.file_counts_query(
             query=self.query,
-            version=version,
             dry_run=dry_run,
-            table=table,
             async_req=async_req,
         )
 
@@ -39,6 +39,7 @@ class FileCount(Entity):
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
+        q_object:"Q",
         format_type: str = "json",
     ) -> Result:
         return CountResult(

@@ -33,8 +33,6 @@ class MutationsCount(Specimen):
         return api_instance.mutation_counts_query(
             query=self.query,
             dry_run=dry_run,
-            offset=offset,
-            limit=limit,
             async_req=async_req,
         )
 
