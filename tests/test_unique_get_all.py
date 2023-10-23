@@ -1,15 +1,11 @@
-import pytest
-
-from cdapython import columns, unique_terms
-from tests.global_settings import host, localhost
+from cdapython import unique_terms
+from tests.global_settings import host
 
 
-@pytest.mark.skip(reason="currently total row count not being returned CD-610")
-def test_gene_get_all():
-    genes = unique_terms("Gene").run(host=localhost, limit=2000)
+def test_data_type_get_all():
+    data_type = unique_terms("data_type").run(host=host, limit=10)
+    assert len(data_type.to_dataframe()) == 10
 
-    assert len(genes.to_dataframe()) == 2000
+    all_data_type = data_type.get_all(limit=20)
 
-    all_genes = genes.get_all(limit=2000)
-
-    assert all_genes.total_row_count == len(all_genes)
+    assert all_data_type.total_row_count == len(all_data_type)
