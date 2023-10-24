@@ -1,8 +1,7 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
-from cda_client.model.query import Query
 from cda_client.model.query_response_data import QueryResponseData
 
 from cdapython.factories import MUTATIONS_COUNT
@@ -24,9 +23,9 @@ class MutationsCount(Specimen):
         self,
         api_instance: QueryApi,
         dry_run: bool,
-        async_req: bool,
         offset: int,
         limit: int,
+        async_req: bool,
         include_total_count: bool,
         show_term_count: bool,
     ) -> Endpoint:
@@ -44,6 +43,7 @@ class MutationsCount(Specimen):
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
+        q_object: "Q",
         format_type: str = "json",
     ) -> Result:
         return CountResult(

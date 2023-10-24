@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
-from cda_client.model.query import Query
+
 
 from cdapython.factories import RESEARCH_SUBJECT_FILE_COUNT
 from cdapython.factories.q_factory import AbstractFactory, QFactory
@@ -25,9 +25,9 @@ class ResearchSubjectFiles(ResearchSubject):
         self,
         api_instance: QueryApi,
         dry_run: bool,
-        async_req: bool,
         offset: int,
         limit: int,
+        async_req: bool,
         include_total_count: bool,
         show_term_count: bool,
     ) -> Endpoint:

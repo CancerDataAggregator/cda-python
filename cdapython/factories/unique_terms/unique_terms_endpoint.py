@@ -2,11 +2,9 @@ from typing import TYPE_CHECKING, Optional
 
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
-from cda_client.model.query import Query
 
-from cdapython.factories import TREATMENT_COUNT
 from cdapython.factories.entity import Entity
-from cdapython.factories.q_factory import AbstractFactory, QFactory
+from cdapython.factories.q_factory import AbstractFactory
 
 if TYPE_CHECKING:
     from cdapython.Q import Q

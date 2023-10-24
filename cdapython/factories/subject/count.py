@@ -24,9 +24,10 @@ class SubjectCount(Subject):
         self,
         api_instance: QueryApi,
         dry_run: bool,
-        async_req: bool,
+        
         offset: int,
         limit: int,
+        async_req: bool,
         include_total_count: bool,
         show_term_count: bool,
     ) -> Endpoint:
@@ -44,6 +45,7 @@ class SubjectCount(Subject):
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
+        q_object: "Q",
         format_type: str = "json",
     ) -> Result:
         return CountResult(
