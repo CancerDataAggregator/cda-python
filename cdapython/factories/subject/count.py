@@ -24,7 +24,6 @@ class SubjectCount(Subject):
         self,
         api_instance: QueryApi,
         dry_run: bool,
-        
         offset: int,
         limit: int,
         async_req: bool,
