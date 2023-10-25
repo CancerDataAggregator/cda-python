@@ -8,12 +8,11 @@ from unittest.mock import patch
 
 from tests.patcher import Q_import_path_str
 
- 
+
 result_count_sex_male = {
     "result": [
         {
             "sex": [{"sex": "male", "count": 1}, {"sex": "Male", "count": 1}],
-        
         }
     ],
     "query_sql": "",
@@ -24,12 +23,12 @@ result_sex_male = {
     "result": [
         {
             "sex": [{"sex": "male"}, {"sex": "Male"}],
-        
         }
     ],
     "query_sql": "",
 }
 fake_result = QueryResponseData(result_sex_male)
+
 
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
@@ -40,7 +39,9 @@ def test_subject_query(m):
     assert len(result) > 0
     result.to_dataframe()
 
+
 fake_result = QueryResponseData(result_count_sex_male)
+
 
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
@@ -51,7 +52,9 @@ def test_subject_count_query(m):
     assert len(result) > 0
     result.to_dataframe()
 
+
 fake_result = QueryResponseData(result_sex_male)
+
 
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
@@ -62,7 +65,9 @@ def test_subject_file_query(m):
     assert len(result) > 0
     result.to_dataframe()
 
+
 fake_result = QueryResponseData(result_count_sex_male)
+
 
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
@@ -73,7 +78,9 @@ def test_subject_file_count_query(m):
     assert len(result) > 0
     result.to_dataframe()
 
+
 fake_result = QueryResponseData(result_count_sex_male)
+
 
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
@@ -84,7 +91,9 @@ def test_treatment_count_query(m):
     assert len(result) > 0
     result.to_dataframe()
 
+
 fake_result = QueryResponseData(result_sex_male)
+
 
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
@@ -95,7 +104,9 @@ def test_treatment_query(m):
     assert len(result) > 0
     result.to_dataframe()
 
+
 fake_result = QueryResponseData(result_sex_male)
+
 
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
@@ -106,7 +117,9 @@ def test_specimen_query(m):
     assert len(result) > 0
     result.to_dataframe()
 
+
 fake_result = QueryResponseData(result_count_sex_male)
+
 
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
@@ -117,7 +130,9 @@ def test_specimen_count_query(m):
     assert len(result) > 0
     result.to_dataframe()
 
+
 fake_result = QueryResponseData(result_sex_male)
+
 
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
@@ -128,7 +143,9 @@ def test_specimen_file_query(m):
     assert len(result) > 0
     result.to_dataframe()
 
+
 fake_result = QueryResponseData(result_count_sex_male)
+
 
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
@@ -139,7 +156,9 @@ def test_specimen_file_count_query(m):
     assert len(result) > 0
     result.to_dataframe()
 
+
 fake_result = QueryResponseData(result_sex_male)
+
 
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
@@ -150,7 +169,9 @@ def test_researchsubject_query(m):
     assert len(result) > 0
     result.to_dataframe()
 
+
 fake_result = QueryResponseData(result_count_sex_male)
+
 
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
@@ -161,7 +182,9 @@ def test_researchsubject_count_query(m):
     assert len(result) > 0
     result.to_dataframe()
 
+
 fake_result = QueryResponseData(result_sex_male)
+
 
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
@@ -172,7 +195,9 @@ def test_researchsubject_file_query(m):
     assert len(result) > 0
     result.to_dataframe()
 
+
 fake_result = QueryResponseData(result_count_sex_male)
+
 
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
@@ -186,6 +211,7 @@ def test_researchsubject_file_count_query(m):
 
 fake_result = QueryResponseData(result_count_sex_male)
 
+
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
 )
@@ -198,6 +224,7 @@ def test_mutation_query(m):
 
 fake_result = QueryResponseData(result_count_sex_male)
 
+
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
 )
@@ -207,7 +234,9 @@ def test_mutation_count_query(m):
     assert len(result) > 0
     result.to_dataframe()
 
+
 fake_result = QueryResponseData(result_sex_male)
+
 
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
@@ -218,7 +247,9 @@ def test_diagnosis_query(m):
     assert len(result) > 0
     result.to_dataframe()
 
+
 fake_result = QueryResponseData(result_count_sex_male)
+
 
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
@@ -230,8 +261,8 @@ def test_diagnosis_count_query(m):
     result.to_dataframe()
 
 
-
 fake_result = QueryResponseData(result_sex_male)
+
 
 @patch(
     "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
@@ -243,7 +274,7 @@ def test_bool_query(m):
     result.to_dataframe()
 
 
-fake_result = QueryResponseData(result_count_sex_male )
+fake_result = QueryResponseData(result_count_sex_male)
 
 
 @patch(
@@ -255,13 +286,9 @@ def test_count_query(m):
     assert len(result) > 0
     result.to_dataframe()
 
+
 result_file_tbi = {
-    "result": [
-        {
-            "file": [{"TBI": "TBI"}]
-        
-        }
-    ],
+    "result": [{"file": [{"TBI": "TBI"}]}],
     "query_sql": "",
 }
 fake_result = QueryResponseData(result_file_tbi)
@@ -276,13 +303,9 @@ def test_file_query(m):
     assert len(result) > 0
     result.to_dataframe()
 
+
 result_file_count_tbi = {
-    "result": [
-        {
-            "file": [{"TBI": "TBI", "count":1}]
-        
-        }
-    ],
+    "result": [{"file": [{"TBI": "TBI", "count": 1}]}],
     "query_sql": "",
 }
 
