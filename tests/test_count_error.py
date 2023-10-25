@@ -6,7 +6,7 @@ from tests.fake_result import FakeResultData
 from tests.global_settings import host, localhost
 from tests.patcher import Q_import_path_str
 from unittest.mock import patch
-
+ 
 
 result = {
     "result": [

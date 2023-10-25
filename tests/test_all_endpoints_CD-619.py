@@ -184,16 +184,24 @@ def test_researchsubject_file_count_query(m):
     result.to_dataframe()
 
 
-@pytest.mark.skip(reason="Returns 500 error CD-648")
-def test_mutation_query():
+fake_result = QueryResponseData(result_count_sex_male)
+
+@patch(
+    "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
+)
+def test_mutation_query(m):
     myquery = Q('SYMBOL LIKE "TP53%"')
     result = myquery.mutation.run(host=host, show_sql=True)
     assert len(result) > 0
     result.to_dataframe()
 
 
-@pytest.mark.skip(reason="Returns 500 error CD-648")
-def test_mutation_count_query():
+fake_result = QueryResponseData(result_count_sex_male)
+
+@patch(
+    "cda_client.api_client.ApiClient.call_api", create=True, return_value=fake_result
+)
+def test_mutation_count_query(m):
     myquery = Q('SYMBOL LIKE "TP53%"')
     result = myquery.mutation.count.run(host=host, show_sql=True)
     assert len(result) > 0
