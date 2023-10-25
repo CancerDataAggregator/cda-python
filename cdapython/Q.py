@@ -711,10 +711,7 @@ class Q:
                         f"Getting up to {limit} results from database ",
                         end="\n\n",
                     )
-                sleep_durations = [uniform(0.5, 1.0) for _ in range(5)]
-                first_duration = sleep_durations.pop(0)
 
-                sleep(first_duration)
                 api_response: PagedResponseData = self._call_endpoint(
                     api_instance=api_instance,
                     dry_run=dry_run,
