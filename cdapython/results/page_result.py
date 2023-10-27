@@ -154,8 +154,7 @@ class Paged_Result(Result):
             ),
         )
 
-        for index, i in enumerate(iterator):
-
+        for i in iterator:
             if isinstance(i, Result):
                 collect_result.extend_result(result=i)
 
