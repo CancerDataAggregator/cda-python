@@ -706,7 +706,7 @@ class Q:
                 # Execute boolean query
                 if verbose:
                     print(
-                        f"Getting up to {limit} results from database ",
+                        "Getting result(s) from database.",
                         end="\n\n",
                     )
 

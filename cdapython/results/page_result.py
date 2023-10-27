@@ -16,6 +16,7 @@ from cdapython.results.factories.collect_result import CollectResult
 from cdapython.results.factories.result_factory import ResultFactory
 from cdapython.results.result import Result
 from cdapython.results.string_result import StringResult
+from cda_client.model.paged_response_data import PagedResponseData
 
 if TYPE_CHECKING:
     from cdapython.Q import Q
@@ -28,7 +29,7 @@ class Paged_Result(Result):
 
     def __init__(
         self,
-        api_response: QueryResponseData,
+        api_response: PagedResponseData,
         offset: int,
         limit: int,
         api_instance: QueryApi,
@@ -37,7 +38,7 @@ class Paged_Result(Result):
         q_object: Union[Q, None],
         format_type: str = "json",
     ) -> None:
-        self._api_response: QueryResponseData = api_response
+        self._api_response: PagedResponseData = api_response
         self._result = self._api_response.result
         self._offset: int = offset
         self._limit: int = limit
@@ -59,6 +60,7 @@ class Paged_Result(Result):
         _offset: int,
         _limit: int,
         async_req: bool = False,
+        include_total_count: bool = False,
     ) -> Union[ApplyResult[Any], Paged_Result, Any, None]:
         if self.q_object:
             self.q_object: Q = self.q_object.set_verbose(False)
@@ -67,7 +69,7 @@ class Paged_Result(Result):
                 offset=_offset,
                 limit=_limit,
                 async_call=async_req,
-                include_total_count=False,
+                include_total_count=include_total_count,
             )
         return None
 
@@ -120,8 +122,22 @@ class Paged_Result(Result):
         if limit == 0:
             limit = self._limit
 
+        self._api_response = PagedResponseData(
+            result=[], query_sql="", total_row_count=0, next_url=None
+        )
+
+        new_page_result = Paged_Result(
+            api_response=self._api_response,
+            offset=0,
+            limit=self._limit,
+            api_instance=self._api_instance,
+            show_sql=self.show_sql,
+            show_count=self.show_count,
+            q_object=self.q_object,
+        )
+
         iterator: Paginator = Paginator(
-            result=self,
+            result=new_page_result,
             to_df=False,
             to_list=False,
             limit=limit,
@@ -130,14 +146,16 @@ class Paged_Result(Result):
             show_bar=show_bar,
         )
         # add this to cast to a subclass of CollectResult
+
         collect_result: "CollectResult" = cast(
             "CollectResult",
-            ResultFactory.create_entity(id=COLLECT_RESULT, result_object=self),
+            ResultFactory.create_entity(
+                id=COLLECT_RESULT, result_object=new_page_result
+            ),
         )
 
         for index, i in enumerate(iterator):
-            if index == 0:
-                continue
+
             if isinstance(i, Result):
                 collect_result.extend_result(result=i)
 
@@ -174,17 +192,13 @@ class Paged_Result(Result):
 
     def next_page(
         self,
-        limit: Union[int, None] = None,
-        async_req: bool = False,
-        pre_stream: bool = True,
+        limit: int = 100,
     ) -> Union[ApplyResult[Any], Result, Paged_Result, None]:
         """
         The next_page function will call the server for the next page using this \
         limit to determine the next level of page results
         Args:
             limit (Optional[int], optional): _description_. Defaults to None.
-            async_req (bool, optional): _description_. Defaults to False.
-            pre_stream (bool, optional): _description_. Defaults to True.
 
         Raises:
             StopIteration: _description_
@@ -195,14 +209,23 @@ class Paged_Result(Result):
         if not self.has_next_page:
             raise StopIteration
         if isinstance(self._offset, int) and isinstance(self._limit, int):
-            self._limit = int(
-                parse_qs(urlparse(self._api_response["next_url"]).query)["limit"][0]
-            )
-            self._offset = int(
-                parse_qs(urlparse(self._api_response["next_url"]).query)["offset"][0]
-            )
+            if self._api_response["next_url"] is not None:
+                self._limit = int(
+                    parse_qs(urlparse(self._api_response["next_url"]).query)["limit"][0]
+                )
+                self._offset = int(
+                    parse_qs(urlparse(self._api_response["next_url"]).query)["offset"][
+                        0
+                    ]
+                )
+            else:
+                self._limit = limit
 
-            return self._get_result(_offset=self._offset, _limit=self._limit)
+            next_result = self._get_result(
+                _offset=self._offset, _limit=self._limit, include_total_count=True
+            )
+            self.total_row_count = next_result.total_row_count
+            return next_result
 
     def prev_page(
         self,

@@ -17,6 +17,7 @@ from pandas import DataFrame, read_csv
 from typing_extensions import Literal
 
 from cdapython.results.base import BaseResult
+from cda_client.model.paged_response_data import PagedResponseData
 
 
 class ResultTypes(TypedDict):
@@ -47,7 +48,7 @@ class Result(BaseResult):
 
     def __init__(
         self,
-        api_response: QueryResponseData,
+        api_response: PagedResponseData,
         offset: int,
         limit: int,
         api_instance: QueryApi,
@@ -55,7 +56,7 @@ class Result(BaseResult):
         show_count: bool,
         format_type: str = "json",
     ) -> None:
-        self._api_response: QueryResponseData = api_response
+        self._api_response: PagedResponseData = api_response
         self._result: List[ResultTypes] = self._api_response.result
         self._offset: int = offset
         self._limit: int = limit
@@ -150,4 +151,4 @@ class Result(BaseResult):
         Returns:
             bool: returns a bool value if there is a next page
         """
-        return self._api_response["next_url"] is not None
+        return self._api_response["next_url"] is not None or self._offset == 0

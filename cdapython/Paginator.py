@@ -63,11 +63,6 @@ class Paginator:
         self.progress.live._screen = True
         self.task: Optional[TaskID] = None
         self.show_bar: bool = show_bar
-        if self.show_bar:
-            self.task: TaskID = self.progress.add_task(
-                "Processing", total=self.result.total_row_count
-            )
-            self.progress.update(self.task, advance=self.result.count)
 
     def _return_result(self) -> Union[DataFrame, List[Any], Paged_Result, StringResult]:
         """
@@ -91,18 +86,26 @@ class Paginator:
         result_nx = self._return_result()
         if self.result.has_next_page:
             try:
-                if self.total_result == 0:
-                    self.total_result = self.result.total_row_count
-
-                tmp_result: Paged_Result = self.result.next_page(limit=self.limit)
-                tmp_result.total_row_count = self.total_result
+                tmp_result = self.result.next_page(limit=self.limit)
                 if tmp_result:
                     self.result = tmp_result
                     if self.show_bar:
-                        self.progress.update(self.task, advance=self.result.count)
+                        if self.task is None:
+                            self.task = self.progress.add_task(
+                                "Processing", total=self.result.total_row_count
+                            )
+
+                        self.progress.update(
+                            task_id=self.task,
+                            advance=self.result.count,
+                            refresh=True,
+                        )
                     return result_nx
             except Exception as e:
                 if self.show_bar:
+                    self.progress.update(
+                        task_id=self.task, advance=self.result.count, refresh=True
+                    )
                     for i in self.progress.tasks:
                         self.progress.remove_task(task_id=i.id)
                     self.progress.stop()
