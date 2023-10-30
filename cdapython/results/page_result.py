@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from multiprocessing.pool import ApplyResult
-from typing import TYPE_CHECKING, Any, Coroutine, Union, cast
+from typing import TYPE_CHECKING, Any, Coroutine, List, Union, cast
 from urllib.parse import parse_qs, urlparse
 
 import anyio
@@ -17,6 +17,8 @@ from cdapython.results.factories.result_factory import ResultFactory
 from cdapython.results.result import Result
 from cdapython.results.string_result import StringResult
 from cda_client.model.paged_response_data import PagedResponseData
+
+from cdapython.utils.none_check import none_check
 
 if TYPE_CHECKING:
     from cdapython.Q import Q
@@ -61,6 +63,7 @@ class Paged_Result(Result):
         _limit: int,
         async_req: bool = False,
         include_total_count: bool = False,
+        show_term_count: bool = False,
     ) -> Union[ApplyResult[Any], Paged_Result, Any, None]:
         if self.q_object:
             self.q_object: Q = self.q_object.set_verbose(False)
@@ -70,6 +73,7 @@ class Paged_Result(Result):
                 limit=_limit,
                 async_call=async_req,
                 include_total_count=include_total_count,
+                show_term_count=show_term_count,
             )
         return None
 
@@ -102,21 +106,47 @@ class Paged_Result(Result):
             show_bar=show_bar,
         )
 
+    def return_result(
+        self, result, output, to_df, to_list
+    ) -> Union[DataFrame, List[Any], Paged_Result, StringResult]:
+        """
+        This return a Result object and DataFrame
+        Returns:
+            Union[DataFrame, list, Result]: _description_
+        """
+        var_output: str = none_check(output)
+        if var_output == "full_df":
+            return result.to_dataframe()
+        if var_output == "full_list":
+            return result.to_list()
+        if to_df:
+            return result.to_dataframe()
+        if to_list:
+            return result.to_list()
+
+        return result
+
     def get_all(
         self,
         output: str = "",
         limit: int = 0,
         show_bar: bool = True,
+        to_df: bool = False,
+        to_list: bool = False,
+        show_term_count: bool = False,
     ) -> "CollectResult":
         """
-        get_all is a method that will loop for you
-
+        This method will automatically paginate and concatenate results for you.
         Args:
             output (str, optional): _description_. Defaults to "".
-            limit (Union[int, None], optional): _description_. Defaults to None.
+            limit (int, optional): _description_. Defaults to 0.
+            show_bar (bool, optional): _description_. Defaults to True.
+            to_df (bool, optional): _description_. Defaults to False.
+            to_list (bool, optional): _description_. Defaults to False.
+            show_term_count (bool, optional): _description_. Defaults to False.
 
         Returns:
-            Union[DataFrame, List[Any]]: _description_
+            CollectResult: _description_
         """
 
         if limit == 0:
@@ -144,6 +174,7 @@ class Paged_Result(Result):
             output=output,
             format_type=self.format_type,
             show_bar=show_bar,
+            show_term_count=show_term_count,
         )
         # add this to cast to a subclass of CollectResult
 
@@ -158,7 +189,9 @@ class Paged_Result(Result):
             if isinstance(i, Result):
                 collect_result.extend_result(result=i)
 
-        return collect_result
+        return self.return_result(
+            result=collect_result, output=output, to_df=to_df, to_list=to_list
+        )
 
     async def async_next_page(
         self,
@@ -190,8 +223,7 @@ class Paged_Result(Result):
         return anyio.to_thread.run_sync(self.prev_page, limit, async_req, pre_stream)
 
     def next_page(
-        self,
-        limit: int = 100,
+        self, limit: int = 100, show_term_count: bool = False
     ) -> Union[ApplyResult[Any], Result, Paged_Result, None]:
         """
         The next_page function will call the server for the next page using this \
@@ -205,8 +237,7 @@ class Paged_Result(Result):
         Returns:
             _type_: _description_
         """
-        if not self.has_next_page:
-            raise StopIteration
+
         if isinstance(self._offset, int) and isinstance(self._limit, int):
             if self._api_response["next_url"] is not None:
                 self._limit = int(
@@ -221,7 +252,10 @@ class Paged_Result(Result):
                 self._limit = limit
 
             next_result = self._get_result(
-                _offset=self._offset, _limit=self._limit, include_total_count=True
+                _offset=self._offset,
+                _limit=self._limit,
+                include_total_count=True,
+                show_term_count=show_term_count,
             )
             self.total_row_count = next_result.total_row_count
             return next_result

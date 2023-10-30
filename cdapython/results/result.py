@@ -151,4 +151,4 @@ class Result(BaseResult):
         Returns:
             bool: returns a bool value if there is a next page
         """
-        return self._api_response["next_url"] is not None or self._offset == 0
+        return self._api_response["next_url"] is not None

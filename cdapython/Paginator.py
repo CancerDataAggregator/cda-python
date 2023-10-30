@@ -4,9 +4,8 @@ This module hold the Paginator class
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any, Coroutine, List, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Coroutine, List, Optional, Union
 
-import anyio
 from rich.progress import (
     BarColumn,
     MofNCompleteColumn,
@@ -22,7 +21,6 @@ if TYPE_CHECKING:
     from pandas import DataFrame
     from rich.progress import TaskID
 
-    from cdapython.results.columns_result import ColumnsResult
     from cdapython.results.page_result import Paged_Result
     from cdapython.results.result import Result
     from cdapython.results.string_result import StringResult
@@ -42,17 +40,18 @@ class Paginator:
         limit: int,
         format_type: str = "JSON",
         show_bar: bool = False,
+        show_term_count: bool = False,
     ) -> None:
         self.result: Union[Paged_Result, StringResult] = result
         self.to_df: bool = to_df
         self.to_list: bool = to_list
         self.limit: Union[int, None] = limit if limit else self.result._limit
-        self.count: int = self.result.count
         self.stopped: bool = False
         self.format_type: str = format_type
         self.output: str = output
         self.total_result: int = 0
         self.progress_dirty: bool = False
+        self.show_term_count: bool = show_term_count
         self.progress: Progress = Progress(
             TextColumn(text_format="[progress.description]{task.description}"),
             BarColumn(),
@@ -83,10 +82,11 @@ class Paginator:
         return self.result
 
     def _do_next(self: Paginator) -> Union[DataFrame, List[Any], Result, None]:
-        result_nx = self._return_result()
-        if self.result.has_next_page:
+        if self.result.has_next_page or not self.stopped:
             try:
-                tmp_result = self.result.next_page(limit=self.limit)
+                tmp_result = self.result.next_page(
+                    limit=self.limit, show_term_count=self.show_term_count
+                )
                 if tmp_result:
                     self.result = tmp_result
                     if self.show_bar:
@@ -100,7 +100,11 @@ class Paginator:
                             advance=self.result.count,
                             refresh=True,
                         )
-                    return result_nx
+                        if not self.result.has_next_page:
+                            self.stopped = True
+                    if self.output != "":
+                        return self._return_result()
+                    return self.result
             except Exception as e:
                 if self.show_bar:
                     self.progress.update(
@@ -110,10 +114,7 @@ class Paginator:
                         self.progress.remove_task(task_id=i.id)
                     self.progress.stop()
                 raise e
-        else:
-            self.stopped = True
-            return result_nx
-        return None
+        return self.result
 
     async def a_do_next(self) -> Union[List, DataFrame, Result, None]:
         return self._do_next()
@@ -135,10 +136,10 @@ class Paginator:
         try:
             if self.stopped:
                 if self.show_bar:
-                    self.progress.update(self.task, advance=self.result.count)
-                    self.progress.stop()
+                    if self.task:
+                        self.progress.update(self.task, advance=self.result.count)
+                        self.progress.stop()
                 raise StopAsyncIteration
-            self.count += self.result.count
             return await self.a_do_next()
         except Exception as e:
             if self.show_bar:
@@ -149,11 +150,10 @@ class Paginator:
         try:
             if self.stopped:
                 if self.show_bar:
-                    self.progress.update(self.task, advance=self.result.count)
-                    self.progress.stop()
+                    if self.task:
+                        self.progress.update(self.task, advance=self.result.count)
+                        self.progress.stop()
                 raise StopIteration
-            self.count += self.result.count
-
             return self._do_next()
         except Exception as e:
             if self.show_bar:
