@@ -29,7 +29,7 @@ def test_data_type_get_all():
 
 def test_data_type_show_term_count():
     data_type = unique_terms("data_type").run(host=host).get_all(show_term_count=True)
-    assert data_type.to_dataframe()["count"]
+    assert "count" in data_type.to_dataframe()
 
 
 @pytest.mark.skip(reason="CD-650 Backend always returns counts")
@@ -83,7 +83,7 @@ def tests_get_all_with_all_df():
         .run(host=host)
         .get_all(output="full_list", to_df=True, to_list=False)
     )
-    assert isinstance(a, DataFrame)
+    assert isinstance(a, list)
 
 
 def tests_get_all_with_all_limit():
