@@ -59,7 +59,7 @@ class HTTP_ERROR_API(ApiException):
                 soup = BeautifulSoup(http_error.body, "html.parser")
 
                 http_dict = {
-                    "error ": soup.find("title").text,
+                    "error": soup.find("title").text,
                     "status": http_error.status,
                 }
                 self.error = http_dict["error"]
