@@ -687,7 +687,7 @@ class Q:
             limit = self._get_limit()
 
         if self.offset is not None:
-            limit = self._get_offset()
+            offset = self._get_offset()
         if limit is not None:
             self._set_limit(number=limit)
         if limit is None:
