@@ -1,8 +1,7 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
-from cda_client.model.query import Query
 from cda_client.model.query_response_data import QueryResponseData
 
 from cdapython.factories.q_factory import AbstractFactory
@@ -18,19 +17,16 @@ class TreatmentCount(Treatment):
     def _call_endpoint(
         self,
         api_instance: QueryApi,
-        query: Query,
-        version: str,
         dry_run: bool,
-        table: str,
-        async_req: bool,
+        offset: int,
         limit: int,
+        async_req: bool,
+        include_total_count: bool,
+        show_term_count: bool,
     ) -> Endpoint:
         return api_instance.treatment_counts_query(
-            query=query,
-            version=version,
+            query=self.query,
             dry_run=dry_run,
-            table=table,
-            limit=limit,
             async_req=async_req,
         )
 
@@ -42,6 +38,7 @@ class TreatmentCount(Treatment):
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
+        q_object: "Q",
         format_type: str = "json",
     ) -> Result:
         return CountResult(

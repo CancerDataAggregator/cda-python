@@ -21,9 +21,9 @@ class Treatment(Entity):
         self,
         api_instance: QueryApi,
         dry_run: bool,
-        async_req: bool,
         offset: int,
         limit: int,
+        async_req: bool,
         include_total_count: bool,
         show_term_count: bool,
     ) -> Endpoint:

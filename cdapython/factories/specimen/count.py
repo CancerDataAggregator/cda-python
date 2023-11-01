@@ -2,7 +2,6 @@ from typing import TYPE_CHECKING
 
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
-from cda_client.model.query import Query
 from cda_client.model.query_response_data import QueryResponseData
 
 from cdapython.factories import SPECIMEN_FILE_COUNT
@@ -24,9 +23,9 @@ class SpecimenCount(Specimen):
         self,
         api_instance: QueryApi,
         dry_run: bool,
-        async_req: bool,
         offset: int,
         limit: int,
+        async_req: bool,
         include_total_count: bool,
         show_term_count: bool,
     ) -> Endpoint:
@@ -44,6 +43,7 @@ class SpecimenCount(Specimen):
         api_instance: QueryApi,
         show_sql: bool,
         show_count: bool,
+        q_object: "Q",
         format_type: str = "json",
     ) -> Result:
         return CountResult(

@@ -21,16 +21,19 @@ class File(Entity):
         self,
         api_instance: QueryApi,
         dry_run: bool,
-        async_req: bool,
-        limit: int,
         offset: int,
+        limit: int,
+        async_req: bool,
+        include_total_count: bool,
+        show_term_count: bool,
     ) -> Endpoint:
         return api_instance.files(
             query=self.query,
             dry_run=dry_run,
-            limit=limit,
-            offset=offset,
             async_req=async_req,
+            offset=offset,
+            limit=limit,
+            include_count=include_total_count,
         )
 
     class Factory(AbstractFactory):

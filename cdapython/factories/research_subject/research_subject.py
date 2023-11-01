@@ -2,7 +2,6 @@ from typing import TYPE_CHECKING
 
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import Endpoint
-from cda_client.model.query import Query
 
 from cdapython.factories import RESEARCH_SUBJECT_COUNT, RESEARCH_SUBJECT_FILE
 from cdapython.factories.entity import Entity
@@ -25,9 +24,9 @@ class ResearchSubject(Entity):
         self,
         api_instance: QueryApi,
         dry_run: bool,
-        async_req: bool,
         offset: int,
         limit: int,
+        async_req: bool,
         include_total_count: bool,
         show_term_count: bool,
     ) -> Endpoint:
