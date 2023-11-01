@@ -35,6 +35,7 @@ class ColumnsResult(BaseResult):
     ) -> None:
         self._result = result
         self.description = description
+        self._data_table: DataFrame
         super().__init__(
             show_sql=show_sql,
             show_count=show_count,
@@ -131,7 +132,13 @@ class ColumnsResult(BaseResult):
         self._data_table: DataFrame = json_normalize(self._result)
 
         if search_fields is not None:
-            column_names = ["fieldName", "endpoint", "description", "type", "mode"]
+            column_names = [
+                "fieldName",
+                "endpoint",
+                "description",
+                "type",
+                "isNullable",
+            ]
             data_frame = self._data_table
             value = DataFrame(columns=column_names, index=Index([], dtype="int"))
             if isinstance(search_fields, str):
