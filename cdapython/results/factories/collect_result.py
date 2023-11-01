@@ -9,6 +9,7 @@ from cdapython.Paginator import Paginator
 from cdapython.results.factories.not_paginated_result import NotPaginatedResult
 from cdapython.results.factories.result_factory import AbstractFactory
 from cdapython.utils.none_check import none_check
+from cda_client.model.paged_response_data import PagedResponseData
 
 if TYPE_CHECKING:
     from cdapython.results.result import Result
@@ -23,7 +24,7 @@ class CollectResult(NotPaginatedResult):
 
     def __init__(
         self,
-        api_response: QueryResponseData,
+        api_response: PagedResponseData,
         offset: int,
         limit: int,
         api_instance: QueryApi,
@@ -49,8 +50,7 @@ class CollectResult(NotPaginatedResult):
         Args:
             result (Result): _description_
         """
-        if none_check(self._result):
-            self._result.extend(result.to_list())
+        self._result.extend(result.to_list())
 
     def get_all(
         self,

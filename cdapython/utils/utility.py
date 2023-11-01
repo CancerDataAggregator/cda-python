@@ -2,7 +2,7 @@
 This module is made for utility functions in Q 
 """
 from __future__ import annotations
-
+from cdapython.Q import Q
 import logging
 from multiprocessing.pool import ApplyResult
 from typing import TYPE_CHECKING, Optional, Union
@@ -23,7 +23,7 @@ from cdapython.results.string_result import StringResult
 from cdapython.utils.Cda_Configuration import CdaConfiguration
 
 logging.captureWarnings(InsecureRequestWarning)
-from cdapython.Q import Q
+
 
 # This is added for Type Checking class to remove a circular import)
 if TYPE_CHECKING:
