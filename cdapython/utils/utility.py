@@ -121,7 +121,6 @@ def unique_terms(
     return q_object
 
 
-@lru_cache_timed(seconds=60)
 def columns(
     host: Optional[str] = None,
     verify: Optional[bool] = None,
