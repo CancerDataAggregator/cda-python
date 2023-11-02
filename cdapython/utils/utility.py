@@ -14,7 +14,6 @@ from rich import print
 from urllib3.exceptions import InsecureRequestWarning
 
 from cdapython.constant_variables import Constants
-from cdapython.decorators.cache import lru_cache_timed
 from cdapython.exceptions.custom_exception import HTTP_ERROR_API, HTTP_ERROR_SERVICE
 from cdapython.results.columns_result import ColumnsResult
 from cdapython.results.factories.collect_result import CollectResult
@@ -99,7 +98,6 @@ def get_table_version() -> str:
     return Constants.table_version
 
 
-@lru_cache_timed(seconds=10)
 def unique_terms(
     col_name: str,
     system: str = "",
@@ -122,7 +120,6 @@ def unique_terms(
     return q_object
 
 
-@lru_cache_timed(seconds=60)
 def columns(
     host: Optional[str] = None,
     verify: Optional[bool] = None,
