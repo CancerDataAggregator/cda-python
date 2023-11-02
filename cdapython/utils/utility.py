@@ -5,7 +5,7 @@ from __future__ import annotations
 from cdapython.Q import Q
 import logging
 from multiprocessing.pool import ApplyResult
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional
 
 from cda_client.api.query_api import QueryApi
 from cda_client.api_client import ApiClient
@@ -14,12 +14,8 @@ from rich import print
 from urllib3.exceptions import InsecureRequestWarning
 
 from cdapython.constant_variables import Constants
-from cdapython.decorators.cache import lru_cache_timed
 from cdapython.exceptions.custom_exception import HTTP_ERROR_API, HTTP_ERROR_SERVICE
 from cdapython.results.columns_result import ColumnsResult
-from cdapython.results.factories.collect_result import CollectResult
-from cdapython.results.page_result import get_query_result
-from cdapython.results.string_result import StringResult
 from cdapython.utils.Cda_Configuration import CdaConfiguration
 
 logging.captureWarnings(InsecureRequestWarning)
