@@ -32,7 +32,6 @@ def test_data_type_show_term_count():
     assert "count" in data_type.to_dataframe()
 
 
-@pytest.mark.skip(reason="CD-650 Backend always returns counts")
 def test_data_type_show_term_count_false():
     with pytest.raises(KeyError):
         data_type = (
