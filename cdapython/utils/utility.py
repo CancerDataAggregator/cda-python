@@ -17,7 +17,7 @@ from cdapython.constant_variables import Constants
 from cdapython.exceptions.custom_exception import HTTP_ERROR_API, HTTP_ERROR_SERVICE
 from cdapython.results.columns_result import ColumnsResult
 from cdapython.results.factories.collect_result import CollectResult
-from cdapython.results.page_result import get_query_result
+from cdapython.results.page_result import Paged_Result, get_query_result
 from cdapython.results.string_result import StringResult
 from cdapython.utils.Cda_Configuration import CdaConfiguration
 
@@ -101,15 +101,33 @@ def get_table_version() -> str:
 def unique_terms(
     col_name: str,
     system: str = "",
-) -> Q:
+    offset: int = 0,
+    host: Optional[str] = None,
+    verify: Optional[bool] = None,
+    async_req: Optional[bool] = True,
+    show_sql: bool = False,
+    show_counts: bool = False,
+    show_term_count: bool = False,
+    verbose: bool = True,
+    limit: int = 100,
+) -> Paged_Result:
     """
     Show all unique terms for a given column.
     Args:
         col_name (str): _description_
         system (str, optional): _description_. Defaults to "".
+        offset (int, optional): _description_. Defaults to 0.
+        host (Optional[str], optional): _description_. Defaults to None.
+        verify (Optional[bool], optional): _description_. Defaults to None.
+        async_req (Optional[bool], optional): _description_. Defaults to True.
+        show_sql (bool, optional): _description_. Defaults to False.
+        show_counts (bool, optional): _description_. Defaults to False.
+        show_term_count (bool, optional): _description_. Defaults to False.
+        verbose (bool, optional): _description_. Defaults to True.
+        limit (int, optional): _description_. Defaults to 100.
 
     Returns:
-        Q: _description_
+        Paged_Result
     """
     # cda_client_obj.select_header_content_type(["text/plain"])
     if system:
@@ -117,7 +135,17 @@ def unique_terms(
         q_object._set_system(system)
     else:
         q_object = Q(col_name).unique_terms
-    return q_object
+    return q_object.run(
+        offset=offset,
+        limit=limit,
+        host=host,
+        verify=verify,
+        show_sql=show_sql,
+        show_count=show_counts,
+        show_term_count=show_term_count,
+        verbose=verbose,
+        async_call=async_req,
+    )
 
 
 def columns(

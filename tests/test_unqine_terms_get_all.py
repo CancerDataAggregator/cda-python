@@ -34,5 +34,5 @@ fake_result = Result(
 
 @mock.patch("cdapython.unique_terms", return_value=fake_result)
 def test_unique_terms_get_all(_: Any) -> None:
-    terms_list = unique_terms("sex").run().get_all().to_list()
+    terms_list = unique_terms("sex").get_all().to_list()
     assert len(terms_list) != 0

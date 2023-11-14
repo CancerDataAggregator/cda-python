@@ -100,8 +100,8 @@ class Paginator:
                             advance=self.result.count,
                             refresh=True,
                         )
-                        if not self.result.has_next_page:
-                            self.stopped = True
+                    if self.result.has_next_page == False:
+                        self.stopped = True
                     if self.output != "":
                         return self._return_result()
                     return self.result
