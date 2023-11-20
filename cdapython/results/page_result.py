@@ -262,8 +262,6 @@ class Paged_Result(Result):
                 self.total_row_count = next_result.total_row_count
                 return next_result
             return None
-            # self.total_row_count = next_result.total_row_count
-            # return next_result
 
     def prev_page(
         self,
