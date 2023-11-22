@@ -257,8 +257,11 @@ class Paged_Result(Result):
                 include_total_count=True,
                 show_term_count=show_term_count,
             )
-            self.total_row_count = next_result.total_row_count
-            return next_result
+
+            if next_result.total_row_count is not None:
+                self.total_row_count = next_result.total_row_count
+                return next_result
+            return None
 
     def prev_page(
         self,
