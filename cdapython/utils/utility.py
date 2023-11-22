@@ -122,7 +122,7 @@ def unique_terms(
         verify (Optional[bool], optional): This will send a request to the cda server without verifying the SSL Cert Verification. Defaults to None.
         async_req (Optional[bool], optional): Execute request asynchronously. Defaults to True.
         show_sql (bool, optional): This will show the sql returned from the server. Defaults to False.
-        show_counts (bool, optional): Deprecated will be removed: This will show or hide the count. Defaults to False.
+        show_counts (bool, optional): Currently, the functionality is nonfunctional and pending further investigation to determine if it is needed: This will show or hide the count. Defaults to False.
         show_term_count (bool, optional): Show the number of occurrences for each value. Defaults to False.
         verbose (bool, optional): This will hide or show values that are automatic printed when Q runs. Defaults to True.
         limit (int, optional): the numbers of entries to return per page of data. Defaults to 100.
