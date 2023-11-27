@@ -29,7 +29,6 @@ class CollectResult(NotPaginatedResult):
         limit: int,
         api_instance: QueryApi,
         show_sql: bool,
-        show_count: bool,
         result: List[Any],
         format_type: str = "json",
     ) -> None:
@@ -40,7 +39,6 @@ class CollectResult(NotPaginatedResult):
             limit=limit,
             api_instance=api_instance,
             show_sql=show_sql,
-            show_count=show_count,
             format_type=format_type,
         )
 
@@ -109,7 +107,6 @@ class CollectResult(NotPaginatedResult):
                 limit=q_object._limit,
                 api_instance=q_object._api_instance,
                 show_sql=q_object.show_sql,
-                show_count=q_object.show_count,
                 format_type="json",
                 result=q_object._result,
             )

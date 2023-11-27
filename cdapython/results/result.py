@@ -53,7 +53,6 @@ class Result(BaseResult):
         limit: int,
         api_instance: QueryApi,
         show_sql: bool,
-        show_count: bool,
         format_type: str = "json",
     ) -> None:
         self._api_response: PagedResponseData = api_response
@@ -64,7 +63,6 @@ class Result(BaseResult):
         self._df: DataFrame
         super().__init__(
             show_sql=show_sql,
-            show_count=show_count,
             format_type=format_type,
             result=self._api_response.result,
         )

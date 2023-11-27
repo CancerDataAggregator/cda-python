@@ -107,11 +107,10 @@ def unique_terms(
     async_req: Optional[bool] = True,
     show_sql: bool = False,
     show_counts: bool = False,
-    show_term_count: bool = False,
     verbose: bool = True,
     limit: int = 100,
 ) -> Paged_Result:
-    # TODO : Should the value be changed? The "show_term_count" parameter was copied from Swagger-generated code. Is this description sufficient?
+    # TODO : Should the value be changed? The "show_counts" parameter was copied from Swagger-generated code. Is this description sufficient?
     """
     Show all unique terms for a given column.
     Args:
@@ -122,8 +121,7 @@ def unique_terms(
         verify (Optional[bool], optional): This will send a request to the cda server without verifying the SSL Cert Verification. Defaults to None.
         async_req (Optional[bool], optional): Execute request asynchronously. Defaults to True.
         show_sql (bool, optional): This will show the sql returned from the server. Defaults to False.
-        show_counts (bool, optional): Currently, the functionality is nonfunctional and pending further investigation to determine if it is needed: This will show or hide the count. Defaults to False.
-        show_term_count (bool, optional): Show the number of occurrences for each value. Defaults to False.
+        show_counts (bool, optional): Show the number of occurrences for each value. Defaults to False.
         verbose (bool, optional): This will hide or show values that are automatic printed when Q runs. Defaults to True.
         limit (int, optional): the numbers of entries to return per page of data. Defaults to 100.
 
@@ -142,8 +140,7 @@ def unique_terms(
         host=host,
         verify=verify,
         show_sql=show_sql,
-        show_count=show_counts,
-        show_term_count=show_term_count,
+        show_counts=show_counts,
         verbose=verbose,
         async_call=async_req,
     )
@@ -192,7 +189,6 @@ def columns(
             if "result" in api_response:
                 query_result: ColumnsResult = ColumnsResult(
                     show_sql=show_sql,
-                    show_count=True,
                     result=api_response["result"],
                     description=description,
                 )
@@ -200,7 +196,6 @@ def columns(
             else:
                 query_result: ColumnsResult = ColumnsResult(
                     show_sql=show_sql,
-                    show_count=True,
                     result=api_response,
                     description=description,
                 )

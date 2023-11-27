@@ -4,7 +4,7 @@ from pandas import DataFrame, concat
 
 from cdapython import Q
 from cdapython.results.page_result import Paged_Result
-from tests.global_settings import host, project
+from tests.global_settings import host
 
 
 async def main() -> None:

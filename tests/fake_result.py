@@ -35,10 +35,6 @@ class FakeResultData:
         return False
 
     @property
-    def show_count(self) -> bool:
-        return False
-
-    @property
     def format_type(self) -> str:
         return "json"
 

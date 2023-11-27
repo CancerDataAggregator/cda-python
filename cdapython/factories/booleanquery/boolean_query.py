@@ -19,7 +19,7 @@ class BooleanQuery(Entity):
         limit: int,
         async_req: bool,
         include_total_count: bool,
-        show_term_count: Optional[bool],
+        show_counts: Optional[bool],
     ) -> PagedResponseData:
         """
         Call the endpoint to start the job for data collection.

@@ -28,7 +28,7 @@ class ResearchSubjectCount(ResearchSubject):
         limit: int,
         async_req: bool,
         include_total_count: bool,
-        show_term_count: bool,
+        show_counts: bool,
     ) -> Endpoint:
         return api_instance.research_subject_counts_query(
             query=self.query,
@@ -43,18 +43,16 @@ class ResearchSubjectCount(ResearchSubject):
         limit: int,
         api_instance: QueryApi,
         show_sql: bool,
-        show_count: bool,
         q_object: "Q",
         format_type: str = "json",
     ) -> Result:
         return CountResult(
-            api_response,
-            offset,
-            limit,
-            api_instance,
-            show_sql,
-            show_count,
-            format_type,
+            api_response=api_response,
+            offset=offset,
+            limit=limit,
+            api_instance=api_instance,
+            show_sql=show_sql,
+            format_type=format_type,
         )
 
     class Factory(AbstractFactory):

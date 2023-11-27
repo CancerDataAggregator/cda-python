@@ -25,7 +25,7 @@ class Treatment(Entity):
         limit: int,
         async_req: bool,
         include_total_count: bool,
-        show_term_count: bool,
+        show_counts: bool,
     ) -> Endpoint:
         return api_instance.treatments_query(
             query=self.query,

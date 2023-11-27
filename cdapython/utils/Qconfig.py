@@ -14,6 +14,7 @@ class Qconfig:
         version: Optional[str] = None,
         show_sql: bool = False,
         verbose: Optional[bool] = None,
+        show_counts: Optional[bool] = None,
     ) -> None:
         """
         This class is made to keep Q's configuration settings to pass on to other Q class or methods.
@@ -30,6 +31,9 @@ class Qconfig:
         self.version: str = Constants.table_version if version is None else version
         self.show_sql: bool = show_sql
         self.verbose: Union[bool, None] = verbose if verbose is None else verbose
+        self.show_counts: Union[bool, None] = (
+            show_counts if show_counts is None else show_counts
+        )
 
     def copy_config(self) -> Qconfig:
         """

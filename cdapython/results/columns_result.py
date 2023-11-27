@@ -28,7 +28,6 @@ class ColumnsResult(BaseResult):
     def __init__(
         self,
         show_sql: bool,
-        show_count: bool,
         result: List[Any],
         description: bool = True,
         format_type: str = "json",
@@ -38,7 +37,6 @@ class ColumnsResult(BaseResult):
         self._data_table: DataFrame
         super().__init__(
             show_sql=show_sql,
-            show_count=show_count,
             format_type=format_type,
             result=result,
         )

@@ -16,7 +16,7 @@ a = Q(
 
 b = Q(
     "identifier_system = 'IDC' FROM researchSubject_identifier_system = 'PDC'  FROM researchSubject_identifier_system = 'GDC'",
-    lark=True,
+    debug=True,
 ).to_json()
 print("lark")
 with open("lark.json", "w") as f:

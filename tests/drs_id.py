@@ -1,9 +1,5 @@
-from global_settings import (
-    integration_host,
-    integration_table,
-    localhost,
-    production_host,
-)
+from tests.global_settings import host
+
 
 from cdapython import Q
 from cdapython.utils.utility import get_host_url
@@ -12,9 +8,9 @@ from cdapython.utils.utility import get_host_url
 def main():
     # print(Q("sex = 'male'").to_json())
     all_data = (
-        Q("sex = REPLACE(REPLACE(sex,'fe',''), 'male', '' ) AND id = 1", lark=True)
+        Q("sex = REPLACE(REPLACE(sex,'fe',''), 'male', '' ) AND id = 1", debug=True)
         .SELECT("id,sex")
-        .set_host(localhost)
+        .set_host(host)
         .run()
     )
     print(all_data)
