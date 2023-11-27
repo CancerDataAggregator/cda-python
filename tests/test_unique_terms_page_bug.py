@@ -5,9 +5,6 @@ from cdapython import unique_terms
 from tests.global_settings import host
 
 
-# TODO debug paginator not returning show_counts with unique_terms
-
-
 def test_unique_paginator():
     projlist = []
     terms = unique_terms(col_name="sex", host=host, show_counts=True)
