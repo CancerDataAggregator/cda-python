@@ -145,7 +145,7 @@ class Paged_Result(Result):
             show_bar (bool, optional): _description_. Defaults to True.
             to_df (bool, optional): _description_. Defaults to False.
             to_list (bool, optional): _description_. Defaults to False.
-            show_counts (bool, optional): _description_. Defaults to False.
+            show_counts (bool, optional): Show the number of occurrences for each value. Defaults to False.
 
         Returns:
             CollectResult: _description_

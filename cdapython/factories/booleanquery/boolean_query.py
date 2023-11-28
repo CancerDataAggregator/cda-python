@@ -19,10 +19,9 @@ class BooleanQuery(Entity):
         limit: int,
         async_req: bool,
         include_total_count: bool,
-        show_counts: Optional[bool],
     ) -> PagedResponseData:
         """
-        Call the endpoint to start the job for data collection.
+
         Args:
             api_instance (QueryApi): _description_
             dry_run (bool): _description_
@@ -30,7 +29,7 @@ class BooleanQuery(Entity):
             limit (int): _description_
             async_req (bool): _description_
             include_total_count (bool): _description_
-            show_term_frequency (Optional[bool]): _description_
+            show_counts (Optional[bool]):  Show the number of occurrences for each value
 
         Returns:
             PagedResponseData: _description_

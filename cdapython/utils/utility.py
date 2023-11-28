@@ -110,7 +110,6 @@ def unique_terms(
     verbose: bool = True,
     limit: int = 100,
 ) -> Paged_Result:
-    # TODO : Should the value be changed? The "show_counts" parameter was copied from Swagger-generated code. Is this description sufficient?
     """
     Show all unique terms for a given column.
     Args:

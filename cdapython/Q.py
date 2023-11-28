@@ -307,10 +307,9 @@ class Q:
 
     def set_counts(self, show_counts: bool) -> Q:
         """
-        this will set the private propey _verbose
+        This will set the private property _verbose
         Args:
             value (bool)
-
         Returns:
             Q
         """
@@ -321,7 +320,7 @@ class Q:
 
     def set_verbose(self, value: bool) -> Q:
         """
-        this will set the private propey _verbose
+        This will set the private property _verbose
         Args:
             value (bool)
 
@@ -511,7 +510,7 @@ class Q:
     @property
     def file(self) -> Q:
         """_summary_
-        this is a chaining method used to get files
+        This is a chaining method used to get files
         Returns:
             _type_
         """
@@ -520,7 +519,7 @@ class Q:
     @property
     def count(self) -> Q:
         """_summary_
-        this is a chaining method used to get counts
+        This is a chaining method used to get counts
         Returns:
             _type_
         """
@@ -597,7 +596,7 @@ class Q:
             limit (int): _description_
             async_req (bool): _description_
             include_total_count (bool): _description_
-            show_counts (Optional[bool]): _description_
+            show_counts (Optional[bool]): Show the number of occurrences for each value
 
         Returns:
             PagedResponseData: _description_
@@ -653,22 +652,22 @@ class Q:
         """
         This will call the server to make a request return a Result like object
         Args:
-            offset (int, optional). Defaults to None.
-            limit (int, optional). Defaults to None.
-            version (Union[str, None], optional). Defaults to None.
-            host (Union[str, None], optional). Defaults to None.
+            offset (int, optional) The number of entries to skip. Defaults to None.
+            limit (int, optional) The numbers of entries to return per page of data. Defaults to None.
+            host (Union[str, None], optional) This is where the user can set a host for a different server. Defaults to None.
             dry_run (bool, optional). Defaults to False.
-            table (Union[str, None], optional). Defaults to None.
-            async_call (bool, optional). Defaults to False.
-            verify (Union[bool, None], optional). Defaults to None.
-            verbose (bool, optional). Defaults to True.
+            async_call (bool, optional) Execute request asynchronously. Defaults to False.
+            verify (Union[bool, None] This will send a request to the cda server without verifying the SSL Cert Verification, optional). Defaults to None.
+            verbose (bool, optional) This will hide or show values that are automatic printed when Q runs. Defaults to True.
             include (Union[str, None], optional). Defaults to None.
             format_type (str, optional). Defaults to "json".
-            show_sql (bool, optional). Defaults to False.
-            show_counts  (bool, optional). Defaults to False.
+            show_sql (bool, optional) This will show the sql returned from the server. Defaults to False.
+            show_counts (bool, optional) Show the number of occurrences for each value. Defaults to False.
+            include_total_count bool This will return add a param to the request to the server
         Returns:
             Union[QueryCreatedData, ApplyResult, Result, DryClass, None]: _description_
         """
+
         dry_run_current = False
 
         if host is None:
