@@ -26,7 +26,7 @@ class BooleanQuery(Entity):
         Args:
             api_instance (QueryApi): _description_
             dry_run (bool): _description_
-            offset (int): _description_
+            offset (int) The number of entries to skip.:
             limit (int): _description_
             async_req (bool): _description_
             include_total_count (bool): _description_
