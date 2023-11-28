@@ -19,6 +19,7 @@ class BooleanQuery(Entity):
         limit: int,
         async_req: bool,
         include_total_count: bool,
+        show_counts: Optional[bool],
     ) -> PagedResponseData:
         """
 
