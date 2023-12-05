@@ -22,7 +22,7 @@ notebook = "6.4.12"
 fastjsonschema = "2.16.2"
 jupyter-core = "4.12"
 pyzmq = "25"
-cda-client = {git = "https://github.com/CancerDataAggregator/cda-service-python-client.git", rev = "3.3.2"}
+cda-client = {git = "https://github.com/CancerDataAggregator/cda-service-python-client.git", rev = "sql_update"}
 lark = "^1.1.5"
 regex = "^2022.10.31"
 tornado = "^6.3.2"
