@@ -152,6 +152,7 @@ class Q:
         self._system = ""
         self.limit = None
         self.offset = None
+        self.show_counts = None
         if len(args) == 1:
             if args[0] is None:
                 raise RuntimeError("Q statement parse error")
@@ -301,9 +302,25 @@ class Q:
     def get_verbose(self) -> bool:
         return self._config.verbose
 
+    def get_counts(self) -> bool:
+        return self._config.show_counts
+
+    def set_counts(self, show_counts: bool) -> Q:
+        """
+        This will set the private property _verbose
+        Args:
+            value (bool)
+        Returns:
+            Q
+        """
+        config = self._config.copy_config()
+        config.show_counts = show_counts
+        self.show_counts = show_counts
+        return self.__class__(self.query, config=config)
+
     def set_verbose(self, value: bool) -> Q:
         """
-        this will set the private propey _verbose
+        This will set the private property _verbose
         Args:
             value (bool)
 
@@ -493,7 +510,7 @@ class Q:
     @property
     def file(self) -> Q:
         """_summary_
-        this is a chaining method used to get files
+        This is a chaining method used to get files
         Returns:
             _type_
         """
@@ -502,7 +519,7 @@ class Q:
     @property
     def count(self) -> Q:
         """_summary_
-        this is a chaining method used to get counts
+        This is a chaining method used to get counts
         Returns:
             _type_
         """
@@ -568,7 +585,7 @@ class Q:
         limit: int,
         async_req: bool,
         include_total_count: bool,
-        show_term_count: Optional[bool],
+        show_counts: Optional[bool],
     ) -> PagedResponseData:
         """
         Call the endpoint to start the job for data collection.
@@ -579,7 +596,7 @@ class Q:
             limit (int): _description_
             async_req (bool): _description_
             include_total_count (bool): _description_
-            show_term_frequency (Optional[bool]): _description_
+            show_counts (Optional[bool]): Show the number of occurrences for each value
 
         Returns:
             PagedResponseData: _description_
@@ -592,7 +609,7 @@ class Q:
             offset=offset,
             async_req=async_req,
             include_total_count=include_total_count,
-            show_term_count=show_term_count,
+            show_counts=show_counts,
         )
 
     def _build_result_object(
@@ -602,7 +619,6 @@ class Q:
         limit: int,
         api_instance: QueryApi,
         show_sql: bool,
-        show_count: bool,
         q_object: Q,
         format_type: str = "json",
     ) -> Result:
@@ -612,7 +628,6 @@ class Q:
             limit=limit,
             api_instance=api_instance,
             show_sql=show_sql,
-            show_count=show_count,
             q_object=q_object,
             format_type=format_type,
         )
@@ -631,30 +646,28 @@ class Q:
         include: Union[str, None] = None,
         format_type: str = "json",
         show_sql: bool = False,
-        show_count: bool = True,
-        show_term_count: bool = False,
+        show_counts: Optional[bool] = None,
         include_total_count: bool = True,
     ) -> Union[DryClass, Result, Paged_Result, None]:
         """
         This will call the server to make a request return a Result like object
         Args:
-            offset (int, optional). Defaults to None.
-            limit (int, optional). Defaults to None.
-            version (Union[str, None], optional). Defaults to None.
-            host (Union[str, None], optional). Defaults to None.
+            offset (int, optional) The number of entries to skip. Defaults to None.
+            limit (int, optional) The numbers of entries to return per page of data. Defaults to None.
+            host (Union[str, None], optional) This is where the user can set a host for a different server. Defaults to None.
             dry_run (bool, optional). Defaults to False.
-            table (Union[str, None], optional). Defaults to None.
-            async_call (bool, optional). Defaults to False.
-            verify (Union[bool, None], optional). Defaults to None.
-            verbose (bool, optional). Defaults to True.
+            async_call (bool, optional) Execute request asynchronously. Defaults to False.
+            verify (Union[bool, None] This will send a request to the cda server without verifying the SSL Cert Verification, optional). Defaults to None.
+            verbose (bool, optional) This will hide or show values that are automatic printed when Q runs. Defaults to True.
             include (Union[str, None], optional). Defaults to None.
             format_type (str, optional). Defaults to "json".
-            show_sql (bool, optional). Defaults to False.
-            show_count (bool, optional). Defaults to True.
-            show_term_count  (bool, optional). Defaults to False.
+            show_sql (bool, optional) This will show the sql returned from the server. Defaults to False.
+            show_counts (bool, optional) Show the number of occurrences for each value. Defaults to False.
+            include_total_count bool This will return add a param to the request to the server
         Returns:
             Union[QueryCreatedData, ApplyResult, Result, DryClass, None]: _description_
         """
+
         dry_run_current = False
 
         if host is None:
@@ -698,6 +711,12 @@ class Q:
         if offset is None:
             offset = 0
 
+        if show_counts is not None:
+            self._config.show_counts = show_counts
+
+        if self.show_counts is not None:
+            show_counts = self.get_counts()
+
         self._show_sql = show_sql or False
 
         try:
@@ -717,7 +736,7 @@ class Q:
                     offset=offset,
                     async_req=async_call,
                     include_total_count=include_total_count,
-                    show_term_count=show_term_count,
+                    show_counts=show_counts,
                 )
                 if isinstance(api_response, ApplyResult):
                     if verbose:
@@ -735,7 +754,6 @@ class Q:
                 limit=limit,
                 api_instance=api_instance,
                 show_sql=show_sql,
-                show_count=show_count,
                 q_object=self,
                 format_type=format_type,
             )

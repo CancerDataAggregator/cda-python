@@ -30,7 +30,7 @@ class SpecimenFileCount(SpecimenFiles):
         limit: int,
         async_req: bool,
         include_total_count: bool,
-        show_term_count: bool,
+        show_counts: bool,
     ) -> Endpoint:
         return api_instance.specimen_file_counts_query(
             query=self.query,
@@ -45,7 +45,6 @@ class SpecimenFileCount(SpecimenFiles):
         limit: int,
         api_instance: QueryApi,
         show_sql: bool,
-        show_count: bool,
         q_object: "Q",
         format_type: str = "json",
     ) -> Result:
@@ -55,7 +54,6 @@ class SpecimenFileCount(SpecimenFiles):
             limit=limit,
             api_instance=api_instance,
             show_sql=show_sql,
-            show_count=show_count,
             format_type=format_type,
         )
 

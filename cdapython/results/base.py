@@ -20,13 +20,11 @@ class BaseResult:
     def __init__(
         self,
         show_sql: bool,
-        show_count: bool,
         result: List[Any],
         format_type: str = "json",
     ) -> None:
         self._result: List[Any] = result
         self.show_sql: Optional[bool] = show_sql
-        self.show_count: Optional[bool] = show_count
         self.format_type: str = format_type
         self._df: DataFrame
 

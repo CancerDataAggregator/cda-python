@@ -1,57 +1,65 @@
-# Intellij IDEA
-.idea
+# MacOS
+.DS_Store
+
+# Python
+**/*.py[cod]
+**/__pycache__
+dist/
+__pycache__/
+*$py.class
+
+# pip install -e generated
+*.egg-info/
+
+# Intellij
+.idea/
+
+# Google credentials files
+**/GCS-service-account-key.*
+
+# Virtual environment files
+/venv*/
+.vscode
+.env
 
 # Jupyter Notebooks
 .ipynb_checkpoints
-.DS_Store
-# pip install -e generated
-cdapython.egg-info
+*/.ipynb_checkpoints/*
 
-# Python
-*.pyc
-**/__pycache__
+# IPython
+profile_default/
+ipython_config.py
 
-# pytest
-.pytest_cache
-
-#virtualenv
-venv
-venv8
-#vscode
-.vscode
-
-monkeytype.*
-
-dist
 #sonrqube scanner
 .scannerwork
 /notebooks/example-dev.ipynb
 typeReport
 
-.DS_Store
-.pymon
-*.Q
-*.tsv
-*.csv
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
 .coverage.*
-.nox
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Data Files
+**/*.Q
+**/*.tsv
+**/*.csv
+
+# Extras
+
+.pymon
+monkeytype.*
 .pytype
 .mypy_cache
-.coverage
-.venv
-venv*
-venv2
-.ven3
-.venv_11
-ven3
-.nox
-.pytype
-venv11
-.coverage
-.coverage.*
 config-dev.ini
-.DS_Store
 .ruff_cache
-.DS_Store
-venv*
-.DS_Store

@@ -1338,7 +1338,6 @@ results: Result = Result(
     limit=fake.limit,
     api_instance=fake.api_instance,
     show_sql=fake.show_sql,
-    show_count=fake.show_count,
     format_type=fake.format_type,
 )
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from multiprocessing.pool import ApplyResult
-from typing import TYPE_CHECKING, Any, Coroutine, List, Union, cast
+from typing import TYPE_CHECKING, Any, Coroutine, List, Union, cast, Optional
 from urllib.parse import parse_qs, urlparse
 
 import anyio
@@ -36,7 +36,6 @@ class Paged_Result(Result):
         limit: int,
         api_instance: QueryApi,
         show_sql: bool,
-        show_count: bool,
         q_object: Union[Q, None],
         format_type: str = "json",
     ) -> None:
@@ -51,7 +50,6 @@ class Paged_Result(Result):
             api_instance=api_instance,
             api_response=api_response,
             show_sql=show_sql,
-            show_count=show_count,
             format_type=format_type,
             offset=offset,
             limit=limit,
@@ -63,17 +61,18 @@ class Paged_Result(Result):
         _limit: int,
         async_req: bool = False,
         include_total_count: bool = False,
-        show_term_count: bool = False,
+        show_counts: bool = False,
     ) -> Union[ApplyResult[Any], Paged_Result, Any, None]:
         if self.q_object:
             self.q_object: Q = self.q_object.set_verbose(False)
+            self.q_object: Q = self.q_object.set_counts(show_counts=show_counts)
             return self.q_object.set_config(config=self.q_object.get_config()).run(
                 verbose=self.q_object.get_verbose(),
                 offset=_offset,
                 limit=_limit,
                 async_call=async_req,
                 include_total_count=include_total_count,
-                show_term_count=show_term_count,
+                show_counts=self.q_object.get_counts(),
             )
         return None
 
@@ -84,6 +83,7 @@ class Paged_Result(Result):
         to_list: bool = False,
         limit: int = 0,
         show_bar: bool = False,
+        show_counts: Optional[bool] = None,
     ) -> Paginator:
         """_summary_
         paginator this will automatically page over results
@@ -93,7 +93,8 @@ class Paged_Result(Result):
         Returns:
             _type_: _description_
         """
-
+        if show_counts is None:
+            show_counts = self.q_object.get_counts()
         limit = limit if limit != 0 else self._limit
 
         return Paginator(
@@ -104,6 +105,7 @@ class Paged_Result(Result):
             output=output,
             format_type=self.format_type,
             show_bar=show_bar,
+            show_counts=show_counts,
         )
 
     def return_result(
@@ -133,7 +135,7 @@ class Paged_Result(Result):
         show_bar: bool = True,
         to_df: bool = False,
         to_list: bool = False,
-        show_term_count: bool = False,
+        show_counts: bool = False,
     ) -> "CollectResult":
         """
         This method will automatically paginate and concatenate results for you.
@@ -143,7 +145,7 @@ class Paged_Result(Result):
             show_bar (bool, optional): _description_. Defaults to True.
             to_df (bool, optional): _description_. Defaults to False.
             to_list (bool, optional): _description_. Defaults to False.
-            show_term_count (bool, optional): _description_. Defaults to False.
+            show_counts (bool, optional): Show the number of occurrences for each value. Defaults to False.
 
         Returns:
             CollectResult: _description_
@@ -162,7 +164,6 @@ class Paged_Result(Result):
             limit=self._limit,
             api_instance=self._api_instance,
             show_sql=self.show_sql,
-            show_count=self.show_count,
             q_object=self.q_object,
         )
 
@@ -174,7 +175,7 @@ class Paged_Result(Result):
             output=output,
             format_type=self.format_type,
             show_bar=show_bar,
-            show_term_count=show_term_count,
+            show_counts=show_counts,
         )
         # add this to cast to a subclass of CollectResult
 
@@ -223,7 +224,7 @@ class Paged_Result(Result):
         return anyio.to_thread.run_sync(self.prev_page, limit, async_req, pre_stream)
 
     def next_page(
-        self, limit: int = 100, show_term_count: bool = False
+        self, limit: int = 100, show_counts: Optional[bool] = None
     ) -> Union[ApplyResult[Any], Result, Paged_Result, None]:
         """
         The next_page function will call the server for the next page using this \
@@ -237,7 +238,8 @@ class Paged_Result(Result):
         Returns:
             _type_: _description_
         """
-
+        if show_counts is None:
+            show_counts = self.q_object.get_counts()
         if isinstance(self._offset, int) and isinstance(self._limit, int):
             if self._api_response["next_url"] is not None:
                 self._limit = int(
@@ -255,10 +257,13 @@ class Paged_Result(Result):
                 _offset=self._offset,
                 _limit=self._limit,
                 include_total_count=True,
-                show_term_count=show_term_count,
+                show_counts=show_counts,
             )
-            self.total_row_count = next_result.total_row_count
-            return next_result
+
+            if next_result.total_row_count is not None:
+                self.total_row_count = next_result.total_row_count
+                return next_result
+            return None
 
     def prev_page(
         self,

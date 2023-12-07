@@ -44,7 +44,7 @@ ResearchSubject.Specimen.derived_from_subject
 )
 s = Q("sex = 'male'").run()
 df = pandas.DataFrame()
-p = s.get_all(to_df=True, limit=10000, host_df=df)
+p = s.get_all(to_df=True, limit=10000)
 
 
 print(p)

@@ -18,7 +18,7 @@ class UniqueTerms(Entity):
         async_req: bool,
         offset: int,
         limit: int,
-        show_term_count: Optional[bool],
+        show_counts: Optional[bool],
         include_total_count: bool,
         system: Optional[str] = "",
     ) -> Endpoint:
@@ -27,7 +27,7 @@ class UniqueTerms(Entity):
             return api_instance.unique_values(
                 body=self.query.value,
                 system=system,
-                count=show_term_count,
+                count=show_counts,
                 async_req=async_req,
                 offset=offset,
                 limit=limit,
@@ -37,7 +37,7 @@ class UniqueTerms(Entity):
             return api_instance.unique_values(
                 body=self.query.value,
                 system=system,
-                count=show_term_count,
+                count=show_counts,
                 async_req=async_req,
                 offset=offset,
                 limit=limit,

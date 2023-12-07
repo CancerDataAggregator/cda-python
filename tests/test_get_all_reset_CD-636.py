@@ -11,7 +11,7 @@ from pandas import DataFrame
 
 
 def test_data_type_get_all():
-    data_type = unique_terms("data_type").run(host=host, limit=10)
+    data_type = unique_terms("data_type", host=host, limit=10)
     assert len(data_type.to_dataframe()) == 10
 
     all_data_type = data_type.get_all(limit=20)
@@ -27,17 +27,15 @@ def test_data_type_get_all():
     assert all_data_type_copy == all_data_type
 
 
-def test_data_type_show_term_count():
-    data_type = unique_terms("data_type").run(host=host).get_all(show_term_count=True)
+def test_data_type_show_counts():
+    data_type = unique_terms("data_type", host=host).get_all(show_counts=True)
     assert "count" in data_type.to_dataframe()
 
 
 @pytest.mark.skip(reason="CD-650 Backend always returns counts")
-def test_data_type_show_term_count_false():
+def test_data_type_show_counts_false():
     with pytest.raises(KeyError):
-        data_type = (
-            unique_terms("data_type").run(host=host).get_all(show_term_count=False)
-        )
+        data_type = unique_terms("data_type", host=host).get_all(show_counts=False)
         df = data_type.to_dataframe()["count"]
         assert df is None
 

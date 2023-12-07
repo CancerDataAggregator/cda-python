@@ -33,7 +33,7 @@ class Mutations(Entity):
         limit: int,
         async_req: bool,
         include_total_count: bool,
-        show_term_count: bool,
+        show_counts: bool,
     ) -> Endpoint:
         """
         This will call the mutation_query endpoint

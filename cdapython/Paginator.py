@@ -40,7 +40,7 @@ class Paginator:
         limit: int,
         format_type: str = "JSON",
         show_bar: bool = False,
-        show_term_count: bool = False,
+        show_counts: bool = False,
     ) -> None:
         self.result: Union[Paged_Result, StringResult] = result
         self.to_df: bool = to_df
@@ -51,7 +51,7 @@ class Paginator:
         self.output: str = output
         self.total_result: int = 0
         self.progress_dirty: bool = False
-        self.show_term_count: bool = show_term_count
+        self.show_counts: bool = show_counts
         self.progress: Progress = Progress(
             TextColumn(text_format="[progress.description]{task.description}"),
             BarColumn(),
@@ -85,7 +85,7 @@ class Paginator:
         if self.result.has_next_page or not self.stopped:
             try:
                 tmp_result = self.result.next_page(
-                    limit=self.limit, show_term_count=self.show_term_count
+                    limit=self.limit, show_counts=self.show_counts
                 )
                 if tmp_result:
                     self.result = tmp_result
@@ -100,8 +100,8 @@ class Paginator:
                             advance=self.result.count,
                             refresh=True,
                         )
-                        if not self.result.has_next_page:
-                            self.stopped = True
+                    if self.result.has_next_page == False:
+                        self.stopped = True
                     if self.output != "":
                         return self._return_result()
                     return self.result

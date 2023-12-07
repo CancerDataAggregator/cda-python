@@ -10,7 +10,7 @@ from cdapython import Q, columns
 # print(df)
 
 
-columns().to_dataframe(include="Column_Name:specimen_Files")
+columns().to_dataframe()
 
 
 Q("GDC_FILTER = 'NonExonic;bitgt'").mutation.ORDER_BY("sex:-1").run(

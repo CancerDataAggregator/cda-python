@@ -21,7 +21,6 @@ class NotPaginatedResult(Result):
         limit: int,
         api_instance: QueryApi,
         show_sql: bool,
-        show_count: bool,
         format_type: str = "json",
     ) -> None:
         super().__init__(
@@ -30,7 +29,6 @@ class NotPaginatedResult(Result):
             limit=limit,
             api_instance=api_instance,
             show_sql=show_sql,
-            show_count=show_count,
             format_type=format_type,
         )
 
