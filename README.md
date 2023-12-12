@@ -1,4 +1,8 @@
-# CDA Python
+# CDA Python minimum viable product working draft
+
+Here, we take apart the existing code and try to make a minimal working version that can be more tractably tested and analyzed than can the current codebase due to an excess of unnecessary indirection, dead-end experiments left in the code, partially- or wholly-unused functions and data structures, etc.
+
+# Below this line, nothing can be assumed to be true.
 
 This library sits on top of the machine generated
 [CDA Python Client](https://github.com/CancerDataAggregator/cda-service-python-client) and offers some syntactic
