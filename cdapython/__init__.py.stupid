@@ -108,30 +108,29 @@ __all__ = [
     "ResearchSubjectFiles",
     "QFactory",
 ]
+try:
+    # python2
+    import __builtin__
+except ImportError:
+    # python3
+    import builtins as __builtin__
 
-#try:
-#    # python2
-#    import __builtin__
-#except ImportError:
-#    # python3
-#    import builtins as __builtin__
-#
-#
-#def console_print(*args, **kwargs) -> None:
-#    """
-#    This function is used to override the default python `print` method.
-#    We do this by Attaching to pythons `__builtin__.print` method
-#    note: There is a conditional check for a file.
-#    if a system or user passes a file to the function It will default back to the original Python print method
-#    """
-#    if "file" in kwargs:
-#        print(*args)
-#    else:
-#        console: Console = Console()
-#        console.print(*args, **kwargs)
-#
-#
-#__builtin__.print = console_print
+
+def console_print(*args, **kwargs) -> None:
+    """
+    This function is used to override the default python `print` method.
+    We do this by Attaching to pythons `__builtin__.print` method
+    note: There is a conditional check for a file.
+    if a system or user passes a file to the function It will default back to the original Python print method
+    """
+    if "file" in kwargs:
+        print(*args)
+    else:
+        console: Console = Console()
+        console.print(*args, **kwargs)
+
+
+__builtin__.print = console_print
 
 
 def __repr__() -> str:
