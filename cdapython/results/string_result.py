@@ -25,6 +25,7 @@ class StringResult(Result):
         show_sql: bool,
         format_type: str = "json",
     ) -> None:
+        print("ran string_result.py __init__")
         super().__init__(
             api_response=api_response,
             offset=offset,
@@ -35,6 +36,7 @@ class StringResult(Result):
         )
 
     def get_all(self) -> None:
+        print("ran string_result.py get_all")
         pass
 
     def to_list(self, filters: Optional[str] = None, exact: bool = False) -> list:
@@ -47,6 +49,7 @@ class StringResult(Result):
         Returns:
             list: _description_
         """
+        print("ran string_result.py to_list")
         if filters is not None and filters != "":
             filters = filters.replace("\n", " ").strip()
             values: List["StringResult"] = [

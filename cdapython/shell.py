@@ -27,6 +27,7 @@ setDebug: bool = False
 
 
 def help() -> None:
+    print("ran shell.py help")
     print(
         """
         Welcome to Q shell's help utility

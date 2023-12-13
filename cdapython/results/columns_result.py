@@ -32,6 +32,7 @@ class ColumnsResult(BaseResult):
         description: bool = True,
         format_type: str = "json",
     ) -> None:
+        print("ran columns_result.py __init__")
         self._result = result
         self.description = description
         self._data_table: DataFrame
@@ -42,17 +43,21 @@ class ColumnsResult(BaseResult):
         )
 
     def _repr_value(self, show_value: Optional[bool]) -> str:
+        print("ran columns_result.py _repr_value")
         return f"""Number of Fields {len(self._result)}"""
 
     def __repr__(self) -> str:
+        print("ran columns_result.py __repr__")
         return self._repr_value(show_value=self.show_sql)
 
     def __str__(self) -> str:
+        print("ran columns_result.py __str__")
         return self._repr_value(show_value=self.show_sql)
 
     def to_list(
         self, filters: Optional[str] = None, exact: bool = False, endpoint: str = ""
     ) -> List[Any]:
+        print("ran columns_result.py to_list")
         if filters is not None and filters != "":
             values: Union[List[_Column_Types], List[Any]] = []
             filters = filters.replace("\n", " ").strip()
@@ -126,7 +131,7 @@ class ColumnsResult(BaseResult):
         Returns:
             DataFrame: [description]
         """
-
+        print("ran columns_result.py to_dataframe")
         self._data_table: DataFrame = json_normalize(self._result)
 
         if search_fields is not None:

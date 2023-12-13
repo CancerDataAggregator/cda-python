@@ -7,14 +7,17 @@ from cdapython.dataclasses_Q.querystr import QueryStr
 
 
 def col(col_name: Union[str, Query, None]) -> Query:
+    print("ran parsers/functions.py col")
     return Query(node_type="column", value=col_name)
 
 
 def quoted(quoted_val: Union[str, Query, None]) -> Query:
+    print("ran parsers/functions.py quoted")
     return Query(node_type="quoted", value=quoted_val)
 
 
 def unquoted(val: Union[str, Query, None]) -> Query:
+    print("ran parsers/functions.py unquoted")
     return Query(node_type="unquoted", value=val)
 
 
@@ -28,6 +31,7 @@ def infer_quote(val: QueryStr) -> QueryStr:
     Returns:
         Query: _description_
     """
+    print("ran parsers/functions.py infer_quote line 25")
     pass
 
 
@@ -41,6 +45,7 @@ def infer_quote(val: Query) -> Query:
     Returns:
         Query: _description_
     """
+    print("ran parsers/functions.py infer_quote line 39")
     pass
 
 
@@ -54,6 +59,7 @@ def infer_quote(val: str) -> str:
     Returns:
         str: _description_
     """
+    print("ran parsers/functions.py infer_quote line 53")
     pass
 
 
@@ -66,6 +72,7 @@ def infer_quote(val: Union[str, Query, QueryStr]) -> Union[Query, QueryStr, str]
     Returns:
         Query: [description]
     """
+    print("ran parsers/functions.py infer_quote line 66")
     if isinstance(val, QueryStr):
         return val
     if isinstance(val, Query):
@@ -98,6 +105,7 @@ def query_type_conversion(
     Returns:
         (tuple[Literal['LIKE'], Query] | tuple[str, str])
     """
+    print("ran parsers/functions.py query_type_conversion")
     if "%" in _r:
         tmp: Query = Query()
         tmp.node_type = "quoted"

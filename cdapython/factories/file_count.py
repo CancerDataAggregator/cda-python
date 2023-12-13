@@ -25,6 +25,7 @@ class FileCount(Entity):
         include_total_count: bool,
         show_counts: bool,
     ) -> Endpoint:
+        print("ran factories/file_count.py _call_endpoint")
         return api_instance.file_counts_query(
             query=self.query,
             dry_run=dry_run,
@@ -41,6 +42,7 @@ class FileCount(Entity):
         q_object: "Q",
         format_type: str = "json",
     ) -> Result:
+        print("ran factories/file_count.py _build_result_object")
         return CountResult(
             api_response=api_response,
             offset=offset,
@@ -53,5 +55,6 @@ class FileCount(Entity):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "FileCount":
+            print("ran factories/file_count.py create")
             subject = FileCount(q_object.query)
             return subject

@@ -22,6 +22,7 @@ class UniqueTerms(Entity):
         include_total_count: bool,
         system: Optional[str] = "",
     ) -> Endpoint:
+        print("ran unique_terms/unique_terms_endpoint.py _call_endpoint")
         system = self._get_system()
         if system:
             return api_instance.unique_values(
@@ -47,6 +48,7 @@ class UniqueTerms(Entity):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "UniqueTerms":
+            print("ran unique_terms/unique_terms_endpoint.py create")
             Q_unique = UniqueTerms(q_object.query)
             Q_unique.set_raw_string(q_object.get_raw_string())
             return Q_unique

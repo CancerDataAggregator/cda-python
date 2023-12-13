@@ -23,6 +23,7 @@ class Mutations(Entity):
         Returns:
             Q: _description_
         """
+        print("ran mutations/mutations.py count")
         return QFactory.create_entity(MUTATIONS_COUNT, self)
 
     def _call_endpoint(
@@ -48,6 +49,7 @@ class Mutations(Entity):
         Returns:
             Endpoint: _description_
         """
+        print("ran mutations/mutations.py _call_endpoint")
         return api_instance.mutation_query(
             query=self.query,
             dry_run=dry_run,
@@ -72,4 +74,5 @@ class Mutations(Entity):
             Returns:
                 Mutations:
             """
+            print("ran mutations/mutations.py create")
             return Mutations(q_object.query)

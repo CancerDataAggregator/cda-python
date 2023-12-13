@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 class Count(Entity):
     @property
     def file(self) -> "Q":
+        print("ran factories/count.py file")
         return QFactory.create_entity(FILE_COUNT, self)
 
     def _call_endpoint(
@@ -29,6 +30,7 @@ class Count(Entity):
         include_total_count: int,
         show_counts: bool,
     ) -> Endpoint:
+        print("ran factories/count.py _call_endpoint")
         return api_instance.global_counts(
             query=self.query,
             dry_run=dry_run,
@@ -45,6 +47,7 @@ class Count(Entity):
         q_object: "Q",
         format_type: str = "json",
     ) -> Result:
+        print("ran factories/count.py _build_result_object")
         return CountResult(
             api_response=api_response,
             offset=offset,
@@ -57,5 +60,6 @@ class Count(Entity):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "Count":
+            print("ran factories/count.py create")
             subject = Count(q_object.query)
             return subject

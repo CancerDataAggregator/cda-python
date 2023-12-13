@@ -24,6 +24,7 @@ class TreatmentCount(Treatment):
         include_total_count: bool,
         show_counts: bool,
     ) -> Endpoint:
+        print("ran treatement/count.py _call_endpoint")
         return api_instance.treatment_counts_query(
             query=self.query,
             dry_run=dry_run,
@@ -40,6 +41,7 @@ class TreatmentCount(Treatment):
         q_object: "Q",
         format_type: str = "json",
     ) -> Result:
+        print("ran treatement/count.py _build_result_object")
         return CountResult(
             api_response=api_response,
             offset=offset,
@@ -52,4 +54,5 @@ class TreatmentCount(Treatment):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "TreatmentCount":
+            print("ran treatement/count.py create")
             return TreatmentCount(q_object.query)

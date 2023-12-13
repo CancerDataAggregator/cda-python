@@ -15,10 +15,12 @@ if TYPE_CHECKING:
 class ResearchSubjectFiles(ResearchSubject):
     @property
     def file(self) -> "Q":
+        print("ran research_subject/file.py file")
         raise NotImplementedError
 
     @property
     def count(self) -> "Q":
+        print("ran research_subject/file.py count")
         return QFactory.create_entity(RESEARCH_SUBJECT_FILE_COUNT, self)
 
     def _call_endpoint(
@@ -31,6 +33,7 @@ class ResearchSubjectFiles(ResearchSubject):
         include_total_count: bool,
         show_counts: bool,
     ) -> Endpoint:
+        print("ran research_subject/file.py _call_endpoint")
         return api_instance.research_subject_files_query(
             query=self.query,
             offset=offset,
@@ -43,4 +46,5 @@ class ResearchSubjectFiles(ResearchSubject):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "ResearchSubjectFiles":
+            print("ran research_subject/file.py create")
             return ResearchSubjectFiles(q_object.query)

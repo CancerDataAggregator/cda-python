@@ -14,10 +14,12 @@ if TYPE_CHECKING:
 class SubjectFiles(Subject):
     @property
     def file(self) -> "Q":
+        print("ran subject/file.py file")
         raise NotImplementedError
 
     @property
     def count(self) -> "Q":
+        print("ran subject/file.py count")
         return QFactory.create_entity(SUBJECT_FILE_COUNT, self)
 
     def _call_endpoint(
@@ -30,6 +32,7 @@ class SubjectFiles(Subject):
         include_total_count: bool,
         show_counts: bool,
     ) -> Endpoint:
+        print("ran subject/file.py _call_endpoint")
         return api_instance.subject_files_query(
             query=self.query,
             dry_run=dry_run,
@@ -42,4 +45,5 @@ class SubjectFiles(Subject):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "SubjectFiles":
+            print("ran subject/file.py create")
             return SubjectFiles(q_object.query)

@@ -5,6 +5,7 @@ from setuptools import find_packages, setup
 
 
 def get_version(filepath: str):
+    print("ran setup.py get_version")
     version = None
     version_client = None
     with open(filepath, "r") as f:

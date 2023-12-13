@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 class ResearchSubjectCount(ResearchSubject):
     @property
     def file(self) -> "Q":
+        print("ran research_subject/count.py file")
         return QFactory.create_entity(RESEARCH_SUBJECT_FILE_COUNT, self)
 
     def _call_endpoint(
@@ -30,6 +31,7 @@ class ResearchSubjectCount(ResearchSubject):
         include_total_count: bool,
         show_counts: bool,
     ) -> Endpoint:
+        print("ran research_subject/count.py _call_endpoint")
         return api_instance.research_subject_counts_query(
             query=self.query,
             dry_run=dry_run,
@@ -46,6 +48,7 @@ class ResearchSubjectCount(ResearchSubject):
         q_object: "Q",
         format_type: str = "json",
     ) -> Result:
+        print("ran research_subject/count.py _build_result_object")
         return CountResult(
             api_response=api_response,
             offset=offset,
@@ -58,4 +61,5 @@ class ResearchSubjectCount(ResearchSubject):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "ResearchSubjectCount":
+            print("ran research_subject/count.py create")
             return ResearchSubjectCount(q_object.query)

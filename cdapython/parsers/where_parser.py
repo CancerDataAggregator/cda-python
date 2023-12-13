@@ -12,33 +12,41 @@ from cdapython.utils.check_case import check_keyword
 
 class Parse_Q(Base_Parser):
     def __init__(self) -> None:
+        print("ran parsers/where_parser.py Parse Q __init__")
         self.query = Query()
 
     def tree(self):
+        print("ran parsers/where_parser.py tree")
         return self.query
 
     def q(self, args) -> Query:
+        print("ran parsers/where_parser.py q")
         return args[0]
 
     def like_expr(self, args):
+        print("ran parsers/where_parser.py like_expr")
         return self._build_Query(args=args, node_type="LIKE")
 
     def statement(self, args: Tree):
+        print("ran parsers/where_parser.py statement")
         query = args[1]
         query.l = args[0]
         query.r = args[2]
         return query
 
     def word(self, word: Token):
+        print("ran parsers/where_parser.py word")
         return word
 
     def expression(self, args) -> Query:
+        print("ran parsers/where_parser.py expression")
         expression_query: Query = Query()
         expression_query.node_type = "column"
         expression_query.value = args[0].value
         return expression_query
 
     def from_expr(self, args) -> Query:
+        print("ran parsers/where_parser.py from_expr")
         subquery_query = Query()
         subquery_query.node_type = "SUBQUERY"
         subquery_query.l = args[0]
@@ -46,6 +54,7 @@ class Parse_Q(Base_Parser):
         return subquery_query
 
     def not_equals(self, args) -> Query:
+        print("ran parsers/where_parser.py not_equals")
         if "value" in args[1] and "%" in str(args[1].value):
             return self._build_Query(args=args, node_type="NOT LIKE")
         if "value" in args[1] and "NULL" in str(args[1].value):
@@ -61,6 +70,7 @@ class Parse_Q(Base_Parser):
         Returns:
             Query: _description_
         """
+        print("ran parsers/where_parser.py equals")
         if "value" in args[1] and "%" in str(args[1].value):
             return self._build_Query(args=args, node_type="LIKE")
         if "value" in args[1] and "NULL" in str(args[1].value):
@@ -68,19 +78,23 @@ class Parse_Q(Base_Parser):
         return super().equals(args)
 
     def single_quotes(self, args) -> Query:
+        print("ran parsers/where_parser.py single_quotes")
         quoted_query: Query = Query()
         quoted_query.node_type = "quoted"
         quoted_query.value = args[0].value
         return quoted_query
 
     def unique_terms_string(self, args) -> Query:
+        print("ran parsers/where_parser.py unique_terms_string")
         return self.single_quotes(args)
 
     def start(self, children):
+        print("ran parsers/where_parser.py start")
         return children[0]
 
 
 def where_parser(text: str, debug: bool = False):
+    print("ran parsers/where_parser.py where_parser")
     sql_grammar = Lark.open(
         "lark/where.lark",
         rel_to=__file__,

@@ -23,21 +23,26 @@ class BaseResult:
         result: List[Any],
         format_type: str = "json",
     ) -> None:
+        print("ran base.py __init__")
         self._result: List[Any] = result
         self.show_sql: Optional[bool] = show_sql
         self.format_type: str = format_type
         self._df: DataFrame
 
     def __dict__(self) -> Dict[str, Any]:  # type: ignore
+        print("ran base.py __dict__")
         return dict(ChainMap(*self._result))
 
     def __eq__(self, __other: object) -> Union[Any, Literal[False]]:
+        print("ran base.py __eq__")
         return isinstance(__other, BaseResult) and self._result == __other._result
 
     def __hash__(self) -> int:
+        print("ran base.py __hash__")
         return hash(tuple(self._result))
 
     def __contains__(self, value: str) -> bool:
+        print("ran base.py __contains__")
         exist: bool = False
         for item in self._result:
             if value in item.values():
@@ -52,6 +57,7 @@ class BaseResult:
         Returns:
             int
         """
+        print("ran base.py count")
         return len(self._result)
 
     def to_dataframe(
@@ -69,7 +75,7 @@ class BaseResult:
         Returns:
             DataFrame: [description]
         """
-
+        print("ran base.py to_dataframe")
         _data_table: DataFrame = json_normalize(self._result)
         if search_fields == "":
             search_fields = None
@@ -129,7 +135,7 @@ class BaseResult:
         Returns:
             Table: The rich Table instance passed, populated with the DataFrame values.
         """
-
+        print("ran base.py df_to_table")
         if pandas_dataframe.empty:
             pandas_dataframe = self.to_dataframe()
 
@@ -164,6 +170,7 @@ class BaseResult:
         Returns:
             str: This returns a comma separated field
         """
+        print("ran base.py join_as_str")
         if key == "":
             raise KeyError("You need to add a value to join on")
         field_split: List[str] = key.split(".")
@@ -174,6 +181,7 @@ class BaseResult:
         def find_field(
             current_field_index: int, field_list: List[Any], data: Any
         ) -> Union[str, Any]:
+            print("ran base.py find_field")
             my_instance = data[field_list[current_field_index]]
 
             if current_field_index == len(field_list) - 1:
@@ -206,12 +214,13 @@ class BaseResult:
         Returns:
             list: _description_
         """
-
+        print("ran base.py to_list")
         if self._result:
             return self._result
         return []
 
     def __len__(self) -> int:
+        print("ran base.py __len__")
         return self.count
 
     def __getitem__(
@@ -225,6 +234,7 @@ class BaseResult:
         Returns:
             Union[Series, DataFrame, Any, list]: _description_
         """
+        print("ran base.py __getitem__")
         if isinstance(self._result, DataFrame):
             return self._result.loc[idx]
 
@@ -240,23 +250,28 @@ class BaseResult:
             return [self._result[i] for i in range_index]
 
     def __iter__(self) -> Iterator[Any]:
+        print("ran base.py __iter__")
         return iter(self._result)
 
     def __aiter__(self) -> AsyncGenerator[Any, None]:
         async def tmp() -> AsyncGenerator[Any, None]:
+            print("ran base.py __aiter__ temp")
             yield self._result
-
+        print("ran base.py __aiter__")
         return tmp()
 
     def sort(self, function):
         # -1 , 1 , 0
         self._result = sorted(self._result, key=function)
+        print("ran base.py sort")
         return copy(self)
 
     # def contains(List[dict]):
+    #     print("ran base.py contains")
     #     self._result
     #     return
     # def filter(self,function):
+    #     print("ran base.py filter")
     def pretty_print(self, idx: Optional[int] = None) -> None:
         """_summary_
         pretty_print will print out a json object if you pass a index then it will print \
@@ -265,6 +280,7 @@ class BaseResult:
         Args:
             idx (Optional[int], optional): _description_. Defaults to None.
         """
+        print("ran base.py pretty_print")
         if idx is None:
             for i in range(self.count):
                 print(json.dumps(self[i], indent=4))

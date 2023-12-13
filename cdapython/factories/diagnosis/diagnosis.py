@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 class Diagnosis(Entity):
     @property
     def count(self) -> "Q":
+        print("ran diagnosis/diagnosis.py count")
         return QFactory.create_entity(DIAGNOSIS_COUNT, self)
 
     def _call_endpoint(
@@ -27,6 +28,7 @@ class Diagnosis(Entity):
         include_total_count: bool,
         show_counts: bool,
     ) -> Endpoint:
+        print("ran diagnosis/diagnosis.py _call_endpoint")
         return api_instance.diagnosis_query(
             query=self.query,
             dry_run=dry_run,
@@ -39,4 +41,5 @@ class Diagnosis(Entity):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "Diagnosis":
+            print("ran diagnosis/diagnosis.py create")
             return Diagnosis(q_object.query)

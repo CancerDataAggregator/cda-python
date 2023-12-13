@@ -4,6 +4,7 @@ T = TypeVar("T")
 
 
 def none_check(object: Union[T, None]) -> T:
+    print("ran none_check.py none_check")
     """Checks that an object is not None
     This fixes mypy errors by removing any `Optional` tags
     Args:

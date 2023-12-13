@@ -30,10 +30,12 @@ class SpecimenFiles(Specimen):
 
     @property
     def file(self) -> "Q":
+        print("ran specimen/file.py file")
         raise NotImplementedError
 
     @property
     def count(self) -> "Q":
+        print("ran specimen/file.py count")
         return QFactory.create_entity(SPECIMEN_FILE_COUNT, self)
 
     def _call_endpoint(
@@ -46,6 +48,7 @@ class SpecimenFiles(Specimen):
         include_total_count: bool,
         show_counts: bool,
     ) -> Endpoint:
+        print("ran specimen/file.py _call_endpoint")
         return api_instance.specimen_files_query(
             query=self.query,
             dry_run=dry_run,
@@ -58,4 +61,5 @@ class SpecimenFiles(Specimen):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "SpecimenFiles":
+            print("ran specimen/file.py create")
             return SpecimenFiles(q_object.query)

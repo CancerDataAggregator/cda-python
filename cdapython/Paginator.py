@@ -42,6 +42,7 @@ class Paginator:
         show_bar: bool = False,
         show_counts: bool = False,
     ) -> None:
+        print("ran Paginator.py __init__")
         self.result: Union[Paged_Result, StringResult] = result
         self.to_df: bool = to_df
         self.to_list: bool = to_list
@@ -69,6 +70,7 @@ class Paginator:
         Returns:
             Union[DataFrame, list, Result]: _description_
         """
+        print("ran Paginator.py _return_result")
         var_output: str = none_check(self.output)
         if var_output == "full_df":
             return self.result.to_dataframe()
@@ -82,6 +84,7 @@ class Paginator:
         return self.result
 
     def _do_next(self: Paginator) -> Union[DataFrame, List[Any], Result, None]:
+        print("ran Paginator.py _do_next")
         if self.result.has_next_page or not self.stopped:
             try:
                 tmp_result = self.result.next_page(
@@ -117,14 +120,17 @@ class Paginator:
         return self.result
 
     async def a_do_next(self) -> Union[List, DataFrame, Result, None]:
+        print("ran Paginator.py a_do_next")
         return self._do_next()
 
     def __iter__(self) -> Paginator:
+        print("ran Paginator.py __iter__")
         if self.show_bar:
             self.progress.start()
         return self
 
     def __aiter__(self) -> Paginator:
+        print("ran Paginator.py __aiter__")
         self._loop = asyncio.get_event_loop()
         if self.show_bar:
             self.progress.start()
@@ -133,6 +139,7 @@ class Paginator:
     async def __anext__(
         self,
     ) -> Coroutine[Any, Any, Union[DataFrame, List[Any], Paged_Result, None]]:
+        print("ran Paginator.py __anext__")
         try:
             if self.stopped:
                 if self.show_bar:
@@ -147,6 +154,7 @@ class Paginator:
             raise e
 
     def __next__(self) -> Union[List[Any], DataFrame, Paged_Result, None]:
+        print("ran Paginator.py __next__")
         try:
             if self.stopped:
                 if self.show_bar:

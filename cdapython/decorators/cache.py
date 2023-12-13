@@ -18,14 +18,16 @@ def lru_cache_timed(seconds: int = 10, maxsize: int = 128) -> Callable:
     Returns:
         Callable: _description_
     """
-
+    print("ran cache.py lru_cache_timed")
     def wrapper_cache(func: Any) -> Callable:
+        print("ran cache.py wrapper_cache")
         func = lru_cache(maxsize=maxsize)(func)
         func.lifetime = timedelta(seconds=seconds)
         func.expiration = datetime.utcnow() + func.lifetime
 
         @wraps(func)
         def wrapped_func(*args: Tuple[Any, Any], **kwargs: Dict[str, Any]) -> Any:
+            print("ran cache.py wrapped_func")
             if datetime.utcnow() >= func.expiration:
                 func.cache_clear()
                 func.expiration = datetime.utcnow() + func.lifetime

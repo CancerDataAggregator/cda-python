@@ -25,6 +25,7 @@ class Constants:
 
     @staticmethod
     def version() -> str:
+        print("ran constant_variables version")
         """
         This is used to get version
         Returns:

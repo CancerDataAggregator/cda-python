@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 class SpecimenCount(Specimen):
     @property
     def file(self) -> "Q":
+        print("ran specimen/count.py file")
         return QFactory.create_entity(SPECIMEN_FILE_COUNT, self)
 
     def _call_endpoint(
@@ -29,6 +30,7 @@ class SpecimenCount(Specimen):
         include_total_count: bool,
         show_counts: bool,
     ) -> Endpoint:
+        print("ran specimen/count.py _call_endpoint")
         return api_instance.specimen_counts_query(
             query=self.query,
             dry_run=dry_run,
@@ -45,6 +47,7 @@ class SpecimenCount(Specimen):
         q_object: "Q",
         format_type: str = "json",
     ) -> Result:
+        print("ran specimen/count.py _build_return_object")
         return CountResult(
             api_response=api_response,
             offset=offset,
@@ -57,4 +60,5 @@ class SpecimenCount(Specimen):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "SpecimenCount":
+            print("ran specimen/count.py create")
             return SpecimenCount(q_object.query)

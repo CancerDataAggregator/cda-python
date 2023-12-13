@@ -35,6 +35,7 @@ class BooleanQuery(Entity):
         Returns:
             PagedResponseData: _description_
         """
+        print("ran boolean_query.py _call_endpoint")
         return api_instance.boolean_query(
             query=self.query,
             dry_run=dry_run,
@@ -47,4 +48,5 @@ class BooleanQuery(Entity):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "BooleanQuery":
+            print("ran boolean_query.py create")
             return BooleanQuery(q_object.query)

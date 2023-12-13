@@ -16,10 +16,12 @@ if TYPE_CHECKING:
 class SpecimenFileCount(SpecimenFiles):
     @property
     def file(self) -> "Q":
+        print("ran specimen/file_count.py file")
         raise NotImplementedError
 
     @property
     def count(self) -> "Q":
+        print("ran specimen/file_count.py count")
         raise NotImplementedError
 
     def _call_endpoint(
@@ -32,6 +34,7 @@ class SpecimenFileCount(SpecimenFiles):
         include_total_count: bool,
         show_counts: bool,
     ) -> Endpoint:
+        print("ran specimen/file_count.py _call_endpoint")
         return api_instance.specimen_file_counts_query(
             query=self.query,
             dry_run=dry_run,
@@ -48,6 +51,7 @@ class SpecimenFileCount(SpecimenFiles):
         q_object: "Q",
         format_type: str = "json",
     ) -> Result:
+        print("ran specimen/file_count.py _build_result_object")
         return CountResult(
             api_response=api_response,
             offset=offset,
@@ -60,4 +64,5 @@ class SpecimenFileCount(SpecimenFiles):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "SpecimenFileCount":
+            print("ran specimen/file_count.py create")
             return SpecimenFileCount(q_object.query)

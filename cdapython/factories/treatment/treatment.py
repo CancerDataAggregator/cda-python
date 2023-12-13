@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 class Treatment(Entity):
     @property
     def count(self) -> "Q":
+        print("ran treatment/treatment.py count")
         return QFactory.create_entity(TREATMENT_COUNT, self)
 
     def _call_endpoint(
@@ -27,6 +28,7 @@ class Treatment(Entity):
         include_total_count: bool,
         show_counts: bool,
     ) -> Endpoint:
+        print("ran treatment/treatment.py _call_endpoint")
         return api_instance.treatments_query(
             query=self.query,
             dry_run=dry_run,
@@ -39,4 +41,5 @@ class Treatment(Entity):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "Treatment":
+            print("ran treatment/treatment.py create")
             return Treatment(q_object.query)

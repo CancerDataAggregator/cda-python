@@ -76,6 +76,7 @@ def check_version_and_table(
     Returns:
         Tuple[str, str]
     """
+    print("ran Q.py check_version_and_table")
     if version is None:
         version = Constants.table_version
 
@@ -101,7 +102,7 @@ class _QEncoder(JSONEncoder):
         Returns:
             Union[Any,dict[str, Any], None]
         """
-
+        print("ran Q.py _QEncoder default")
         if isinstance(o, MappingProxyType):
             return None
         # Using vars() over o.__dict__ dunder method,
@@ -120,6 +121,7 @@ class DryClass:
     query_sql: str
 
     def __repr__(self) -> str:
+        print("ran Q.py DryClass __repr__")
         return f"""
                 SQL: {self.query_sql}
                 """
@@ -139,6 +141,7 @@ class Q:
         config: Optional[Qconfig] = None,
         debug: bool = False,
     ) -> None:
+        print("ran Q.py Q __init__")
         """
 
         Args:
@@ -187,12 +190,14 @@ class Q:
             number (int): _description_
         Returns: None
         """
+        print("ran Q.py Q _set_system)
         self._system = system
 
     def _get_system(self) -> str:
         """
         This will return the Q's system for unique_terms
         """
+        print("ran Q.py Q _get_system")
         return self._system
 
     def _set_limit(self, number: int) -> None:
@@ -202,12 +207,14 @@ class Q:
             number (int): _description_
         Returns None
         """
+        print("ran Q.py Q _set_limit")
         self.limit = number
 
     def _get_limit(self) -> int:
         """
         This will return the Q's limit
         """
+        print("ran Q.py Q _get_limit")
         return self.limit
 
     def _set_offset(self, number: int) -> None:
@@ -217,18 +224,21 @@ class Q:
             number (int): _description_
         Returns None
         """
+        print("ran Q.py Q _set_offset")
         self.offset = number
 
     def _get_offset(self) -> int:
         """
         This will return the Q's limit
         """
+        print("ran Q.py Q _get_offset")
         return self.offset
 
     def __iter__(
         self,
     ) -> Union[Generator[Any, None, None], Iterator[Paged_Result]]:
         if isinstance(self, Q):
+            print("ran Q.py Q __iter__")
             q_tmp_object: Q = Q(self.query, config=self._config)
             results = q_tmp_object.run(verify=False, async_call=True)
             if isinstance(results, Paged_Result):
@@ -239,12 +249,15 @@ class Q:
                         yield result
 
     def __repr__(self) -> str:
+        print("ran Q.py Q __repr__")
         return str(self.__class__) + ": \n" + str(self.__dict__)
 
     def set_raw_string(self, text: str):
+        print("ran Q.py Q set_raw_string")
         self.raw_Q_string = text
 
     def get_raw_string(self):
+        print("ran Q.py Q get_raw_string")
         return self.raw_Q_string
 
     @staticmethod
@@ -254,6 +267,7 @@ class Q:
         Returns:
             str: returns a str of the current version
         """
+        print("ran Q.py Q get_version")
         return Constants.version()
 
     def set_version(self, table_version: str) -> Q:
@@ -265,19 +279,23 @@ class Q:
         Returns:
             Q
         """
+        print("ran Q.py Q set_version")
         config = self._config.copy_config()
         config.version = table_version
         return self.__class__(self.query, config=config)
 
     def set_host(self, host: str) -> Q:
+        print("ran Q.py Q set_host")
         config = self._config.copy_config()
         config.host = host
         return self.__class__(self.query, config=config)
 
     def get_host(self) -> str:
+        print("ran Q.py Q get_host")
         return self._config.host
 
     def set_project(self, project: str) -> Q:
+        print("ran Q.py Q set_project")
         config = self._config.copy_config()
         config.table = project
         return self.__class__(self.query, config=config)
@@ -291,18 +309,23 @@ class Q:
         Returns:
             Q
         """
+        print("ran Q.py Q set_config")
         return self.__class__(self.query, config=config)
 
     def get_config(self) -> Qconfig:
+        print("ran Q.py Q get_config")
         return self._config
 
     def get_table(self) -> str:
+        print("ran Q.py Q get_table")
         return self._config.table
 
     def get_verbose(self) -> bool:
+        print("ran Q.py Q get_verbose")
         return self._config.verbose
 
     def get_counts(self) -> bool:
+        print("ran Q.py Q get_counts")
         return self._config.show_counts
 
     def set_counts(self, show_counts: bool) -> Q:
@@ -313,6 +336,7 @@ class Q:
         Returns:
             Q
         """
+        print("ran Q.py Q set_counts")
         config = self._config.copy_config()
         config.show_counts = show_counts
         self.show_counts = show_counts
@@ -327,6 +351,7 @@ class Q:
         Returns:
             Q
         """
+        print("ran Q.py Q set_verbose")
         config = self._config.copy_config()
         config.verbose = value
         return self.__class__(self.query, config=config)
@@ -340,6 +365,7 @@ class Q:
         Returns:
             str: returns a json str to the user
         """
+        print("ran Q.py Q to_json")
         tmp_json = dumps(self, indent=indent, cls=_QEncoder)
         if write_file:
             with open(f"{file_name}.json", "w", encoding="utf-8") as file:
@@ -352,11 +378,13 @@ class Q:
         Returns:
             Any
         """
+        print("ran Q.py Q to_dict")
         return self.query.to_dict()
 
     # endregion
     @staticmethod
     def open_Q_file(file: str) -> Q:
+        print("ran Q.py Q open_Q_file")
         path = Path(file)
         if path.suffix != ".Q":
             raise Exception("error reading .Q file")
@@ -387,6 +415,7 @@ class Q:
         Returns:
             Q
         """
+        print("ran Q.py Q from_file")
         values_to_search: List[str] = []
         if not Path(file_to_search).resolve().is_file():
             raise OSError(f"File not found {Path(file_to_search).resolve()}")
@@ -444,7 +473,7 @@ class Q:
         Returns:
             [DataFrame | None]: [This will return a Result class]
         """
-
+        print("ran Q.py Q bulk_download")
         cda_client_obj: ApiClient = ApiClient(
             configuration=CdaConfiguration(host=host, verify=verify, verbose=verbose),
             pool_threads=2,
@@ -496,6 +525,7 @@ class Q:
         Returns:
             str: status messages
         """
+        print("ran Q.py Q bigquery_status")
         cda_client_obj: ApiClient = ApiClient(
             configuration=CdaConfiguration(host=host, verify=verify)
         )
@@ -514,6 +544,7 @@ class Q:
         Returns:
             _type_
         """
+        print("ran Q.py Q file")
         return QFactory.create_entity(FILE, self)
 
     @property
@@ -523,6 +554,7 @@ class Q:
         Returns:
             _type_
         """
+        print("ran Q.py Q count")
         return QFactory.create_entity(COUNT, self)
 
     @property
@@ -532,6 +564,7 @@ class Q:
         Returns:
             Q
         """
+        print("ran Q.py Q subject")
         return QFactory.create_entity(SUBJECT, self)
 
     @property
@@ -541,6 +574,7 @@ class Q:
         Returns:
             Q
         """
+        print("ran Q.py Q researchsubject")
         return QFactory.create_entity(RESEARCH_SUBJECT, self)
 
     @property
@@ -550,6 +584,7 @@ class Q:
         Returns:
             Q
         """
+        print("ran Q.py Q specimen")
         return QFactory.create_entity(SPECIMEN, self)
 
     @property
@@ -559,22 +594,27 @@ class Q:
         Returns:
             Q
         """
+        print("ran Q.py Q diagnosis")
         return QFactory.create_entity(DIAGNOSIS, self)
 
     @property
     def treatment(self) -> Q:
+        print("ran Q.py Q treatment")
         return QFactory.create_entity(TREATMENT, self)
 
     @property
     def mutation(self) -> Q:
+        print("ran Q.py Q mutation")
         return QFactory.create_entity(MUTATIONS, self)
 
     @property
     def unique_terms(self) -> Q:
+        print("ran Q.py Q unique_terms")
         return QFactory.create_entity(UNIQUE_TERMS, self)
 
     @property
     def bool_query(self) -> Q:
+        print("ran Q.py Q bool_query")
         return QFactory.create_entity(BOOLEAN_QUERY, self)
 
     def _call_endpoint(
@@ -601,6 +641,7 @@ class Q:
         Returns:
             PagedResponseData: _description_
         """
+        print("ran Q.py Q _call_endpoint")
         factory = QFactory.create_entity(BOOLEAN_QUERY, self)
         return factory._call_endpoint(
             api_instance=api_instance,
@@ -622,6 +663,7 @@ class Q:
         q_object: Q,
         format_type: str = "json",
     ) -> Result:
+        print("ran Q.py Q _build_result_object")
         return Paged_Result(
             api_response=api_response,
             offset=offset,
@@ -667,7 +709,7 @@ class Q:
         Returns:
             Union[QueryCreatedData, ApplyResult, Result, DryClass, None]: _description_
         """
-
+        print("ran Q.py Q run")
         dry_run_current = False
 
         if host is None:
@@ -808,6 +850,7 @@ class Q:
         Returns:
             Q
         """
+        print("ran Q.py Q q_wrap")
         if isinstance(right, str):
             right = Q(right)
         if isinstance(right, Q):
@@ -824,6 +867,7 @@ class Q:
         Returns:
             Q: a joined Q queries with a AND node
         """
+        print("ran Q.py Q AND")
         return self.q_wrap(right, operator="AND")
 
     def OR(self, right: Union[str, Q]) -> Q:
@@ -835,6 +879,7 @@ class Q:
         Returns:
             Q: a joined Q queries with a OR node
         """
+        print("ran Q.py Q OR")
         return self.q_wrap(right, operator="OR")
 
     def FROM(self, right: Union[str, Q]) -> Q:
@@ -846,6 +891,7 @@ class Q:
         Returns:
             Q: a joined Q queries with a SUBQUERY node
         """
+        print("ran Q.py Q FROM")
         return self.q_wrap(right, operator="SUBQUERY")
 
     def NOT(self) -> Q:
@@ -857,9 +903,11 @@ class Q:
         Returns:
             Q: Adds a NOT to a Q query
         """
+        print("ran Q.py Q NOT")
         return self.q_wrap(None, operator="NOT")
 
     def _Not_EQ(self, right: Union[str, Q]) -> Q:
+        print("ran Q.py Q _Not_EQ")
         return self.q_wrap(right, operator="!=")
 
     def _Greater_Than_EQ(self, right: Union[str, Q]) -> Q:
@@ -871,6 +919,7 @@ class Q:
         Returns:
             Q
         """
+        print("ran Q.py Q _Greater_Than_EQ")
         return self.q_wrap(right, operator=">=")
 
     def _Greater_Than(self, right: Union[str, Q]) -> Q:
@@ -882,6 +931,7 @@ class Q:
         Returns:
             Q
         """
+        print("ran Q.py Q _Greater_Than")
         return self.q_wrap(right, operator=">")
 
     def _Less_Than_EQ(self, right: Q) -> Q:
@@ -893,6 +943,7 @@ class Q:
         Returns:
             Q
         """
+        print("ran Q.py Q _Less_Than_EQ")
         return self.__class__(self.query, "<=", right.query, config=self._config)
 
     def _Less_Than(self, right: Q) -> Q:
@@ -904,6 +955,7 @@ class Q:
         Returns:
             Q
         """
+        print("ran Q.py Q _Less_Than")
         return self.__class__(self.query, "<", right.query, config=self._config)
 
     def SELECT(self, fields: str) -> Q:
@@ -915,6 +967,7 @@ class Q:
         Returns:
             Q
         """
+        print("ran Q.py Q SELECT")
         return self.__select(fields=fields)
 
     def ORDER_BY(self, fields: str) -> Q:
@@ -926,6 +979,7 @@ class Q:
         Returns:
             Q
         """
+        print("ran Q.py Q ORDER_BY")
         return self._order_by(fields=fields)
 
     def _order_by(self, fields: str) -> Q:
@@ -937,6 +991,7 @@ class Q:
         Returns:
             [Q]: [returns a Q object]
         """
+        print("ran Q.py Q _order_by")
         # This lambda will strip a comma and rejoin the string
         mod_fields: str = (
             ",".join(map(lambda fields: fields.strip(","), fields.split()))
@@ -957,6 +1012,7 @@ class Q:
         Returns:
             Q
         """
+        print("ran Q.py Q IS")
         return self.q_wrap(fields, operator="IS")
 
     def __select(self, fields: str) -> Q:
@@ -968,6 +1024,7 @@ class Q:
         Returns:
             [Q]: [returns a Q object]
         """
+        print("ran Q.py Q __select")
         select_functions_parsed = sql_function_parser(fields)
         # # This lambda will strip a comma and rejoin the string
         # mod_fields: str = ",".join(
@@ -980,9 +1037,11 @@ class Q:
         )
 
     def LIMIT(self, number: int) -> Q:
+        print("ran Q.py Q LIMIT")
         self._set_limit(number)
         return self
 
     def OFFSET(self, number: int) -> Q:
+        print("ran Q.py Q OFFSET")
         self._set_offset(number)
         return self

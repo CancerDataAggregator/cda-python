@@ -17,10 +17,12 @@ if TYPE_CHECKING:
 class DiagnosisCount(Diagnosis):
     @property
     def file(self) -> "Q":
+        print("ran diagnosis/count.py file")
         raise NotImplementedError
 
     @property
     def count(self) -> "Q":
+        print("ran diagnosis/count.py count")
         raise NotImplementedError
 
     def _call_endpoint(
@@ -33,6 +35,7 @@ class DiagnosisCount(Diagnosis):
         include_total_count: bool,
         show_counts: bool,
     ) -> Endpoint:
+        print("ran diagnosis/count.py _call_endpoint")
         return api_instance.diagnosis_counts_query(
             query=self.query,
             dry_run=dry_run,
@@ -49,6 +52,7 @@ class DiagnosisCount(Diagnosis):
         q_object: "Q",
         format_type: str = "json",
     ) -> Result:
+        print("ran diagnosis/count.py _build_result_object")
         return CountResult(
             api_response=api_response,
             offset=offset,
@@ -61,4 +65,5 @@ class DiagnosisCount(Diagnosis):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "DiagnosisCount":
+            print("ran diagnosis/count.py create")
             return DiagnosisCount(q_object.query)

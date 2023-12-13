@@ -23,6 +23,7 @@ class NotPaginatedResult(Result):
         show_sql: bool,
         format_type: str = "json",
     ) -> None:
+        print("ran not_paginated_result.py __init__")
         super().__init__(
             api_response=api_response,
             offset=offset,
@@ -55,6 +56,7 @@ class NotPaginatedResult(Result):
         Returns:
             Paginator: _description_
         """
+        print("ran not_paginated_result.py paginator")
         raise NotImplementedError(MESSAGE_NOT_ALLOW)
 
     def get_all(
@@ -73,4 +75,5 @@ class NotPaginatedResult(Result):
         Raises:
             NotImplementedError: _description_
         """
+        print("ran not_paginated_result.py get_all")
         raise NotImplementedError(MESSAGE_NOT_ALLOW)

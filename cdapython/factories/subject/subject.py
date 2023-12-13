@@ -14,10 +14,12 @@ if TYPE_CHECKING:
 class Subject(Entity):
     @property
     def file(self) -> "Q":
+        print("ran subject/subject.py file")
         return QFactory.create_entity(SUBJECT_FILE, self)
 
     @property
     def count(self) -> "Q":
+        print("ran subject/subject.py count")
         return QFactory.create_entity(SUBJECT_COUNT, self)
 
     def _call_endpoint(
@@ -30,6 +32,7 @@ class Subject(Entity):
         include_total_count: bool,
         show_counts: bool,
     ) -> Endpoint:
+        print("ran subject/subject.py _call_endpoint")
         return api_instance.subject_query(
             query=self.query,
             dry_run=dry_run,
@@ -42,4 +45,5 @@ class Subject(Entity):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "Subject":
+            print("ran subject/subject.py create")
             return Subject(q_object.query)

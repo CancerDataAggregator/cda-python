@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 class File(Entity):
     @property
     def count(self) -> "Q":
+        print("ran factories/file.py count")
         return QFactory.create_entity(FILE_COUNT, self)
 
     def _call_endpoint(
@@ -27,6 +28,7 @@ class File(Entity):
         include_total_count: bool,
         show_counts: bool,
     ) -> Endpoint:
+        print("ran factories/file.py _call_endpoint")
         return api_instance.files(
             query=self.query,
             dry_run=dry_run,
@@ -39,5 +41,6 @@ class File(Entity):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "File":
+            print("ran factories/file.py create")
             subject = File(q_object.query)
             return subject

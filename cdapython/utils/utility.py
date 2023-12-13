@@ -47,6 +47,7 @@ def get_version() -> str:
     Returns:
         str: returns a str of the current version
     """
+    print("ran utility.py get_version")
     return Constants._VERSION
 
 
@@ -56,6 +57,7 @@ def set_host_url(url: str) -> None:
     Args:
         url (str): param to set the global url
     """
+    print("ran utility.py set_host_url")
     if len(url.strip()) > 0:
         Constants.cda_api_url = url
     else:
@@ -68,6 +70,7 @@ def get_host_url() -> str:
     Returns:
         str: returns a str of the current url
     """
+    print("ran utility.py get_host_url")
     return Constants.cda_api_url
 
 
@@ -77,6 +80,7 @@ def set_default_project_dataset(table: str) -> None:
     Args:
         table (str): _description_
     """
+    print("ran utility.py set_default_project_dataset")
     if len(table.strip()) > 0:
         Constants.default_table = table
     else:
@@ -84,10 +88,12 @@ def set_default_project_dataset(table: str) -> None:
 
 
 def get_default_project_dataset() -> str:
+    print("ran utility.py get_default_project_dataset")
     return Constants.default_table
 
 
 def set_table_version(table_version: str) -> None:
+    print("ran utility.py set_table_version")
     if len(table_version.strip()) > 0:
         Constants.table_version = table_version
     else:
@@ -95,6 +101,7 @@ def set_table_version(table_version: str) -> None:
 
 
 def get_table_version() -> str:
+    print("ran utility.py get_table_version")
     return Constants.table_version
 
 
@@ -128,6 +135,7 @@ def unique_terms(
         Paged_Result
     """
     # cda_client_obj.select_header_content_type(["text/plain"])
+    print("ran utility.py unique_terms")
     if system:
         q_object = Q(col_name).unique_terms
         q_object._set_system(system)
@@ -168,6 +176,7 @@ def columns(
     """
 
     # Execute query
+    print("ran utility.py columns")
     if host is None:
         host = Constants.cda_api_url
 

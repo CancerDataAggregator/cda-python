@@ -14,10 +14,12 @@ if TYPE_CHECKING:
 class Specimen(Entity):
     @property
     def file(self) -> "Q":
+        print("ran specimen/specimen.py file")
         return QFactory.create_entity(SPECIMEN_FILE, self)
 
     @property
     def count(self) -> "Q":
+        print("ran specimen/specimen.py count")
         return QFactory.create_entity(SPECIMEN_COUNT, self)
 
     def _call_endpoint(
@@ -30,6 +32,7 @@ class Specimen(Entity):
         include_total_count: bool,
         show_counts: bool,
     ) -> Endpoint:
+        print("ran specimen/specimen.py _call_endpoint")
         return api_instance.specimen_query(
             query=self.query,
             dry_run=dry_run,
@@ -42,4 +45,5 @@ class Specimen(Entity):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "Specimen":
+            print("ran specimen/specimen.py create")
             return Specimen(q_object.query)

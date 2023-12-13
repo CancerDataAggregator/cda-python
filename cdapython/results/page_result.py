@@ -39,6 +39,7 @@ class Paged_Result(Result):
         q_object: Union[Q, None],
         format_type: str = "json",
     ) -> None:
+        print("ran page_result.py __init__")
         self._api_response: PagedResponseData = api_response
         self._result = self._api_response.result
         self._offset: int = offset
@@ -63,6 +64,7 @@ class Paged_Result(Result):
         include_total_count: bool = False,
         show_counts: bool = False,
     ) -> Union[ApplyResult[Any], Paged_Result, Any, None]:
+        print("ran page_result.py _get_result")
         if self.q_object:
             self.q_object: Q = self.q_object.set_verbose(False)
             self.q_object: Q = self.q_object.set_counts(show_counts=show_counts)
@@ -93,6 +95,7 @@ class Paged_Result(Result):
         Returns:
             _type_: _description_
         """
+        print("ran page_result.py paginator")
         if show_counts is None:
             show_counts = self.q_object.get_counts()
         limit = limit if limit != 0 else self._limit
@@ -116,6 +119,7 @@ class Paged_Result(Result):
         Returns:
             Union[DataFrame, list, Result]: _description_
         """
+        print("ran page_result.py return_result")
         var_output: str = none_check(output)
         if var_output == "full_df":
             return result.to_dataframe()
@@ -150,7 +154,7 @@ class Paged_Result(Result):
         Returns:
             CollectResult: _description_
         """
-
+        print("ran page_result.py get_all")
         if limit == 0:
             limit = self._limit
 
@@ -205,6 +209,7 @@ class Paged_Result(Result):
         Returns:
             _type_: _description_
         """
+        print("ran page_result.py async_next_page")
         return anyio.to_thread.run_sync(self.next_page, limit, async_req, pre_stream)
 
     async def async_prev_page(
@@ -221,6 +226,7 @@ class Paged_Result(Result):
         Returns:
             _type_: _description_
         """
+        print("ran page_result.py async_prev_page")
         return anyio.to_thread.run_sync(self.prev_page, limit, async_req, pre_stream)
 
     def next_page(
@@ -238,6 +244,7 @@ class Paged_Result(Result):
         Returns:
             _type_: _description_
         """
+        print("ran page_result.py next_page")
         if show_counts is None:
             show_counts = self.q_object.get_counts()
         if isinstance(self._offset, int) and isinstance(self._limit, int):
@@ -275,6 +282,7 @@ class Paged_Result(Result):
         Returns:
             _type_: _description_
         """
+        print("ran page_result.py prev_page")
         if isinstance(self._offset, int) and isinstance(self._limit, int):
             offset = self._offset - self._limit
             offset = max(0, offset)
@@ -310,7 +318,7 @@ def get_query_result(
     Returns:
         Optional[Result]: [returns a class Result Object]
     """
-
+    print("ran page_result.py get_query_result")
     response = q_object._call_endpoint(
         api_instance=api_instance,
         limit=limit,

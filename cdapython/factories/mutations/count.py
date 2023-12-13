@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 class MutationsCount(Specimen):
     @property
     def file(self) -> "Q":
+        print("ran mutations/count.py file")
         return QFactory.create_entity(MUTATIONS_COUNT, self)
 
     def _call_endpoint(
@@ -29,6 +30,7 @@ class MutationsCount(Specimen):
         include_total_count: bool,
         show_counts: bool,
     ) -> Endpoint:
+        print("ran mutations/count.py _call_endpoint")
         return api_instance.mutation_counts_query(
             query=self.query,
             dry_run=dry_run,
@@ -45,6 +47,7 @@ class MutationsCount(Specimen):
         q_object: "Q",
         format_type: str = "json",
     ) -> Result:
+        print("ran mutations/count.py _build_result_object")
         return CountResult(
             api_response=api_response,
             offset=offset,
@@ -57,4 +60,5 @@ class MutationsCount(Specimen):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "MutationsCount":
+            print("ran mutations/count.py create")
             return MutationsCount(q_object.query)

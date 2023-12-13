@@ -8,12 +8,14 @@ from watchdog.observers import Observer
 
 class Handler(FileSystemEventHandler):
     def __init__(self):
+        print("ran tasks.py Handler __init__")
         self.event_type = None
         self.src_path = None
 
     def on_any_event(self, event):
         # if event.is_directory:
         #     return None
+        print("ran tasks.py Handler on_any_event")
         if event.src_path.find("__pycache__") == -1:
             self.event_type = event.event_type
             self.src_path = event.src_path
@@ -27,6 +29,7 @@ def black_w(c, args):
     Args:
         c (_type_): _description_
     """
+    print("ran tasks.py black_w")
     print("[bold yellow] Black is watching files [/bold yellow]")
     if args == "lint":
         print(" [bold yellow]pylint is watching[/bold yellow]")
@@ -60,12 +63,14 @@ def venv(c):
     Args:
         c (_type_): _description_
     """
+    print("ran tasks.py venv")
     print("Create venv ")
     c.run("python3 -m venv venv && source venv/bin/activate")
 
 
 @task
 def formatting(c) -> None:
+    print("ran tasks.py formatting")
     """
     This will run black formatting for you
     Args:
@@ -82,6 +87,7 @@ def mypy(c, args=None) -> None:
     Args:
         c (_type_): _description_
     """
+    print("ran tasks.py mypy")
     print("Checking Types")
     if args is None:
         c.run("mypy cdapython")
@@ -96,6 +102,7 @@ def tests(c, args=None) -> None:
     Args:
         c (_type_): _description_
     """
+    print("ran tasks.py tests")
     print("Run pytest")
     if args is None:
         c.run("pytest .")
@@ -111,6 +118,7 @@ def lint(c, args=None) -> None:
         c (_type_): _description_
         args (_type_): _description_
     """
+    print("ran tasks.py lint")
     print(f"linting {args}")
     if args is None:
         c.run("pylint")
@@ -121,5 +129,6 @@ def lint(c, args=None) -> None:
 
 @task
 def uninstall(c, args=None) -> None:
+    print("ran tasks.py uninstall")
     print("uninstall and reinstall")
     c.run("pip uninstall cdapython -y  && pip install -e .")

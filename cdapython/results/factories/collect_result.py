@@ -32,6 +32,7 @@ class CollectResult(NotPaginatedResult):
         result: List[Any],
         format_type: str = "json",
     ) -> None:
+        print("ran collect_result.py __init__")
         self._result = result
         super().__init__(
             api_response=api_response,
@@ -48,6 +49,7 @@ class CollectResult(NotPaginatedResult):
         Args:
             result (Result): _description_
         """
+        print("ran collect_result.py extend_result")
         self._result.extend(result.to_list())
 
     def get_all(
@@ -67,6 +69,7 @@ class CollectResult(NotPaginatedResult):
         Returns:
             Result: _description_
         """
+        print("ran collect_result.py get_all")
         return super().get_all(output, limit, show_bar)
 
     def paginator(
@@ -90,6 +93,7 @@ class CollectResult(NotPaginatedResult):
         Returns:
             Paginator: _description_
         """
+        print("ran collect_result.py paginator")
         return super().paginator(
             output=output,
             to_df=to_df,
@@ -101,6 +105,7 @@ class CollectResult(NotPaginatedResult):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: Result) -> CollectResult:
+            print("ran collect_result.py create")
             return CollectResult(
                 api_response=q_object._api_response,
                 offset=q_object._offset,

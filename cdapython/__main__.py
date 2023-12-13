@@ -4,11 +4,13 @@ import cdapython
 
 
 def run_file(path: str) -> None:
+    print("ran cdapython/__main__.py run_file")
     with open(file=path, mode="r", encoding="UTF-8") as file:
         print(cdapython.Q(file.read()).to_json())
 
 
 def main() -> None:
+    print("ran cdapython/__main__.py main")
     args = sys.argv[1:]
     if args == []:
         from cdapython import shell

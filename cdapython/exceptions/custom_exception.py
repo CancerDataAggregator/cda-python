@@ -27,17 +27,21 @@ class WRONGDATABASEError(Exception):
 
 class QSyntaxError(SyntaxError):
     def __init__(self, keyword: str, message: str = "Q Syntax Error") -> None:
+        print("ran custom_exception.py QSyntaxError __init__")
         self.message = message
         self.keyword = keyword
         super().__init__(self.message)
 
     def PRINT_Q_ERROR(self) -> str:
+        print("ran custom_exception.py QSyntaxError PRINT_Q_ERROR")
         return f'{self.message} -> Q operator "{self.keyword}" is not uppercase. Please use "{self.keyword.upper()}" instead'
 
     def __str__(self) -> str:
+        print("ran custom_exception.py QSyntaxError __str__")
         return self.PRINT_Q_ERROR()
 
     def __repr__(self) -> str:
+        print("ran custom_exception.py QSyntaxError __repr__")
         return self.PRINT_Q_ERROR()
 
 
@@ -53,6 +57,7 @@ class HTTP_ERROR_API(ApiException):
         http_error: Union[ServiceException, ApiException],
         message: str = "HTTP ERROR",
     ) -> None:
+        print("ran custom_exception.py HTTP_ERROR_API __init__")
         self.message = message
         if http_error.body:
             if http_error.headers.get("content-type") == "text/html":
@@ -77,6 +82,7 @@ class HTTP_ERROR_API(ApiException):
         super().__init__(reason=self.message)
 
     def PRINT_Q_ERROR(self) -> str:
+        print("ran custom_exception.py HTTP_ERROR_API PRINT_Q_ERROR")
         return f"""
                 {self.message}
                 Http Status: {self.statusCode}
@@ -84,14 +90,17 @@ class HTTP_ERROR_API(ApiException):
             """
 
     def __str__(self) -> str:
+        print("ran custom_exception.py HTTP_ERROR_API __str__")
         return self.PRINT_Q_ERROR()
 
     def __repr__(self) -> str:
+        print("ran custom_exception.py HTTP_ERROR_API __repr__")
         return self.PRINT_Q_ERROR()
 
 
 class HTTP_ERROR_SERVICE(HTTP_ERROR_API):
     def __init__(self, http_error: ServiceException) -> None:
+        print("ran custom_exception.py HTTP_ERROR_SERVICE __init__")
         super().__init__(http_error=http_error)
 
 

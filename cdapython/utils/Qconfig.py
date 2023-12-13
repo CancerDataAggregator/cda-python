@@ -26,6 +26,7 @@ class Qconfig:
             show_sql (bool, optional): _description_. Defaults to False.
             verbose (Optional[bool], optional): _description_. Defaults to None.
         """
+        print("ran Qconfig.py __init__")
         self.host: str = Constants.cda_api_url if host is None else host
         self.table: str = Constants.default_table if table is None else table
         self.version: str = Constants.table_version if version is None else version
@@ -41,4 +42,5 @@ class Qconfig:
         Returns:
             Qconfig: _description_
         """
+        print("ran Qconfig.py copy_config")
         return copy(self)

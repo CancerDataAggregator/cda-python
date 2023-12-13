@@ -55,6 +55,7 @@ class Result(BaseResult):
         show_sql: bool,
         format_type: str = "json",
     ) -> None:
+        print("ran result.py __init__")
         self._api_response: PagedResponseData = api_response
         self._result: List[ResultTypes] = self._api_response.result
         self._offset: int = offset
@@ -76,6 +77,7 @@ class Result(BaseResult):
         # add a if check to query output for counts to hide sql
 
     def _repr_value(self, show_value: Optional[bool]) -> str:
+        print("ran result.py _repr_value")
         return f"""
             {"Query:"+self.sql if show_value is True else ""  }
             Offset: {self._offset}
@@ -85,21 +87,27 @@ class Result(BaseResult):
             """
 
     def __repr__(self) -> str:
+        print("ran result.py __repr__")
         return self._repr_value(show_value=self.show_sql)
 
     def __str__(self) -> str:
+        print("ran result.py __str__")
         return self._repr_value(show_value=self.show_sql)
 
     def __dict__(self) -> Dict[str, Any]:  # type: ignore
+        print("ran result.py __dict__")
         return dict(ChainMap(*self._result))
 
     def __eq__(self, __other: object) -> Union[Any, Literal[False]]:
+        print("ran result.py __eq__")
         return isinstance(__other, Result) and self._result == __other._result
 
     def __hash__(self) -> int:
+        print("ran result.py __hash__")
         return hash(tuple(self._result))
 
     def __contains__(self, value: str) -> bool:
+        print("ran result.py __contains__")
         exist: bool = False
         for item in self._result:
             if value in item.values():
@@ -115,6 +123,7 @@ class Result(BaseResult):
         Returns:
             str: sql query
         """
+        print("ran result.py sql")
         return str(self._api_response.query_sql)
 
     @property
@@ -124,6 +133,7 @@ class Result(BaseResult):
         Returns:
             int
         """
+        print("ran result.py count")
         return len(self._result)
 
     @property
@@ -134,12 +144,14 @@ class Result(BaseResult):
         Returns:
             int: _description_
         """
+        print("ran result.py total_row_count line 140")
         if self._api_response.total_row_count is None:
             return 0
         return int(self._api_response.total_row_count)
 
     @total_row_count.setter
     def total_row_count(self, value: int):
+        print("ran result.py total_row_count line 154")
         self._api_response.total_row_count = value
 
     @property
@@ -149,4 +161,5 @@ class Result(BaseResult):
         Returns:
             bool: returns a bool value if there is a next page
         """
+        print("ran result.py has_next_page")
         return self._api_response["next_url"] is not None

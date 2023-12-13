@@ -26,6 +26,7 @@ class CdaConfiguration(Configuration):
         verify: Optional[bool] = None,
         verbose: Optional[bool] = None,
     ):
+        print("ran Cda_Configuration.py __init__")
         self.verify = verify
 
         if host is None:
@@ -55,6 +56,7 @@ class CdaConfiguration(Configuration):
         """
         This function was made to overwrite the verfly_ssl prop in the super method
         """
+        print("ran Cda_Configuration.py _check_verify")
         if self.verify is None:
             self.verify_ssl = self._find_ssl_path()
 
@@ -72,6 +74,7 @@ class CdaConfiguration(Configuration):
         Returns:
             bool: [description]
         """
+        print("ran Cda_Configuration.py _find_ssl_path")
         openssl_cafile: str
         openssl_dir: str
         openssl_dir, openssl_cafile = path.split(
@@ -88,6 +91,7 @@ class CdaConfiguration(Configuration):
         return check
 
     def _unverified_http(self) -> None:
+        print("ran Cda_Configuration.py _unverified_http")
         print(
             f"""[bold yellow]
             Unverified HTTPS request is being made to host'{Constants.cda_api_url}'.

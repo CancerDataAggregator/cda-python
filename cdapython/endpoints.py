@@ -11,6 +11,7 @@ def _subject_query(
     table: str,
     async_req: bool,
 ) -> Endpoint:
+    print("ran endpoints.py _subject_query")
     return api_instance.subject_query(
         query, version=version, dry_run=dry_run, table=table, async_req=async_req
     )
@@ -24,6 +25,7 @@ def _subject_files_query(
     table: str,
     async_req: bool,
 ) -> Endpoint:
+    print("ran endpoints.py _subject_files_query")
     return api_instance.subject_files_query(
         query, version=version, dry_run=dry_run, table=table, async_req=async_req
     )
@@ -37,6 +39,7 @@ def _research_subject_query(
     table: str,
     async_req: bool,
 ) -> Endpoint:
+    print("ran endpoints.py _research_subject_query")
     return api_instance.research_subject_query(
         query, version=version, dry_run=dry_run, table=table, async_req=async_req
     )
@@ -50,6 +53,7 @@ def _research_files_query(
     table: str,
     async_req: bool,
 ) -> Endpoint:
+    print("ran endpoints.py _research_subject_files_query")
     return api_instance.research_subject_files_query(
         query, version=version, dry_run=dry_run, table=table, async_req=async_req
     )
@@ -63,6 +67,7 @@ def _specimen_query(
     table: str,
     async_req: bool,
 ) -> Endpoint:
+    print("ran endpoints.py _specimen_query")
     return api_instance.specimen_query(
         query, version=version, dry_run=dry_run, table=table, async_req=async_req
     )
@@ -76,6 +81,7 @@ def _specimen_files_query(
     table: str,
     async_req: bool,
 ) -> Endpoint:
+    print("ran endpoints.py _specimen_files_query")
     return api_instance.specimen_files_query(
         query, version=version, dry_run=dry_run, table=table, async_req=async_req
     )
@@ -89,6 +95,7 @@ def _diagnosis_query(
     table: str,
     async_req: bool,
 ) -> Endpoint:
+    print("ran endpoints.py _diagnosis_query")
     return api_instance.diagnosis_query(
         query, version=version, dry_run=dry_run, table=table, async_req=async_req
     )
@@ -102,6 +109,7 @@ def _treatments_query(
     table: str,
     async_req: bool,
 ) -> Endpoint:
+    print("ran endpoints.py _treatments_query")
     return api_instance.treatments_query(
         query, version=version, dry_run=dry_run, table=table, async_req=async_req
     )
@@ -115,6 +123,7 @@ def _boolean_query(
     table: str,
     async_req: bool,
 ) -> Endpoint:
+    print("ran endpoints.py _boolean_query")
     return api_instance.boolean_query(
         query, version=version, dry_run=dry_run, table=table, async_req=async_req
     )
@@ -128,6 +137,7 @@ def _files_query(
     table: str,
     async_req: bool,
 ) -> Endpoint:
+    print("ran endpoints.py _files_query")
     return api_instance.files(
         query, version=version, dry_run=dry_run, table=table, async_req=async_req
     )
@@ -141,6 +151,7 @@ def _counts_query(
     table: str,
     async_req: bool,
 ) -> Endpoint:
+    print("ran endpoints.py _counts_query")
     return api_instance.global_counts(
         query, version=version, dry_run=dry_run, table=table, async_req=async_req
     )
@@ -154,6 +165,7 @@ def _diagnosis_counts_query(
     table: str,
     async_req: bool,
 ) -> Endpoint:
+    print("ran endpoints.py _diagnosis_counts_query")
     return api_instance.diagnosis_counts_query(
         query, version=version, dry_run=dry_run, table=table, async_req=async_req
     )
@@ -167,6 +179,7 @@ def _researchsubject_counts_query(
     table: str,
     async_req: bool,
 ) -> Endpoint:
+    print("ran endpoints.py _researchsubject_counts_query")
     return api_instance.research_subject_counts_query(
         query, version=version, dry_run=dry_run, table=table, async_req=async_req
     )
@@ -180,6 +193,7 @@ def _subject_counts_query(
     table: str,
     async_req: bool,
 ) -> Endpoint:
+    print("ran endpoints.py _subject_counts_query")
     return api_instance.subject_counts_query(
         query, version=version, dry_run=dry_run, table=table, async_req=async_req
     )
@@ -193,6 +207,7 @@ def _specimen_counts_query(
     table: str,
     async_req: bool,
 ) -> Endpoint:
+    print("ran endpoints.py _specimen_counts_query")
     return api_instance.specimen_counts_query(
         query, version=version, dry_run=dry_run, table=table, async_req=async_req
     )
@@ -206,6 +221,7 @@ def _treatment_counts_query(
     table: str,
     async_req: bool,
 ) -> Endpoint:
+    print("ran endpoints.py _treatment_counts_query")
     return api_instance.treatment_counts_query(
         query, version=version, dry_run=dry_run, table=table, async_req=async_req
     )

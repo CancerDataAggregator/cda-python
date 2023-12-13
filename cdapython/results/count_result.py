@@ -25,7 +25,7 @@ class CountResult(Result):
         Returns:
             str: _description_
         """
-
+        print("ran count_result.py _repr_value")
         result: Union[Series, DataFrame, CountResult] = self[0]
         html_string: str = ""
         count_string: str = ""
@@ -91,6 +91,7 @@ class CountResult(Result):
             return ""
 
     def isnotebook(self) -> bool:
+        print("ran count_result.py isnotebook")
         try:
             shell: str = get_ipython().__class__.__name__
             if shell == "ZMQInteractiveShell":

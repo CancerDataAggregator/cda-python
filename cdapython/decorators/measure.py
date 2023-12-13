@@ -20,15 +20,18 @@ class Measure:
     """
 
     def __init__(self, verbose: bool = False) -> None:
+        print("ran measure.py __init__")
         self.kwargs: Measure_Type = {"verbose": verbose}
         self.result: Union[Any, None]
         self.verbose_default: bool = verbose
 
     def __call__(self, func: F) -> FunctionAny[F]:
+        print("ran measure.py __call__")
         self.result = None
 
         @wraps(func)
         def wrapper(*args: Tuple[Any], **kwargs: Measure_Type) -> FunctionAny[F]:
+            print("ran measure.py wrapper")
             start_time = int(round(time() * 1000))
             self.kwargs = kwargs
             verbose = self.verbose_default
@@ -54,4 +57,5 @@ class Measure:
         return wrapper
 
     def __str__(self) -> str:
+        print("ran measure.py __str__")
         return self.__class__.__name__

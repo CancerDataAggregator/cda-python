@@ -15,10 +15,12 @@ if TYPE_CHECKING:
 class ResearchSubjectFileCount(ResearchSubjectFiles):
     @property
     def file(self) -> "Q":
+        print("ran research_subject/file_count.py file")
         raise NotImplementedError
 
     @property
     def count(self) -> "Q":
+        print("ran research_subject/file_count.py count")
         raise NotImplementedError
 
     def _call_endpoint(
@@ -31,6 +33,7 @@ class ResearchSubjectFileCount(ResearchSubjectFiles):
         include_total_count: bool,
         show_counts: bool,
     ) -> QueryResponseData:
+        print("ran research_subject/file_count.py _call_endpoint")
         return api_instance.research_subject_file_counts_query(
             query=self.query,
             dry_run=dry_run,
@@ -47,6 +50,7 @@ class ResearchSubjectFileCount(ResearchSubjectFiles):
         q_object: "Q",
         format_type: str = "json",
     ) -> Result:
+        print("ran research_subject/file_count.py _build_result_object")
         return CountResult(
             api_response=api_response,
             offset=offset,
@@ -59,4 +63,5 @@ class ResearchSubjectFileCount(ResearchSubjectFiles):
     class Factory(AbstractFactory):
         @staticmethod
         def create(q_object: "Q") -> "ResearchSubjectFileCount":
+            print("ran research_subject/file_count.py create")
             return ResearchSubjectFileCount(q_object.query)
