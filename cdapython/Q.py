@@ -190,7 +190,7 @@ class Q:
             number (int): _description_
         Returns: None
         """
-        print("ran Q.py Q _set_system)
+        print("ran Q.py Q _set_system")
         self._system = system
 
     def _get_system(self) -> str:
