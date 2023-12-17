@@ -1,3 +1,5 @@
+print( "INITIALIZATION TRACE: Loading /results/__init__.py" )
+
 from cdapython.results.factories import COLLECT_RESULT
 from cdapython.results.factories.result_factory import ResultFactory
 

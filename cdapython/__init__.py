@@ -3,6 +3,8 @@ cdapython is a library used to interact with the machine generated CDA Python Cl
 syntactic sugar to make it more pleasant to query the CDA.
 """
 
+print( "INITIALIZATION TRACE: Loading /__init__.py" )
+
 from typing import Any
 
 from rich.console import Console

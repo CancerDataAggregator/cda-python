@@ -1,3 +1,5 @@
+print( "INITIALIZATION TRACE: Loading /factories/specimen/__init__.py" )
+
 from cdapython.factories.specimen.count import SpecimenCount
 from cdapython.factories.specimen.file import SpecimenFiles
 from cdapython.factories.specimen.file_count import SpecimenFileCount
