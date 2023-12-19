@@ -182,6 +182,7 @@ class Q:
             self.query.node_type = _op
             self.query.l = _l  # noqa: E741
             self.query.r = _r  # noqa: E741
+        print("END: Q.py Q __init__")
 
     def _set_system(self, system: str):
         """
@@ -618,6 +619,7 @@ class Q:
     def bool_query(self) -> Q:
         print("ran Q.py Q bool_query")
         return QFactory.create_entity(BOOLEAN_QUERY, self)
+        print("END: Q.py Q bool_query")
 
     def _call_endpoint(
         self,
