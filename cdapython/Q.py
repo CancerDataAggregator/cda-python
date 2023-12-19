@@ -300,6 +300,8 @@ class Q:
         config.table = project
         return self.__class__(self.query, config=config)
 
+    # The DEFINITION of this function has the side effect of calling Qconfig() when Q.py is imported. This is officially insane.
+
     def set_config(self, config: Qconfig = Qconfig()) -> Q:
         """
         This is used to set the config
