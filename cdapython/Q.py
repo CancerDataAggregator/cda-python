@@ -676,14 +676,9 @@ class Q:
             format_type=format_type,
         )
 
-    # This is incorrect Python decorator syntax. The way this is written has
-    # the side effect of calling the Measure object's constructor, instead of
-    # just declaring a wrapper relationship without executing code (which is
-    # all it's supposed to do).
+    # This isn't a regular decorator; it's a callable function that RETURNS a decorator.
     # 
-    # Unfortunately, downstream code currently depends on this constructor
-    # having run itself before anything executes, so this is yet another instance
-    # of an impossible-to-find hidden initializer in this system
+    # See https://stackoverflow.com/questions/35572663/using-python-decorator-with-or-without-parentheses
 
     @Measure(verbose=True)
     def run(
