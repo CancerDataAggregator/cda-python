@@ -62,11 +62,17 @@ while True:
         help()
         continue
     if text == "col()":
-        print(columns().df_to_table())
+        if setServer is None:
+            print(columns())
+        else:
+            print(columns(host=setServer).df_to_table())
         continue
     if text == "unique()":
         value = input("Enter term ")
-        print(unique_terms(value).df_to_table())
+        if setServer is None:
+            print(unique_terms())
+        else:
+            print(unique_terms(value, host=setServer).df_to_table())
         continue
     if text == "exit()" or text == "exit":
         break
@@ -77,7 +83,7 @@ while True:
         setServer = console.input("Enter your server ")
         continue
     if text == "table()":
-        setServer = console.input("Enter your table ")
+        setTable = console.input("Enter your table ")
     if text == "DataFrame()":
         setDataFrame = True
         continue
