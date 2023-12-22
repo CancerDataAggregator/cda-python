@@ -12,7 +12,8 @@ class Constants:
     _VERSION: str = "2023.9.12"
     _DATABASETABLE_VERSION: str = "all_merged_subjects_v3_4_final"
     _DATABASETABLE: str = "broad-dsde-prod.cda_prod"
-    _CDA_API_URL_ENV: str = "https://cancerdata.ah-cda6.bee.envs-terra.bio"
+    _CDA_API_URL_ENV: str = "http://localhost:8080/"
+    #_CDA_API_URL_ENV: str = "https://cancerdata.ah-cda6.bee.envs-terra.bio"
     _DATABASETABLE_FOR_FILES: str = "broad-dsde-prod.cda_prod"
     _DATABASETABLE_VERSION_FOR_FILES: str = "all_merged_files_v3_4_final"
 

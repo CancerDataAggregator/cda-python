@@ -619,7 +619,6 @@ class Q:
     def bool_query(self) -> Q:
         print("ran Q.py Q bool_query")
         return QFactory.create_entity(BOOLEAN_QUERY, self)
-        print("END: Q.py Q bool_query")
 
     def _call_endpoint(
         self,
