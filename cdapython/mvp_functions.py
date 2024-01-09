@@ -21,16 +21,16 @@ from cdapython.results.page_result import Paged_Result #, get_query_result
 #from cdapython.utils.Cda_Configuration import CdaConfiguration
 
 def new_unique_terms(
-    col_name: str,
-    system: str = "",
-    offset: int = 0,
-    host: Optional[str] = None,
-    verify: Optional[bool] = None,
-    async_req: Optional[bool] = True,
-    show_sql: bool = False,
-    show_counts: bool = False,
-    verbose: bool = True,
-    limit: int = 100,
+    col_name,
+    system = "",
+    offset = 0,
+    host = None,
+    verify = None,
+    async_req = True,
+    show_sql = False,
+    show_counts = False,
+    verbose = True,
+    limit = 100,
 ) -> Paged_Result:
     """
     Show all unique terms for a given column.
@@ -49,8 +49,8 @@ def new_unique_terms(
     Returns:
         Paged_Result
     """
-    # cda_client_obj.select_header_content_type(["text/plain"])
     print("ran mvp_functions.py new_unique_terms")
+
     if system:
         q_object = Q(col_name).unique_terms
         q_object._set_system(system)
