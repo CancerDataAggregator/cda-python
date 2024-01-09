@@ -5,13 +5,42 @@ from cda_client.api.query_api import QueryApi
 
 from cdapython.parsers.where_parser import where_parser
 
-from cdapython.results.page_result import Paged_Result
+from cdapython.results.result import Result
+#from cdapython.results.page_result import Paged_Result
 
 from cdapython.utils.Cda_Configuration import CdaConfiguration
 
 from multiprocessing.pool import ApplyResult
 
 from rich import print
+
+class Paged_Result( Result ):
+
+    def __init__(
+        self,
+        paged_response_data_object,
+        offset,
+        limit,
+        query_api_instance,
+        show_sql,
+        format_type='json'
+    ) -> None:
+        print("ran mvp_functions.py Paged_Result constructor (__init__())")
+        self._api_response = paged_response_data_object
+        self._result = self._api_response.result
+        self._offset = offset
+        self._limit = limit
+        self._api_instance = query_api_instance
+        self._df = None
+
+        super().__init__(
+            api_instance=query_api_instance,
+            api_response=paged_response_data_object,
+            show_sql=show_sql,
+            format_type=format_type,
+            offset=offset,
+            limit=limit,
+        )
 
 def new_unique_terms(
     col_name,
@@ -79,10 +108,10 @@ def new_unique_terms(
         paged_response_data_object = paged_response_data_object.get()
 
     return Paged_Result(
-        api_response=paged_response_data_object,
+        paged_response_data_object=paged_response_data_object,
         offset=offset,
         limit=limit,
-        api_instance=query_api_instance,
+        query_api_instance=query_api_instance,
         show_sql=show_sql,
         q_object=None,
         format_type='json'

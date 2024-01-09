@@ -22,7 +22,6 @@ from cdapython.utils.none_check import none_check
 
 if TYPE_CHECKING:
     from cdapython.Q import Q
-print("GABAGOOL!")
 
 class Paged_Result(Result):
     """
