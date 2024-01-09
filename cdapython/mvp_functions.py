@@ -65,6 +65,18 @@ def new_unique_terms(
         include_count=True
     )
 
+    if isinstance( paged_response_data_object, ApplyResult ):
+        
+        if verbose_arg:
+            
+            print()
+
+        while paged_response_data_object.ready() is False:
+            
+            paged_response_data_object.wait(10000)
+
+        paged_response_data_object = paged_response_data_object.get()
+
     return Paged_Result(
         api_response=paged_response_data_object,
         offset=offset_arg,
