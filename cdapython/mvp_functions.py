@@ -2,7 +2,7 @@
 from cda_client import ApiClient
 from cda_client.api.query_api import QueryApi
 
-from cdapython.Q import Q
+#from cdapython.Q import Q
 
 from cdapython.parsers.where_parser import where_parser
 
