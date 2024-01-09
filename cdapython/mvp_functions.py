@@ -4,6 +4,8 @@ from cda_client.api.query_api import QueryApi
 
 from cdapython.Q import Q
 
+from cdapython.parsers.where_parser import where_parser
+
 from cdapython.results.page_result import Paged_Result
 
 from cdapython.utils.Cda_Configuration import CdaConfiguration
