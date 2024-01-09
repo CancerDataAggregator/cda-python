@@ -10,6 +10,8 @@ from cdapython.results.page_result import Paged_Result
 
 from cdapython.utils.Cda_Configuration import CdaConfiguration
 
+from multiprocessing.pool import ApplyResult
+
 from rich import print
 
 def new_unique_terms(
