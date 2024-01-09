@@ -113,7 +113,6 @@ def new_unique_terms(
         limit=limit,
         query_api_instance=query_api_instance,
         show_sql=show_sql,
-        q_object=None,
         format_type='json'
     )
 
