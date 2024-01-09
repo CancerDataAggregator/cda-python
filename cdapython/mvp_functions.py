@@ -20,7 +20,7 @@ from cdapython.results.page_result import Paged_Result, get_query_result
 from cdapython.results.string_result import StringResult
 from cdapython.utils.Cda_Configuration import CdaConfiguration
 
-def unique_terms_new(
+def new_unique_terms(
     col_name: str,
     system: str = "",
     offset: int = 0,
