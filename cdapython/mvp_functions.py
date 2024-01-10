@@ -1,13 +1,8 @@
-
 from cda_client import ApiClient
-
 from cda_client.api.query_api import QueryApi
 
 from cdapython.parsers.where_parser import where_parser
-
 from cdapython.results.result import Result
-#from cdapython.results.page_result import Paged_Result
-
 from cdapython.utils.Cda_Configuration import CdaConfiguration
 
 from multiprocessing.pool import ApplyResult
