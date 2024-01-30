@@ -68,7 +68,9 @@ def new_unique_terms(
 
     col_name = col_name.strip().replace( '\n', ' ' )
 
-    parsed_query_object = where_parser( col_name, debug=True )
+    parsed_query_object = where_parser( col_name )
+
+    print( f"node_type: {parsed_query_object.node_type}; l: {parsed_query_object.l}; r: {parsed_query_object.r}" )
 
     api_client_instance = ApiClient( configuration=CdaConfiguration( host=host, verify=verify, verbose=verbose ) )
 
