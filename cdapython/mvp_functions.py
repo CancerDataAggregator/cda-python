@@ -72,7 +72,25 @@ def new_unique_terms(
 
     print(type(parsed_query_object))
 
-    print( f"node_type: {parsed_query_object.node_type}" ) #; l: {parsed_query_object.l}; r: {parsed_query_object.r}" )
+    print( f"node_type: {parsed_query_object.node_type}" )
+
+    print( f"value: {parsed_query_object.node_type}" )
+
+    if parsed_query_object.l is not None:
+        
+        print( f"l (node_type, value): ({parsed_query_object.l.node_type}, {parsed_query_object.l.value})" )
+
+    else:
+        
+        print( 'l: null' )
+        
+    if parsed_query_object.r is not None:
+        
+        print( f"r (node_type, value): ({parsed_query_object.r.node_type}, {parsed_query_object.r.value})" )
+
+    else:
+        
+        print( 'r: null' )
 
     api_client_instance = ApiClient( configuration=CdaConfiguration( host=host, verify=verify, verbose=verbose ) )
 
