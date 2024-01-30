@@ -73,7 +73,7 @@ def new_unique_terms(
 
     col_name = re.sub( r'\s+', r'', col_name )
 
-"""
+    """
 # Neither parsing nor a Query object is needed at all in this case.
 # 
 # Earlier imports:
@@ -122,7 +122,7 @@ from cdapython.parsers.where_parser import where_parser
         else:
             
             print( 'r: null' )
-"""
+    """
 
     api_client_instance = ApiClient( configuration=CdaConfiguration( host=host, verify=verify, verbose=verbose ) )
 
