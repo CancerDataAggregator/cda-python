@@ -1,4 +1,5 @@
-from cda_client import ApiClient
+from cda_client.api_client import ApiClient
+from cda_client.model.query import Query
 from cda_client.api.query_api import QueryApi
 
 from cdapython.parsers.where_parser import where_parser
