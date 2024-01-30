@@ -123,7 +123,7 @@ def console_print(*args, **kwargs) -> None:
     note: There is a conditional check for a file.
     if a system or user passes a file to the function It will default back to the original Python print method
     """
-    print("ran cdapython/init_.py.stupid console_print")
+    print("ran cdapython/__init__.py.stupid console_print")
     if "file" in kwargs:
         print(*args)
     else:
@@ -135,7 +135,7 @@ __builtin__.print = console_print
 
 
 def __repr__() -> str:
-    print("ran cdapython/init_.py.stupid __repl__")
+    print("ran cdapython/__init__.py.stupid __repr__")
     return __version__
 
 
