@@ -129,7 +129,6 @@ from cdapython.parsers.where_parser import where_parser
     query_api_instance = QueryApi( api_client_instance )
 
     paged_response_data_object = query_api_instance.unique_values(
-        
         body=col_name,
         system=system,
         count=show_counts,
@@ -148,7 +147,6 @@ from cdapython.parsers.where_parser import where_parser
         paged_response_data_object = paged_response_data_object.get()
 
     return Paged_Result(
-        
         paged_response_data_object=paged_response_data_object,
         offset=offset,
         limit=limit,
