@@ -16,7 +16,7 @@ class Paged_Result( Result ):
         offset,
         limit,
         query_api_instance,
-        show_sql,
+        show_sql=False,
         format_type='json'
     ) -> None:
         print("ran mvp_functions.py Paged_Result constructor (__init__())")
@@ -149,10 +149,10 @@ from cdapython.parsers.where_parser import where_parser
 
     return Paged_Result(
         
-        api_response=paged_response_data_object,
+        paged_response_data_object=paged_response_data_object,
         offset=offset,
         limit=limit,
-        api_instance=query_api_instance,
+        query_api_instance=query_api_instance,
         show_sql=show_sql,
         format_type='json'
     )
