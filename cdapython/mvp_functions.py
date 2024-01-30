@@ -1,10 +1,8 @@
 import re
 
 from cda_client.api_client import ApiClient
-from cda_client.model.query import Query
 from cda_client.api.query_api import QueryApi
 
-from cdapython.parsers.where_parser import where_parser
 from cdapython.results.result import Result
 from cdapython.utils.Cda_Configuration import CdaConfiguration
 
@@ -75,15 +73,31 @@ def new_unique_terms(
 
     col_name = re.sub( r'\s+', r'', col_name )
 
-#    Parsing is not needed at all in this case. Earlier call:
-#    
-#    query_object = where_parser( col_name, debug=debug )
-
+"""
+# Neither parsing nor a Query object is needed at all in this case.
+# 
+# Earlier imports:
+ 
+from cda_client.model.query import Query
+from cdapython.parsers.where_parser import where_parser
+ 
+# Earlier call:
+ 
+    query_object = where_parser( col_name, debug=debug )
+ 
+# ...which produced the same result as:
+ 
     query_object = Query()
 
     query_object.node_type = 'quoted'
 
     query_object.value = col_name
+ 
+# ...and then below, the `body` argument to `query_api_instance.unique_values()` would read
+ 
+        body=query_object.value 
+ 
+# Some helpful debugging traces if one reactivates the Query route for some reason:
 
     if debug:
         
@@ -108,17 +122,15 @@ def new_unique_terms(
         else:
             
             print( 'r: null' )
+"""
 
     api_client_instance = ApiClient( configuration=CdaConfiguration( host=host, verify=verify, verbose=verbose ) )
 
     query_api_instance = QueryApi( api_client_instance )
 
-    if verbose:
-        
-        print( 'Fetching results from database...', end='\n\n' )
-
     paged_response_data_object = query_api_instance.unique_values(
-        body=query_object.value,
+        
+        body=col_name,
         system=system,
         count=show_counts,
         async_req=async_req,
@@ -129,10 +141,6 @@ def new_unique_terms(
 
     if isinstance( paged_response_data_object, ApplyResult ):
         
-        if verbose:
-            
-            print()
-
         while paged_response_data_object.ready() is False:
             
             paged_response_data_object.wait(10000)
@@ -140,10 +148,11 @@ def new_unique_terms(
         paged_response_data_object = paged_response_data_object.get()
 
     return Paged_Result(
-        paged_response_data_object=paged_response_data_object,
+        
+        api_response=paged_response_data_object,
         offset=offset,
         limit=limit,
-        query_api_instance=query_api_instance,
+        api_instance=query_api_instance,
         show_sql=show_sql,
         format_type='json'
     )
