@@ -76,7 +76,7 @@ def new_unique_terms(
 
     print( f"value: {parsed_query_object.node_type}" )
 
-    if l in parsed_query_object:
+    if 'l' in parsed_query_object:
         
         print( f"l (node_type, value): ({parsed_query_object.l.node_type}, {parsed_query_object.l.value})" )
 
@@ -84,7 +84,7 @@ def new_unique_terms(
         
         print( 'l: null' )
         
-    if r in parsed_query_object:
+    if 'r' in parsed_query_object:
         
         print( f"r (node_type, value): ({parsed_query_object.r.node_type}, {parsed_query_object.r.value})" )
 
