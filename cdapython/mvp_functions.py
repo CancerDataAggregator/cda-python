@@ -68,31 +68,37 @@ def new_unique_terms(
 
     col_name = col_name.strip().replace( '\n', ' ' )
 
-    if verbose:
+#    if verbose:
+#        
+#        query_object = where_parser( col_name, debug=True )
+#
+#    else:
+#        
+#        query_object = where_parser( col_name )
+
+    query_object = Query()
+
+    query_object.node_type = 'quoted'
+
+    query_object.value = col_name
+
+    print( type( query_object ) )
+
+    print( f"node_type: {query_object.node_type}" )
+
+    print( f"value: {query_object.value}" )
+
+    if 'l' in query_object:
         
-        parsed_query_object = where_parser( col_name, debug=True )
-
-    else:
-        
-        parsed_query_object = where_parser( col_name )
-
-    print( type( parsed_query_object ) )
-
-    print( f"node_type: {parsed_query_object.node_type}" )
-
-    print( f"value: {parsed_query_object.value}" )
-
-    if 'l' in parsed_query_object:
-        
-        print( f"l (node_type, value): ({parsed_query_object.l.node_type}, {parsed_query_object.l.value})" )
+        print( f"l (node_type, value): ({query_object.l.node_type}, {query_object.l.value})" )
 
     else:
         
         print( 'l: null' )
         
-    if 'r' in parsed_query_object:
+    if 'r' in query_object:
         
-        print( f"r (node_type, value): ({parsed_query_object.r.node_type}, {parsed_query_object.r.value})" )
+        print( f"r (node_type, value): ({query_object.r.node_type}, {query_object.r.value})" )
 
     else:
         
@@ -107,7 +113,7 @@ def new_unique_terms(
         print( 'Fetching results from database...', end='\n\n' )
 
     paged_response_data_object = query_api_instance.unique_values(
-        body=parsed_query_object.value,
+        body=query_object.value,
         system=system,
         count=show_counts,
         async_req=async_req,
