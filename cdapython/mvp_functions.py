@@ -70,7 +70,9 @@ def new_unique_terms(
 
     parsed_query_object = where_parser( col_name )
 
-    print( f"node_type: {parsed_query_object.node_type}; l: {parsed_query_object.l}; r: {parsed_query_object.r}" )
+    print(type(parsed_query_object))
+
+    print( f"node_type: {parsed_query_object.node_type}" ) #; l: {parsed_query_object.l}; r: {parsed_query_object.r}" )
 
     api_client_instance = ApiClient( configuration=CdaConfiguration( host=host, verify=verify, verbose=verbose ) )
 
