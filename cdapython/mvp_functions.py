@@ -68,13 +68,19 @@ def new_unique_terms(
 
     col_name = col_name.strip().replace( '\n', ' ' )
 
-    parsed_query_object = where_parser( col_name )
+    if verbose:
+        
+        parsed_query_object = where_parser( col_name, debug=True )
 
-    print(type(parsed_query_object))
+    else:
+        
+        parsed_query_object = where_parser( col_name )
+
+    print( type( parsed_query_object ) )
 
     print( f"node_type: {parsed_query_object.node_type}" )
 
-    print( f"value: {parsed_query_object.node_type}" )
+    print( f"value: {parsed_query_object.value}" )
 
     if 'l' in parsed_query_object:
         
