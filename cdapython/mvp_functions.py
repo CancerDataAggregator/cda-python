@@ -7,7 +7,7 @@ from cdapython.utils.Cda_Configuration import CdaConfiguration
 
 from multiprocessing.pool import ApplyResult
 
-from rich import print
+#from rich import print
 
 class Paged_Result( Result ):
 
