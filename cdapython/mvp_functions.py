@@ -7,8 +7,6 @@ from cdapython.utils.Cda_Configuration import CdaConfiguration
 
 from multiprocessing.pool import ApplyResult
 
-#from rich import print
-
 class Paged_Result( Result ):
 
     def __init__(
@@ -64,7 +62,7 @@ def new_unique_terms(
     Returns:
         Paged_Result
     """
-    print('ran mvp_functions.py new_unique_terms')
+    print( f"ran mvp_functions.py new_unique_terms( col_name={col_name}, system={system}, offset={offset}, async_req={async_req}, show_sql={show_sql}, show_counts={show_counts}, verbose={verbose}, verify={verify}, limit={limit} )" )
 
     host = 'http://localhost:8080/'
 
