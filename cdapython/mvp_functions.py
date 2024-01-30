@@ -39,12 +39,12 @@ def new_unique_terms(
     col_name,
     system = '',
     offset = 0,
-    async_req = True,
+    limit = 100,
     show_sql = False,
     show_counts = False,
     verbose = True,
+    async_req = True,
     verify = False,
-    limit = 100,
 ) -> Paged_Result:
     """
     Show all unique terms for a given column.
@@ -52,23 +52,23 @@ def new_unique_terms(
         col_name (str): This is the default way to search for a unique term from the CDA service API.
         system (str, optional): his is an optional parameter used to filter the search values by data center, such as 'GDC', 'IDC', 'PDC', or 'CDS'. Defaults to ''.
         offset (int, optional): The number of entries to skip. Defaults to 0.
-        async_req (Optional[bool], optional): Execute request asynchronously. Defaults to True.
+        limit (int, optional): the numbers of entries to return per page of data. Defaults to 100.
         show_sql (bool, optional): This will show the sql returned from the server. Defaults to False.
         show_counts (bool, optional): Show the number of occurrences for each value. Defaults to False.
         verbose (bool, optional): This will hide or show values that are automatic printed when Q runs. Defaults to True.
+        async_req (Optional[bool], optional): Execute request asynchronously. Defaults to True.
         verify (Optional[bool], optional): This will send a request to the cda server without verifying the SSL Cert Verification. Defaults to None.
-        limit (int, optional): the numbers of entries to return per page of data. Defaults to 100.
 
     Returns:
         Paged_Result
     """
-    print( f"ran mvp_functions.py new_unique_terms( col_name={col_name}, system={system}, offset={offset}, async_req={async_req}, show_sql={show_sql}, show_counts={show_counts}, verbose={verbose}, verify={verify}, limit={limit} )" )
+    print( f"ran mvp_functions.py new_unique_terms( col_name={col_name}, system={system}, offset={offset}, limit={limit}, show_sql={show_sql}, show_counts={show_counts}, verbose={verbose}, async_req={async_req}, verify={verify} )" )
 
     host = 'http://localhost:8080/'
 
     col_name = col_name.strip().replace( '\n', ' ' )
 
-    parsed_query_object = where_parser( col_name )
+    parsed_query_object = where_parser( col_name, debug=True )
 
     api_client_instance = ApiClient( configuration=CdaConfiguration( host=host, verify=verify, verbose=verbose ) )
 
