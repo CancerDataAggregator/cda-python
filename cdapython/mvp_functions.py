@@ -1,3 +1,5 @@
+import re
+
 from cda_client.api_client import ApiClient
 from cda_client.model.query import Query
 from cda_client.api.query_api import QueryApi
@@ -44,6 +46,7 @@ def new_unique_terms(
     show_sql = False,
     show_counts = False,
     verbose = True,
+    debug = False,
     async_req = True,
     verify = False,
 ) -> Paged_Result:
@@ -57,25 +60,24 @@ def new_unique_terms(
         show_sql (bool, optional): This will show the sql returned from the server. Defaults to False.
         show_counts (bool, optional): Show the number of occurrences for each value. Defaults to False.
         verbose (bool, optional): This will hide or show values that are automatic printed when Q runs. Defaults to True.
+        debug (bool, optional): This will hide or show debug messages, and will pass itself on to downstream code as appropriate. Defaults to False.
         async_req (Optional[bool], optional): Execute request asynchronously. Defaults to True.
         verify (Optional[bool], optional): This will send a request to the cda server without verifying the SSL Cert Verification. Defaults to None.
 
     Returns:
         Paged_Result
     """
-    print( f"ran mvp_functions.py new_unique_terms( col_name={col_name}, system={system}, offset={offset}, limit={limit}, show_sql={show_sql}, show_counts={show_counts}, verbose={verbose}, async_req={async_req}, verify={verify} )" )
+    print( f"ran mvp_functions.py new_unique_terms( col_name={col_name}, system={system}, offset={offset}, limit={limit}, show_sql={show_sql}, show_counts={show_counts}, verbose={verbose}, debug={debug}, async_req={async_req}, verify={verify} )" )
 
     host = 'http://localhost:8080/'
 
-    col_name = col_name.strip().replace( '\n', ' ' )
+    # If there's whitespace in our column name, remove it before it does any damage.
 
-#    if verbose:
-#        
-#        query_object = where_parser( col_name, debug=True )
-#
-#    else:
-#        
-#        query_object = where_parser( col_name )
+    col_name = re.sub( r'\s+', r'', col_name )
+
+#    Parsing is not needed at all in this case. Earlier call:
+#    
+#    query_object = where_parser( col_name, debug=debug )
 
     query_object = Query()
 
@@ -83,27 +85,29 @@ def new_unique_terms(
 
     query_object.value = col_name
 
-    print( type( query_object ) )
-
-    print( f"node_type: {query_object.node_type}" )
-
-    print( f"value: {query_object.value}" )
-
-    if 'l' in query_object:
+    if debug:
         
-        print( f"l (node_type, value): ({query_object.l.node_type}, {query_object.l.value})" )
+        print( type( query_object ) )
 
-    else:
-        
-        print( 'l: null' )
-        
-    if 'r' in query_object:
-        
-        print( f"r (node_type, value): ({query_object.r.node_type}, {query_object.r.value})" )
+        print( f"node_type: {query_object.node_type}" )
 
-    else:
+        print( f"value: {query_object.value}" )
+
+        if 'l' in query_object:
+            
+            print( f"l (node_type, value): ({query_object.l.node_type}, {query_object.l.value})" )
+
+        else:
+            
+            print( 'l: null' )
         
-        print( 'r: null' )
+        if 'r' in query_object:
+            
+            print( f"r (node_type, value): ({query_object.r.node_type}, {query_object.r.value})" )
+
+        else:
+            
+            print( 'r: null' )
 
     api_client_instance = ApiClient( configuration=CdaConfiguration( host=host, verify=verify, verbose=verbose ) )
 
