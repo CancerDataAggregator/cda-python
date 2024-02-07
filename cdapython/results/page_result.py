@@ -135,7 +135,7 @@ class Paged_Result(Result):
         self,
         output: str = "",
         limit: int = 0,
-        show_bar: bool = True,
+        show_bar: bool = False,
         to_df: bool = False,
         to_list: bool = False,
         show_counts: bool = False,
@@ -145,7 +145,7 @@ class Paged_Result(Result):
         Args:
             output (str, optional): _description_. Defaults to "".
             limit (int, optional): _description_. Defaults to 0.
-            show_bar (bool, optional): _description_. Defaults to True.
+            show_bar (bool, optional): _description_. Defaults to False.
             to_df (bool, optional): _description_. Defaults to False.
             to_list (bool, optional): _description_. Defaults to False.
             show_counts (bool, optional): Show the number of occurrences for each value. Defaults to False.
