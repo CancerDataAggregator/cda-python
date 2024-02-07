@@ -190,10 +190,9 @@ class Paged_Result(Result):
         )
 
         for i in iterator:
+            print("BADING!")
             if isinstance(i, Result):
                 collect_result.extend_result(result=i)
-            else:
-                print("BADING!")
 
         return self.return_result(
             result=collect_result, output=output, to_df=to_df, to_list=to_list
