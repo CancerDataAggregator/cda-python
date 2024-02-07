@@ -191,6 +191,7 @@ class Paged_Result(Result):
 
         for i in iterator:
             if isinstance(i, Result):
+                print("BADING!")
                 collect_result.extend_result(result=i)
 
         return self.return_result(
