@@ -33,7 +33,6 @@ class Subject(Entity):
         show_counts: bool,
     ) -> Endpoint:
         print("ran subject/subject.py _call_endpoint")
-        print( self.to_json() )
         return api_instance.subject_query(
             query=self.query,
             dry_run=dry_run,
