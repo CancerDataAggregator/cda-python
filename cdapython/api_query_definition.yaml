@@ -1,0 +1,73 @@
+    Query:
+      type: object
+      description: |
+        A Query consists of a node type, a value and l and r Query objects. A Query must
+        have a node type, but other fields are optional depending on the node type. See
+        the description of `node_type`for more information.
+
+        For example, the query "age < 50" is expressed as:
+
+        ```
+        {
+          "node_type": "<",
+          "l": {
+            "node_type": "column",
+            "value": "age"
+          },
+          "r": {
+            "node_type": "unquoted",
+            "value": 50
+          }
+        }
+        ```
+
+      properties:
+        node_type:
+          type: string
+          enum:
+            [
+              column,
+              quoted,
+              unquoted,
+              ">=",
+              "<=",
+              "<",
+              ">",
+              "=",
+              "!=",
+              AND,
+              OR,
+              NOT,
+              SUBQUERY,
+              WHERE,
+              IN,
+              SELECTVALUES,
+              SELECT,
+              LIKE,
+              IS,
+              "IS NOT",
+              "NOT IN",
+              "NOT LIKE",
+              ORDERBY,
+              ORDERBYVALUES,
+              "+",
+              "-",
+              "/",
+              "*"
+            ]
+          description: >
+            Query contents and behavior depends on `node_type`:
+             * `column` - column name is in `value`
+             * `quoted` - value that needs quotes is in `value`
+             * `unquoted` - value that doesn't need quotes is in `value`
+             * `>=`, `<=`, `<`, `>`, `=`, `!=`, `AND`, `OR` - `l` and `r` are used to create the expression `l` op `r`
+             * `SUBQUERY` - `l` is run as a query on the results of query `r`
+             * `NOT` - `l` is used to create the expression `NOT l`
+        value:
+          type: string
+        l:
+          $ref: "#/components/schemas/Query"
+        r:
+          $ref: "#/components/schemas/Query"
+
+
