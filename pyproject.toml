@@ -11,7 +11,7 @@ authors = [ { name = 'cdadevs' } ]
 maintainers = [ { name = 'cdadevs' } ]
 description = "Python library for exploring CDA data"
 readme = "README.md"
-license = "Apache License 2.0"
+license = { text = "Apache License 2.0" }
 dependencies = [
     "wheel >= 0.38.4",
     "urllib3 >= 1.26.8",
