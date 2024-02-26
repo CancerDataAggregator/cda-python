@@ -27,7 +27,6 @@ dependencies = [
     "fastjsonschema >= 2.16.2",
     "jupyter-core >= 4.12",
     "pyzmq >= 25",
-#    'cda-client @ git+ssh://git@github.com/CancerDataAggregator/cda-service-python-client.git@code_review_testing',
     'cda-client @ git+https://github.com/CancerDataAggregator/cda-service-python-client.git@code_review_testing',
     "lark == 1.*",
     "regex == 2022.*",
@@ -43,6 +42,9 @@ Repository = "https://github.com/CancerDataAggregator/cda-python"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["cdapython*"]
+
+[tool.setuptools.package-data]
+"*" = [ ".env", ".lark" ]
 
 [tool.poetry]
 name = "cdapython"
