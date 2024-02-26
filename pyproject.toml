@@ -44,7 +44,7 @@ where = ["."]
 include = ["cdapython*"]
 
 [tool.setuptools.package-data]
-"*" = [ ".env", ".lark" ]
+"" = [ ".env", ".lark" ]
 
 [tool.poetry]
 name = "cdapython"
