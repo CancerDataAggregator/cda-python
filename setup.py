@@ -43,6 +43,7 @@ for i in dependency_list[1:]:
     else:
         i = i.replace("=", "==").replace('"', "").replace("^", "")
         i = f"{i}"
+        print(i)
         setup_list.append(i)
 
 
