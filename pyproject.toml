@@ -28,7 +28,7 @@ dependencies = [
     "jupyter-core >= 4.12",
     "pyzmq >= 25",
 #    'cda-client @ git+ssh://git@github.com/CancerDataAggregator/cda-service-python-client.git@code_review_testing',
-    'cda-client @ git+ssh://git@github.com/CancerDataAggregator/cda-service-python-client.git',
+    'cda-client @ git+https://github.com/CancerDataAggregator/cda-service-python-client.git@code_review_testing',
     "lark == 1.*",
     "regex == 2022.*",
     "tornado == 6.*",
