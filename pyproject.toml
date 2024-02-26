@@ -8,7 +8,7 @@ name = "cdapython"
 version = "2023.9.12"
 requires-python = ">=3.8"
 authors = [ { name = 'cdadevs' } ]
-maintainers = [ { name = 'cdadevs' } ],
+maintainers = [ { name = 'cdadevs' } ]
 description = "Python library for exploring CDA data"
 readme = "README.md"
 license = "Apache License 2.0"
