@@ -18,7 +18,7 @@ dependencies = [
     "typing-extensions >= 4.4",
     "rich >= 13.2.0",
     "matplotlib >= 3.6.2",
-    "pandas = >= 1.5.3",
+    "pandas >= 1.5.3",
     "python-dotenv >= 0.18.0",
     "itables >= 1.1.2",
     "nbconvert >= 6.5.1",
