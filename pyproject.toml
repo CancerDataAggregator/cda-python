@@ -40,8 +40,9 @@ dependencies = [
 [project.urls]
 Repository = "https://github.com/CancerDataAggregator/cda-python"
 
-[tool.setuptools]
-packages = ["cdapython"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cdapython*"]
 
 [tool.poetry]
 name = "cdapython"
