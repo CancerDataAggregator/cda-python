@@ -169,7 +169,7 @@ class Q:
                 )
                 self.query = query_parsed
                 # DEBUG: output query being sent to API
-                self.to_json()
+                print( self.to_json() )
         elif len(args) != 3:
             raise RuntimeError(
                 "Require one or three arguments. Please see documentation."
