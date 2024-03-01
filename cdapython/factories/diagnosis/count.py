@@ -36,6 +36,11 @@ class DiagnosisCount(Diagnosis):
         show_counts: bool,
     ) -> Endpoint:
         print("ran diagnosis/count.py _call_endpoint")
+
+        # DEBUG: Output query being sent to API.
+
+        print( self.to_json() )
+
         return api_instance.diagnosis_counts_query(
             query=self.query,
             dry_run=dry_run,
