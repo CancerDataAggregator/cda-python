@@ -746,6 +746,7 @@ class Q:
 
         if include is not None:
             self.query = Q.SELECT(self, fields=include).query
+            self.query.to_json()
 
         if self.limit is not None:
             limit = self._get_limit()
