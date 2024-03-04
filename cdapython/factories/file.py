@@ -29,6 +29,11 @@ class File(Entity):
         show_counts: bool,
     ) -> Endpoint:
         print("ran factories/file.py _call_endpoint")
+
+        # DEBUG: Output query being sent to API.
+
+        print( self.to_json() )
+
         return api_instance.files(
             query=self.query,
             dry_run=dry_run,

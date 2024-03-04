@@ -33,6 +33,11 @@ class ResearchSubject(Entity):
         show_counts: bool,
     ) -> Endpoint:
         print("ran research_subject/research_subject.py _call_endpoint")
+
+        # DEBUG: Output query being sent to API.
+
+        print( self.to_json() )
+
         return api_instance.research_subject_query(
             query=self.query,
             dry_run=dry_run,
