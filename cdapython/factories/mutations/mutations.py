@@ -49,6 +49,11 @@ class Mutations(Entity):
         Returns:
             Endpoint: _description_
         """
+
+        # DEBUG: Output query being sent to API.
+
+        print( self.to_json() )
+
         print("ran mutations/mutations.py _call_endpoint")
         return api_instance.mutation_query(
             query=self.query,
